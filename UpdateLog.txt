@@ -1,0 +1,61 @@
+Version 0.1
+-----------
+
+Summary
+-------
+Main goal is to set up the player; 
+	player movement (running, jumping, sprint),
+	simple camera script that follows the player,
+			
+Future tasks;
+	multi-player
+	player attacking (shooting),
+	player dying and respawning
+	make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+
+
+TODO Tasks | 1 = done, 0 = not done
+-----------------------------------
+
+Importing assets
+----------------
+1 Player sprites with animations
+1 Gun sprites (integrated with player so don't need seperate)
+1 Gun shot projectiles with animations
+1 Gun shot blast sprays with animations
+
+UnityEditor
+-----------
+1 Set up static ground player can run on for testing
+1 Set up a player object, with Rigidbody2D, CapsuleCollider2D, PlayerMovement, Animation Controller, PlayerAnimations
+
+1 Add Tags: Platform, Enemy, Ground-Static
+1 Add Sorting Layers: UI, Foreground, Ground, Player, Enemy, Platform, Middleground
+1 Add Layers: Player, Ground-static, Platform
+
+Animations
+----------
+1 Idle
+1 Run
+1 Sprint
+1 Jump
+1 Land
+1 Die
+
+Animator
+--------
+1 Idle to Run and back
+1 Run to Sprint and back
+1 Idle to Sprint and back
+1 Any State to Jump
+1 Jump to Land and back (back prevents from being stuck in a Land loop if not detecting ground after jump)
+1 Land to Run
+1 Land to Idle
+1 Land to Sprint
+
+
+Implementing scripts
+--------------------
+1 PlayerMovement, which allows the player to run and sprint, using branched, branchless, hybrid branched/brancless methods (hybrid is executed fastest)
+1 PlayerAnimations, giving the player animations, via use of animation data that is received from PlayerMovement, through GetAnimationData(), flip sprite when moving in opposite direction
+1 SimpleCameraFollow, makes the camera follow the player, when the camera child of the player is detached from player, so can see player facing left and right

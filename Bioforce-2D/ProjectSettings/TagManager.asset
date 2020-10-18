@@ -3,7 +3,10 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Platform
+  - Enemy
+  - Ground-static
   layers:
   - Default
   - TransparentFX
@@ -13,9 +16,9 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
+  - Player
+  - Ground-Static
+  - Platform
   - 
   - 
   - 
@@ -38,6 +41,27 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Middleground
+    uniqueID: 2889790771
+    locked: 0
+  - name: Platform
+    uniqueID: 580416163
+    locked: 0
+  - name: Enemy
+    uniqueID: 1405739067
+    locked: 0
+  - name: Player
+    uniqueID: 4044317899
+    locked: 0
+  - name: Ground
+    uniqueID: 1785736805
+    locked: 0
+  - name: Foreground
+    uniqueID: 795728489
+    locked: 0
+  - name: UI
+    uniqueID: 23045771
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
