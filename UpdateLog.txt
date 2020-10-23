@@ -1,3 +1,65 @@
+===============================================================================================================================
+Version 0.2
+-----------
+
+Summary
+-------
+Main goal is to set up multi-player; 
+	setup a game server using .NET Core - so able to run on Windows, Mac, Linux machines
+	add scripts to unity project necessary for the connection between game server and players
+			
+Future tasks;
+	player attacking (shooting),
+	player dying and respawning
+	make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+
+
+TODO Tasks | 1 = done, 0 = not done
+-----------------------------------
+
+Importing assets
+----------------
+1 TMP (TextMeshPro) Essentials - used for higher resolution texts that appear on the screen.
+
+UnityEditor
+-----------
+1 Attaching to Player gameObject the Client script
+1 Making a Canvas that holds the NetworkMenu gameObject which has the SimpleNetworkingUI script, that controls when to connect the client to server.
+	Through use of a ConnectBtn, which has an onClickEvent that triggers the ConnectToServer method in SimpleNetworkingUI.
+
+
+Implementing scripts
+--------------------
+1 Client, singleton, holds the client id, tcp, databuffersize (used as a the number of bytes that is sent with each transmission), IP address and port number.
+	The tcp is a class which contains a TcpClient (socket), the id, byte array which is the stream receive buffer, and a NetworkStream.
+	A Connect method assigns a new socket, then assigns the same send & receive buffer sizes to the data buffer size of the Client.
+	The socket begins to connect to the IP, port through its own state. Giving ConnectCallback method as the AsyncCallback, which checks for connection and begins to read data stream
+	The NetworkStream is assigned to the socket stream. Data is then continuosly read, until an error occurs or the no bytes are sent in the stream.
+1 SimpleNetworkingUI, singleton, which holds the NetworkMenu (UI element which is turned off when a ConnectBtn is clicked on, contains the ConnectBtn and the UserName InputField)
+	Gets the NetworkMenu and username inputField from the children gameObjects. 
+	Has a ConnectToServer method which is triggered by the ConnectBtn, which deactivates the NetworkMenu and Calls the Client singleton to connect to server.
+0 ClientHandler
+1 Packet, same Packet class as used in GameServer code
+1 ThreadManager, a single thread manager, used to execute the commands, need to remake it make it multi-threaded. To get things up and running I used a pre-made ThreadManager class
+
+
+GameServer code
+---------------
+1 Program, holds the start point of the game server, initialises a console application, and calls the Server.StartServer with player number limit and port to use
+1 Server, holds the player limit, port number that is used for the connection, clients (dictionary) and a tcpListener (used to listen to tcp requests). 
+	The server initiliases all clients on starting, populating the client dictionary.
+	Assigns new tcpListener that can communicate on any IP addresses, on port number stored.
+	The tcpListener starts to listen to requests, and begins accepting clients indefinetely.
+1 Client, holds the client id, tcp and databuffersize (used as a the number of bytes that is sent with each transmission).
+	The tcp is a class which contains a TcpClient (socket), the id, byte array which is the stream receive buffer, and a NetworkStream.
+	A Connect method takes a TcpClient (socket) and assigns to its own socket, then assigns the same send & receive buffer sizes to the data buffer size of the Client.
+	The NetworkStream is assigned to the socket stream. Data is then continuosly read, until an error occurs or the no bytes are sent in the stream.
+1 Packet, using an already made Packet class, could write my own Packet class but that would take too long, due to need to learn translation from datatypes to bytes and back... 
+	Translates data like int, float, string into bytes, and translates the bytes back into the datatypes. Using the buffer, readposition (used for assigning how many bytes are read and written
+	due to different datatypes taking up different number of bytes).
+1 PacketSender, sends packets from the server to the Clients, using Packet syntax. Can send to specific recipient, all or exclude specific clients.
+
+===============================================================================================================================
 Version 0.1
 -----------
 
