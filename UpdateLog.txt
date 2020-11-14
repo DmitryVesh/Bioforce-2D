@@ -5,13 +5,18 @@ Version 0.2
 Summary
 -------
 Main goal is to set up multi-player; 
-	setup a game server using .NET Core - so able to run on Windows, Mac, Linux machines
-	add scripts to unity project necessary for the connection between game server and players
+	1 setup a game server using .NET Core - so able to run on Windows, Mac, Linux machines
+	1 setup communication between game server and Unity project, via TCP (important packets) and UDP (real-time packets),
+	1 spawn players when joining server	
+	1 sync player movements
 			
 Future tasks;
+	import cinemachine camera, so gets rid of jetiry motion of the camera
+	improve collision detection,
 	player attacking (shooting),
 	player dying and respawning
 	make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+	make the ThreadManager to work on multi-threading
 
 
 TODO Tasks | 1 = done, 0 = not done
@@ -23,9 +28,19 @@ Importing assets
 
 UnityEditor
 -----------
-1 Attaching to Player gameObject the Client script
+1 Updated UnityEditor to version 2020.1.12f1
+1 Creating a ClientManager gameObject and attaching to Player - Holds the Client, ClientRead & ThreadManager Scripts
 1 Making a Canvas that holds the NetworkMenu gameObject which has the SimpleNetworkingUI script, that controls when to connect the client to server.
 	Through use of a ConnectBtn, which has an onClickEvent that triggers the ConnectToServer method in SimpleNetworkingUI.
+1 Made a LocalPlayer and Player prefabs, similar to original Player gameObect. 
+	LocalPlayer contains PlayerMovementNetworking and PlayerAnimationsNetworking scripts
+	Player doesn't contain the scripts for playerMovement, and animation, to prevent the local client controlling not their own players.
+	Both contain PlayerManager script, so can update local and other players.
+
+Materials
+---------
+1 LocalPlayer material which makes the local player sprite Red
+1 Player material which makes the other player sprites Blue
 
 
 Implementing scripts
@@ -35,29 +50,53 @@ Implementing scripts
 	A Connect method assigns a new socket, then assigns the same send & receive buffer sizes to the data buffer size of the Client.
 	The socket begins to connect to the IP, port through its own state. Giving ConnectCallback method as the AsyncCallback, which checks for connection and begins to read data stream
 	The NetworkStream is assigned to the socket stream. Data is then continuosly read, until an error occurs or the no bytes are sent in the stream.
+	Initialises the Packet dictionary.
 1 SimpleNetworkingUI, singleton, which holds the NetworkMenu (UI element which is turned off when a ConnectBtn is clicked on, contains the ConnectBtn and the UserName InputField)
 	Gets the NetworkMenu and username inputField from the children gameObjects. 
 	Has a ConnectToServer method which is triggered by the ConnectBtn, which deactivates the NetworkMenu and Calls the Client singleton to connect to server.
-0 ClientHandler
+1 ClientRead, used to read contents of packets sent to the client, and handles the data. Currently able to read a welcome packet, setting ClientID of Client to the id received in packet 
+	and print the welcome message from server. Calls ClientSend.WelcomePacketReply to send back the ClientID and Username. Receives UDPTest packet and calls the reply to server.
+	Reads spawnPlayer, playerPosition, playerVelocity and playerRotation packets.
+1 ClientSend, used to send packets from client to the server. Currently able to send confirmation that a welcome packet received, sending back ClientID and Username entered.
+	Able to send packet as TCP or UDP, as well as replying to Welcome and UDP test packets.
+	Sends out PlayerMovement and PlayerMovementStats packets.
 1 Packet, same Packet class as used in GameServer code
-1 ThreadManager, a single thread manager, used to execute the commands, need to remake it make it multi-threaded. To get things up and running I used a pre-made ThreadManager class
-
+1 ThreadManager, a single thread manager, used to execute networking commands in a queue, need to remake it make it multi-threaded. To get things up and running I used a pre-made ThreadManager class
+1 GameManager, singleton which holds all the playerManagers, LocalPlayerPrefab and PlayerPrefab. Responsible for spawning players.
+1 PlayerManager, holds the ID, username and rigidBody of player, able to set the position of player and add velocity to the rigidBody of the player.
+1 PlayerMovementNetworking, same as PlayerMovement, however now also sends the position of player to Server, and sends the playerMovementStats to the server, runSpeed and sprintSpeed, so checks for valid moves.
 
 GameServer code
 ---------------
-1 Program, holds the start point of the game server, initialises a console application, and calls the Server.StartServer with player number limit and port to use
+1 Program, holds the start point of the game server, initialises a console application, and calls the Server.StartServer with player number limit and port to use.
+	Sets a new thread, which is used to call MainThread, which updates the GameLogic every tick.
+	Currently a 30 tick server, so unity game project was set to 30 ticks to, to prevent data being sent that should be ignored.
 1 Server, holds the player limit, port number that is used for the connection, clients (dictionary) and a tcpListener (used to listen to tcp requests). 
-	The server initiliases all clients on starting, populating the client dictionary.
+	The server initiliases all clients on starting, populating the client dictionary, and intiliasing all the packets to read.
 	Assigns new tcpListener that can communicate on any IP addresses, on port number stored.
 	The tcpListener starts to listen to requests, and begins accepting clients indefinetely.
+	
 1 Client, holds the client id, tcp and databuffersize (used as a the number of bytes that is sent with each transmission).
 	The tcp is a class which contains a TcpClient (socket), the id, byte array which is the stream receive buffer, and a NetworkStream.
 	A Connect method takes a TcpClient (socket) and assigns to its own socket, then assigns the same send & receive buffer sizes to the data buffer size of the Client.
 	The NetworkStream is assigned to the socket stream. Data is then continuosly read, until an error occurs or the no bytes are sent in the stream.
+	SendIntoGame, sends the player into the game, by creating new Player, spawning that player into all other connected clients, also spawns all connected clients to the new player.
 1 Packet, using an already made Packet class, could write my own Packet class but that would take too long, due to need to learn translation from datatypes to bytes and back... 
 	Translates data like int, float, string into bytes, and translates the bytes back into the datatypes. Using the buffer, readposition (used for assigning how many bytes are read and written
 	due to different datatypes taking up different number of bytes).
-1 PacketSender, sends packets from the server to the Clients, using Packet syntax. Can send to specific recipient, all or exclude specific clients.
+	Has enum ServerPackets which holds all packets the server sends, and enum ClientPacket holding the packets that the client sends to server.
+1 ThreadManager, same class as in Unity Project, used to queue actions like updating GameLogic.
+1 ServerSend, sends packets from the server to the Clients, using Packet syntax. Can send to specific recipient, all or exclude specific clients. Able to send via TCP or UDP. Sends the Welcome, UDPTest, SpawnPlayer
+	Player position, velocity and rotation packets.
+1 ServerRead, reads packets sent from Clients to the Server. Gets back Welcome packet with clientID and username, then stores username inside ClientDictionary - Player. 
+	Receives the UDPTest Packet, and the PlayerMovement and PlayerMovementStats.
+1 GameLogic, will act as processor of game data, calls ThreadManager.UpdateMain when Update is called. Called by Program MainThread, where a single thread is made and used to update the game state.
+	Calls the connected players' Update methods.
+1 Player, holds all data on the player server side, ID, username, position, velocity, rotation...
+	Has an Update method, which currently calls MovePlayer, which calls ServerSend to send the player's position and rotation to all other players, apart from self.
+	Checks if the position that the player now is valid (only checks the X axis so far, but need to check Y axis), if not valid then sends the valid possible to all players including itself self. 
+
+
 
 ===============================================================================================================================
 Version 0.1
@@ -66,8 +105,8 @@ Version 0.1
 Summary
 -------
 Main goal is to set up the player; 
-	player movement (running, jumping, sprint),
-	simple camera script that follows the player,
+	1 player movement (running, jumping, sprint),
+	1 simple camera script that follows the player,
 			
 Future tasks;
 	multi-player
