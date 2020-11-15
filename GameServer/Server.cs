@@ -19,6 +19,7 @@ namespace GameServer
 
         public static void StartServer(int maxNumPlayers, int portNum)
         {
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnEndingConsoleApplication);
             (MaxNumPlayers, PortNum) = (maxNumPlayers, portNum);
 
             Console.WriteLine("Trying to start the server...");
@@ -121,7 +122,8 @@ namespace GameServer
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"Error, in UDP data: {exception}");
+                //TODO: maybe Disconnect client, error caused when 2 or more clients disconnect at same time.
+                Console.WriteLine($"Error, in UDP data:\n{exception}");
             }
         }
         private static void UDPBeginReceive()
@@ -129,6 +131,11 @@ namespace GameServer
             UDPClient.BeginReceive(UDPConnectAsyncCallback, null);
         }
 
+        private static void OnEndingConsoleApplication(object sender, EventArgs e)
+        {
+            TCPListener.Stop();
+            UDPClient.Close();
+        }
         
     }
 }

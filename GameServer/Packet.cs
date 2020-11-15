@@ -13,7 +13,8 @@ namespace GameServer
         spawnPlayer,
         playerPosition,
         playerRotation,
-        playerVelocity
+        playerVelocity,
+        playerDisconnect
 
     }
 

@@ -20,6 +20,13 @@ namespace GameServer
             packet.Write("Testing UDP");
             SendUDPPacket(recipientClient, packet);
         }
+        public static void DisconnectPlayer(int disconnectedPlayer)
+        {
+            Packet packet = new Packet((int)ServerPackets.playerDisconnect);
+            packet.Write(disconnectedPlayer);
+            SendTCPPacketToAll(packet); // Packet has to arrive, so sending via TCP to make sure
+        }
+
 
         public static void SpawnPlayer(int recipientClient, Player player)
         {
@@ -36,7 +43,6 @@ namespace GameServer
             Packet packet = new Packet((int)ServerPackets.playerPosition);
             packet.Write(playerID);
             packet.Write(position);
-            //Console.WriteLine("Sending PlayerMovementRead Packet");
 
             SendUDPPacketToAll(packet);
         }
@@ -45,7 +51,6 @@ namespace GameServer
             Packet packet = new Packet((int)ServerPackets.playerPosition);
             packet.Write(playerID);
             packet.Write(position);
-            //Console.WriteLine("Sending PlayerMovementRead Packet");
 
             SendUDPPacketToAllButIncluded(playerID, packet);
         }
@@ -54,7 +59,6 @@ namespace GameServer
             Packet packet = new Packet((int)ServerPackets.playerVelocity);
             packet.Write(playerID);
             packet.Write(velocity);
-            //Console.WriteLine("Sending PlayerMovementRead Packet");
 
             SendUDPPacketToAllButIncluded(playerID, packet);
         }
@@ -78,6 +82,7 @@ namespace GameServer
             packet.WriteLength();
             for (int count = 1; count < Server.MaxNumPlayers + 1; count++)
             {
+                //TODO: maybe check if the client is null or something to fix the simultaneous exit crash
                 Server.ClientDictionary[count].tCP.SendPacket(packet);
             }
         }

@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.CompilerServices;
-using TMPro;
 using UnityEngine;
 
 public class Client : MonoBehaviour
 {
-    public static Client instance;
+    public static Client Instance;
     public static int DataBufferSize = 4096;
 
     public string IPAddress = "127.0.0.1";
@@ -20,44 +18,19 @@ public class Client : MonoBehaviour
     //TODO: Make a class that ones with PacketHandlers can inheret from to don't have to rewrite
     private delegate void PacketHandler(Packet packet);
     private static Dictionary<int, PacketHandler> PacketHandlerDictionary;
+    private bool Connected { get; set; } = false;
 
     public void ConnectToServer()
     {
         InitClientData();
+        Connected = true;
+        
+        tCP = new TCP();
+        uDP = new UDP();
+
         tCP.Connect();
     }
 
-    private void Awake()
-    {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else if (instance != this)
-        {
-            Debug.Log($"Client instance already exists, destroying {gameObject.name}");
-            Destroy(this);
-        }
-    }
-    private void Start()
-    {
-        tCP = new TCP();
-        uDP = new UDP();
-    }
-
-    private void InitClientData()
-    {
-        PacketHandlerDictionary = new Dictionary<int, PacketHandler>();
-        PacketHandlerDictionary.Add((int)ServerPackets.welcome, ClientRead.WelcomeRead);
-        PacketHandlerDictionary.Add((int)ServerPackets.udpTest, ClientRead.UDPTestRead);
-        PacketHandlerDictionary.Add((int)ServerPackets.spawnPlayer, ClientRead.SpawnPlayer);
-        PacketHandlerDictionary.Add((int)ServerPackets.playerPosition, ClientRead.PlayerPosition);
-        PacketHandlerDictionary.Add((int)ServerPackets.playerVelocity, ClientRead.PlayerVelocity);
-        PacketHandlerDictionary.Add((int)ServerPackets.playerRotation, ClientRead.PlayerRotation);
-    }
-
-
-    //TODO: almost same as GameServer TCP class, should make TCP Client class and TCP Server class
     public class TCP
     {
         public TcpClient Socket { get; private set; }
@@ -74,7 +47,7 @@ public class Client : MonoBehaviour
 
             ReceiveBuffer = new byte[DataBufferSize];
 
-            Socket.BeginConnect(instance.IPAddress, instance.PortNum, ConnectCallback, Socket);
+            Socket.BeginConnect(Instance.IPAddress, Instance.PortNum, ConnectCallback, Socket);
         }
         public void SendPacket(Packet packet)
         {
@@ -88,7 +61,7 @@ public class Client : MonoBehaviour
             }
             catch (Exception exception)
             {
-                Debug.Log($"Error, sending data to server from Client: {instance.ClientID} via TCP.\nException {exception}");
+                Debug.Log($"Error, sending data to server from Client: {Instance.ClientID} via TCP.\nException {exception}");
             }
         }
 
@@ -109,7 +82,7 @@ public class Client : MonoBehaviour
                 int byteLen = Stream.EndRead(asyncResult);
                 if (byteLen <= 0)
                 {
-                    // TODO: Disconnect
+                    Instance.Disconnect();
                     return;
                 }
 
@@ -121,8 +94,8 @@ public class Client : MonoBehaviour
             }
             catch (Exception exception)
             {
-                // TODO: disconnect
                 Console.WriteLine($"\nError in BeginReadReceiveCallback...\nError: {exception}");
+                Disconnect();
             }
         }
         //TODO: Change so not copying and pasting same thing inheret from same class 
@@ -185,8 +158,17 @@ public class Client : MonoBehaviour
         {
             Stream.BeginRead(ReceiveBuffer, 0, DataBufferSize, BeginReadReceiveCallback, null);
         }
+        private void Disconnect()
+        {
+            Instance.Disconnect();
+
+            Socket = null;
+            Stream = null;
+            ReceiveBuffer = null;
+            ReceivePacket = null;
+            
+        }
     }
-    
     public class UDP
     {
         public UdpClient Socket;
@@ -194,7 +176,7 @@ public class Client : MonoBehaviour
 
         public UDP()
         {
-            ipEndPoint = new IPEndPoint(System.Net.IPAddress.Parse(instance.IPAddress), instance.PortNum);
+            ipEndPoint = new IPEndPoint(System.Net.IPAddress.Parse(Instance.IPAddress), Instance.PortNum);
         }
         public void Connect(int localPort)
         {
@@ -209,7 +191,7 @@ public class Client : MonoBehaviour
         {
             try
             {
-                packet.InsertInt(instance.ClientID);
+                packet.InsertInt(Instance.ClientID);
                 if (Socket != null)
                 {
                     Socket.BeginSend(packet.ToArray(), packet.Length(), null, null);
@@ -217,10 +199,11 @@ public class Client : MonoBehaviour
             }
             catch (Exception exception)
             {
-                Debug.Log($"Error, sending data to server from Client: {instance.ClientID} via UDP.\nException {exception}");
+                Debug.Log($"Error, sending data to server from Client: {Instance.ClientID} via UDP.\nException {exception}");
+                Disconnect();
             }
         }
-        private void ReceiveCallback(IAsyncResult result)
+        private void BeginReadReceiveCallback(IAsyncResult result)
         {
             try
             {
@@ -229,7 +212,7 @@ public class Client : MonoBehaviour
 
                 if (data.Length < 4)
                 {
-                    //TODO: Disconnect
+                    Instance.Disconnect();
                     return;
                 }
 
@@ -237,8 +220,8 @@ public class Client : MonoBehaviour
             }
             catch (Exception exception)
             {
-                Debug.Log($"{exception}");
-                //TODO: Disconnect
+                Debug.Log($"Player {Instance.ClientID} Can't access the server via UDP.\nDisconnecting from server.\n{exception}");
+                Disconnect();
             }
         }
         private void HandleData(byte[] data)
@@ -256,7 +239,59 @@ public class Client : MonoBehaviour
         }
         private void SocketBeginReceive()
         {
-            Socket.BeginReceive(ReceiveCallback, null);
+            Socket.BeginReceive(BeginReadReceiveCallback, null);
+        }
+        private void Disconnect()
+        {
+            Instance.Disconnect();
+            ipEndPoint = null;
+            Socket = null;            
         }
     }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Debug.Log($"Client instance already exists, destroying {gameObject.name}");
+            Destroy(this);
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        Disconnect();
+    }
+
+    private void InitClientData()
+    {
+        PacketHandlerDictionary = new Dictionary<int, PacketHandler>();
+        PacketHandlerDictionary.Add((int)ServerPackets.welcome, ClientRead.WelcomeRead);
+        PacketHandlerDictionary.Add((int)ServerPackets.udpTest, ClientRead.UDPTestRead);
+        PacketHandlerDictionary.Add((int)ServerPackets.spawnPlayer, ClientRead.SpawnPlayer);
+        PacketHandlerDictionary.Add((int)ServerPackets.playerPosition, ClientRead.PlayerPosition);
+        PacketHandlerDictionary.Add((int)ServerPackets.playerVelocity, ClientRead.PlayerVelocity);
+        PacketHandlerDictionary.Add((int)ServerPackets.playerRotation, ClientRead.PlayerRotation);
+        PacketHandlerDictionary.Add((int)ServerPackets.playerDisconnect, ClientRead.PlayerDisconnect);
+    }
+    private void Disconnect()
+    {
+        if (Connected)
+        {
+            SimpleNetworkingUI.Instance.Disconnected();
+            Connected = false;
+            
+            tCP.Socket.Close();
+            uDP.Socket.Close();
+
+            Debug.Log($"You, client: {ClientID} have been disconnected.");
+            
+            GameManager.Instance.DisconnectAllPlayers();
+            
+        }
+    }    
 }

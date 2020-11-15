@@ -28,15 +28,37 @@ public class GameManager : MonoBehaviour
         GameObject player;
         GameObject prefab;
 
-        if (iD == Client.instance.ClientID)
+        if (iD == Client.Instance.ClientID)
+        {   
             prefab = LocalPlayerPrefab;
+            Debug.Log($"You, player: {iD} have been spawned.");
+        }
         else
+        {
             prefab = PlayerPrefab;
-
+            Debug.Log($"Player: {iD} has been spawned.");
+        }
         player = Instantiate(prefab, position, rotation);
         PlayerManager playerManager = player.GetComponent<PlayerManager>();
         playerManager.Initialise(iD, username);
 
         PlayerDictionary.Add(iD, playerManager);
+    }
+    public void DisconnectPlayer(int disconnectedPlayer)
+    {
+        //TODO: problem occurs here
+        Debug.Log($"Player: {disconnectedPlayer} has disconnected.");
+        PlayerDictionary[disconnectedPlayer].Disconnect();
+        PlayerDictionary.Remove(disconnectedPlayer);
+    }
+    public void DisconnectAllPlayers()
+    {
+        //TODO: problem occurs here
+        Debug.Log($"All players are being disconnected.");
+        foreach (PlayerManager player in PlayerDictionary.Values)
+        {
+            player.Disconnect();
+        }
+        PlayerDictionary.Clear();
     }
 }

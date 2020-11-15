@@ -14,11 +14,17 @@ public class SimpleNetworkingUI : MonoBehaviour
         NetworkMenu.SetActive(false);
         UsernameInputField.interactable = false;
 
-        Client.instance.ConnectToServer();
+        Client.Instance.ConnectToServer();
     }
     public string GetUsername()
     {
         return UsernameInputField.text;
+    }
+
+    public void Disconnected()
+    {
+        NetworkMenu.SetActive(true);
+        UsernameInputField.interactable = true;
     }
 
     private void Awake()

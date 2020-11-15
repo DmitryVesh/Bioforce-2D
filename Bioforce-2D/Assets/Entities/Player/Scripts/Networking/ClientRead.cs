@@ -12,16 +12,21 @@ public class ClientRead : MonoBehaviour
         int id = packet.ReadInt();
 
         Debug.Log($"Message from server: {message}");
-        Client.instance.ClientID = id;
+        Client.Instance.ClientID = id;
 
         ClientSend.WelcomePacketReply();
 
-        Client.instance.uDP.Connect(((IPEndPoint)Client.instance.tCP.Socket.Client.LocalEndPoint).Port);
+        Client.Instance.uDP.Connect(((IPEndPoint)Client.Instance.tCP.Socket.Client.LocalEndPoint).Port);
     }
     public static void UDPTestRead(Packet packet)
     {
         Debug.Log($"Received packet via UDP: {packet.ReadString()}");
         ClientSend.UDPTestPacketReply();
+    }
+    public static void PlayerDisconnect(Packet packet)
+    {
+        int disconnectedPlayer = packet.ReadInt();
+        GameManager.Instance.DisconnectPlayer(disconnectedPlayer);
     }
 
     public static void SpawnPlayer(Packet packet)
@@ -37,9 +42,8 @@ public class ClientRead : MonoBehaviour
     {
         int iD = packet.ReadInt();
         Vector3 position = packet.ReadVector3();
-        //Debug.Log("Received Player Position packet");
-        //GameManager_SampleScene.PlayerDictionary[iD].transform.position = position;
-        
+
+        //Debug.Log($"Received player position packet from player: {iD}\nPosition sent {position}");
         // Prevents crash when a UDP packet connects before the TCP spawn player call from server
         try
         {
@@ -54,8 +58,6 @@ public class ClientRead : MonoBehaviour
     {
         int iD = packet.ReadInt();
         Vector3 velocity = packet.ReadVector3();
-        //Debug.Log("Received Player Position packet");
-        //GameManager_SampleScene.PlayerDictionary[iD].transform.position = position;
         
         // Prevents crash when a UDP packet connects before the TCP spawn player call from server
         try

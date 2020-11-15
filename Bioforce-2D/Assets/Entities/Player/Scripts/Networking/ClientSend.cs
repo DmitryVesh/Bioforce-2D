@@ -8,14 +8,14 @@ public class ClientSend : MonoBehaviour
     public static void WelcomePacketReply()
     {
         Packet packet = new Packet((int)ClientPackets.welcomeReceived);
-        packet.Write(Client.instance.ClientID);
+        packet.Write(Client.Instance.ClientID);
         packet.Write(SimpleNetworkingUI.Instance.GetUsername());
         SendTCPPacket(packet);
     }
     public static void UDPTestPacketReply()
     {
         Packet packet = new Packet((int)ClientPackets.udpTestReceived);
-        packet.Write(Client.instance.ClientID);
+        packet.Write(Client.Instance.ClientID);
         packet.Write("Received UDP Test Packet");
         SendUDPPacket(packet);
     }
@@ -26,6 +26,7 @@ public class ClientSend : MonoBehaviour
         packet.Write(position);
         packet.Write(velocity);
         SendUDPPacket(packet);
+        //Debug.Log($"Sending movement packet to server, position: {position}");
     }
     public static void PlayerMovementStats(float runSpeed, float sprintSpeed)
     {
@@ -43,12 +44,12 @@ public class ClientSend : MonoBehaviour
     private static void SendTCPPacket(Packet packet)
     {
         packet.WriteLength();
-        Client.instance.tCP.SendPacket(packet);
+        Client.Instance.tCP.SendPacket(packet);
     }
     private static void SendUDPPacket(Packet packet)
     {
         packet.WriteLength();
-        Client.instance.uDP.SendPacket(packet);
+        Client.Instance.uDP.SendPacket(packet);
     }
 
     

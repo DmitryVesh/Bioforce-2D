@@ -10,9 +10,9 @@ namespace GameServer
         {
             foreach (Client client in Server.ClientDictionary.Values)
             {
-                if (client.Player != null)
+                if (client.player != null)
                 {
-                    client.Player.Update();
+                    client.player.Update();
                 }
             }
             ThreadManager.UpdateMain();

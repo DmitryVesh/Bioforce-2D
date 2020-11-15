@@ -17,9 +17,14 @@ public class PlayerManager : MonoBehaviour
     {
         RB.AddForce(velocity);
     }
-    
+    public void Disconnect()
+    {
+        Destroy(gameObject);
+    }
+
     private void Awake()
     {
         RB = GetComponent<Rigidbody2D>();
     }
+    
 }

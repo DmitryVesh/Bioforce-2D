@@ -1,4 +1,64 @@
 ===============================================================================================================================
+Version 0.3
+-----------
+
+Summary
+-------
+Main goal is to fix camera jiteriness, stop the non local players from teleporting quickly when falling and jumping,
+	 handle client and server disconnects
+	1 import and use cinemachine camera, so gets rid of jetiry motion of the camera
+	1 stop non local player teleporting when in air
+	1 handle client disconnections (still issues when 2 or more clients disconnect simultaneously)
+			
+Future tasks;
+	improve collision detection,
+	player attacking (shooting),
+	player dying and respawning
+	make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+	make the ThreadManager to work on multi-threading
+	prevent crashing and stopping receiving packets from client to server when 2 or more clients disconnect simultaneosly.
+
+TODO Tasks | 1 = done, 0 = not done
+-----------------------------------
+
+Importing assets
+----------------
+1 Cinemachine, will use the cinemachine camera for local player, so camera will be smooth and in future can easily add camera effects for shooting, taking damage, etc...
+
+UnityEditor
+-----------
+1 Removed and deleted from project the SimpleCameraFollow script from camera that looks at the player.
+1 Added CinemachineBrain to Main Camera, which will be used as parent for other cameras that look at the foregroumd, background and etc...
+1 Added a CinemachineCamera and CinemachineVirtualCamera to the it that will follow the player.
+1 Adjusted CinemachineVirtualCamera to follow and look at the LocalPlayer, and tweaked Aim component to have a Composer camera with adjusted zones.
+1 Added LocalPlayer layer which is set to LocalPlayer, so can use normal Player as whatIsGround to fix infinite jumping due to detecting itself as ground.
+1 Added to LocalPlayer whatIsGround the player layer, so can bounce on other players.
+1 Set non local Player Rigidbody2D into Static mode, preventing local machine calculating the gravity and creating a teleporting effecting when in air.
+
+
+Implementing scripts
+--------------------
+1 DetachFromParent, sets gameObject transform parent to null, applied to CinemachineCamera
+1 Edit Client, added proper disconnections to the TCP, UDP and Client instance itself to disconnect from the server properly, inside the try catch blocks in BeginReadReceiveCallBacks.
+	Moved instantiation of tcp and udp to the ConnectToServer method instead of Start, allowing for player to be re-connect after server is shutdown.
+1 Edit Packet, added playerDisconnect to ServerPackets enum, so server able to sends to connected clients that a player has disconnected.
+1 PlayerCameraController, holds the CinemachineCamera gameObject, needs to be assigned by Inspector, adds an OnDestroyObject method which destroys the camera, when the LocalPlayer is destroyed.
+	Preventing multiple CinemachineCameras being around, when the server is shutdown and player is sent back to Connect Screen.
+1 Edit SimpleNetworkingUI, added Disconnected method which re-enables the Networking UI, after Local client is disconnected.
+1 Edit PlayerManager, added Disconnect method which destroys the LocalPlayer gameObject. Called by GameManager, upon getting the disconnect client packet, and when localPlayer is disconnected.
+1 Edit ClientRead, added a PlayerDisconnect packet handler, which calls Disconnect method of PlayerManager.
+1 Edit GameManager, added Disconneting particular and DisconnetingAllPlayers method.
+
+GameServer code
+---------------
+1 Edit Client, added similar disconnections to the TCP, UDP and Client.
+1 Edit Packet, ""
+1 Edit Player, Changed in ValidMove, the xMaxLeftTravelledLeft - 0.5f, instead of + 0.5f, due to going left/negative x direction.
+1 Edit ServerSend, added DisconnectPlayer packet which is sent to all players via TCP.
+1 Edit Server, added an event for when the console application is closed, which stops the tcpListener and udpClient, preventing server from listening to the port when shutting down.
+
+
+===============================================================================================================================
 Version 0.2
 -----------
 

@@ -263,13 +263,6 @@ public class PlayerMovementNetworking : MonoBehaviour
     }
 
 
-
-
-
-
-
-
-
     //TODO: make a seperate class for testing 
     //TODO: make a class for branchless methods
     void MethodTimeTesting(Action method, int iterationsPower10)

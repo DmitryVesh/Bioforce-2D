@@ -16,6 +16,7 @@ namespace GameServer
             if (clientID == checkClientID)
             {
                 Server.ClientDictionary[clientID].SendIntoGame(username);
+                Console.WriteLine($"Player: {clientID} was sent into game.");
                 return;
             }
             Console.WriteLine($"Error, player {username} is connected as wrong player number");
@@ -37,16 +38,14 @@ namespace GameServer
             Quaternion rotation = packet.ReadQuaternion();
             Vector3 position = packet.ReadVector3();
             Vector3 velocity = packet.ReadVector3();
-            //Console.WriteLine("Received PlayerMovementRead Packet");
-
-            Server.ClientDictionary[clientID].Player.PlayerMoves(rotation, position, velocity);
+            Server.ClientDictionary[clientID].player.PlayerMoves(rotation, position, velocity);
         }
         public static void PlayerMovementStatsRead(int clientID, Packet packet)
         {
             float runSpeed = packet.ReadFloat();
             float sprintSpeed = packet.ReadFloat();
 
-            Server.ClientDictionary[clientID].Player.SetPlayerMovementStats(runSpeed, sprintSpeed);
+            Server.ClientDictionary[clientID].player.SetPlayerMovementStats(runSpeed, sprintSpeed);
         }
         public static void PlayerAnimationRead()
         {

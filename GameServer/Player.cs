@@ -70,7 +70,7 @@ namespace GameServer
             //Validating X
             float xLast = LastPosition.X;
             float xMaxTravelledRight = xLast + SprintSpeed + 0.5f;
-            float xMaxTravelledLeft = xLast - SprintSpeed + 0.5f;
+            float xMaxTravelledLeft = xLast - SprintSpeed - 0.5f;
             //Console.WriteLine($"xLast: {xLast}\nxMaxTravelledLeft: {xMaxTravelledLeft}\nxMaxTravelledRight: {xMaxTravelledRight} ");
 
             float xNow = Position.X;

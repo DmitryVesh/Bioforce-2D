@@ -12,7 +12,7 @@ namespace GameServer
         public UDP uDP { get; private set; }
         private static int DataBufferSize { get; set; } = 4096;
 
-        public Player Player { get; private set; }
+        public Player player { get; private set; }
 
         public Client(int iD)
         {
@@ -53,10 +53,19 @@ namespace GameServer
                 }
                 catch (Exception exception)
                 {
-                    Console.WriteLine($"\nError has occured when sending data from client {ID}\nError{exception}");
+                    //Disconnect();
+                    Console.WriteLine($"\nError, occured when sending TCP data from client {ID}\nError{exception}");
                 }
             }
-            
+            public void Disconnect()
+            {
+                Socket.Close();
+                Socket = null;
+                Stream = null;
+                ReceiveBuffer = null;
+                ReceivePacket = null;
+            }
+
             private void BeginReadReceiveCallback(IAsyncResult asyncResult)
             {
                 try
@@ -64,7 +73,7 @@ namespace GameServer
                     int byteLen = Stream.EndRead(asyncResult);
                     if (byteLen <= 0)
                     {
-                        // TODO: Disconnect
+                        Server.ClientDictionary[ID].Disconnect();
                         return;
                     }
 
@@ -76,8 +85,8 @@ namespace GameServer
                 }
                 catch (Exception exception)
                 {
-                    // TODO: disconnect
                     Console.WriteLine($"\nError in BeginReadReceiveCallback of client {ID}...\nError: {exception}");
+                    Server.ClientDictionary[ID].Disconnect();
                 }
             }
             //TODO: Change so not copying and pasting same thing inheret from same class 
@@ -128,6 +137,7 @@ namespace GameServer
             {
                 Stream.BeginRead(ReceiveBuffer, 0, DataBufferSize, BeginReadReceiveCallback, null);
             }
+            
         }
         public class UDP
         {
@@ -159,20 +169,24 @@ namespace GameServer
                     Server.PacketHandlerDictionary[packetID](ID, packet);
                 });
             }
+            public void Disconnect()
+            {
+                ipEndPoint = null;
+            }
         }
         
         public void SendIntoGame(string username)
         {
-            Player = new Player(ID, username, new Vector3(0, 0, 0));
+            player = new Player(ID, username, new Vector3(0, 0, 0));
             
             //Spawning rest of players for the connected user
             foreach (Client client in Server.ClientDictionary.Values)
             {
-                if (client.Player != null)
+                if (client.player != null)
                 {
                     if (client.ID != ID)
                     {
-                        ServerSend.SpawnPlayer(ID, client.Player);
+                        ServerSend.SpawnPlayer(ID, client.player);
                     }
                 }
             }
@@ -180,12 +194,22 @@ namespace GameServer
             //Spawning the player who just joined, for all connected users
             foreach (Client client in Server.ClientDictionary.Values)
             {
-                if (client.Player != null)
+                if (client.player != null)
                 {
-                    ServerSend.SpawnPlayer(client.ID, Player);
+                    ServerSend.SpawnPlayer(client.ID, player);
                 }
             }
         }
+        private void Disconnect()
+        {
+            //TODO: crashes when 2 players disconnect simultaneously, or stops receiving packets from players
+            Console.WriteLine($"Player: {ID} has disconnected. {tCP.Socket.Client.RemoteEndPoint}");
+            ServerSend.DisconnectPlayer(ID);
+            
+            tCP.Disconnect();
+            uDP.Disconnect();
 
+            player = null;
+        }
     }
 }
