@@ -11,8 +11,8 @@ public class ClientRead : MonoBehaviour
         string message = packet.ReadString();
         int id = packet.ReadInt();
 
-        Debug.Log($"Message from server: {message}");
-        Client.Instance.ClientID = id;
+        Debug.Log($"Message from server:\n{message}");
+        Client.Instance.SuccessfullyConnected(id);
 
         ClientSend.WelcomePacketReply();
 
@@ -77,7 +77,7 @@ public class ClientRead : MonoBehaviour
         // Prevents crash when a UDP packet connects before the TCP spawn player call from server
         try
         {
-            GameManager.PlayerDictionary[iD].transform.rotation = rotation;
+            GameManager.PlayerDictionary[iD].SetRotation(rotation);
         }
         catch (KeyNotFoundException exception)
         {

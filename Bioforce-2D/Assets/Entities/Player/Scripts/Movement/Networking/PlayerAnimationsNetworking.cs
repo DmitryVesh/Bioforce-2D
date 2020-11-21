@@ -10,10 +10,9 @@ public class PlayerAnimationsNetworking : MonoBehaviour
     //private float* SpeedX;
     //private bool* isGrounded;
     private PlayerMovementNetworking movementScript = null;
-    private Transform tf = null;
     private float SpeedX;
     [SerializeField] private bool facingRight = true;
-
+    private GameObject PlayerModelObject { get; set; }
 
     public void JumpAnimation()
     {
@@ -22,9 +21,9 @@ public class PlayerAnimationsNetworking : MonoBehaviour
 
     private void Awake()
     {
-        anim = GetComponent<Animator>();
+        PlayerModelObject = transform.GetChild(0).gameObject;
+        anim = PlayerModelObject.GetComponent<Animator>();
         movementScript = GetComponent<PlayerMovementNetworking>();
-        tf = GetComponent<Transform>();
     }
     private void Start()
     {
@@ -53,10 +52,6 @@ public class PlayerAnimationsNetworking : MonoBehaviour
             SpeedX = -SpeedX; // Adjusting the horizontal speed to a positive value if moving to left
         }
         
-        // Can be used to stop the need for the if statement as a negative * negative = positive
-        //TODO: run tests to see which way would be faster to execute
-        //SpeedX = SpeedX * SpeedX;
-        //runSpeed = runSpeed * runSpeed;
         bool Moving = false, Sprinting = false;
 
         if (SpeedX > runSpeed)
@@ -98,7 +93,7 @@ public class PlayerAnimationsNetworking : MonoBehaviour
     private void FlipSprite()
     {
         facingRight = !facingRight;
-        tf.Rotate(0, 180, 0);
+        PlayerModelObject.transform.Rotate(0, 180, 0);
     }
 
     

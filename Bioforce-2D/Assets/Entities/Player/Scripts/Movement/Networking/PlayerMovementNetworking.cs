@@ -19,6 +19,8 @@ public class PlayerMovementNetworking : MonoBehaviour
 
     // Moving in Y direction Data
     [SerializeField] public LayerMask WhatIsGround; // LayerMask used to determine what is considered ground for the player
+    [SerializeField] private string PlatformLayerName; // LayerMask used to determine what is a platform, so can go through that layer
+    private int PlatformLayer;
 
     [SerializeField] private float JumpForce = 8; // the force applied to player when they jump
     [SerializeField] private int NumberOfExtraJumps = 1; // the number of jumps given to the player
@@ -41,8 +43,8 @@ public class PlayerMovementNetworking : MonoBehaviour
     // References to other scripts
     private Rigidbody2D rb { get; set; } // Used to add force in x and y directions, corresponding to input
     private CapsuleCollider2D hitbox { get; set; } // Used to determine if player is grounded
-    private PlayerAnimations playerAnimations { get; set; } // Used to call Jump animation method when Jumping
-
+    //private PlayerAnimations playerAnimations { get; set; } // Used to call Jump animation method when Jumping
+    private GameObject PlayerModelObject { get; set; }
 
     // Variables used for PlayerAnimations
     private bool Grounded { get; set; } = false; // used to track if the player has landed, or is the air
@@ -61,24 +63,22 @@ public class PlayerMovementNetworking : MonoBehaviour
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
-        hitbox = GetComponent<CapsuleCollider2D>();
+        PlayerModelObject = transform.GetChild(0).gameObject;
+        rb = PlayerModelObject.GetComponent<Rigidbody2D>();
+        hitbox = PlayerModelObject.GetComponent<CapsuleCollider2D>();
         CanMove = true;
         currentStamina = MaxStamina;
 
         ClientSend.PlayerMovementStats(RunSpeed, SprintSpeed);
-
-        //TODO: remove this
-        //MethodTimeTesting(MovementX, 6);
-        //MethodTimeTesting(MovementXBranchless, 6);
-        //MethodTimeTesting(MovementXHybridBranchless, 6);
+        PlatformLayer = LayerMask.NameToLayer(PlatformLayerName);
 
     }
     
     void Update() // Used for getting user input, and storing it later to be used in FixedUpdate
     {
         if (!CanMove) { return; } // Player shouldn't be able to move when dying, or initially respawing, so shouldn't move
-
+        //transform.position = PlayerModelObject.transform.position;
+        //transform.rotation = PlayerModelObject.transform.rotation;
         MovementX();
         MovementY();
     }
@@ -169,7 +169,6 @@ public class PlayerMovementNetworking : MonoBehaviour
     
     private void MovementY() // Responsible for the jumping, falling of the player 
     {
-        //TODO: add code comments
         groundTimer -= Time.deltaTime; // Decreasing the ground check timer
 
         bool groundTimerRunOut = groundTimer < 0; // Has ground check timer ran out?
@@ -214,6 +213,8 @@ public class PlayerMovementNetworking : MonoBehaviour
             PlayerJump(); // Jump
             currentNumJumps--; // Decriment jumps available
         }
+
+        Physics2D.IgnoreLayerCollision(gameObject.layer, PlatformLayer, rb.velocity.y > 0.0f || Input.GetAxis("Vertical") < -0.5);
     }
     private void PlayerJump()
     {
@@ -259,7 +260,7 @@ public class PlayerMovementNetworking : MonoBehaviour
 
     private void SendMovesToServer(Vector3 newPosition)
     {
-        ClientSend.PlayerMovement(transform.rotation, transform.position, newPosition);
+        ClientSend.PlayerMovement(PlayerModelObject.transform.rotation, PlayerModelObject.transform.position, newPosition);
     }
 
 

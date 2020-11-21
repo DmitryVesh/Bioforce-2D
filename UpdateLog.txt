@@ -1,4 +1,104 @@
 ===============================================================================================================================
+Version 0.4
+-----------
+
+Summary
+-------
+Main goals is to;
+	1 Let the player choose how to try connect to the server, via LocalHost, LAN or Internet. Allowing for over internet connections
+	1 Add player user names to the players, so players can know who is in the server.
+	1 Add timeouts, so if player trying to connect to server for too long, gets timed out. Allowing for player to try and reconnect, if chosen
+		wrong IP connection setting, or the server is just slow.
+	1 Make a Level 1 map, and load into game so can see how action on a map occurs.
+
+			
+Future tasks;
+	Fix non local player animations
+	Make so can play on a mobile device.
+	Make so LAN connection tries to connect to your actual lan connection, and not hard coded values
+	Decrease quality of the sprites used in game, reducing space and execution speed.
+	Add animations to banners
+	improve collision detection,
+	add player attacking (shooting),
+	add player taking damage
+	add player dying and respawning
+	Add player disconnections if the server suspects the player of movement cheating
+	make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+	make the ThreadManager to work on multi-threading
+	prevent crashing and stopping receiving packets from client to server when 2 or more clients disconnect simultaneosly.
+	improve UI, adding pop up animations to the UI elements instead of just appearing instantly.
+	improve UI, adding black borders to UI Panels like TimeOutPanel.
+
+	add breathing camera movement when player is idle, going up and down.
+	add music Spoiler - Original Mix (Hyper) to game.
+
+TODO Tasks | 1 = done, 0 = not done
+-----------------------------------
+
+Importing assets
+----------------
+1 Level 1 - Warped_city art assets.
+
+UnityEditor
+-----------
+1 Add a OnValueChanged event to the InputField, which calls OnUsernameInputField method in SimpleNetworkingUI, checks if the username entered is valid, if valid makes 
+	Connect button interactable, if not then not interactable.
+1 Add a IPAddress TMP dropdown list, which is responsible for player choosing what IPAddress to connect to. Has OnValueChanged event, which calls SimpleNetworkingUI
+	OnIPAddressDropDownChanged.
+1 Added Description Text, child of IPAddressDropdown, mentions that 
+1 Make a PlayerModel prefab, which just holds the player model, rigidbody and capsule collider.
+1 Edit LocalPlayer, so it holds a child gameObject of PlayerModel, delete the player model from the parent Local player object. Set cinemachine follow to the PlayerModel.
+1 Make OtherPlayer gameObject, which is the non-local player, child the PlayerModel to it, and add PlayerManagerScript to it.
+1 Added a UI canvas (UsernameCanvas) and TextMeshProText (Username Text TMP) as children to PlayerModel, so the player username can be displayed.
+1 Added a IgnoreParentRotation script to the UsernameCanvas, so flipping the sprite of the gameObject doesn't change the 
+1 Added a TimeOutPanel, TimeOut Text, Continue Button, to act as a time out message when a connection fails via a timeout. The Continue Button has an onClick event which calls the 
+	SimpleNetworkingUI OnTimeOutContinueBtnPresss.
+1 Edit Shooter sprite pixels per unit, decreasing the player size.
+1 Edit CinemachineCamera lens to 6, so can see more of the map.
+1 Added folder for Prefabs from Warped_city art, including banners, and individual parts.
+1 Add 5 different house types into the game.
+1 Add a new Scene named Level 1, use the houses made to make a basic level.
+1 Add background to game.
+1 Added 3 different prespective cameras that view individual background elements, allowing for a parallex effect.
+1 Increased gravity to -15.81, felt better when the player is jumping, speeding up the time it takes for the player to hit the ground, feels more responsive.
+1 Increased animation Samples to the Run animation to 7, and to Sprint animation to 8, making the player feel more responsive and faster.
+
+Implementing scripts
+--------------------
+1 Edit Client, Add different IP addresses; localHost, LAN and Internet, so can connect computers wherever they are. (Portwarded on my router)
+	Added method ChangeIPAddressConnectTo, which changes the IPAddress which the player will connect to, called by SimpleNetworkingUI.
+	Added timer and methods which work on the connection time out, timer is started when the ConnectToServer is called, and stopped when either the timer reaches a TimerTimeOutTime
+	value, or when a SuccessfullyConnected method is called. When the time out occurs, the ConnectionTimedOut is called, which disconnects the client from the server, and displays
+	the TimeOutPanel. When a successful connection occurs, ClientRead welcome read calls the successful connection method, the timer is reset and turned off.
+1 Edit SimpleNetworkingUI, Added OnUsernameInputFieldChanged, called by OnValueChanged event on InputField, then calls inputfield validation method, 
+	and makes the ConnectBtn interactable when valid.
+	Also added a OnIPAddressDropdownChanged method, which is called by OnValueChanged event on IPAddressInputField, calls Client's ChangeIPAddressConnectTo, giving the index
+	of the IPAddress.
+	Added a DisplayTimeOutMessage, which activates the TimeOutPanel and calls the SetInteractableConnectionMenu with false, so player has to read message and press ContinueButton.
+	Added a OnTimeOutContinueBtnPress, which is called by Continue button, deactivates the TimeOutPanel and makes the connection menu interactable.
+1 Edit PlayerManager, cache the player model gameObject, and reference its rigidBody in the initialise and transfrom in SetPosition.
+	Added a SetRotation method which changes the PlayerModel rotation.
+1 Edit PlayerMovementNetworking, cache the player model gameObject, and set its rigidBody, CapsuleCollider in Awake, also change SendMovesToServer to send the PlayerModel's data.
+	Added IgnoreLayerCollisions in MovementY, which ignores collision between the gameObject's layer attached to it, and the Platform layer when going up and when holding press
+	down button.
+1 Edit PlayerAnimationsNetworking, cache the player model gameObject, get its animator, and change its transform in FlipSprite;
+1 Bug: When sending the position of player to server, sometimes the opposite value for x coord gets sent... 
+	Only happens when turning the player...
+	Checked for packets sent from player to server, the error in position doesn't occur from sending local player packets, happens on the server or receiving end.
+	Deoesn't occur when setting position from received packet... 
+	The point at which the x coordinate is changed is the initial spawn location of the object that it happens on...
+	It is to do with the OtherPlayer gameObject rotation being changed, so the PlayerModel position coordinate x changes from negative to positive or positive to negative, 
+	so sometimes doesn't have time to switch the rotation, causing the problem, transform change sent from server should apply to PlayerModel, not to OtherPlayer!
+1 IgnoreParentRotation, resets the gameObject's transform to 0,0,0 every late, overriding changes made in transform update of parent object. 
+1 Edit ClientRead, in PlayerRotation, instead of changing the player's actual rotation, a SetRotation method is called.
+	Edited the WelcomeRead method to call the Client instance SuccessfullyConnected method, instead of just setting the id of client manually.
+
+
+GameServer code
+---------------
+1 Edit ServerRead, put a try catch block for the PlayerMovementRead, because ran into issues, where a packet is received from an already deleted player, causing crashing.
+
+===============================================================================================================================
 Version 0.3
 -----------
 

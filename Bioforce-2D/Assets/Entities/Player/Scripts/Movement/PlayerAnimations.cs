@@ -53,10 +53,6 @@ public class PlayerAnimations : MonoBehaviour
             SpeedX = -SpeedX; // Adjusting the horizontal speed to a positive value if moving to left
         }
         
-        // Can be used to stop the need for the if statement as a negative * negative = positive
-        //TODO: run tests to see which way would be faster to execute
-        //SpeedX = SpeedX * SpeedX;
-        //runSpeed = runSpeed * runSpeed;
         bool Moving = false, Sprinting = false;
 
         if (SpeedX > runSpeed)

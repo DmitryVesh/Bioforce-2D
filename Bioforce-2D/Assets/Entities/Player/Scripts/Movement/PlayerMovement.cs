@@ -65,12 +65,6 @@ public class PlayerMovement : MonoBehaviour
         hitbox = GetComponent<CapsuleCollider2D>();
         CanMove = true;
         currentStamina = MaxStamina;
-
-        //TODO: remove this
-        //MethodTimeTesting(MovementX, 6);
-        //MethodTimeTesting(MovementXBranchless, 6);
-        //MethodTimeTesting(MovementXHybridBranchless, 6);
-
     }
     
     void Update() // Used for getting user input, and storing it later to be used in FixedUpdate
@@ -167,7 +161,6 @@ public class PlayerMovement : MonoBehaviour
     
     private void MovementY() // Responsible for the jumping, falling of the player 
     {
-        //TODO: add code comments
         groundTimer -= Time.deltaTime; // Decreasing the ground check timer
 
         bool groundTimerRunOut = groundTimer < 0; // Has ground check timer ran out?

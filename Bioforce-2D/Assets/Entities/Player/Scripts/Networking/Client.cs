@@ -9,7 +9,11 @@ public class Client : MonoBehaviour
     public static Client Instance;
     public static int DataBufferSize = 4096;
 
-    public string IPAddress = "127.0.0.1";
+    private string IPAddressLocalHost = "127.0.0.1";
+    private string IPAddressLAN = "192.168.1.152";
+    private string IPAddressInternet = "79.67.169.176";
+
+    private string IPAddressConnectTo;
     public int PortNum = 28020; //Must be the same as GameServer Port
     public int ClientID = 0;
     public TCP tCP;
@@ -20,6 +24,10 @@ public class Client : MonoBehaviour
     private static Dictionary<int, PacketHandler> PacketHandlerDictionary;
     private bool Connected { get; set; } = false;
 
+    [SerializeField] private float TimerTimeOutTime = 15;
+    private bool TimerRunning { get; set; } = false;
+    private float Timer { get; set; }
+
     public void ConnectToServer()
     {
         InitClientData();
@@ -28,7 +36,21 @@ public class Client : MonoBehaviour
         tCP = new TCP();
         uDP = new UDP();
 
+        ResetTimeOutTimer();
+
         tCP.Connect();
+    }
+    public void SuccessfullyConnected(int assignedID)
+    {
+        ResetTimeOutTimer(false);
+        ClientID = assignedID;
+        //TODO: Display connected to server 
+    }
+    public void ChangeIPAddressConnectTo(int IPAddressIndex)
+    {
+        string[] IPs = new string[] { IPAddressLocalHost, IPAddressLAN, IPAddressInternet };
+        Debug.Log($"Going to connect to: {IPs[IPAddressIndex]}");
+        IPAddressConnectTo = IPs[IPAddressIndex];
     }
 
     public class TCP
@@ -47,7 +69,7 @@ public class Client : MonoBehaviour
 
             ReceiveBuffer = new byte[DataBufferSize];
 
-            Socket.BeginConnect(Instance.IPAddress, Instance.PortNum, ConnectCallback, Socket);
+            Socket.BeginConnect(Instance.IPAddressConnectTo, Instance.PortNum, ConnectCallback, Socket);
         }
         public void SendPacket(Packet packet)
         {
@@ -176,7 +198,7 @@ public class Client : MonoBehaviour
 
         public UDP()
         {
-            ipEndPoint = new IPEndPoint(System.Net.IPAddress.Parse(Instance.IPAddress), Instance.PortNum);
+            ipEndPoint = new IPEndPoint(System.Net.IPAddress.Parse(Instance.IPAddressConnectTo), Instance.PortNum);
         }
         public void Connect(int localPort)
         {
@@ -254,6 +276,9 @@ public class Client : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            
+            //Set default address
+            IPAddressConnectTo = IPAddressLocalHost;
         }
         else if (Instance != this)
         {
@@ -261,7 +286,29 @@ public class Client : MonoBehaviour
             Destroy(this);
         }
     }
+    private void FixedUpdate()
+    {
+        if (TimerRunning)
+            Timer += Time.fixedDeltaTime;
+        else
+            return;
 
+        if (Timer > TimerTimeOutTime)
+        {
+            ResetTimeOutTimer(false);
+            ConnectionTimedOut();
+        }
+    }
+    private void ResetTimeOutTimer(bool runTimer = true)
+    {
+        TimerRunning = runTimer;
+        Timer = 0;
+    }
+    private void ConnectionTimedOut()
+    {
+        Disconnect();
+        SimpleNetworkingUI.Instance.DisplayTimeOutMessage();
+    }
     private void OnApplicationQuit()
     {
         Disconnect();
@@ -282,11 +329,17 @@ public class Client : MonoBehaviour
     {
         if (Connected)
         {
+            try
+            {
+                tCP.Socket.Close();
+                uDP.Socket.Close();
+            }
+            catch (Exception exception)
+            {
+                Debug.Log($"Error, tried to close TCP and UDP sockets:\n{exception}");
+            }
             SimpleNetworkingUI.Instance.Disconnected();
             Connected = false;
-            
-            tCP.Socket.Close();
-            uDP.Socket.Close();
 
             Debug.Log($"You, client: {ClientID} have been disconnected.");
             

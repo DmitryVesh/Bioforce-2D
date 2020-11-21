@@ -46,14 +46,12 @@ public class GameManager : MonoBehaviour
     }
     public void DisconnectPlayer(int disconnectedPlayer)
     {
-        //TODO: problem occurs here
         Debug.Log($"Player: {disconnectedPlayer} has disconnected.");
         PlayerDictionary[disconnectedPlayer].Disconnect();
         PlayerDictionary.Remove(disconnectedPlayer);
     }
     public void DisconnectAllPlayers()
     {
-        //TODO: problem occurs here
         Debug.Log($"All players are being disconnected.");
         foreach (PlayerManager player in PlayerDictionary.Values)
         {

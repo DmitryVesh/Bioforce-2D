@@ -35,10 +35,18 @@ namespace GameServer
         }
         public static void PlayerMovementRead(int clientID, Packet packet)
         {
-            Quaternion rotation = packet.ReadQuaternion();
-            Vector3 position = packet.ReadVector3();
-            Vector3 velocity = packet.ReadVector3();
-            Server.ClientDictionary[clientID].player.PlayerMoves(rotation, position, velocity);
+            try
+            {
+                Quaternion rotation = packet.ReadQuaternion();
+                Vector3 position = packet.ReadVector3();
+                Vector3 velocity = packet.ReadVector3();
+                //Sometimes System.NullReferenceException when a player disconnects
+                Server.ClientDictionary[clientID].player.PlayerMoves(rotation, position, velocity);
+            }
+            catch (NullReferenceException exception)
+            {
+                Console.WriteLine($"Error, trying to read player movement, when a player: {clientID} has disconnected...\n{exception}");
+            }
         }
         public static void PlayerMovementStatsRead(int clientID, Packet packet)
         {
