@@ -1,13 +1,22 @@
-﻿using TMPro;
+﻿using System;
+using TMPro;
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
     [SerializeField] private int ID;
     [SerializeField] private string Username;
-    private Rigidbody2D RB { get; set; }
+
     private GameObject PlayerModelObject { get; set; }
     private TextMeshProUGUI UsernameText { get; set; }
+
+    public Vector2 Velocity { get; set; }
+    private float RunSpeed { get; set; }
+    private float SprintSpeed { get; set; }
+
+    // Delegate and event used to notify when movement stats are read from server
+    public delegate void PlayerMovementStats(float runSpeed);
+    public event PlayerMovementStats PlayerMovementStatsChanged;
 
     public void Initialise(int iD, string username) 
     {
@@ -17,28 +26,30 @@ public class PlayerManager : MonoBehaviour
     public void SetPosition(Vector3 position)
     {
         PlayerModelObject.transform.position = position;
-
     }
     public void SetRotation(Quaternion rotation)
     {
         PlayerModelObject.transform.rotation = rotation;
     }
-    public void AddVelocity(Vector3 velocity)
+    public void SetPlayerMovementStats(float runSpeed, float sprintSpeed)
     {
-        RB.AddForce(velocity);
+        RunSpeed = runSpeed;
+        SprintSpeed = sprintSpeed;
+        PlayerMovementStatsChanged?.Invoke(runSpeed);
     }
     public void Disconnect()
     {
         Destroy(gameObject);
     }
 
+
     private void Awake()
     {
         PlayerModelObject = transform.GetChild(0).gameObject;
-        RB = PlayerModelObject.GetComponent<Rigidbody2D>();
         UsernameText = PlayerModelObject.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>();
         SetUsername("");
     }
+    
     private void SetUsername()
     {
         UsernameText.text = Username;

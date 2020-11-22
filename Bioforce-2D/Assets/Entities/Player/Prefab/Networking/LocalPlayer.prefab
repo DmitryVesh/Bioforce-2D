@@ -177,7 +177,7 @@ GameObject:
   m_Component:
   - component: {fileID: 286639045735284032}
   - component: {fileID: 2011391865815507775}
-  - component: {fileID: 1433785289875460062}
+  - component: {fileID: 6959280556832634452}
   - component: {fileID: 3727253228089246339}
   - component: {fileID: 1533597402597742654}
   m_Layer: 11
@@ -217,12 +217,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RunSpeed: 5
   SprintSpeed: 7
-  MaxStamina: 5
-  RateStaminaLoss: 1
-  RateStaminaRegen: 0.5
   WhatIsGround:
     serializedVersion: 2
     m_Bits: 1792
+  MaxStamina: 5
+  RateStaminaLoss: 1
+  RateStaminaRegen: 0.5
   PlatformLayerName: Platform
   JumpForce: 10
   NumberOfExtraJumps: 1
@@ -230,7 +230,7 @@ MonoBehaviour:
   FGroundedRememberTime: 0.2
   FCutJumpHeight: 0.45
   GroundCheckTimer: 0.15
---- !u!114 &1433785289875460062
+--- !u!114 &6959280556832634452
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -239,10 +239,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5321615058723665281}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c322152b89434f479bdb76fdc554b8f, type: 3}
+  m_Script: {fileID: 11500000, guid: fbbf4f29bd9c2f5418a74918a2c14114, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  facingRight: 1
+  FacingRight: 1
 --- !u!114 &3727253228089246339
 MonoBehaviour:
   m_ObjectHideFlags: 0

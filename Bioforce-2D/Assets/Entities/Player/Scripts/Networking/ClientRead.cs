@@ -36,14 +36,26 @@ public class ClientRead : MonoBehaviour
         Vector3 position = packet.ReadVector3();
         Quaternion rotation = packet.ReadQuaternion();
 
+        float runSpeed = packet.ReadFloat();
+        float sprintSpeed = packet.ReadFloat();
+
         GameManager.Instance.SpawnPlayer(iD, username, position, rotation);
+        GameManager.PlayerDictionary[iD].SetPlayerMovementStats(runSpeed, sprintSpeed);
     }
+    public static void PlayerMovementStats(Packet packet)
+    {
+        int iD = packet.ReadInt();
+        float runSpeed = packet.ReadFloat();
+        float sprintSpeed = packet.ReadFloat();
+
+        GameManager.PlayerDictionary[iD].SetPlayerMovementStats(runSpeed, sprintSpeed);
+    }
+
     public static void PlayerPosition(Packet packet)
     {
         int iD = packet.ReadInt();
         Vector3 position = packet.ReadVector3();
 
-        //Debug.Log($"Received player position packet from player: {iD}\nPosition sent {position}");
         // Prevents crash when a UDP packet connects before the TCP spawn player call from server
         try
         {
@@ -54,34 +66,22 @@ public class ClientRead : MonoBehaviour
             Debug.Log($"Player iD PlayerPosition: {iD}\n {exception}");
         }
     }
-    public static void PlayerVelocity(Packet packet)
-    {
-        int iD = packet.ReadInt();
-        Vector3 velocity = packet.ReadVector3();
-        
-        // Prevents crash when a UDP packet connects before the TCP spawn player call from server
-        try
-        {
-            GameManager.PlayerDictionary[iD].AddVelocity(velocity);
-        }
-        catch (KeyNotFoundException exception)
-        {
-            Debug.Log($"Player iD PlayerVelocity: {iD}\n {exception}");
-        }
-    }
-    public static void PlayerRotation(Packet packet)
+    public static void PlayerRotationAndVelocity(Packet packet)
     {
         int iD = packet.ReadInt();
         Quaternion rotation = packet.ReadQuaternion();
+        Vector2 velocity = packet.ReadVector2();
 
         // Prevents crash when a UDP packet connects before the TCP spawn player call from server
         try
         {
             GameManager.PlayerDictionary[iD].SetRotation(rotation);
+            GameManager.PlayerDictionary[iD].Velocity = velocity;
         }
         catch (KeyNotFoundException exception)
         {
             Debug.Log($"Player iD PlayerRotation: {iD}\n {exception}");
         }
     }
+    
 }

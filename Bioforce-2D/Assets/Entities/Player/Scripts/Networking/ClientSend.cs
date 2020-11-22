@@ -19,14 +19,13 @@ public class ClientSend : MonoBehaviour
         packet.Write("Received UDP Test Packet");
         SendUDPPacket(packet);
     }
-    public static void PlayerMovement(Quaternion rotation, Vector3 position, Vector3 velocity)
+    public static void PlayerMovement(Quaternion rotation, Vector3 position, Vector2 velocity)
     {
         Packet packet = new Packet((int)ClientPackets.playerMovement);
         packet.Write(rotation);
         packet.Write(position);
         packet.Write(velocity);
         SendUDPPacket(packet);
-        //Debug.Log($"Sending movement packet to server, position: {position}");
     }
     public static void PlayerMovementStats(float runSpeed, float sprintSpeed)
     {

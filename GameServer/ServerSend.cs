@@ -36,6 +36,9 @@ namespace GameServer
             packet.Write(player.Position);
             packet.Write(player.Rotation);
 
+            packet.Write(player.RunSpeed);
+            packet.Write(player.SprintSpeed);
+
             SendTCPPacket(recipientClient, packet);
         }
         public static void PlayerPosition(int playerID, Vector3 position)
@@ -54,22 +57,23 @@ namespace GameServer
 
             SendUDPPacketToAllButIncluded(playerID, packet);
         }
-        public static void PlayerVelocity(int playerID, Vector3 velocity)
+        public static void PlayerRotationAndVelocity(int playerID, Quaternion rotation, Vector2 velocity)
         {
-            Packet packet = new Packet((int)ServerPackets.playerVelocity);
+            Packet packet = new Packet((int)ServerPackets.playerRotationAndVelocity);
             packet.Write(playerID);
+            packet.Write(rotation);
             packet.Write(velocity);
 
             SendUDPPacketToAllButIncluded(playerID, packet);
         }
-        public static void PlayerRotation(int playerID, Quaternion rotation)
+        public static void PlayerMovementStats(int playerID, float runSpeed, float sprintSpeed)
         {
-            Packet packet = new Packet((int)ServerPackets.playerRotation);
+            Packet packet = new Packet((int)ServerPackets.playerMovementStats);
             packet.Write(playerID);
-            packet.Write(rotation);
+            packet.Write(runSpeed);
+            packet.Write(sprintSpeed);
 
-            //SendUDPPacketToAllButIncluded(playerID, packet);
-            SendTCPPacketToAllButIncluded(playerID, packet);
+            SendTCPPacketToAll(packet);
         }
 
         private static void SendTCPPacket(int recipientClient, Packet packet)

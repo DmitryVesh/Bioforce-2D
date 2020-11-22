@@ -26,7 +26,7 @@ namespace GameServer
             int checkClientID = packet.ReadInt();
             string message = packet.ReadString();
 
-            Console.WriteLine($"UDP Test received from: {checkClientID}\n{message}");
+            Console.WriteLine($"UDP Test received from: {checkClientID}, Message: {message}\n");
             if (clientID == checkClientID)
             {
                 return;
@@ -39,7 +39,7 @@ namespace GameServer
             {
                 Quaternion rotation = packet.ReadQuaternion();
                 Vector3 position = packet.ReadVector3();
-                Vector3 velocity = packet.ReadVector3();
+                Vector2 velocity = packet.ReadVector2();
                 //Sometimes System.NullReferenceException when a player disconnects
                 Server.ClientDictionary[clientID].player.PlayerMoves(rotation, position, velocity);
             }
@@ -54,6 +54,7 @@ namespace GameServer
             float sprintSpeed = packet.ReadFloat();
 
             Server.ClientDictionary[clientID].player.SetPlayerMovementStats(runSpeed, sprintSpeed);
+            ServerSend.PlayerMovementStats(clientID, runSpeed, sprintSpeed);
         }
         public static void PlayerAnimationRead()
         {

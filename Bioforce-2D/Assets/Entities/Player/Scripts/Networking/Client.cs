@@ -321,8 +321,8 @@ public class Client : MonoBehaviour
         PacketHandlerDictionary.Add((int)ServerPackets.udpTest, ClientRead.UDPTestRead);
         PacketHandlerDictionary.Add((int)ServerPackets.spawnPlayer, ClientRead.SpawnPlayer);
         PacketHandlerDictionary.Add((int)ServerPackets.playerPosition, ClientRead.PlayerPosition);
-        PacketHandlerDictionary.Add((int)ServerPackets.playerVelocity, ClientRead.PlayerVelocity);
-        PacketHandlerDictionary.Add((int)ServerPackets.playerRotation, ClientRead.PlayerRotation);
+        PacketHandlerDictionary.Add((int)ServerPackets.playerRotationAndVelocity, ClientRead.PlayerRotationAndVelocity);
+        PacketHandlerDictionary.Add((int)ServerPackets.playerMovementStats, ClientRead.PlayerMovementStats);
         PacketHandlerDictionary.Add((int)ServerPackets.playerDisconnect, ClientRead.PlayerDisconnect);
     }
     private void Disconnect()

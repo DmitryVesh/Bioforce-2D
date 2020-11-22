@@ -9,12 +9,12 @@ namespace GameServer
         public string Username { get; private set; }
 
         public Vector3 Position { get; private set; }
-        public Vector3 Velocity { get; private set; }
+        public Vector2 Velocity { get; private set; }
         public Quaternion Rotation { get; private set; }
 
         private Vector3 LastPosition { get; set; }
-        private float RunSpeed { get; set; } = 0;
-        private float SprintSpeed { get; set; } = 0;
+        public float RunSpeed { get; set; } = 0;
+        public float SprintSpeed { get; set; } = 0;
         private int MovePlayerSent { get; set; } = 0;
 
         public Player(int iD, string username, Vector3 position)
@@ -25,7 +25,7 @@ namespace GameServer
             Rotation = Quaternion.Identity;
             LastPosition = position;
         }
-        public void PlayerMoves(Quaternion rotation, Vector3 position, Vector3 velocity)
+        public void PlayerMoves(Quaternion rotation, Vector3 position, Vector2 velocity)
         {
             Rotation = rotation;
             Position = position;
@@ -58,7 +58,7 @@ namespace GameServer
                 ServerSend.PlayerPositionButLocal(ID, Position);
 
             //ServerSend.PlayerVelocity(ID, Velocity);
-            ServerSend.PlayerRotation(ID, Rotation);
+            ServerSend.PlayerRotationAndVelocity(ID, Rotation, Velocity);
             MovePlayerSent += 1;
             //ServerSend.PlayerAnimation(ID, )
         }

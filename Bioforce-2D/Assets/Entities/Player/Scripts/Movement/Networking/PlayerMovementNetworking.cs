@@ -1,13 +1,11 @@
 ﻿using System;
 using UnityEngine;
 
-public class PlayerMovementNetworking : MonoBehaviour
+public class PlayerMovementNetworking : EntityWalking
 {
     // Moving in X direction Data
     private bool CanMove { get; set; } // Used to check if the player should be able to move
-    [SerializeField] private float RunSpeed = 5; // Used as x velocity multiplier when running
-    [SerializeField] private float SprintSpeed = 7; // Used as x velocity multiplier when sprinting
-    private float SpeedX { get; set; } // Used to store the input in x direction, as well as in PlayerAnimations
+    public float SpeedX { get; private set; } // Used to store the input in x direction, as well as in PlayerAnimations
 
 
     // Stamina Data
@@ -18,7 +16,6 @@ public class PlayerMovementNetworking : MonoBehaviour
 
 
     // Moving in Y direction Data
-    [SerializeField] public LayerMask WhatIsGround; // LayerMask used to determine what is considered ground for the player
     [SerializeField] private string PlatformLayerName; // LayerMask used to determine what is a platform, so can go through that layer
     private int PlatformLayer;
 
@@ -38,16 +35,11 @@ public class PlayerMovementNetworking : MonoBehaviour
     [SerializeField] private float GroundCheckTimer = 0.1f; // Timer used to check for ground, should't be all the time, as it CPU taxing to draw rays
                                                             // Also allows the player to be grounded for longer 
     private float groundTimer = 0; // Holds current ground check timer time
-    private float SpeedY { get; set; }
 
-    // References to other scripts
-    private Rigidbody2D rb { get; set; } // Used to add force in x and y directions, corresponding to input
-    private CapsuleCollider2D hitbox { get; set; } // Used to determine if player is grounded
-    //private PlayerAnimations playerAnimations { get; set; } // Used to call Jump animation method when Jumping
-    private GameObject PlayerModelObject { get; set; }
+    
 
     // Variables used for PlayerAnimations
-    private bool Grounded { get; set; } = false; // used to track if the player has landed, or is the air
+    // Grounded found in EntityWalking
     // SpeedX which is found in moving in X direction Data
     // runSpeed used to know when to switch from normal running animation to sprinting animation
     private bool Jumped { get; set; } = false; // Used to identify when player has jumped
@@ -60,12 +52,17 @@ public class PlayerMovementNetworking : MonoBehaviour
         Jumped = false; // Resets jumped if it is was true
         return animData;
     }
-
-    private void Awake()
+    public bool HasJumped()
     {
-        PlayerModelObject = transform.GetChild(0).gameObject;
-        rb = PlayerModelObject.GetComponent<Rigidbody2D>();
-        hitbox = PlayerModelObject.GetComponent<CapsuleCollider2D>();
+        bool result = Jumped;
+        Jumped = false;
+        return result;
+    }
+
+    protected override void Awake()
+    {
+        base.Awake();
+
         CanMove = true;
         currentStamina = MaxStamina;
 
@@ -77,8 +74,6 @@ public class PlayerMovementNetworking : MonoBehaviour
     void Update() // Used for getting user input, and storing it later to be used in FixedUpdate
     {
         if (!CanMove) { return; } // Player shouldn't be able to move when dying, or initially respawing, so shouldn't move
-        //transform.position = PlayerModelObject.transform.position;
-        //transform.rotation = PlayerModelObject.transform.rotation;
         MovementX();
         MovementY();
     }
@@ -172,12 +167,9 @@ public class PlayerMovementNetworking : MonoBehaviour
         groundTimer -= Time.deltaTime; // Decreasing the ground check timer
 
         bool groundTimerRunOut = groundTimer < 0; // Has ground check timer ran out?
-        bool isGrounded = IsGrounded();
-        this.Grounded = isGrounded;
 
-        if (isGrounded && groundTimerRunOut) // If has landed and ground check timer ran out
+        if (Grounded && groundTimerRunOut) // If has landed and ground check timer ran out
         {
-            this.Grounded = true;
             groundTimer = GroundCheckTimer; // Reset ground check timer
             currentNumJumps = NumberOfExtraJumps + 1; // Restore all jumps
             fGroundedRemember = FGroundedRememberTime; // Restore remember that you are grounded timer
@@ -196,7 +188,6 @@ public class PlayerMovementNetworking : MonoBehaviour
             if (velocity.y > 0) // If player is still going up
             { 
                 rb.velocity = new Vector2(velocity.x, velocity.y * FCutJumpHeight); // Decreases the y axis up velocity, so player stops moving up faster
-                //SpeedY = velocity.y * FCutJumpHeight; // Decreases the y axis up velocity, so player stops moving up faster
             }
         }
 
@@ -218,49 +209,23 @@ public class PlayerMovementNetworking : MonoBehaviour
     }
     private void PlayerJump()
     {
-        //SpeedY = JumpForce;
         rb.velocity = new Vector2(rb.velocity.x, JumpForce);
-        
         Jumped = true;
     }
-    private bool IsGrounded() // Raycast used to check if character is grounded, uses layemark whatIsGround
-    {
-        float extraHeight = 0.01f;
-        // A ray is used to detect ground using what is defined in Inspector as ground using layers
-        RaycastHit2D raycastHit = Physics2D.Raycast(hitbox.bounds.center, Vector2.down, hitbox.bounds.extents.y + extraHeight, WhatIsGround);
-        //Color rayColor; // Debug color of the gizmo
+    
 
-        if (raycastHit)
-        {
-            //rayColor = Color.green;
-            //Debug.DrawRay(hitbox.bounds.center, Vector2.down * (hitbox.bounds.extents.y + extraHeight), rayColor); // showing the gizmo line 
-            return true;
-        }
-        else
-        {
-            //rayColor = Color.red;
-            //Debug.DrawRay(hitbox.bounds.center, Vector2.down * (hitbox.bounds.extents.y + extraHeight), rayColor);
-            return false;
-        }
-    }
-
-    private void FixedUpdate()
+    protected override void FixedUpdate()
     {
-        rb.velocity = new Vector2(SpeedX, rb.velocity.y); // Applying movement in x direction, SpeedX calculated in Update, calculated in Update in order to increase responsiveness, applied in FixedUpdate to keep physics interaction reliable
-        //Vector3 movingDirection = new Vector3(SpeedX, rb.velocity.y);
-        //Vector3 newPosition = transform.position + movingDirection;
-        //Debug.Log($"SpeedX: {SpeedX}" +
-        //        $"\nrb.velocity.y: {rb.velocity.y}" +
-        //        $"\nmovingDirection: {movingDirection}" +
-        //        $"\nnewPosition: {newPosition}");
-        //SendMovesToServer(new Vector2(SpeedX, rb.velocity.y));
+        base.FixedUpdate();
+        Vector2 velocity = new Vector2(SpeedX, rb.velocity.y);
+        rb.velocity = velocity; // Applying movement in x direction, SpeedX calculated in Update, calculated in Update in order to increase responsiveness, applied in FixedUpdate to keep physics interaction reliable
         
-        SendMovesToServer(new Vector2(SpeedX, SpeedY));
+        SendMovesToServer(velocity);
     }
 
-    private void SendMovesToServer(Vector3 newPosition)
+    private void SendMovesToServer(Vector3 velocity)
     {
-        ClientSend.PlayerMovement(PlayerModelObject.transform.rotation, PlayerModelObject.transform.position, newPosition);
+        ClientSend.PlayerMovement(ModelObject.transform.rotation, ModelObject.transform.position, velocity);
     }
 
 

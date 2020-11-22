@@ -10,8 +10,8 @@ public enum ServerPackets
     udpTest,
     spawnPlayer,
     playerPosition,
-    playerRotation,
-    playerVelocity,
+    playerRotationAndVelocity,
+    playerMovementStats,
     playerDisconnect
 
 }
@@ -174,6 +174,13 @@ public class Packet : IDisposable
         Write(_value.x);
         Write(_value.y);
         Write(_value.z);
+    }
+    /// <summary>Adds a Vector2 to the packet.</summary>
+    /// <param name="_value">The Vector2 to add.</param>
+    public void Write(Vector2 _value)
+    {
+        Write(_value.x);
+        Write(_value.y);
     }
     /// <summary>Adds a Quaternion to the packet.</summary>
     /// <param name="_value">The Quaternion to add.</param>
@@ -368,6 +375,20 @@ public class Packet : IDisposable
         catch
         {
             throw new Exception("Could not read value of type 'Vector3'!");
+        }
+    }
+    /// <summary>Reads a Vector2 from the packet.</summary>
+    /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
+    public Vector2 ReadVector2(bool _moveReadPos = true)
+    {
+        try
+        {
+            Vector2 _value = new Vector2(ReadFloat(_moveReadPos), ReadFloat(_moveReadPos));
+            return _value; // Return the Vector2
+        }
+        catch
+        {
+            throw new Exception("Could not read value of type 'Vector2'!");
         }
     }
     /// <summary>Reads a Quaternion from the packet.</summary>

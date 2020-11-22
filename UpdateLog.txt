@@ -1,11 +1,77 @@
 ===============================================================================================================================
+Version 0.5.1
+-----------
+
+Summary
+-------
+Main goals is to;
+	1 Add non local player animations
+
+			
+Future tasks;
+	Add player attacking (shooting),
+	Add player taking damage
+	Add player dying and respawning
+	Fix LAN connection	
+
+	Make so can play on a mobile device.
+	Make so LAN connection tries to connect to your actual lan connection, and not hard coded values
+	
+	Add animations to banners
+	improve collision detection,
+	
+	Add player disconnections if the server suspects the player of movement cheating
+	make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+	make the ThreadManager to work on multi-threading
+	prevent crashing and stopping receiving packets from client to server when 2 or more clients disconnect simultaneosly.
+	improve UI, adding pop up animations to the UI elements instead of just appearing instantly.
+	improve UI, adding black borders to UI Panels like TimeOutPanel.
+
+	add breathing camera movement when player is idle, going up and down.
+	add music Spoiler - Original Mix (Hyper) to game.
+
+TODO Tasks | 1 = done, 0 = not done
+-----------------------------------
+
+Importing assets
+----------------
+
+UnityEditor
+-----------
+1 Added NonLocalPlayerAnimations and EntityWalking to OtherPlayer prefab. So non local players are animated.
+
+Implementing scripts
+--------------------
+1 Added NonLocalPlayerAnimations, which is similar to PlayerAnimationsNetworking, enables to be put onto non local players, and get updates
+	of the player movement stats, changing SpeedX of the player, using the Event defined in PlayerManager script.
+1 Renamed PlayerAnimationsNetworking script to LocalPlayerAnimations, and made it to so it inherets from NonLocalPlayerAnimations.
+	Overrides awake, fixedUpdate and YaxisAnimations, so able to correct the SpeedX and triggering the jumped animation trigger.
+1 Add EntityWalking, script placed on non local players, and for future enemies, which is a brief PlayerMovementNetworking script, with a ground check.
+	PlayerMovementNetworking inherits from it.
+1 Edit PlayerMovementNetworking, made it inherit from EntityWalking, took away methods and properties that are found in the inherited class.
+1 Edit Client, changed PacketHandler dictionary initiliasation to combine the playerVelocity and playerRotation, and added player movement stats.
+1 Edit ClientRead, added reading of runSpeed and sprintSpeed to the spawn packet. Added a new handler for playerMovementStats packet, which sets the player movement stats of a player.
+1 Edit ClientSend, changed the Vector3 to a vector2, so habe to transmit less data.
+1 Edit PlayerManager, added a delegate and event which notifies the subscribed nonLocalPlayerAnimations of a change in the playermovement stats, removed rigidBody because it was not used, 
+	and added velocity and player movement stats fields. 
+1 Edit Packet, added server packets for playerRotationAndVelocity and movement stats. Added a vector2 write and read method.
+
+GameServer code
+---------------
+1 Edit Packet, added server packets for playerRotationAndVelocity and movement stats. Added a vector2 write and read method.
+1 Edit Player, changed velocity to vector2, made runSpeed and sprintSpeed public, calls to send the PlayerRotationAndVelocity, not just rotation.
+1 Edit ServerRead, changed velocity to vector2, and added a serverSend call of the playerMovementStats when receiving a movement stats packet, which sends it to all players.
+1 Edit ServerSend, changed seperate PlayerRotation and velocity packets into 1, and added a movement stats packet, sending to all via TCP to make sure it doesn't get lost.w
+
+===============================================================================================================================
 Version 0.4
 -----------
 
 Summary
 -------
 Main goals is to;
-	1 Let the player choose how to try connect to the server, via LocalHost, LAN or Internet. Allowing for over internet connections
+	1 Let the player choose how to try connect to the server, via LocalHost, LAN or Internet. Allowing for over internet connections,
+		an IP connectiong setting dropdown list
 	1 Add player user names to the players, so players can know who is in the server.
 	1 Add timeouts, so if player trying to connect to server for too long, gets timed out. Allowing for player to try and reconnect, if chosen
 		wrong IP connection setting, or the server is just slow.

@@ -71,7 +71,7 @@ namespace GameServer
         {
             TcpClient client = TCPListener.EndAcceptTcpClient(asyncResult);
             TCPBeginAcceptClient();
-            Console.WriteLine($"User {client.Client.RemoteEndPoint} is trying to connect...");
+            Console.WriteLine($"\nUser {client.Client.RemoteEndPoint} is trying to connect...");
 
             for (int count = 1; count < MaxNumPlayers + 1; count++)
             {
@@ -83,7 +83,7 @@ namespace GameServer
                     return;
                 }
             }
-            Console.WriteLine($"The server is full... {client.Client.RemoteEndPoint} couldn't connect...");
+            Console.WriteLine($"\nThe server is full... {client.Client.RemoteEndPoint} couldn't connect...");
         }
         private static void TCPBeginAcceptClient()
         {

@@ -186,7 +186,8 @@ namespace GameServer
                 {
                     if (client.ID != ID)
                     {
-                        ServerSend.SpawnPlayer(ID, client.player);
+                        Player player = client.player;
+                        ServerSend.SpawnPlayer(ID, player);
                     }
                 }
             }
