@@ -2,84 +2,95 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NonLocalPlayerAnimations : MonoBehaviour
+public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
 {
     private GameObject PlayerModelObject { get; set; } = null;
     protected Animator Anim { get; set; } = null;
-    private PlayerManager PlayerManager { get; set; } = null;
-    private EntityWalking EntityWalking { get; set; } = null;
+    protected IWalkingPlayer WalkingPlayer { get; set; } = null;
 
-    protected bool IsLocalPlayer { get; set; } = false;
+    private int OwnerClientID { get; set; } = -1;
+    PlayerManager PlayerManager { get; set; } = null;
 
-    //X axis animations
-    public float RunSpeed { get; set; }
-    protected float SpeedX { get; set; }
+
+    //Fields for X axis animations
     [SerializeField] private bool FacingRight = true;
+    private float SpeedXNonLocal { get; set; }
 
-    //Y Axis animations
+    //TODO: add Jumped sent animations so can play sound effect
 
-
-    //TODO: PlayerAnimation script which is put on nonLocal players, and then inhereted
-    // and extended by LocalPlayer
-
-    // 1 RunSpeed
-    // 1 SpeedX
-    // 1 Grounded
-    // 0 Jumped
+    public void SetOwnerClientID(int iD)
+    {
+        OwnerClientID = iD;
+    }
 
     protected virtual void Awake()
     {
         PlayerModelObject = transform.GetChild(0).gameObject;
         Anim = PlayerModelObject.GetComponent<Animator>();
-        PlayerManager = GetComponent<PlayerManager>();
-        PlayerManager.PlayerMovementStatsChanged += ChangedPlayerMovementStats; //Subscribe to the PlayerMovementStatsChanged event, so can change runSpeed
-
-        if (!IsLocalPlayer)
-            EntityWalking = GetComponent<EntityWalking>();
+        
+        WalkingPlayer = GetComponent<IWalkingPlayer>();
     }
-    private void OnDestroy()
+    private void Start()
     {
-        PlayerManager.PlayerMovementStatsChanged -= ChangedPlayerMovementStats;
+        PlayerManager = GameManager.PlayerDictionary[OwnerClientID];
+
+        PlayerManager.OnPlayerDeath += DieAnimation;
+        PlayerManager.OnPlayerRespawn += RespawnAnimation;
     }
     protected virtual void FixedUpdate()
     {
-        if (!IsLocalPlayer)
-            SpeedX = PlayerManager.Velocity.x;
-
-        XaxisAnimations();
-        YaxisAnimations();
+        SpeedXNonLocal = WalkingPlayer.GetSpeedX();
+        XAxisAnimations(SpeedXNonLocal);
+        YAxisAnimations();
     }
 
-    protected void ChangedPlayerMovementStats(float runSpeed)
+    
+    public void XAxisAnimations(float speedX)
     {
-        RunSpeed = runSpeed;
-    }
-
-    private void XaxisAnimations()
-    {
-        float speedX = SpeedX;
         if (speedX < 0) //Moving left
         {
             speedX = -speedX; // Adjusting the horizontal speed to a positive value if moving to left
         }
         Anim.SetBool("Moving", speedX != 0);
-        Anim.SetBool("Sprinting", speedX > RunSpeed);
+        Anim.SetBool("Sprinting", speedX > WalkingPlayer.GetRunSpeed());
     }
-    protected virtual void YaxisAnimations()
+    public virtual void YAxisAnimations()
     {
-        Anim.SetBool("Grounded", EntityWalking.Grounded);
+        Anim.SetBool("Grounded", WalkingPlayer.GetGrounded());
     }
-    protected virtual void LateUpdate()
+    public virtual void DieAnimation()
     {
-        if ((SpeedX < 0 && FacingRight) || (SpeedX > 0 && !FacingRight))
-        {
-            FlipSprite();
-        }
+        Anim.SetTrigger("Die");
+    }
+    public virtual void RespawnAnimation()
+    {
+        Anim.SetTrigger("Respawn");
     }
 
-    private void FlipSprite()
+
+    protected virtual void LateUpdate()
+    {
+        if (CheckIfNeedToFlipSprite(WalkingPlayer.GetSpeedX()))
+            FlipSprite();
+    }
+    protected bool CheckIfNeedToFlipSprite(float speedX)
+    {
+        if ((speedX < 0 && FacingRight) || (speedX > 0 && !FacingRight))
+        {
+            return true;
+        }
+        return false;
+    }
+    public void FlipSprite()
     {
         FacingRight = !FacingRight;
         PlayerModelObject.transform.Rotate(0, 180, 0);
     }
+
+    private void OnDestroy()
+    {
+        PlayerManager.OnPlayerDeath -= DieAnimation;
+        PlayerManager.OnPlayerRespawn -= RespawnAnimation;
+    }
+
 }

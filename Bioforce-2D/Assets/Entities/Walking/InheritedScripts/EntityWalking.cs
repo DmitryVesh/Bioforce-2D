@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EntityWalking : MonoBehaviour
+public class EntityWalking : MonoBehaviour, IWalking
 {
     // Moving in X direction Data
     [SerializeField] protected float RunSpeed = 5; // Used as x velocity multiplier when running
@@ -18,7 +18,7 @@ public class EntityWalking : MonoBehaviour
 
     // Variables used for Animations
     public bool Grounded { get; private set; } = false; // used to track if the entity has landed, or is the air
-
+    protected bool CanMove { get; set; } = true;
 
     protected virtual void Awake()
     {
@@ -28,9 +28,14 @@ public class EntityWalking : MonoBehaviour
     }
     protected virtual void FixedUpdate()
     {
+        if (!CanMove)
+        {
+            Grounded = true;
+            return;
+        }
         Grounded = IsGrounded();
     }
-    protected bool IsGrounded() // Raycast used to check if character is grounded, uses layemark whatIsGround
+    private bool IsGrounded() // Raycast used to check if character is grounded, uses layemark whatIsGround
     {
         float extraHeight = 0.01f;
         // A ray is used to detect ground using what is defined in Inspector as ground using layers
@@ -49,5 +54,22 @@ public class EntityWalking : MonoBehaviour
             //Debug.DrawRay(hitbox.bounds.center, Vector2.down * (hitbox.bounds.extents.y + extraHeight), rayColor);
             return false;
         }
+    }
+    
+    public bool GetGrounded()
+    {
+        return Grounded;
+    }
+
+    protected void FreezeMotion()
+    {
+        CanMove = false;
+        rb.velocity.Set(0, 0);
+        rb.Sleep();
+    }
+    protected void UnFreezeMotion()
+    {
+        CanMove = true;
+        rb.WakeUp();
     }
 }

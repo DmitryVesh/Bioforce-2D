@@ -39,7 +39,9 @@ public class ClientRead : MonoBehaviour
         float runSpeed = packet.ReadFloat();
         float sprintSpeed = packet.ReadFloat();
 
-        GameManager.Instance.SpawnPlayer(iD, username, position, rotation);
+        bool isDead = packet.ReadBool();
+
+        GameManager.Instance.SpawnPlayer(iD, username, position, rotation, isDead);
         GameManager.PlayerDictionary[iD].SetPlayerMovementStats(runSpeed, sprintSpeed);
     }
     public static void PlayerMovementStats(Packet packet)
@@ -76,12 +78,38 @@ public class ClientRead : MonoBehaviour
         try
         {
             GameManager.PlayerDictionary[iD].SetRotation(rotation);
-            GameManager.PlayerDictionary[iD].Velocity = velocity;
+            GameManager.PlayerDictionary[iD].SetVelocity(velocity);
         }
         catch (KeyNotFoundException exception)
         {
             Debug.Log($"Player iD PlayerRotation: {iD}\n {exception}");
         }
     }
-    
+    public static void BulletShot(Packet packet)
+    {
+        int iD = packet.ReadInt();
+        Vector2 position = packet.ReadVector2();
+        Quaternion rotation = packet.ReadQuaternion();
+
+        try
+        {
+            GameManager.PlayerDictionary[iD].ShotBullet(position, rotation);
+        }
+        catch (KeyNotFoundException exception)
+        {
+            Debug.Log($"Error, in bullet shot in player iD: {iD}\n{exception}");
+        }
+    }
+    public static void PlayerDied(Packet packet)
+    {
+        int playerKilledID = packet.ReadInt();
+        int bulletOwnerID = packet.ReadInt();
+        KillFeedUI.Instance.AddKillFeedEntry(playerKilledID, bulletOwnerID);
+        GameManager.PlayerDictionary[playerKilledID].PlayerDied();
+    }
+    public static void PlayerRespawned(Packet packet)
+    {
+        int iD = packet.ReadInt();
+        GameManager.PlayerDictionary[iD].PlayerRespawned();
+    }
 }

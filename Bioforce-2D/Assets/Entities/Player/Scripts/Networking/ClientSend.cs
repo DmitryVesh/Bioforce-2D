@@ -34,21 +34,52 @@ public class ClientSend : MonoBehaviour
         packet.Write(sprintSpeed);
         SendTCPPacket(packet); // Only sending once, so want to make sure it gets there
     }
-
-    public static void PlayerAnimation(float runSpeed, float speedX, bool grounded, bool jumped)
+    public static void ShotBullet(Vector2 position, Quaternion rotation)
     {
-        //throw new NotImplementedException("Player Animation in Client Send Not set up");
+        Packet packet = new Packet((int)ClientPackets.bulletShot);
+        packet.Write(position);
+        packet.Write(rotation);
+        SendTCPPacket(packet);
     }
+    public static void PlayerDied(int bulletOwnerID)
+    {
+        //TODO: 9000 Implement so see kill score and etc... so send who killed who
+        Packet packet = new Packet((int)ClientPackets.playerDied);
+        packet.Write(bulletOwnerID);
+        SendTCPPacket(packet);
+    }
+    public static void PlayerRespawned()
+    {
+        Packet packet = new Packet((int)ClientPackets.playerRespawned);
+        //Can send empty packet because the server knows which clients sent a packet
+        SendTCPPacket(packet);
+    }
+    
 
     private static void SendTCPPacket(Packet packet)
     {
-        packet.WriteLength();
-        Client.Instance.tCP.SendPacket(packet);
+        try
+        {
+            packet.WriteLength();
+            Client.Instance.tCP.SendPacket(packet);
+        }
+        catch (Exception exception)
+        {
+            //TODO: add disconnect if too many packets are lost
+            Debug.Log($"Error, sending TCP Packet...\n{exception}");
+        }
     }
     private static void SendUDPPacket(Packet packet)
     {
-        packet.WriteLength();
-        Client.Instance.uDP.SendPacket(packet);
+        try
+        {
+            packet.WriteLength();
+            Client.Instance.uDP.SendPacket(packet);
+        }
+        catch (Exception exception)
+        {
+            Debug.Log($"Error, sending UDP Packet...\n{exception}");
+        }
     }
 
     

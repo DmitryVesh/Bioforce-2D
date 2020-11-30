@@ -180,6 +180,8 @@ GameObject:
   - component: {fileID: 6959280556832634452}
   - component: {fileID: 3727253228089246339}
   - component: {fileID: 1533597402597742654}
+  - component: {fileID: -6939984365992781228}
+  - component: {fileID: 5049058652260020967}
   m_Layer: 11
   m_Name: LocalPlayer
   m_TagString: Untagged
@@ -270,6 +272,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ID: 0
   Username: 
+--- !u!114 &-6939984365992781228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5321615058723665281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dda935c7621b35944ba522e425aaab55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BulletPrefab: {fileID: 8231054374207678704, guid: aa2eb6671e351654d96393916723c4e3,
+    type: 3}
+  NumBulletsInPool: 0
+  FirePointTransform: {fileID: 4192087018930569236}
+--- !u!114 &5049058652260020967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5321615058723665281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50421395cfb246e4c8366689dcc01570, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &8251422772928506271
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -357,11 +387,27 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: f3482d74ce666f64180c2372f5706508, type: 2}
+    - target: {fileID: 5237609012544596363, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.512
+      objectReference: {fileID: 0}
+    - target: {fileID: 5237609012544596363, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 73ac35a2afb20154c8e39c9292eb9d5d, type: 3}
 --- !u!4 &7847370238992379355 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2190302947158787140, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+    type: 3}
+  m_PrefabInstance: {fileID: 8251422772928506271}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4192087018930569236 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5237609012544596363, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
     type: 3}
   m_PrefabInstance: {fileID: 8251422772928506271}
   m_PrefabAsset: {fileID: 0}

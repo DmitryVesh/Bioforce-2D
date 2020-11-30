@@ -19,7 +19,6 @@ public class Client : MonoBehaviour
     public TCP tCP;
     public UDP uDP;
 
-    //TODO: Make a class that ones with PacketHandlers can inheret from to don't have to rewrite
     private delegate void PacketHandler(Packet packet);
     private static Dictionary<int, PacketHandler> PacketHandlerDictionary;
     private bool Connected { get; set; } = false;
@@ -44,7 +43,7 @@ public class Client : MonoBehaviour
     {
         ResetTimeOutTimer(false);
         ClientID = assignedID;
-        //TODO: Display connected to server 
+        //TODO: Display connected to server sign 
     }
     public void ChangeIPAddressConnectTo(int IPAddressIndex)
     {
@@ -324,6 +323,9 @@ public class Client : MonoBehaviour
         PacketHandlerDictionary.Add((int)ServerPackets.playerRotationAndVelocity, ClientRead.PlayerRotationAndVelocity);
         PacketHandlerDictionary.Add((int)ServerPackets.playerMovementStats, ClientRead.PlayerMovementStats);
         PacketHandlerDictionary.Add((int)ServerPackets.playerDisconnect, ClientRead.PlayerDisconnect);
+        PacketHandlerDictionary.Add((int)ServerPackets.bulleShot, ClientRead.BulletShot);
+        PacketHandlerDictionary.Add((int)ServerPackets.playerDied, ClientRead.PlayerDied);
+        PacketHandlerDictionary.Add((int)ServerPackets.playerRespawned, ClientRead.PlayerRespawned);
     }
     private void Disconnect()
     {

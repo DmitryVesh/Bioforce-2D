@@ -1,11 +1,171 @@
 ===============================================================================================================================
+Version 0.5.2
+-------------
+
+Summary
+-------
+Main goals is to;
+	1 Add player attacking (shooting), using Polymorphism and Interface
+	1 Add player health system, using Polymorphism and Interface
+	1 Add player taking damage,  using the health system, bullets and guns
+	1 Add player dying and respawning, using C# events, which other scripts can subscribe to, adding functionality,
+		with decreased dependencies.
+	1 Add kill feed entries, showing players who killed who. Uses queue to keep track of active entries
+			
+Future tasks;
+	add local and non local player health bars
+	add local player stamina bars
+	Add muzzel flash when a player shoots, randmonly chooses which animation to play
+	Add an impact effect for when the bullet hits a collider
+	Assign each player a color, and change the color of name on kill field to corresponding player color.
+	change sending playermovement position to vector2 - reduce data sent
+	change sending playermovement rotation to bool isGoingRight - reduce data sent
+	Fix LAN connection	
+
+	Make so can play on a mobile device.
+	Make server sided, currently very client sided
+	Make so LAN connection tries to connect to your actual lan connection, and not hard coded values
+	
+	Add animations to banners
+	improve collision detection,
+	
+	Add player disconnections if the server suspects the player of movement cheating
+	make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+	make the ThreadManager to work on multi-threading
+	prevent crashing and stopping receiving packets from client to server when 2 or more clients disconnect simultaneosly.
+	imrpove killFeedUI, make entries disappear by decreasing opacity, and popping them back up smoothly instead of vertical layout group which
+		pops them and moves other entries up instantly.
+	improve UI, adding pop up animations to the UI elements instead of just appearing instantly.
+	improve UI, adding black borders to UI Panels like TimeOutPanel.
+
+	add breathing camera movement when player is idle, going up and down.
+	add music Spoiler - Original Mix (Hyper) to game.
+
+TODO Tasks | 1 = done, 0 = not done
+-----------------------------------
+
+Importing assets
+----------------
+1 Border image for UI killFeed
+
+Animations
+----------
+1 Bullet
+1 Player Die
+1 Player Respawn
+
+UnityEditor
+-----------
+1 Decrease quality of muzzel flash textures
+1 Add a bullet prefab, which has a Bullet script, Rigidbody2D, Capsule Collider and Animator, with a Bullet animator controller
+1 Add bullet animations to the bullet prefab, added animator and animation.
+1 Attach a bullet script to the bullet prefab
+1 Edit LocalPlayer prefab, attached LocalPlayerGun, LocalPlayerHealth.
+1 Edit OtherPlayer prefab, attached NonLocalPlayerGun, NonLocalPlayerHeatlh
+1 Added a PlayerDummy prefab, which was used for testing attacking & IHealth
+1 Added FirePoint and UsernameCanvas to PlayerModel. FirePoint used for shooting bullets from a player and Username canvas is used for a world space canvas,
+	which displays the username the player entered, before connecting to the server.
+
+1 Add KillFeed, attach KillFeedUI to it, and add child gameObject panel, which holds 15 KillTextEntryPanel.
+	
+
+1 Fix the bullet going through the opposite player if touching each other, but make sure player's own bullet can't touch them, made RigidBody of NonLocal players to kinematic,
+	seemed to have fixed the issues	
+1 Linked playerDie & respawn animations to player animation controller
+
+Implementing scripts
+--------------------
+1 Add Bullet, is able to be instantiated, and called to be enabled and disabled, via Shoot method which takes the firepoint vector2 and rotation, and ResetBullet which 
+	deactivates the gameObject, reseting its TimeToLive timer and made available to be used again (using pooling system to prevent garbage collector collecting lots of garbage)
+	The bullet ignores collisions with the platform layer.
+	An OnCollisionEnter2D event is used to try and get a IHealth interface with the collided object, if finds it, compares its owner id to bullets owner id, if match then makes the 
+	health take damage, random value between DamageMin & DamageMax. BulletHit is called after any collision.
+	Has a time to live timer, which resets the bullet, stopping bullets from flying forever.
+
+1 Edit GameManager, added handler for isDead boolean in spawn player packet. Added use of NonLocalPlayer health, movement and animations in spawn player, giving them their clientID,
+	and calling coroutine of player being dead, if isDead is true in the SpawnPlayer method.
+	Added handler for PlayerDied, which sends to server that localPlayer is dead, by anotherPlayer IDed, calling playerManager died method of client who died, and adding
+	killFeedEntry.
+	Also added handler for PlayerRespawned, sending to server that player has respawned, and calling playerManager's respawned method. 
+1 Edit PlayerManager, added OnPlayerSpeedXChange, OnPlayerDeath & OnPlayerRespawn events, which other scripts can subscribe to, to act when action happens to player.
+	Added static RespawnTime & DeadTime, giving other scripts like animations & gun to deactivate & activate when time is right.
+	Add reference to IGun of player, so able to shootFrom it when getting a shot bullet packet via ShotBullet method.
+1 Added KillFeedUI, Singleton which handles killFeeds. Has references to the killFeed panel, and its entries, and each entries' text.
+	When AddKillFeedEntry is called, the playerDiedName and killerPlayerName is added to an unactive entry.
+	The entry can have red borders and black fill if the local player killed a  player.
+	The entry can be fully filled red if local player was killed.
+	The entry can be black if kills are between other non local players.
+	An entry is removed after timeToLive amout of time.
+	A problem occurs when more kills than entries occur within short period of time where no more entries can be added,
+	therefore have to get longest active entry and deactivate, and set to a new a entry, uses a queue to keep track of active entries,
+	enques when adding, deques when removing, however can deque longest active entry when no more entries available, to get access to another.
+
+1 Added IGun, interface which is inhereted by local and non local player guns, can Shoot, set owner client id, disabled and enabled
+1 Added NonLocalPlayerGun, which inherits form IGun interface, pooling bullets within a list. Able to shoot a bullet, by either getting 1 from pool or adding to pool. 
+	Stores clientID, so able to subscirbe to playerManager's OnPlayerDeath & OnPlayerRespawn events. The death event disables the ability to shoot, the respawn event
+	re-enables the ability to shoot after static respawnTime held in playerManager.
+1 Added LocalPlayerGun, inherits from NonLocalPlayerGun, adds an Update method which checks if Fire1 is pressed, when pressed calls its own ShootBullet method, that takes no params,
+	calls the inherited ShootBullet with the FirePoint position and rotation, and ClientSends to server the shot bullet.
+
+1 Add IHealth, interface inherited by NonLocalPlayerHealth, can: TakeDamage, Die, Respawn and GetOwnerClientID
+1 Add NonLocalPlayerHealth, inherits from IHealth, has Max health and ownerID, the TakeDamage decreases currentHealth and calls Die player if currentHealth <= 0.
+	Die method calls GameManager instance playerDied method, and calls waitBeforeRespawning, which waits static PlayerManager.DeadTime and calls Respawn.
+	Respawn resets health to max health and calls GameManager Instance Player respawned method.
+1 Add LocalPlayerHealth, inehits from NonLocalPlayerHealth, hasn't extended any functionality yet.
+
+1 Add IAnimations, interface which is inherited by NonLocalPlayerAnimations, can XAxisAnimations, YAxisAnimations, DieAnimation, RespawnAnimation and FlipSprite.
+1 Edit NonLocalPlayerAnimations, inherits from IAnimations, references IWalkingPlayer instead of EntityWalking. Subscribes to PlayerManager's OnPlayerDeath and OnPlayerRespawn,
+	with DieAnimation and RespawnAnimation, which trigger respective animations.
+	Needs IWawlkingPlayer reference to get speedX of player.
+1 Edit LocalPlayerAnimations, which still gets PlayerMovementNetworking script to get if player hasJumped. Overrides YAxisAnimations to call base method and trigger Jumped, if player
+	hasJumped returns true
+
+1 Add IWalking, inherited by EntityWalking and IWalkingPlayer, can Get if entity is Grounded.
+1 Add IWalkingPlayer, inherits from IWalking, inherited by NonLocalPlayerMovement, extends can GetSpeedX and GetRunSpeed.
+1 Edit EntityWalking, inherits from IWalking, implements GetGrounded, and also Freeze and UnFreeze motion.
+1 Add NonLocalPlayerMovement, inherits from EntityWalking and IWalkingPlayer. Implements GetRunSpeed & SpeedX, abd sets ownerID. Now references playerManager to subscribe more events:
+	OnPlayerSpeedXChanged; setting the SpeedX, 
+	OnPlayerDeath; Freezing motion and disabling hitbox, 
+	OnPlayerRespawn; UnFreezing motion and hitbox after static PlayerManager.RespawnTime
+1 Edit PlayerMovementNetworking - renamed to LocalPlayerMovement, now inherits from NonLocalPlayerMovement, and calls GetGrounded instead of Grounded in MovementY.
+
+1 Edit Client, added to PacketHandlerDict bullet shot, player died & respawned packets.
+1 Edit ClientRead, Added packet handling for: 
+	BulletShot; reads playerID, position & rotation of a bullet, shooting the bullet via PlayerManager dict.
+	PlayerDied; reads ids of killed and killer, calls killFeedUI to add a kill feed entry, and calls PlayerDied via PlayerManager dict.
+	PlayerRespawned; reads id, and calls PlayerRespawned via PlayerManager dict.
+1 Edit ClientSend, sending the ShotBullet, PlayerDied and Respawned packets.
+1 Edit Packet, added to server; bulletShot, playerDied, playerRespawned 
+	and client; bulletShot, playerDied, playerRespawned enums
+
+1 Bug, fix dead players appearing alive in game when a player just joins in, after the players were killed, adding to SpawnPlayer packet a bool isDead, which 
+	is stored in Server, if arrives to player and is true, then calls onPlayerDeath event on corresponding player when joining.
+1 Bug, bullet shot from LocalPlayer point blank, doesn't hits the non local player in localPlayer's game, however it does hit in non local player's game
+	Edited Bullet OnCollisionEnter2D, so also calls BulletHit after getting IHealth which is not null.
+1 Bug, player respawning is still able to be hit by other player, and move, fixed by activating hitbox when unfreezing motion.
+
+GameServer code
+---------------
+1 Edit Packet, ""
+1 Eidt Player, add isDead field which is set by Died & respawned methods from ServerRead
+1 Edit Server, add to PacketHandler dict bulletShot, playerDied & respawned packets.
+1 Edit ServerRead, added packet handlers:
+	BulletShot; receives and calls ServerSend shotBullet with id, position & rotation of bullet.
+	PlayerDied; gets the killer id and calls ServerSend playerDied, and sets player's isDead to true via Player.Died
+	PlayerRespanwed; ServerSends the player who respawned and sets player's isDead to false via Player.Respawned
+1 Edit ServerSend, added player.isDead to spawn packet, added packets to send:
+	ShotBullet; sends tcpPacket to all but player who shot bullet.
+	PlayerDied; sends tcpPacket to all but player who died.
+	PlayerRespawned; sends tcpPacket to all but player who respawned.
+
+===============================================================================================================================
 Version 0.5.1
 -----------
 
 Summary
 -------
 Main goals is to;
-	1 Add non local player animations
+	1 Add non local player animations using Polymorphism
 
 			
 Future tasks;

@@ -39,6 +39,8 @@ namespace GameServer
             packet.Write(player.RunSpeed);
             packet.Write(player.SprintSpeed);
 
+            packet.Write(player.IsDead);
+
             SendTCPPacket(recipientClient, packet);
         }
         public static void PlayerPosition(int playerID, Vector3 position)
@@ -74,6 +76,30 @@ namespace GameServer
             packet.Write(sprintSpeed);
 
             SendTCPPacketToAll(packet);
+        }
+        public static void ShotBullet(int playerID, Vector2 position, Quaternion rotation)
+        {
+            Packet packet = new Packet((int)ServerPackets.bulleShot);
+            packet.Write(playerID);
+            packet.Write(position);
+            packet.Write(rotation);
+
+            SendTCPPacketToAllButIncluded(playerID, packet);
+        }
+        public static void PlayerDied(int playerKilledID, int bulletOwnerID)
+        {
+            Packet packet = new Packet((int)ServerPackets.playerDied);
+            packet.Write(playerKilledID);
+            packet.Write(bulletOwnerID);
+
+            SendTCPPacketToAllButIncluded(playerKilledID, packet);
+        }
+        public static void PlayerRespawned(int playerID)
+        {
+            Packet packet = new Packet((int)ServerPackets.playerRespawned);
+            packet.Write(playerID);
+
+            SendTCPPacketToAllButIncluded(playerID, packet);
         }
 
         private static void SendTCPPacket(int recipientClient, Packet packet)

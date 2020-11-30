@@ -11,7 +11,9 @@ GameObject:
   - component: {fileID: 3166873245592658926}
   - component: {fileID: 6602524263812415708}
   - component: {fileID: -8473130671724453727}
-  - component: {fileID: -497183633582519825}
+  - component: {fileID: 2811104684193076455}
+  - component: {fileID: -5377822686258764856}
+  - component: {fileID: 7716823473094436728}
   m_Layer: 8
   m_Name: OtherPlayer
   m_TagString: Untagged
@@ -48,7 +50,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ID: 0
   Username: 
-  RunSpeed: 0
 --- !u!114 &-8473130671724453727
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62,7 +63,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FacingRight: 1
---- !u!114 &-497183633582519825
+--- !u!114 &2811104684193076455
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -71,7 +72,36 @@ MonoBehaviour:
   m_GameObject: {fileID: 598685846401911508}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 79704de5125aa034db540b0884f4368e, type: 3}
+  m_Script: {fileID: 11500000, guid: a8a88dd352c9e474497c3dbe4b28ddc9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BulletPrefab: {fileID: 8231054374207678704, guid: aa2eb6671e351654d96393916723c4e3,
+    type: 3}
+  NumBulletsInPool: 0
+--- !u!114 &-5377822686258764856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 598685846401911508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f03168d01d67bc46af9bf16f2cd2232, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxHealth: 50
+  CurrentHealth: 0
+--- !u!114 &7716823473094436728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 598685846401911508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94f95c5d9089d6e4c92f78402ed1ea12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   RunSpeed: 5
@@ -145,6 +175,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: PlayerModel
+      objectReference: {fileID: 0}
+    - target: {fileID: 2190302947158787146, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_BodyType
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2190302947158787147, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
         type: 3}

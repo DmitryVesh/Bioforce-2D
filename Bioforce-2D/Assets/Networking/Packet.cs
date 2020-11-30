@@ -12,7 +12,10 @@ public enum ServerPackets
     playerPosition,
     playerRotationAndVelocity,
     playerMovementStats,
-    playerDisconnect
+    playerDisconnect,
+    bulleShot,
+    playerDied,
+    playerRespawned
 
 }
 
@@ -22,7 +25,10 @@ public enum ClientPackets
     welcomeReceived = 1,
     udpTestReceived,
     playerMovement,
-    playerMovementStats
+    playerMovementStats,
+    bulletShot,
+    playerDied,
+    playerRespawned
 
 }
 

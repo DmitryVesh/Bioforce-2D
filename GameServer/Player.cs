@@ -17,6 +17,8 @@ namespace GameServer
         public float SprintSpeed { get; set; } = 0;
         private int MovePlayerSent { get; set; } = 0;
 
+        public bool IsDead { get; private set; } = false;
+
         public Player(int iD, string username, Vector3 position)
         {
             ID = iD;
@@ -24,6 +26,14 @@ namespace GameServer
             Position = position;
             Rotation = Quaternion.Identity;
             LastPosition = position;
+        }
+        public void Died()
+        {
+            IsDead = true;
+        }
+        public void Respawned()
+        {
+            IsDead = false;
         }
         public void PlayerMoves(Quaternion rotation, Vector3 position, Vector2 velocity)
         {

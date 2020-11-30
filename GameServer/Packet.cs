@@ -14,7 +14,10 @@ namespace GameServer
         playerPosition,
         playerRotationAndVelocity,
         playerMovementStats,
-        playerDisconnect
+        playerDisconnect,
+        bulleShot,
+        playerDied,
+        playerRespawned
 
     }
 
@@ -24,7 +27,10 @@ namespace GameServer
         welcomeReceived = 1,
         udpTestReceived,
         playerMovement,
-        playerMovementStats
+        playerMovementStats,
+        bulletShot,
+        playerDied,
+        playerRespawned
 
     }
 

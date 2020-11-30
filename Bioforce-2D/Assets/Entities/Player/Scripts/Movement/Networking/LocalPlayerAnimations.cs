@@ -3,24 +3,19 @@ using System;
 
 public class LocalPlayerAnimations : NonLocalPlayerAnimations
 {
-    private PlayerMovementNetworking MovementScript { get; set; } = null;
+    private LocalPlayerMovement MovementScript { get; set; } = null;
 
     protected override void Awake()
     {
-        IsLocalPlayer = true;
+        MovementScript = GetComponent<LocalPlayerMovement>();
         base.Awake();
-        MovementScript = GetComponent<PlayerMovementNetworking>();
-    }
-    protected override void FixedUpdate()
-    {
-        SpeedX = MovementScript.SpeedX;
-        base.FixedUpdate();
     }
 
-    protected override void YaxisAnimations()
+    public override void YAxisAnimations()
     {
-        Anim.SetBool("Grounded", MovementScript.Grounded);
+        base.YAxisAnimations();
         if (MovementScript.HasJumped())
             Anim.SetTrigger("Jumped");
     }
+
 }

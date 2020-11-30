@@ -13,7 +13,6 @@ namespace GameServer
         private static TcpListener TCPListener { get; set; }
         private static UdpClient UDPClient { get; set; }
 
-        //TODO: Make a class that ones with PacketHandlers can inheret from to don't have to rewrite
         public delegate void PacketHandler(int clientID, Packet packet);
         public static Dictionary<int, PacketHandler> PacketHandlerDictionary;
 
@@ -63,6 +62,9 @@ namespace GameServer
             PacketHandlerDictionary.Add((int)ClientPackets.udpTestReceived, ServerRead.UDPTestRead);
             PacketHandlerDictionary.Add((int)ClientPackets.playerMovement, ServerRead.PlayerMovementRead);
             PacketHandlerDictionary.Add((int)ClientPackets.playerMovementStats, ServerRead.PlayerMovementStatsRead);
+            PacketHandlerDictionary.Add((int)ClientPackets.bulletShot, ServerRead.ShotBulletRead);
+            PacketHandlerDictionary.Add((int)ClientPackets.playerDied, ServerRead.PlayerDiedRead);
+            PacketHandlerDictionary.Add((int)ClientPackets.playerRespawned, ServerRead.PlayerRespawnedRead);
 
             Console.WriteLine("Initialised server packets.");
         }

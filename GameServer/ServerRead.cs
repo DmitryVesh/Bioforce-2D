@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
 
 namespace GameServer
 {
@@ -38,33 +36,72 @@ namespace GameServer
             try
             {
                 Quaternion rotation = packet.ReadQuaternion();
+                //TODO: Change position to be vector2
                 Vector3 position = packet.ReadVector3();
                 Vector2 velocity = packet.ReadVector2();
                 //Sometimes System.NullReferenceException when a player disconnects
                 Server.ClientDictionary[clientID].player.PlayerMoves(rotation, position, velocity);
             }
-            catch (NullReferenceException exception)
+            catch (Exception exception)
             {
                 Console.WriteLine($"Error, trying to read player movement, when a player: {clientID} has disconnected...\n{exception}");
             }
         }
         public static void PlayerMovementStatsRead(int clientID, Packet packet)
         {
-            float runSpeed = packet.ReadFloat();
-            float sprintSpeed = packet.ReadFloat();
+            try
+            {
+                float runSpeed = packet.ReadFloat();
+                float sprintSpeed = packet.ReadFloat();
 
-            Server.ClientDictionary[clientID].player.SetPlayerMovementStats(runSpeed, sprintSpeed);
-            ServerSend.PlayerMovementStats(clientID, runSpeed, sprintSpeed);
+                Server.ClientDictionary[clientID].player.SetPlayerMovementStats(runSpeed, sprintSpeed);
+                ServerSend.PlayerMovementStats(clientID, runSpeed, sprintSpeed);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"Error, trying to read player movement stats, from player: {clientID}\n{exception}");
+            }
+            
         }
-        public static void PlayerAnimationRead()
+        public static void ShotBulletRead(int clientID, Packet packet)
         {
-            //throw new NotImplementedException("Player Animation in Client Send Not set up");
-            /*
-            float runSpeed = packet.ReadFloat();
-            float speedX = packet.ReadFloat();
-            bool grounded = packet.ReadBool();
-            bool jumped = packet.ReadBool();
-            */
+            try
+            {
+                Vector2 position = packet.ReadVector2();
+                Quaternion rotation = packet.ReadQuaternion();
+                ServerSend.ShotBullet(clientID, position, rotation);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"Error, trying to read shot bullet, from player: {clientID}\n{exception}");
+            }
+        }
+        public static void PlayerDiedRead(int clientID, Packet packet)
+        {
+            try
+            {
+                int bulletOwnerID = packet.ReadInt();
+                ServerSend.PlayerDied(clientID, bulletOwnerID);
+                Server.ClientDictionary[clientID].player.Died();
+                //TODO: UPDATE GAMELOGIC kill score
+                //GameLogic.
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"Error, trying to read player died, from player: {clientID}\n{exception}");
+            }
+        }
+        public static void PlayerRespawnedRead(int clientID, Packet packet)
+        {
+            try
+            {
+                ServerSend.PlayerRespawned(clientID);
+                Server.ClientDictionary[clientID].player.Respawned();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"Error, trying to read player respawned, from player: {clientID}\n{exception}");
+            }
         }
     }
 }
