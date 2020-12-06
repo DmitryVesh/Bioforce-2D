@@ -11,7 +11,7 @@ public class SimpleNetworkingUI : MonoBehaviour
     private Button ConnectBtn { get; set; }
     private TMP_Dropdown IPAddressDropDown { get; set; }
     private GameObject TimeOutPanel { get; set; }
-
+    private TouchScreenKeyboard MobileUsernameInputKeyboard { get; set; } = null;
 
     public void ConnectToServer()
     {
@@ -32,6 +32,20 @@ public class SimpleNetworkingUI : MonoBehaviour
         {
             //TODO: Shake usernameInputField, make borders red
             ConnectBtn.interactable = false;
+        }
+    }
+    public void OnUsernameInputFieldSelect()
+    {
+        if (MobileUsernameInputKeyboard != null)
+        {
+            MobileUsernameInputKeyboard.active = true;
+        }
+    }
+    public void OnUsernameInputFieldDeselect()
+    {
+        if (MobileUsernameInputKeyboard != null)
+        {
+            MobileUsernameInputKeyboard.active = false;
         }
     }
     public void OnIPAddressDropDownChange()
@@ -78,6 +92,14 @@ public class SimpleNetworkingUI : MonoBehaviour
         TimeOutPanel.SetActive(false);
 
         ConnectBtn.interactable = false;
+
+        if (TouchScreenKeyboard.isSupported)
+        {
+            TouchScreenKeyboard.hideInput = true;
+            MobileUsernameInputKeyboard = TouchScreenKeyboard.Open("", TouchScreenKeyboardType.Default, false, false, false, true);
+            MobileUsernameInputKeyboard.active = false;
+            Debug.Log("touch screen is supported");
+        }
     } 
     private void SetInteractableConnectionMenu(bool active)
     {

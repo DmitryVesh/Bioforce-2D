@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject LocalPlayerPrefab;
     [SerializeField] private GameObject PlayerPrefab;
 
+    [SerializeField] private GameObject MobileLocalPlayerPrefab;
+
     private void Awake()
     {
         if (Instance == null)
@@ -28,8 +30,11 @@ public class GameManager : MonoBehaviour
         GameObject prefab;
 
         if (iD == Client.Instance.ClientID)
-        {   
-            prefab = LocalPlayerPrefab;
+        {
+            if (Input.touchSupported || Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.OSXEditor)
+                prefab = MobileLocalPlayerPrefab;
+            else 
+                prefab = LocalPlayerPrefab;
             Debug.Log($"You, player: {iD} have been spawned.");
         }
         else

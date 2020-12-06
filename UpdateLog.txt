@@ -5,10 +5,17 @@ Version 0.5.3
 Summary
 -------
 Main goals is to;
-	0 Make so can play on a mobile device.
-			
+	1 Make so can play on a mobile device.
+	1 Implement mobile playermovement via use of polymorphism
+	1 Implement mobile playergun via use of polymorphism	
+	0 Test on actual build for iOS.	
+	
 Future tasks;
 	version 0.5.4
+		add map boundries, so if player falls off map, dies and camera stays in boundry
+		Fix bullets being saved in hierarchy after server is shutdown, and player is ejected from game.
+		Fix own bullets hitting the player and destroying them when player is running left.
+		Implement shooting where the player aims their mouse/touch, have a crosshair and dynamic arms holding gun
 		add local and non local player health bars
 		add local player stamina bars
 		Add muzzel flash when a player shoots, randmonly chooses which animation to play
@@ -30,7 +37,8 @@ Future tasks;
 	Make so LAN connection tries to connect to your actual lan connection, and not hard coded values
 	
 	Add animations to banners
-	
+	Add trail effects when a player sprints, so can clearly see player sprinting, also maybe zoom camera out a little bit...
+
 	Add player disconnections if the server suspects the player of movement cheating
 	make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
 	make the ThreadManager to work on multi-threading
@@ -45,22 +53,48 @@ Future tasks;
 
 TODO Tasks | 1 = done, 0 = not done
 -----------------------------------
+TODO: Commit to github version needed for testing the game on actual mobile device, not via Unity Remote as it limits the ability for touchscreenKeyboard.
+
 
 Importing assets
 ----------------
-
+1 Import Joystick pad, so can use for mobile version
 
 Animations
 ----------
 
-
 UnityEditor
 -----------
-
+1 In project settings allowed for Unity Remote to connect to any iOS devices. So can use Unity Remote on my iPhone to test the game on iOS device.
+1 Added OnSelect and OnDeselect events to the UsernameInputField, which link to SimpleNetworkingUI OnUsernameInputField select & deselect methods.
+1 Edit CinemachineCamera on LocalPlayer Lens to 4. Because the players on mobile device were too small.
+1 Edited the Canvas, and some of its children to fit onto the new screen resolution.
+1 Added a MobileLocalPlayer prefab, which contains mobile localPlayer scripts, playermovement, playergun
+1 Added a Floating Joystick prefab into Canvas, so can use and see the joystick in mobile games. 
+	Attached MobileJoystick script to it.
 
 Implementing scripts
 --------------------
+1 Edit SimpleNetworkingUI, Added OnUsernameInputFieldSelect and Deselect methods. Which turn on and off the interactable unity input keyboard for mobile devices.
+	So can enter username on iOS devices.
+1 Edit LocalPlayerMovement, added GetMoveInputX method for getting get axis raw input for horizontal, and so the MobileLocalPlayerMovement can override the method,
+	to get the touch version input. Similarly, added GetSprintInput & GetJumpInputPressed / Released, so can override in Mobile version.
+1 Add MobileLocalPlayerMovement, inherits from LocalPlayerMovement, overrides GetMoveInputX, SprintInput, JumpInputPressed & Released. 
+	Stores reference of a joystick, which is the joystick in the canvas, in order to get horizontal input, if above or equal to RunThereshold, then player will run,
+	if its above a sprint threshold, then the player can run.
+	The GetJumpInputPressed checks if a jump vertical joystick value is above/equals threshold and the player can jump, if yes, then make player jump, and reset timeBetweenJumps timer, 
+	setting canJump to false. The GetJumpInputReleased returns true if the vertical value is lower than jumpThershold.
+	CanJump is a boolean set to false if timer between jumps runs out, the timer ensure the player doesn't use all jumps at once, due to input joystick remaining above.
+	Activates the joystick on awake, and deactivates it on destroy.	
+1 Edit GameManager, add a field to store the mobile player prefab. In the SpawnPlayer method, when local player is spawned, if the device running is touch supported,
+	or is the windows or macOS unityEditor, the mobileLocalPlayer is set to the prefab to spawn, otherwise, just normal LocalPlayer prefab.
 
+1 Edit LocalPlayerGun, added a method IsPlayerTryingToShoot, which returns if fire1 button is pressed down. Added to inherited MobileLocalPlayerGun is able override it,
+	so player shoots when a button is pressed on screen.
+1 Added MobileLocalPlayerGun, inherits from LocalPlayerGun, overrides the IsPlayerTryingToShoot, by checking in update if a touch screen has been pressed more than half the screen width.
+1 Add MobileJoystick, a Singleton, which holds the joystick gameObject, so can turn on and off, when player joins or exits.
+
+1 Edit KillFeedUI, in awake method the activeKillFeedEntries is set to new Queue<GameObject>, prevents errors when adding killfeed entry.
 
 GameServer code
 ---------------

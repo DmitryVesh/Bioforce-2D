@@ -71,7 +71,8 @@ public class KillFeedUI : MonoBehaviour
         KillFeedPanel = transform.GetChild(0).gameObject;
 
         InitKillFeedEntryPanels();
-        InitKillFeedEntryTexts(); 
+        InitKillFeedEntryTexts();
+        ActiveKillFeedEntries = new Queue<GameObject>();
     }
     
     private int FindIndexOfInactiveEntry()

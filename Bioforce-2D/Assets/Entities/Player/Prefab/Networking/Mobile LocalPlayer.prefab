@@ -176,14 +176,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 286639045735284032}
-  - component: {fileID: 2011391865815507775}
   - component: {fileID: 6959280556832634452}
   - component: {fileID: 3727253228089246339}
   - component: {fileID: 1533597402597742654}
-  - component: {fileID: -6939984365992781228}
   - component: {fileID: 5049058652260020967}
+  - component: {fileID: 1998249785263435074}
+  - component: {fileID: 8214395592641625921}
   m_Layer: 11
-  m_Name: LocalPlayer
+  m_Name: Mobile LocalPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -205,33 +205,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2011391865815507775
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5321615058723665281}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d04bba36c9c6953428990529b2aabcee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  RunSpeed: 5
-  SprintSpeed: 7
-  WhatIsGround:
-    serializedVersion: 2
-    m_Bits: 1792
-  MaxStamina: 5
-  RateStaminaLoss: 1
-  RateStaminaRegen: 0.5
-  PlatformLayerName: Platform
-  JumpForce: 10
-  NumberOfExtraJumps: 1
-  FJumpPressedRememberTime: 0.2
-  FGroundedRememberTime: 0.2
-  FCutJumpHeight: 0.45
-  GroundCheckTimer: 0.15
 --- !u!114 &6959280556832634452
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -272,21 +245,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ID: 0
   Username: 
---- !u!114 &-6939984365992781228
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5321615058723665281}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dda935c7621b35944ba522e425aaab55, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  BulletPrefab: {fileID: 8231054374207678704, guid: aa2eb6671e351654d96393916723c4e3,
-    type: 3}
-  FirePointTransform: {fileID: 4192087018930569236}
 --- !u!114 &5049058652260020967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -301,6 +259,53 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxHealth: 50
   CurrentHealth: 0
+--- !u!114 &1998249785263435074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5321615058723665281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adb3d2dd929620a4db8b4c4d1e645146, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RunSpeed: 5
+  SprintSpeed: 7
+  WhatIsGround:
+    serializedVersion: 2
+    m_Bits: 1792
+  MaxStamina: 5
+  RateStaminaLoss: 1
+  RateStaminaRegen: 0.5
+  PlatformLayerName: Platform
+  JumpForce: 10
+  NumberOfExtraJumps: 1
+  currentNumJumps: 0
+  FJumpPressedRememberTime: 0.2
+  FGroundedRememberTime: 0.2
+  FCutJumpHeight: 0.45
+  GroundCheckTimer: 0.15
+  RunThreshold: 0.4
+  SprintThreshold: 0.85
+  JumpThreshold: 0.4
+  TimeBetweenJumps: 0.65
+--- !u!114 &8214395592641625921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5321615058723665281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae780744dcf160347b2dc81e3de6ef26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BulletPrefab: {fileID: 8231054374207678704, guid: aa2eb6671e351654d96393916723c4e3,
+    type: 3}
+  FirePointTransform: {fileID: 4192087018930569236}
 --- !u!1001 &8251422772928506271
 PrefabInstance:
   m_ObjectHideFlags: 0

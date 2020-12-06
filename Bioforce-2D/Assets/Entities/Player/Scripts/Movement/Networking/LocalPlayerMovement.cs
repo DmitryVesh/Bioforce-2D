@@ -11,12 +11,12 @@ public class LocalPlayerMovement : NonLocalPlayerMovement
 
 
     // Moving in Y direction Data
-    [SerializeField] private string PlatformLayerName; // LayerMask used to determine what is a platform, so can go through that layer
+    [SerializeField] private string PlatformLayerName = "Platform"; // LayerMask used to determine what is a platform, so can go through that layer
     private int PlatformLayer;
 
-    [SerializeField] private float JumpForce = 8; // the force applied to player when they jump
+    [SerializeField] private float JumpForce = 10; // the force applied to player when they jump
     [SerializeField] private int NumberOfExtraJumps = 1; // the number of jumps given to the player
-    private int currentNumJumps; // number of jumps left
+    [SerializeField] private int currentNumJumps; // number of jumps left
 
     [SerializeField] private float FJumpPressedRememberTime = 0.2f; // Timer used to "remember" when the last time a jump key was pressed, improving feeling of responsiveness
                                                                     // When player presses a jump key just above ground, the jump will still occur when player lands, if within timer limit
@@ -26,8 +26,8 @@ public class LocalPlayerMovement : NonLocalPlayerMovement
                                                                     // Helps player to still be able to jump with >1 jump, if just started falling off an edge
                                                                     // Helps the player not feel stupid
     private float fGroundedRemember = 0; // Holds current ground remember timer time
-    [SerializeField] private float FCutJumpHeight = 0.5f; // How much up velocity is cut when releasing the jump key, getting mario jump control effect
-    [SerializeField] private float GroundCheckTimer = 0.1f; // Timer used to check for ground, should't be all the time, as it CPU taxing to draw rays
+    [SerializeField] private float FCutJumpHeight = 0.45f; // How much up velocity is cut when releasing the jump key, getting mario jump control effect
+    [SerializeField] private float GroundCheckTimer = 0.15f; // Timer used to check for ground, should't be all the time, as it CPU taxing to draw rays
                                                             // Also allows the player to be grounded for longer 
     private float groundTimer = 0; // Holds current ground check timer time
 
@@ -65,11 +65,32 @@ public class LocalPlayerMovement : NonLocalPlayerMovement
         MovementX();
         MovementY();
     }
+    protected virtual float GetMoveInputX()
+    {
+        return Input.GetAxisRaw("Horizontal"); // Get user input in x direction
+    }
+    protected virtual bool GetSprintInput()
+    {
+        return Input.GetButton("Sprint");
+    }
+    protected virtual bool GetJumpInputPressed()
+    {
+        return Input.GetButtonDown("Jump");
+    }
+    protected virtual bool GetJumpInputReleased()
+    {
+        return Input.GetButtonUp("Jump");
+    }
+    protected virtual float GetVerticalInput()
+    {
+        return Input.GetAxis("Vertical");
+    }
+
     private void MovementX() // Calculates SpeedX that will be applied to player, in response to x axis inputs
     {
-        float moveInputX = Input.GetAxisRaw("Horizontal"); // Get user input in x direction
+        float moveInputX = GetMoveInputX();
 
-        if (Input.GetButton("Sprint") && moveInputX != 0) // Player is moving and trying to sprint
+        if (GetSprintInput() && moveInputX != 0) // Player is moving and trying to sprint
         {
             if (currentStamina > 0) // Is stamina left
             {
@@ -169,8 +190,10 @@ public class LocalPlayerMovement : NonLocalPlayerMovement
 
 
         fJumpPressedRemember -= Time.deltaTime;
-        if (Input.GetButtonDown("Jump")) { fJumpPressedRemember = FJumpPressedRememberTime; } //Reseting jump remember timer when player tries to jump
-        if (Input.GetButtonUp("Jump")) // When a player releases the Jump key
+        bool JumpPressed = GetJumpInputPressed();
+
+        if (JumpPressed) { fJumpPressedRemember = FJumpPressedRememberTime; } //Reseting jump remember timer when player tries to jump
+        if (GetJumpInputReleased()) // When a player releases the Jump key
         {
             Vector2 velocity = rb.velocity;
             if (velocity.y > 0) // If player is still going up
@@ -187,13 +210,13 @@ public class LocalPlayerMovement : NonLocalPlayerMovement
             PlayerJump(); // Jump
             currentNumJumps--; // Decriment jumps available
         }
-        else if (currentNumJumps > 0 && Input.GetButtonDown("Jump")) // If in the air and try to jump
+        else if (currentNumJumps > 0 && JumpPressed) // If in the air and try to jump
         {
             PlayerJump(); // Jump
             currentNumJumps--; // Decriment jumps available
         }
 
-        Physics2D.IgnoreLayerCollision(gameObject.layer, PlatformLayer, rb.velocity.y > 0.0f || Input.GetAxis("Vertical") < -0.5);
+        Physics2D.IgnoreLayerCollision(gameObject.layer, PlatformLayer, rb.velocity.y > 0.0f || GetVerticalInput() < -0.5);
     }
     private void PlayerJump()
     {
