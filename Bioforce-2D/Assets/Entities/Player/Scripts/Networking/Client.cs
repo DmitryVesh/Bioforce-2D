@@ -10,8 +10,8 @@ public class Client : MonoBehaviour
     public static int DataBufferSize = 4096;
 
     private string IPAddressLocalHost = "127.0.0.1";
-    private string IPAddressLAN = "192.168.1.152";
-    private string IPAddressInternet = "79.67.169.176";
+    private string IPAddressLAN = "192.168.1.65";
+    private string IPAddressInternet = "148.252.129.44";
 
     private string IPAddressConnectTo;
     public int PortNum = 28020; //Must be the same as GameServer Port

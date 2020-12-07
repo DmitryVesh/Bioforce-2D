@@ -5,10 +5,11 @@ using UnityEngine;
 public class MobileJoystick : MonoBehaviour
 {
     public static MobileJoystick Instance;
+    private static bool Destroyed = false;
 
     public void SetActive(bool active)
     {
-        if (gameObject != null)
+        if (!Destroyed)
             gameObject.SetActive(active);
     }
     private void Awake()
@@ -23,6 +24,10 @@ public class MobileJoystick : MonoBehaviour
             Destroy(this);
         }
         SetActive(false);
+    }
+    private void OnDestroy()
+    {
+        Destroyed = true;
     }
     
 }

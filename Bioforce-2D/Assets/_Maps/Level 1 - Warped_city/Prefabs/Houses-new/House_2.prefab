@@ -72,7 +72,7 @@ GameObject:
   - component: {fileID: 8465341873041682411}
   - component: {fileID: 8465341873041681428}
   - component: {fileID: 8465341873041681429}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: House_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -133,37 +133,37 @@ CompositeCollider2D:
   m_Offset: {x: 0, y: -0.02}
   m_GeometryType: 0
   m_GenerationType: 0
-  m_EdgeRadius: 0.03
+  m_EdgeRadius: 0
   m_ColliderPaths:
   - m_Collider: {fileID: 7939282599317017005}
     m_ColliderPaths:
-    - - X: 161245
+    - - X: 161246
         Y: -3076923
-      - X: 161245
+      - X: 161246
         Y: 3076923
-      - X: -36761540
+      - X: -36761536
         Y: 3076630
-      - X: -36761247
+      - X: -36761243
         Y: -3076923
   - m_Collider: {fileID: 6242247096564949038}
     m_ColliderPaths:
-    - - X: 37084323
+    - - X: 37084319
         Y: -3076923
-      - X: 37084323
+      - X: 37084319
         Y: 3076923
-      - X: 161538
+      - X: 161536
         Y: 3076630
-      - X: 161831
+      - X: 161829
         Y: -3076923
   - m_Collider: {fileID: 7382306413131614450}
     m_ColliderPaths:
-    - - X: 42468935
+    - - X: 42468931
         Y: -3076923
-      - X: 42468935
+      - X: 42468931
         Y: 3076923
-      - X: 37084616
+      - X: 37084608
         Y: 3076630
-      - X: 37084909
+      - X: 37084901
         Y: -3076923
   - m_Collider: {fileID: 8052235555046028553}
     m_ColliderPaths:
@@ -171,16 +171,16 @@ CompositeCollider2D:
         Y: -3076923
       - X: -36761833
         Y: 3076923
-      - X: -42146152
+      - X: -42146160
         Y: 3076630
-      - X: -42145859
+      - X: -42145867
         Y: -3076923
   m_CompositePaths:
     m_Paths:
-    - - {x: -4.2145863, y: -0.327663}
-      - {x: 4.246894, y: -0.327663}
+    - - {x: -4.2145867, y: -0.327663}
+      - {x: 4.2468934, y: -0.327663}
       - {x: 4.246864, y: 0.28769228}
-      - {x: -4.2146153, y: 0.2876337}
+      - {x: -4.214616, y: 0.2876337}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
 --- !u!1 &8465341873921174679
