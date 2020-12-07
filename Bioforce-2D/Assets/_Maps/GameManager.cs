@@ -5,9 +5,10 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; set; }
     public static Dictionary<int, PlayerManager> PlayerDictionary { get; set; }
+
+    [SerializeField] private bool TestingTouchInEditor = false;
     [SerializeField] private GameObject LocalPlayerPrefab;
     [SerializeField] private GameObject PlayerPrefab;
-
     [SerializeField] private GameObject MobileLocalPlayerPrefab;
 
     private void Awake()
@@ -31,7 +32,7 @@ public class GameManager : MonoBehaviour
 
         if (iD == Client.Instance.ClientID)
         {
-            if (Input.touchSupported || Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.OSXEditor)
+            if (IsMobileSupported())
                 prefab = MobileLocalPlayerPrefab;
             else 
                 prefab = LocalPlayerPrefab;
@@ -84,5 +85,18 @@ public class GameManager : MonoBehaviour
     {
         ClientSend.PlayerRespawned();
         PlayerDictionary[iD].PlayerRespawned();
+    }
+    private bool IsMobileSupported()
+    {
+        bool result;
+        RuntimePlatform platform = Application.platform;
+
+        if (TestingTouchInEditor && (platform.Equals(RuntimePlatform.WindowsEditor) || platform.Equals(RuntimePlatform.OSXEditor)))
+            result = true;
+        else if (platform.Equals(RuntimePlatform.IPhonePlayer) || platform.Equals(RuntimePlatform.Android) || platform.Equals(RuntimePlatform.Lumin))
+            result = true;
+        else
+            result = false;
+        return result;
     }
 }

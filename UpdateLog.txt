@@ -72,6 +72,7 @@ UnityEditor
 1 Added a MobileLocalPlayer prefab, which contains mobile localPlayer scripts, playermovement, playergun
 1 Added a Floating Joystick prefab into Canvas, so can use and see the joystick in mobile games. 
 	Attached MobileJoystick script to it.
+1 Deleted Player Dummy prefab, don't need and was causing errors in mobile build.
 
 Implementing scripts
 --------------------
@@ -88,6 +89,7 @@ Implementing scripts
 	Activates the joystick on awake, and deactivates it on destroy.	
 1 Edit GameManager, add a field to store the mobile player prefab. In the SpawnPlayer method, when local player is spawned, if the device running is touch supported,
 	or is the windows or macOS unityEditor, the mobileLocalPlayer is set to the prefab to spawn, otherwise, just normal LocalPlayer prefab.
+	Added a IsMobileSupported check, and a testing touch in editor field, which determine whether touch controls, or keyboard/mouse controls are used.
 
 1 Edit LocalPlayerGun, added a method IsPlayerTryingToShoot, which returns if fire1 button is pressed down. Added to inherited MobileLocalPlayerGun is able override it,
 	so player shoots when a button is pressed on screen.
