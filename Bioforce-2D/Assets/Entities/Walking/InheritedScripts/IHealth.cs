@@ -5,4 +5,5 @@ public interface IHealth
     void TakeDamage(int damage, int bulletOwnerID);
     void Die(int bulletOwnerID);
     void Respawn();
+    void FallDie();
 }

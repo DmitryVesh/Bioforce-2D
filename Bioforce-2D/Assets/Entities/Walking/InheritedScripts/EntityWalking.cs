@@ -65,11 +65,11 @@ public class EntityWalking : MonoBehaviour, IWalking
     {
         CanMove = false;
         rb.velocity.Set(0, 0);
-        rb.Sleep();
+        rb.bodyType = RigidbodyType2D.Static;
     }
-    protected void UnFreezeMotion()
+    protected virtual void UnFreezeMotion()
     {
         CanMove = true;
-        rb.WakeUp();
+        rb.bodyType = RigidbodyType2D.Kinematic;
     }
 }

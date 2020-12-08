@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 
 public class LocalPlayerMovement : NonLocalPlayerMovement
@@ -61,7 +62,10 @@ public class LocalPlayerMovement : NonLocalPlayerMovement
     
     void Update() // Used for getting user input, and storing it later to be used in FixedUpdate
     {
-        if (!CanMove) { return; } // Player shouldn't be able to move when dying, or initially respawing, so shouldn't move
+        if (!CanMove) 
+        {        
+            return; // Player shouldn't be able to move when dying, or initially respawing, so shouldn't move
+        } 
         MovementX();
         MovementY();
     }
@@ -228,10 +232,28 @@ public class LocalPlayerMovement : NonLocalPlayerMovement
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
+
         Vector2 velocity = new Vector2(SpeedX, rb.velocity.y);
-        rb.velocity = velocity; // Applying movement in x direction, SpeedX calculated in Update, calculated in Update in order to increase responsiveness, applied in FixedUpdate to keep physics interaction reliable
+        if (CanMove)
+            rb.velocity = velocity; // Applying movement in x direction, SpeedX calculated in Update, calculated in Update in order to increase responsiveness, applied in FixedUpdate to keep physics interaction reliable
         
         SendMovesToServer(velocity);
+    }
+
+    protected override IEnumerator UnFreezeMotionAndHitBoxAfterRespawnAnimation()
+    {
+        SetRespawnPointLocation();
+        return base.UnFreezeMotionAndHitBoxAfterRespawnAnimation();
+    }
+    protected override void UnFreezeMotion()
+    {
+        CanMove = true;
+        rb.bodyType = RigidbodyType2D.Dynamic;
+    }
+    private void SetRespawnPointLocation()
+    {
+        ModelObject.transform.position = RespawnPoint.GetRandomSpawnPoint(ModelObject.transform.position);
+        rb.velocity.Set(0, 0);
     }
 
     private void SendMovesToServer(Vector3 velocity)

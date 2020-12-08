@@ -5,7 +5,7 @@ using UnityEngine;
 public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
 {
     protected float SpeedX { get; set; } // Used to store the input in x direction, as well as in PlayerAnimations
-    private int OwnerClientID { get; set; } = -1;
+    protected int OwnerClientID { get; set; } = -1;
     private PlayerManager PlayerManager { get; set; } = null;
 
     public float GetRunSpeed()
@@ -42,21 +42,18 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
     }
     private void PlayerCantMoveAndCantBeHit()
     {
-        if (CanMove)
-        {
-            Hitbox.enabled = false;
-            FreezeMotion();
-        }
+        Hitbox.enabled = false;
+        FreezeMotion();
     }
     private void PlayerCanMoveAndCanBeHit()
     {
         StartCoroutine(UnFreezeMotionAndHitBoxAfterRespawnAnimation());
     }
-    private IEnumerator UnFreezeMotionAndHitBoxAfterRespawnAnimation()
+    protected virtual IEnumerator UnFreezeMotionAndHitBoxAfterRespawnAnimation()
     {
         yield return new WaitForSeconds(PlayerManager.RespawnTime);
         UnFreezeMotion();
-        Hitbox.enabled = true;
+        Hitbox.enabled = true;        
     }
     
     private void OnDestroy()

@@ -1,4 +1,108 @@
 ===============================================================================================================================
+Version 0.5.4
+-------------
+
+Summary
+-------
+Main goals is to;
+	Improve overall gameplay response, and game feel.
+		1 add map boundries, so if player falls off map, dies and camera stays in boundry
+		1 add player respawn points, so when player dies, instead of respawning where died, goes to a random respawn point
+
+		0 Fix bullets being saved in hierarchy after server is shutdown, and player is ejected from game.
+
+		0 Fix own bullets hitting the player and destroying them when player is running left.
+		0 Implement shooting where the player aims their mouse/touch, have a crosshair and dynamic arms holding gun
+		0 add local and non local player health bars
+		0 add local player stamina bars
+		0 Add muzzel flash when a player shoots, randmonly chooses which animation to play
+		0 Add an impact effect for when the bullet hits a collider
+Future tasks;		
+	version 0.5.5 
+		add a mixer system, which all sound effects sub categorise and use, so can control volume by settings 
+		add sound effects to player running, sprinting, jumping, dying and respawning
+		sound effects for bullets being shot and hitting
+	version 0.5.6
+		add invincibility frames, after being hit/respawning
+		
+
+	Assign each player a color, and change the color of name on kill field to corresponding player color.
+	change sending playermovement position to vector2 - reduce data sent
+	change sending playermovement rotation to bool isGoingRight - reduce data sent	
+		
+	Make server sided, currently very client sided
+	Make so LAN connection tries to connect to your actual lan connection, and not hard coded values
+	
+	Add animations to banners
+	Add trail effects when a player sprints, so can clearly see player sprinting, also maybe zoom camera out a little bit...
+
+	Add player disconnections if the server suspects the player of movement cheating
+	make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+	make the ThreadManager to work on multi-threading
+	prevent crashing and stopping receiving packets from client to server when 2 or more clients disconnect simultaneosly.
+	imrpove killFeedUI, make entries disappear by decreasing opacity, and popping them back up smoothly instead of vertical layout group which
+		pops them and moves other entries up instantly.
+	improve UI, adding pop up animations to the UI elements instead of just appearing instantly.
+	improve UI, adding black borders to UI Panels like TimeOutPanel.
+	fix player move validation, when respawned, should ignore any changes that occured lately.	
+
+	add breathing camera movement when player is idle, going up and down.
+	add music Spoiler - Original Mix (Hyper) to game.
+
+TODO Tasks | 1 = done, 0 = not done
+-----------------------------------
+
+
+Importing assets
+----------------
+
+Animations
+----------
+
+Animator
+--------
+1 Fixing the player animator controller, so jump animation gets called from specific states, and not from any state.
+	Prevents player that got killed in mid air, from not playing the die animations.
+
+UnityEditor
+-----------
+1 Changed the Floating Joystick sprites in background and in handle to improve aesthetics.
+1 Added Empty gameObject called Boundries, which will store the FallBoundries, InvisibleBoundries, and CameraBoundries
+1 Add FallBoundries gameObject, with trigger box collider. Attach FallBoundry script to it. Made into prefab
+1 Add CameraBoundries gameObject, with trigger Polygon Collider,
+1 Edit CinemachineCamera in LocalPlayer a prefab, and set the CinemachineCamera in Mobile player to the prefab, so changes made to prefab
+	will propegate to both players. Attached CinemachineConfiner, CameraBoundries script, so can confine camera to camera boundries collider.
+1 Add PlayerBoundries gameObject, which contain box colliders, which constrict where the player can go.
+1 Add empty RespawnPoints gameObject, with many scattered children gameObjects Point, which will act as spawn points. 
+	Attach RespawnPoint script to it.
+
+Implementing scripts
+--------------------
+1 Add FallBoundry script, has an OnTriggerEnter2D method, which checks if the gameObject is an IHealth interface, 
+	and if it is local player, then calls FallDie method
+1 Edit IHealth, added FallDie method.
+1 Edit NonLocalPlayerHealth, added FallDie, which is similar to simple, die, but in future other events will be added to the death, like player fall sounds.
+1 Add CameraBoundries script, a singleton, which holds the camera polygon Collider, in future, more than 1 colliders, so need to access multiple colliders.
+	Also contains a ResetCamera method which is subscribed to the OnPlayerRespawn event, so can get rid of jiterniess when warping to spawn point.
+1 Edit PlayerCameraController, added cam confiner field, and added awake method which caches and sets the bounding shape of the camera script.
+	Added OnPlayerRespawn event, which ResetsCamera, avoiding jitteriness of camera when warping spawn locations.
+
+1 Add RespawnPoint, a singleton script, which gets all its children transforms, and returns a random 1, when a GetRandomSpawnPoint is called.
+	Stores the last respawn and die position, so playerCamera controller can access it, during its ResetCamera method called OnPlayerRespawned
+1 Edit LocalPlayerNovement, adding SetRespawnPointLocation to the overriding IEnumarator UnFreezeMotionAndHitBox..., which sets model object's positon to respawnPoint
+	GetRandomSpawnPoint.
+1 Edit EntityWalking, making freezing motion and unfreezing, set velocity to 0, and making static when dead, and not when alive. 
+	Fixing when player falls sideways, and flies out of map when respawning.
+1 Bug, when respawning another player, the non local player jitters, trying to fix by making UnFreezeMotionAndHitBox virtual, so local player,
+	can override and setRespawnPointLocation.
+	Also LocalPlayer overrides the freeze motion, to make the rb bodyType to dynamic, whilsts the entity walking default is isKinematic.
+
+GameServer code
+---------------
+1 Edit Player, remove invalid move checking, because when player respawned, it causes the player to be though of as cheating.
+	Need to fix the issue later.
+
+===============================================================================================================================
 Version 0.5.3
 -------------
 
@@ -8,7 +112,7 @@ Main goals is to;
 	1 Make so can play on a mobile device.
 	1 Implement mobile playermovement via use of polymorphism
 	1 Implement mobile playergun via use of polymorphism	
-	0 Test on actual build for iOS.	
+	1 Test on actual build for iOS.	
 	
 Future tasks;
 	version 0.5.4

@@ -36,6 +36,11 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
         ResetHealth();
         GameManager.Instance.PlayerRespawned(OwnerClientID);
     }
+    public void FallDie()
+    {
+        GameManager.Instance.PlayerDied(OwnerClientID, OwnerClientID);
+        StartCoroutine(WaitBeforeRespawning());
+    }
 
     private void Start()
     {
