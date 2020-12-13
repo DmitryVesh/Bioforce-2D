@@ -3,18 +3,18 @@ using System;
 
 public class LocalPlayerAnimations : NonLocalPlayerAnimations
 {
-    private LocalPlayerMovement MovementScript { get; set; } = null;
+    private IWalkingLocalPlayer LocalPlayerMoveInterface { get; set; } = null;
 
     protected override void Awake()
     {
-        MovementScript = GetComponent<LocalPlayerMovement>();
+        LocalPlayerMoveInterface = GetComponent<IWalkingLocalPlayer>();
         base.Awake();
     }
 
     public override void YAxisAnimations()
     {
         base.YAxisAnimations();
-        if (MovementScript.HasJumped())
+        if (LocalPlayerMoveInterface.HasJumped())
             Anim.SetTrigger("Jumped");
     }
 

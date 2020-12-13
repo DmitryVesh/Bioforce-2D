@@ -10,21 +10,33 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
     //Set to default of -1, which will mean that the object will take damage from any bullet
     public int OwnerClientID { get; private set; } = -1;
 
+    private PlayerManager PlayerManager { get; set; }
+
+    public float GetMaxHealth() =>
+        MaxHealth;
+    public float GetCurrentHealth() =>
+        CurrentHealth;
+
+    public void TookDamage(int damage, int currentHealth)
+    {
+        //TODO: display hit effect
+        //TODO: display damage hit numbers
+        CurrentHealth = currentHealth;
+        Debug.Log($"took damage: {OwnerClientID}");
+    }
     public void TakeDamage(int damage, int bulletOwnerID)
     {
         CurrentHealth -= damage;
         //TODO: display hit effect
+        ClientSend.TookDamage(damage, CurrentHealth);
         if (CurrentHealth <= 0) 
             Die(bulletOwnerID);
     }
-    public void SetOwnerClientID(int iD)
-    {
+    public void SetOwnerClientID(int iD) =>
         OwnerClientID = iD;
-    }
-    public int GetOwnerClientID()
-    {
-        return OwnerClientID;
-    }
+
+    public int GetOwnerClientID() => 
+        OwnerClientID;
 
     public void Die(int bulletOwnerID)
     {
@@ -42,9 +54,13 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
         StartCoroutine(WaitBeforeRespawning());
     }
 
+    //TODO: 9000 maybe call Respawn instead of ResetHealth()????????????????????
     private void Start()
     {
         ResetHealth();
+        PlayerManager = GameManager.PlayerDictionary[OwnerClientID];
+        PlayerManager.OnPlayerTookDamage += TookDamage;
+        PlayerManager.OnPlayerRespawn += ResetHealth;
     }
     private IEnumerator WaitBeforeRespawning()
     {

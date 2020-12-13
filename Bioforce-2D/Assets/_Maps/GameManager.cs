@@ -11,6 +11,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject PlayerPrefab;
     [SerializeField] private GameObject MobileLocalPlayerPrefab;
 
+    public delegate void PlayerConnected (int iD, string username, bool justJoined);
+    public event PlayerConnected OnPlayerConnected;
+
+    public delegate void PlayerDisconnected (int iD, string username);
+    public event PlayerDisconnected OnPlayerDisconnected;
+
     private void Awake()
     {
         if (Instance == null)
@@ -25,12 +31,14 @@ public class GameManager : MonoBehaviour
         PlayerDictionary = new Dictionary<int, PlayerManager>();
     }
 
-    public void SpawnPlayer(int iD, string username, Vector3 position, Quaternion rotation, bool isDead)
+    public void SpawnPlayer(int iD, string username, Vector3 position, Quaternion rotation, bool isDead, bool justJoined)
     {
         GameObject player;
         GameObject prefab;
 
-        if (iD == Client.Instance.ClientID)
+        bool localClient = iD == Client.Instance.ClientID;
+
+        if (localClient)
         {
             if (IsMobileSupported())
                 prefab = MobileLocalPlayerPrefab;
@@ -59,12 +67,18 @@ public class GameManager : MonoBehaviour
         playerAnimations?.SetOwnerClientID(iD);
 
         StartCoroutine(playerManager.IsPlayerDeadUponSpawning(isDead));
+
+        OnPlayerConnected?.Invoke(iD, username, justJoined);
     }
     public void DisconnectPlayer(int disconnectedPlayer)
     {
         Debug.Log($"Player: {disconnectedPlayer} has disconnected.");
-        PlayerDictionary[disconnectedPlayer].Disconnect();
-        PlayerDictionary.Remove(disconnectedPlayer);
+        PlayerManager playerManager = PlayerDictionary[disconnectedPlayer];
+
+        OnPlayerDisconnected?.Invoke(disconnectedPlayer, playerManager.GetUsername());
+
+        playerManager.Disconnect();
+        PlayerDictionary.Remove(disconnectedPlayer);        
     }
     public void DisconnectAllPlayers()
     {

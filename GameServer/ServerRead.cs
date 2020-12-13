@@ -76,6 +76,8 @@ namespace GameServer
                 Console.WriteLine($"Error, trying to read shot bullet, from player: {clientID}\n{exception}");
             }
         }
+
+        
         public static void PlayerDiedRead(int clientID, Packet packet)
         {
             try
@@ -103,5 +105,21 @@ namespace GameServer
                 Console.WriteLine($"Error, trying to read player respawned, from player: {clientID}\n{exception}");
             }
         }
+
+        public static void TookDamageRead(int clientID, Packet packet)
+        {
+            try
+            {
+                int damage = packet.ReadInt();
+                int currentHealth = packet.ReadInt();
+
+                ServerSend.TookDamage(clientID, damage, currentHealth);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"Error, trying to read player took damage, from player: {clientID}\n{exception}");
+            }
+        }
+
     }
 }

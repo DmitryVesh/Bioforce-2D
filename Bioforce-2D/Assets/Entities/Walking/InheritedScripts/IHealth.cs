@@ -6,4 +6,7 @@ public interface IHealth
     void Die(int bulletOwnerID);
     void Respawn();
     void FallDie();
+
+    float GetMaxHealth();
+    float GetCurrentHealth();
 }

@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class LocalPlayerMovement : NonLocalPlayerMovement
+public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
 {
     // Stamina Data
     [SerializeField] private float MaxStamina = 5; // Used as time limit for how much a player can sprint
@@ -38,8 +38,12 @@ public class LocalPlayerMovement : NonLocalPlayerMovement
     // Grounded found in EntityWalking
     // SpeedX which is found in moving in X direction Data
     // runSpeed used to know when to switch from normal running animation to sprinting animation
-    private bool Jumped { get; set; } = false; // Used to identify when player has jumped
-
+    private bool Jumped { get; set; } = false; // Used to identify when player has jumped, for LocalPlayerAnimations
+    
+    public float GetMaxStamina() =>
+        MaxStamina;
+    public float GetCurrentStamina() =>
+        currentStamina;
 
     public bool HasJumped()
     {
@@ -57,7 +61,6 @@ public class LocalPlayerMovement : NonLocalPlayerMovement
 
         ClientSend.PlayerMovementStats(RunSpeed, SprintSpeed);
         PlatformLayer = LayerMask.NameToLayer(PlatformLayerName);
-
     }
     
     void Update() // Used for getting user input, and storing it later to be used in FixedUpdate
@@ -69,26 +72,17 @@ public class LocalPlayerMovement : NonLocalPlayerMovement
         MovementX();
         MovementY();
     }
-    protected virtual float GetMoveInputX()
-    {
-        return Input.GetAxisRaw("Horizontal"); // Get user input in x direction
-    }
-    protected virtual bool GetSprintInput()
-    {
-        return Input.GetButton("Sprint");
-    }
-    protected virtual bool GetJumpInputPressed()
-    {
-        return Input.GetButtonDown("Jump");
-    }
-    protected virtual bool GetJumpInputReleased()
-    {
-        return Input.GetButtonUp("Jump");
-    }
-    protected virtual float GetVerticalInput()
-    {
-        return Input.GetAxis("Vertical");
-    }
+    protected virtual float GetMoveInputX() =>
+        Input.GetAxisRaw("Horizontal"); // Get user input in x direction
+    protected virtual bool GetSprintInput() =>
+        Input.GetButton("Sprint");
+
+    protected virtual bool GetJumpInputPressed() =>
+        Input.GetButtonDown("Jump");
+    protected virtual bool GetJumpInputReleased() =>
+        Input.GetButtonUp("Jump");
+    protected virtual float GetVerticalInput() =>
+        Input.GetAxis("Vertical");
 
     private void MovementX() // Calculates SpeedX that will be applied to player, in response to x axis inputs
     {
@@ -255,6 +249,11 @@ public class LocalPlayerMovement : NonLocalPlayerMovement
         ModelObject.transform.position = RespawnPoint.GetRandomSpawnPoint(ModelObject.transform.position);
         rb.velocity.Set(0, 0);
     }
+    protected override void PlayerCanMoveAndCanBeHit()
+    {
+        currentStamina = MaxStamina;
+        base.PlayerCanMoveAndCanBeHit();
+    }
 
     private void SendMovesToServer(Vector3 velocity)
     {
@@ -296,4 +295,6 @@ public class LocalPlayerMovement : NonLocalPlayerMovement
     {
         return (value * -1 * BoolToInt(condition)) + (value * 1 * BoolToInt(!condition));
     }
+
+    
 }

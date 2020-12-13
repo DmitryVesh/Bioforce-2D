@@ -30,6 +30,8 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
         PlayerManager.OnPlayerSpeedXChanged += ChangedSpeedX;
         PlayerManager.OnPlayerDeath += PlayerCantMoveAndCantBeHit;
         PlayerManager.OnPlayerRespawn += PlayerCanMoveAndCanBeHit;
+
+        PlayerCanMoveAndCanBeHit();
     }
 
     private void ChangedPlayerMovementStats(float runSpeed)
@@ -45,7 +47,7 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
         Hitbox.enabled = false;
         FreezeMotion();
     }
-    private void PlayerCanMoveAndCanBeHit()
+    protected virtual void PlayerCanMoveAndCanBeHit()
     {
         StartCoroutine(UnFreezeMotionAndHitBoxAfterRespawnAnimation());
     }

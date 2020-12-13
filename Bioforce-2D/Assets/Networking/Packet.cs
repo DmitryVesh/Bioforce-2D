@@ -15,7 +15,8 @@ public enum ServerPackets
     playerDisconnect,
     bulleShot,
     playerDied,
-    playerRespawned
+    playerRespawned,
+    tookDamage
 
 }
 
@@ -28,8 +29,8 @@ public enum ClientPackets
     playerMovementStats,
     bulletShot,
     playerDied,
-    playerRespawned
-
+    playerRespawned,
+    tookDamage
 }
 
 public class Packet : IDisposable

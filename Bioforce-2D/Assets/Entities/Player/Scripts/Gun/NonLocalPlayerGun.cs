@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class NonLocalPlayerGun : MonoBehaviour, IGun
 {
@@ -10,16 +12,20 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
     protected bool CanShoot = true;
     private PlayerManager PlayerManager { get; set; } = null;
 
+    [SerializeField] private Color PlayerColor; //Set in inspector, colors the muzzel flash and bulletPrefab
+    [SerializeField] private MuzzelFlash MuzzelFlash; //Set in inspector
 
     public virtual void ShootBullet(Vector2 position, Quaternion rotation)
     {
         Bullet bullet;
         bullet = GetBullet();
-
+        
         if (bullet == null)
             bullet = AddBullet();
 
         bullet.Shoot(position, rotation);
+
+        MuzzelFlash.PlayFlash();
     }
     public void SetOwnerClientID(int iD)
     {
@@ -48,17 +54,23 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
         PlayerManager = GameManager.PlayerDictionary[OwnerClientID];
         PlayerManager.OnPlayerDeath += Disable;
         PlayerManager.OnPlayerRespawn += Enable;
+        SetToPlayerColor(MuzzelFlash.gameObject);
     }
 
     private Bullet AddBullet()
     {
         GameObject bulletGameObject = Instantiate(BulletPrefab, Vector3.zero, Quaternion.identity);
+        SetToPlayerColor(bulletGameObject);
         Bullet bulletScript = bulletGameObject.GetComponent<Bullet>();
         bulletScript.SetOwnerClientID(OwnerClientID);
         
         BulletList.Add(bulletScript);
         return bulletScript;
     }
+
+    private void SetToPlayerColor(GameObject bulletGameObject) =>
+        bulletGameObject.GetComponent<SpriteRenderer>().color = PlayerColor;
+
     private Bullet GetBullet()
     {
         Bullet bulletToShoot = null;
@@ -75,6 +87,14 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
 
     private void OnDestroy()
     {
+
+        foreach (Bullet bullet in BulletList)
+        {
+            if (bullet == null)
+                continue;
+            Destroy(bullet.gameObject);
+        }
+
         PlayerManager.OnPlayerDeath -= Disable;
         PlayerManager.OnPlayerRespawn -= Enable;
     }

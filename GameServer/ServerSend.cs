@@ -28,7 +28,7 @@ namespace GameServer
         }
 
 
-        public static void SpawnPlayer(int recipientClient, Player player)
+        public static void SpawnPlayer(int recipientClient, Player player, bool justJoined)
         {
             Packet packet = new Packet((int)ServerPackets.spawnPlayer);
             packet.Write(player.ID);
@@ -40,6 +40,7 @@ namespace GameServer
             packet.Write(player.SprintSpeed);
 
             packet.Write(player.IsDead);
+            packet.Write(justJoined);
 
             SendTCPPacket(recipientClient, packet);
         }
@@ -101,6 +102,16 @@ namespace GameServer
 
             SendTCPPacketToAllButIncluded(playerID, packet);
         }
+        internal static void TookDamage(int clientID, int damage, int currentHealth)
+        {
+            Packet packet = new Packet((int)ServerPackets.tookDamage);
+            packet.Write(clientID);
+            packet.Write(damage);
+            packet.Write(currentHealth);
+
+            SendTCPPacketToAllButIncluded(clientID, packet);
+        }
+
 
         private static void SendTCPPacket(int recipientClient, Packet packet)
         {
@@ -126,7 +137,8 @@ namespace GameServer
                 Server.ClientDictionary[count].tCP.SendPacket(packet);
             }
         }
-        
+
+
         private static void SendUDPPacket(int RecipientClient, Packet packet)
         {
             packet.WriteLength();

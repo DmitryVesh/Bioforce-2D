@@ -5,25 +5,34 @@ Version 0.5.4
 Summary
 -------
 Main goals is to;
-	Improve overall gameplay response, and game feel.
+	Improve overall gameplay response, and game feel, by showing player data.
 		1 add map boundries, so if player falls off map, dies and camera stays in boundry
 		1 add player respawn points, so when player dies, instead of respawning where died, goes to a random respawn point
+		
+		1 adding a game chat, which will display player connected and disconnected messages.
+			Further uses are, in-game chat system, and server info, like round ending in x mins...
 
-		0 Fix bullets being saved in hierarchy after server is shutdown, and player is ejected from game.
-
-		0 Fix own bullets hitting the player and destroying them when player is running left.
-		0 Implement shooting where the player aims their mouse/touch, have a crosshair and dynamic arms holding gun
-		0 add local and non local player health bars
-		0 add local player stamina bars
-		0 Add muzzel flash when a player shoots, randmonly chooses which animation to play
-		0 Add an impact effect for when the bullet hits a collider
+		1 Fix bullets being saved in hierarchy after server is shutdown, and player is ejected from game.
+		1 Fix own bullets hitting the player and destroying them when player is running left or right.
+		
+		1 add local player stamina bars
+		1 add local player health bar 
+		1 and non local player health bars
+		
+		1 Add muzzel flash when a player shoots, randomly chooses which animation to play
+		0 Implement Damage nums
+		0 Add an impact effect for when the bullet hits a collide
 Future tasks;		
 	version 0.5.5 
+		
 		add a mixer system, which all sound effects sub categorise and use, so can control volume by settings 
 		add sound effects to player running, sprinting, jumping, dying and respawning
 		sound effects for bullets being shot and hitting
+		Implement shooting where the player aims their mouse/touch, have a crosshair and dynamic arms holding gun
+
 	version 0.5.6
 		add invincibility frames, after being hit/respawning
+		add chat into game
 		
 
 	Assign each player a color, and change the color of name on kill field to corresponding player color.
@@ -52,21 +61,29 @@ Future tasks;
 TODO Tasks | 1 = done, 0 = not done
 -----------------------------------
 
+Gimp
+----
+1 Make all the blue muzzel flashes to grey scale images, using Gimp, so can reuse same sprite for many colours.
+1 Make the bullet sprites into grey scale too.
 
 Importing assets
 ----------------
+1 Imported icon which will be presented as icon of the game.
+1 Import doom font
 
-Animations
-----------
 
 Animator
 --------
 1 Fixing the player animator controller, so jump animation gets called from specific states, and not from any state.
 	Prevents player that got killed in mid air, from not playing the die animations.
 
+//Get muzzel flash to work
+1 Added 10 muzzel flash animations to a MuzzelFlash gameObject animator, and linked them together using idle state.
+	contains params Trigger shot, and Int flashIndex, shot is used to determine if need to play anim, and flashIndex which flash anim.
+
 UnityEditor
 -----------
-1 Changed the Floating Joystick sprites in background and in handle to improve aesthetics.
+1 Changed the Floating Joystick sprites in background and in handle to improve aesthetics. Made bigger
 1 Added Empty gameObject called Boundries, which will store the FallBoundries, InvisibleBoundries, and CameraBoundries
 1 Add FallBoundries gameObject, with trigger box collider. Attach FallBoundry script to it. Made into prefab
 1 Add CameraBoundries gameObject, with trigger Polygon Collider,
@@ -75,6 +92,27 @@ UnityEditor
 1 Add PlayerBoundries gameObject, which contain box colliders, which constrict where the player can go.
 1 Add empty RespawnPoints gameObject, with many scattered children gameObjects Point, which will act as spawn points. 
 	Attach RespawnPoint script to it.
+
+1 Edited KillFeedEntries, removed some, so only 11 instead of 15 made bigger, and in the panel holder, made it so it uses child's scale, 
+	so can scale the panel properly.
+1 Edited Environment, made houses a bit closer, so players can see and make jumps easier.
+1 Added a boundry to the right, and made a boundry prefab.
+1 Added white semi transparent background to player usernames so easier to see, increased font size, and change the font to Doom font
+1 Edit networking menu font to doom font.
+1 Moved Client, ClientRead, ClientSend and PlayerManager scripts into Networking folder.
+
+//Get chat to work
+1 Add Chat gameobject to the canvas, will hold in-game chat. Attach InGameChat script to it. Similar to KillFeedUI,
+	however contains ChatEntries instead of KillEntries.
+
+// Get health bars to work
+1 Add LocalHealthAndStaminaCanvasgameObject to the LocalPlayer, which holds a panel for the 2 Stamina sliders, and another panel for Health slider.
+	The StaminaPanel has a StaminaBar script, the HealthPanel has a HealthBar script
+
+//Get muzzel flashes to work
+1 Added muzzel flash to player model prefab, and attached muzzelFlash script to it.
+1 Deleted all older flashes, only using grey scale ones.
+1 Edit Bullet prefab, uses greyscale sprites instead.
 
 Implementing scripts
 --------------------
@@ -96,11 +134,68 @@ Implementing scripts
 1 Bug, when respawning another player, the non local player jitters, trying to fix by making UnFreezeMotionAndHitBox virtual, so local player,
 	can override and setRespawnPointLocation.
 	Also LocalPlayer overrides the freeze motion, to make the rb bodyType to dynamic, whilsts the entity walking default is isKinematic.
+1 Renamed SimpleNetworkingUI to NetworkingUI.
+1 Edit NonLocalPlayerGun, OnDestroy event iterates through all bullets in the bulletList, and destroys their gameObject.
+1 Edit Bullet, OnCollisionEnter2D, checks if the bullet is its own player's, if it is, then don't call bulletHit.
+
+
+//Get chat working
+1 Edit SimpleNetworkingUI, OnUsernameInputFieldChanged, so certain characters added, are not allowed to be entered, by simply deleting them,
+	when user tries to enter them. Every username validation runs a RemoveInvalidChars method, which deletes any invalid chars from the string.
+	Also usernames have to be minimum 3 chars in length to be valid.
+1 Add UIEntryManager script, which is inherited by KillFeedUI and InGameChat. An abstract class, which holds almost all the KillFeedUI methods and fields,
+	so can be reused by the InGameChat, to display messages as entries, similar to kill feed entries.
+1 Edit KillFeedUI, inherits from UIEntryManager, moved generic entry methods and fields to the UIEntryManager, except the AddKillFeedEntry method, 
+	and the turning on/off the borders/filling.
+1 Add InGameChat, singleton, inherits from UIEntryManager, subscribes to the GameManager OnPlayerConnected/Disconnected events. 
+	Contains a method AddInGameChatEntry, which takes in a string, and adds an entry to the game chat.
+	Will get called by the PlayerConnectedMessage/Disconnected subscribers to the events.
+1 Edit GameManager, added delegate and events OnPlayerConnected and OnPlayerDisconnected, to reduce dependancy, take iD and username. 
+	Get called in SpawnPlayer, and DisconnectPlayer. Added param justJoined, in SpawnPlayer, passes it onto OnPlayerConnected.
+1 Edit ClientRead, SpawnPlayer method gets the JustJoined, passes it to GameManager.
+
+
+//Get health/stamina bars to work
+1 Add Bar, aggregation to StatsBar, holds a slider, and sets the slider's max/min values, and current value.
+	Also holds a Gradient value and slider fill image, which will be changed during setCurrentBarValue, to the slider normalised value.
+1 Add StatsBar, abstract class, inherited by stamina/health Bars. Aggregation reference to StatsBar array, which is needed to hold the 2 bars, 1 going left-right
+	1 right-left. Has abstract methods to GetMax & GetCurrent, which inherited classes have to implement.
+	In Start, the statsBar are got from children, and each bar is assigned max value. In fixed update the 
+1 Added IWalkingLocalPlayer interface, inherits from IWalking, exposes the CurrentStamina of the localPlayer, (need to use interface, because have 
+	mobile version of local player and normal version.) Also fixes the LocalPlayerAnimations only getting has jumped from the non mobile version 
+1 Add StaminaBar, inherits from StatsBar, holds reference to IWalkingLocalPlayer, setting its GetMax/GetCurrent values from the interface stamina values.
+1 Edit IHealth, to have to implement get max health, & current health. So can be accessed by HealthBar.
+1 Edit NonLocalPlayerHealth, implement the new IHealth methods. 
+	Added to TakeDamage  a call to ClientSend.TookDamage.
+1 Add HealthBar, inherits from StatsBar, holds reference to IHealth, and sets the GetMax/GetCurrent to IHealth health values.
+1 Edit ClientSend, added TookDamage method, which sends the damage player received and currentHealth after damage applied.
+1 Edit Packet, added to ClientPackets & ServerPackets tookDamage enum.
+1 Edit Client, added TookDamage server packet to packet handler.
+1 Edit ClientRead, added TookDamage method, called by Client packetHandler, calls PlayerManager's tookDamage method.
+1 Edit PayerManager, added OnPlayerTakeDamage event,
+	added TookDamage method, which calls the OnPlayerTookDamage event.
+1 Edit NonLocalPlayerHealth, added reference to playerManager, and subscribe to the OnTookDamage Event with the TookDamage method
+	sets the currentHealth to the health sent. Subscribed to OnPlayerRespawn event, resetingHealth of player.
+
+//Get muzzel flashes to work - Going to make a class that holds all the effects, like muzzel flash
+1 Add MuzzelFlash, holds the number of flashes, and animator. When PlayFlash is called, the animator trigger shot is called,
+	and the integer flashIndex is set to a random value between 0, and numFlashes.
+1 Edit NonLocalPlayerGun, added reference to MuzzelFlash, and PlayerColor. The ShootBullet method now Calls the MuzzelFlash PlayFlash method.
+	Also in Start, set the MuzzelFlash color to player color, and when adding a bullet, set its color to player color too.
 
 GameServer code
 ---------------
 1 Edit Player, remove invalid move checking, because when player respawned, it causes the player to be though of as cheating.
 	Need to fix the issue later.
+1 Edit Client, added boolean param to ServerSend.SpawnPlayer calls, which represents if a player is already present in game, or not.
+	False when spawning rest of players for the connected user. True when spawning player who just joined to all connected players
+1 Edit ServerSend, added boolean param justJoined to SpawnPlayer, to know if player just joined a game or not.
+
+//Get health bar to work'
+1 Edit Packet, ""
+1 Edit Server, added TookDamage client packet to packet handler.
+1 Edit ServerRead, add TookDamageRead method, called by packetHandler, reads the damage, and currentHealth, calls serverSend.TookDamage.
+1 Edit ServerSend, add TookDamage method, which sends the player who took damage, the damage and the current health to all but the player who took damage
 
 ===============================================================================================================================
 Version 0.5.3

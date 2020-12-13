@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class LocalPlayerGun : NonLocalPlayerGun
 {
-    [SerializeField] private Transform FirePointTransform;
+    [SerializeField] private Transform FirePointTransform; //Set in inspector
 
     protected virtual bool IsPlayerTryingToShoot()
     {

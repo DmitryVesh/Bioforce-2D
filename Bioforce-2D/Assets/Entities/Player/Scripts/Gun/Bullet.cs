@@ -58,12 +58,17 @@ public class Bullet : MonoBehaviour
         if (health != null)
         {
             int healthOwner = health.GetOwnerClientID();
+
+            bool ownClient = healthOwner == Client.Instance.ClientID;
+            bool ownBullet = healthOwner == OwnerClientID;
             //So only hurts local player, so other people's bullets only hurt you,
-            if (healthOwner == Client.Instance.ClientID && healthOwner != OwnerClientID)
+            if (ownClient && !ownBullet)
             {
                 int damage = Random.Range(DamageMin, DamageMax + 1);
                 health.TakeDamage(damage, OwnerClientID);
             }
+            else if (ownClient && ownBullet)
+                return;
         }
         BulletHit();
     }

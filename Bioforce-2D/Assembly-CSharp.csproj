@@ -26,7 +26,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169</NoWarn>
-    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,7 +35,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169</NoWarn>
-    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <NoConfig>true</NoConfig>
@@ -73,29 +73,38 @@
     <Compile Include="Assets\Entities\Player\Scripts\Movement\Networking\LocalPlayerMovement.cs" />
     <Compile Include="Assets\Joystick Pack\Scripts\Joysticks\FloatingJoystick.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Camera\CameraBoundries.cs" />
-    <Compile Include="Assets\UI\SimpleNetworkingUI.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Gun\LocalPlayerGun.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Camera\PlayerCameraController.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Movement\Networking\LocalPlayerAnimations.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Movement\PlayerAnimations.cs" />
-    <Compile Include="Assets\Entities\Player\Scripts\Networking\ClientRead.cs" />
+    <Compile Include="Assets\Networking\ClientRead.cs" />
     <Compile Include="Assets\UI\IgnoreParentRotation.cs" />
     <Compile Include="Assets\UI\KillFeed\KillFeedUI.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Camera\DetachFromParent.cs" />
     <Compile Include="Assets\Joystick Pack\Scripts\Joysticks\DynamicJoystick.cs" />
     <Compile Include="Assets\Joystick Pack\Scripts\Joysticks\FixedJoystick.cs" />
     <Compile Include="Assets\Networking\ThreadManager.cs" />
-    <Compile Include="Assets\Entities\Player\Scripts\Networking\PlayerManager.cs" />
+    <Compile Include="Assets\Networking\PlayerManager.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Movement\Networking\NonLocalPlayerMovement.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Health\NonLocalPlayerHealth.cs" />
-    <Compile Include="Assets\Entities\Player\Scripts\Networking\ClientSend.cs" />
+    <Compile Include="Assets\Networking\ClientSend.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Movement\Networking\MobileLocalPlayerMovement.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Movement\PlayerMovement.cs" />
     <Compile Include="Assets\Entities\Walking\InheritedScripts\IHealth.cs" />
     <Compile Include="Assets\Joystick Pack\Scripts\Joysticks\VariableJoystick.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Gun\Bullet.cs" />
-    <Compile Include="Assets\Entities\Player\Scripts\Networking\Client.cs" />
+    <Compile Include="Assets\Networking\Client.cs" />
     <Compile Include="Assets\_Maps\RespawnPoints\RespawnPoint.cs" />
+    <Compile Include="Assets\UI\Chat\InGameChat.cs" />
+    <Compile Include="Assets\UI\UIEntryManager.cs" />
+    <Compile Include="Assets\UI\NetworkingUI.cs" />
+    <Compile Include="Assets\Entities\Player\Scripts\UI\StaminaBar.cs" />
+    <Compile Include="Assets\Entities\Player\Scripts\UI\HealthBar.cs" />
+    <Compile Include="Assets\Entities\Player\Scripts\UI\Bar.cs" />
+    <Compile Include="Assets\Entities\Player\Scripts\Movement\Networking\IWalkingLocalPlayer.cs" />
+    <Compile Include="Assets\Entities\Player\Scripts\UI\StatsBar.cs" />
+    <Compile Include="Assets\Entities\Player\Scripts\Gun\MuzzelFlash.cs" />
+    <Compile Include="Assets\Entities\Scripts\DamageNumManager.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />

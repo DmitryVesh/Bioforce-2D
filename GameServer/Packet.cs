@@ -17,7 +17,8 @@ namespace GameServer
         playerDisconnect,
         bulleShot,
         playerDied,
-        playerRespawned
+        playerRespawned,
+        tookDamage
 
     }
 
@@ -30,7 +31,8 @@ namespace GameServer
         playerMovementStats,
         bulletShot,
         playerDied,
-        playerRespawned
+        playerRespawned,
+        tookDamage
 
     }
 
