@@ -1619,7 +1619,7 @@ GameObject:
   - component: {fileID: 546723070}
   - component: {fileID: 546723071}
   - component: {fileID: 546723072}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: DamageNumManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7334,6 +7334,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1800429564}
     m_Modifications:
+    - target: {fileID: 567357950873570620, guid: f325494b6f4312341afe5fa407374769,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 9b157c9d27a44954d89eea8d5146fc5e, type: 2}
+    - target: {fileID: 4232339083651129009, guid: f325494b6f4312341afe5fa407374769,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: baa4cd4223989d541943f7f029e17d6f, type: 2}
     - target: {fileID: 8407672069723523122, guid: f325494b6f4312341afe5fa407374769,
         type: 3}
       propertyPath: m_Name

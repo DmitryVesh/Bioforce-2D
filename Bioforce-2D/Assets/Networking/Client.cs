@@ -10,7 +10,7 @@ public class Client : MonoBehaviour
     public static int DataBufferSize = 4096;
 
     private string IPAddressLocalHost = "127.0.0.1";
-    private string IPAddressLAN = "192.168.1.66";
+    private string IPAddressLAN = "192.168.1.65";
     private string IPAddressInternet = "148.252.129.44";
 
     private string IPAddressConnectTo;

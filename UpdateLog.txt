@@ -1,4 +1,77 @@
 ===============================================================================================================================
+Version 0.5.5
+-------------
+
+Summary
+-------
+Main goals is to;
+	Improve overall gameplay response, and game feel, by showing player data.
+		1 Animate the banners in the map
+
+		0 Add a sound mixer system, which all sound effects sub categorise and use, so can control volume by settings 
+
+		0 Add sound effects to player running, sprinting, jumping, dying and respawning
+		0 add sound effects for bullets being shot and hitting
+		0 Implement shooting where the player aims their mouse/touch, have a crosshair and dynamic arms holding gun
+
+Future tasks;		
+		
+	version 0.5.6
+		add invincibility frames, after being hit/respawning
+		add chat into game
+		add gamepad support for pc & mac
+
+	Assign each player a color, and change the color of name on kill field to corresponding player color.
+	change sending playermovement position to vector2 - reduce data sent
+	change sending playermovement rotation to bool isGoingRight - reduce data sent	
+		
+	Make server sided, currently very client sided
+	Make so LAN connection tries to connect to your actual lan connection, and not hard coded values
+	
+	Add animations to banners
+	Add trail effects when a player sprints, so can clearly see player sprinting, also maybe zoom camera out a little bit...
+
+	Add player disconnections if the server suspects the player of movement cheating
+	make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+	make the ThreadManager to work on multi-threading
+	prevent crashing and stopping receiving packets from client to server when 2 or more clients disconnect simultaneosly.
+	imrpove killFeedUI, make entries disappear by decreasing opacity, and popping them back up smoothly instead of vertical layout group which
+		pops them and moves other entries up instantly.
+	improve UI, adding pop up animations to the UI elements instead of just appearing instantly.
+	improve UI, adding black borders to UI Panels like TimeOutPanel.
+	fix player move validation, when respawned, should ignore any changes that occured lately.	
+
+	add breathing camera movement when player is idle, going up and down.
+	add music Spoiler - Original Mix (Hyper) to game.
+
+TODO Tasks | 1 = done, 0 = not done
+-----------------------------------
+
+Gimp
+----
+
+Importing assets
+----------------
+
+
+Animator
+--------
+1 Animated all banner prefabs.
+
+
+UnityEditor
+-----------
+
+
+Implementing scripts
+--------------------
+
+
+GameServer code
+---------------
+
+
+===============================================================================================================================
 Version 0.5.4
 -------------
 
