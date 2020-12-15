@@ -19,9 +19,12 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
     {
         Bullet bullet;
         bullet = GetBullet();
-        
+
         if (bullet == null)
+        {
             bullet = AddBullet();
+            bullet.SetBulletColor(PlayerColor);
+        }
 
         bullet.Shoot(position, rotation);
 

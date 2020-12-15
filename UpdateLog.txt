@@ -20,11 +20,11 @@ Main goals is to;
 		1 and non local player health bars
 		
 		1 Add muzzel flash when a player shoots, randomly chooses which animation to play
-		0 Implement Damage nums
-		0 Add an impact effect for when the bullet hits a collide
+		1 Implement Damage nums
+		1 Add an impact effect for when the bullet hits a collider
+
 Future tasks;		
 	version 0.5.5 
-		
 		add a mixer system, which all sound effects sub categorise and use, so can control volume by settings 
 		add sound effects to player running, sprinting, jumping, dying and respawning
 		sound effects for bullets being shot and hitting
@@ -33,7 +33,7 @@ Future tasks;
 	version 0.5.6
 		add invincibility frames, after being hit/respawning
 		add chat into game
-		
+		add gamepad support for pc & mac
 
 	Assign each player a color, and change the color of name on kill field to corresponding player color.
 	change sending playermovement position to vector2 - reduce data sent
@@ -70,7 +70,7 @@ Importing assets
 ----------------
 1 Imported icon which will be presented as icon of the game.
 1 Import doom font
-
+1 Import Impact effect sprites
 
 Animator
 --------
@@ -80,6 +80,9 @@ Animator
 //Get muzzel flash to work
 1 Added 10 muzzel flash animations to a MuzzelFlash gameObject animator, and linked them together using idle state.
 	contains params Trigger shot, and Int flashIndex, shot is used to determine if need to play anim, and flashIndex which flash anim.
+
+//Get Impact effect to work
+1 Added ImpactEffect animation to the Bullet, added 2 triggers to bullet, a shot and hit trigger, will be set in bullet script.
 
 UnityEditor
 -----------
@@ -113,6 +116,12 @@ UnityEditor
 1 Added muzzel flash to player model prefab, and attached muzzelFlash script to it.
 1 Deleted all older flashes, only using grey scale ones.
 1 Edit Bullet prefab, uses greyscale sprites instead.
+
+
+//Get DamagNums to work
+1 Added DamageNum prefab, which contains TextMeshProText, and DamageNum script. Used to display the damage number.
+1 Added DamageNumCanvas to PlayerModel, so all players contain the ability to display damageNums when hit. 
+	Contains DamageNumManager
 
 Implementing scripts
 --------------------
@@ -182,6 +191,29 @@ Implementing scripts
 	and the integer flashIndex is set to a random value between 0, and numFlashes.
 1 Edit NonLocalPlayerGun, added reference to MuzzelFlash, and PlayerColor. The ShootBullet method now Calls the MuzzelFlash PlayFlash method.
 	Also in Start, set the MuzzelFlash color to player color, and when adding a bullet, set its color to player color too.
+
+//Get damage nums to work
+//Need to setup system similar to the Bullet - Gun relationshipff
+1 Added DamageNum, is placed onto damageNumPrefab. Controls the activation of damage numbers.
+	The damage numbers are moved up and to the right/left depending on which direction the bullet hit the target. 
+	The size is increased initially small amounts, but then a larger amount, to simulate the damage nums blowing up.
+	After time to live passes, the damage num is faded away, and when the fully transparent, reset it.
+1 Added DamageNumManager, Has an create method, which gets a DamageNum, from either stored list of damageNums, or Instantiates/sets a new 1, and sets its parent to itself.
+	Contains reference to the prefab to instantiate, and a List which holds the DamageNums instantiated.
+1 Added PhysicsHelper, a class which will be used to check if the collision occured is goingRight or not.
+	GoingRight, checks if target position x is greater than collider position, if yes going right is false.
+	Also can generate a random bool, used in TookDamage playerManager, when Creating a damageNumber.
+1 Edit PlayerManager, add to the TookDamage method, creating a damageNumber (has to be called from playerManager because playerManager has reference to the playerModel object.)
+1 Edit Bullet, added creation of damage Number, when hitting player.
+
+//Get Impact effect to work
+1 Edit Bullet, add reference to animator, capsule collider (hitbox), spriteRenderer, and a bulletColor. 
+	Added method SetBulletColor, to set the color to player's color
+	In Shoot method, set animator trigger shot, set the color to bullet color, and set the rigid body to dynamic.
+	In bulletHit set animator trigger hit, to play impact effect. set the color to white, disable the hitbox, make rigidbody static, reset time to live so can play the impact effect,
+	before being reset. 
+	Also need to set the 
+1 Edit NonLocalPlayerGun, when a bullet is added, set its color.
 
 GameServer code
 ---------------

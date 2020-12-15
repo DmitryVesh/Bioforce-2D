@@ -20,9 +20,7 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
     public void TookDamage(int damage, int currentHealth)
     {
         //TODO: display hit effect
-        //TODO: display damage hit numbers
         CurrentHealth = currentHealth;
-        Debug.Log($"took damage: {OwnerClientID}");
     }
     public void TakeDamage(int damage, int bulletOwnerID)
     {

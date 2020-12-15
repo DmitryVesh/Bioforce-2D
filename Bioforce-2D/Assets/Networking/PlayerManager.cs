@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -24,6 +23,7 @@ public class PlayerManager : MonoBehaviour
     public static float RespawnTime { get; private set; } = 1.5f;
     public static float DeadTime { get; private set; } = 2;
 
+    //TODO: implement a onFireEvent
     private IGun PlayerGun;
 
     public delegate void PlayerTookDamage(int damage, int currentHealth);
@@ -91,6 +91,10 @@ public class PlayerManager : MonoBehaviour
     private void SetUsername(string username) =>
         UsernameText.text = username;
 
-    public void TookDamage(int damage, int currentHealth) =>
+    public void TookDamage(int damage, int currentHealth)
+    {
+        DamageNumManager.Instance.Create(PlayerModelObject.transform.position, damage, PhysicsHelper.RandomBool());
         OnPlayerTookDamage?.Invoke(damage, currentHealth);
+    }
+
 }
