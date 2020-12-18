@@ -35,12 +35,12 @@ namespace GameServer
         {
             try
             {
-                Quaternion rotation = packet.ReadQuaternion();
+                bool isFacingRight = packet.ReadBool();
                 //TODO: Change position to be vector2
-                Vector3 position = packet.ReadVector3();
+                Vector2 position = packet.ReadVector2();
                 Vector2 velocity = packet.ReadVector2();
                 //Sometimes System.NullReferenceException when a player disconnects
-                Server.ClientDictionary[clientID].player.PlayerMoves(rotation, position, velocity);
+                Server.ClientDictionary[clientID].player.PlayerMoves(isFacingRight, position, velocity);
             }
             catch (Exception exception)
             {
@@ -83,7 +83,8 @@ namespace GameServer
             try
             {
                 int bulletOwnerID = packet.ReadInt();
-                ServerSend.PlayerDied(clientID, bulletOwnerID);
+                int typeOfDeath = packet.ReadInt();
+                ServerSend.PlayerDied(clientID, bulletOwnerID, typeOfDeath);
                 Server.ClientDictionary[clientID].player.Died();
                 //TODO: UPDATE GAMELOGIC kill score
                 //GameLogic.

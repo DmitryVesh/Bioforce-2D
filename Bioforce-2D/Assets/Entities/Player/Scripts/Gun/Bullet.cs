@@ -10,7 +10,6 @@ public class Bullet : MonoBehaviour
     [SerializeField] private int DamageMax = 15;
     [SerializeField] private float TimeToLive = 1;
     private float CurrentTimeToLive;
-    //TODO: make a pooling system for impactEffect as well
     //[SerializeField] private GameObject impactEffect;
     private Rigidbody2D rb;
     private int OwnerClientID = -1;
@@ -82,7 +81,6 @@ public class Bullet : MonoBehaviour
             if (ownClient && !ownBullet)
             {
                 int damage = UnityEngine.Random.Range(DamageMin, DamageMax + 1);
-                DamageNumManager.Instance.Create(collision.transform.position, damage, PhysicsHelper.GoingRight(transform, collision.transform));
                 health.TakeDamage(damage, OwnerClientID);
             }
             else if (ownClient && ownBullet)

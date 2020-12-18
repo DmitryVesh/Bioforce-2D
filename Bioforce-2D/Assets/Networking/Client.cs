@@ -16,7 +16,7 @@ public class Client : MonoBehaviour
     private string IPAddressConnectTo;
     public int PortNum = 28020; //Must be the same as GameServer Port
     public int ClientID = 0;
-    public TCP tCP;
+    public TCP tCP { get; set; }
     public UDP uDP;
 
     private delegate void PacketHandler(Packet packet);
@@ -27,6 +27,26 @@ public class Client : MonoBehaviour
     private bool TimerRunning { get; set; } = false;
     private float Timer { get; set; }
 
+    public static bool IsIPAddressValid(string text)
+    {
+        string[] splitIPAddress = text.Split('.');
+        if (splitIPAddress.Length != 4)
+            return false;
+        try
+        {
+            foreach (string item in splitIPAddress)
+            {
+                int byteValue = int.Parse(item);
+                if (byteValue < 0 || byteValue > 255)
+                    return false;
+            }
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+        return true;
+    }
     public void ConnectToServer()
     {
         InitClientData();
@@ -39,6 +59,7 @@ public class Client : MonoBehaviour
 
         tCP.Connect();
     }
+
     public void SuccessfullyConnected(int assignedID)
     {
         ResetTimeOutTimer(false);
@@ -48,9 +69,10 @@ public class Client : MonoBehaviour
     public void ChangeIPAddressConnectTo(int IPAddressIndex)
     {
         string[] IPs = new string[] { IPAddressLAN, IPAddressLocalHost, IPAddressInternet };
-        Debug.Log($"Going to connect to: {IPs[IPAddressIndex]}");
         IPAddressConnectTo = IPs[IPAddressIndex];
     }
+    public void SetManualIPAddressConnectTo(string IPaddress) =>
+        IPAddressConnectTo = IPaddress;
 
     public class TCP
     {
@@ -119,20 +141,13 @@ public class Client : MonoBehaviour
                 Disconnect();
             }
         }
-        //TODO: Change so not copying and pasting same thing inheret from same class 
         private bool HandleData(byte[] data)
         {
             int packetLen = 0;
             ReceivePacket.SetBytes(data);
 
-            if (ReceivePacket.UnreadLength() >= 4)
-            {
-                packetLen = ReceivePacket.ReadInt();
-                if (packetLen < 1)
-                {
-                    return true;
-                }
-            }
+            if (ExitHandleData(ref packetLen))
+                return true;
 
             while (packetLen > 0 && packetLen <= ReceivePacket.UnreadLength())
             {
@@ -145,29 +160,19 @@ public class Client : MonoBehaviour
                 });
                 packetLen = 0;
 
-                if (ReceivePacket.UnreadLength() >= 4)
-                {
-                    packetLen = ReceivePacket.ReadInt();
-                    if (packetLen < 1)
-                    {
-                        return true;
-                    }
-                }
+                if (ExitHandleData(ref packetLen))
+                    return true;
             }
             if (packetLen < 2)
-            {
                 return true;
-            }
 
             return false;
         }
-
-        //TODO: Implement so don't copy and paste above
-        private bool ExitHandleData()
+        private bool ExitHandleData(ref int packetLen)
         {
             if (ReceivePacket.UnreadLength() >= 4)
             {
-                int packetLen = ReceivePacket.ReadInt();
+                packetLen = ReceivePacket.ReadInt();
                 if (packetLen < 1)
                 {
                     return true;
@@ -214,9 +219,7 @@ public class Client : MonoBehaviour
             {
                 packet.InsertInt(Instance.ClientID);
                 if (Socket != null)
-                {
                     Socket.BeginSend(packet.ToArray(), packet.Length(), null, null);
-                }
             }
             catch (Exception exception)
             {
@@ -275,9 +278,7 @@ public class Client : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            
-            //Set default address
-            IPAddressConnectTo = IPAddressLAN;
+            IPAddressConnectTo = IPAddressLAN; //Set default address
         }
         else if (Instance != this)
         {

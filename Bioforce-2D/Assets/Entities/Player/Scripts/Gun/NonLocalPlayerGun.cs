@@ -10,7 +10,7 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
 
     private int OwnerClientID = -1;
     protected bool CanShoot = true;
-    private PlayerManager PlayerManager { get; set; } = null;
+    protected PlayerManager PlayerManager { get; set; } = null;
 
     [SerializeField] private Color PlayerColor; //Set in inspector, colors the muzzel flash and bulletPrefab
     [SerializeField] private MuzzelFlash MuzzelFlash; //Set in inspector
@@ -35,28 +35,25 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
         OwnerClientID = iD;
     }
     
-    public void Disable()
-    {
+    public void Disable(TypeOfDeath typeOfDeath) =>
         CanShoot = false;
-    }
-    public void Enable()
-    {
+
+    public void Enable() =>
         Invoke("SetCanShootTrue", PlayerManager.RespawnTime);
-    }
-    private void SetCanShootTrue()
-    {
+
+    private void SetCanShootTrue() =>
         CanShoot = true;
-    }
 
     private void Awake()
     {
         BulletList = new List<Bullet>();
     }
-    private void Start()
+    protected virtual void Start()
     {
         PlayerManager = GameManager.PlayerDictionary[OwnerClientID];
         PlayerManager.OnPlayerDeath += Disable;
         PlayerManager.OnPlayerRespawn += Enable;
+        PlayerManager.OnPlayerShot += ShootBullet;
         SetToPlayerColor(MuzzelFlash.gameObject);
     }
 

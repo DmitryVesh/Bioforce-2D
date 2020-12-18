@@ -34,7 +34,7 @@ namespace GameServer
             packet.Write(player.ID);
             packet.Write(player.Username);
             packet.Write(player.Position);
-            packet.Write(player.Rotation);
+            packet.Write(player.IsFacingRight);
 
             packet.Write(player.RunSpeed);
             packet.Write(player.SprintSpeed);
@@ -44,7 +44,7 @@ namespace GameServer
 
             SendTCPPacket(recipientClient, packet);
         }
-        public static void PlayerPosition(int playerID, Vector3 position)
+        public static void PlayerPosition(int playerID, Vector2 position)
         {
             Packet packet = new Packet((int)ServerPackets.playerPosition);
             packet.Write(playerID);
@@ -52,7 +52,7 @@ namespace GameServer
 
             SendUDPPacketToAll(packet);
         }
-        public static void PlayerPositionButLocal(int playerID, Vector3 position)
+        public static void PlayerPositionButLocal(int playerID, Vector2 position)
         {
             Packet packet = new Packet((int)ServerPackets.playerPosition);
             packet.Write(playerID);
@@ -60,11 +60,11 @@ namespace GameServer
 
             SendUDPPacketToAllButIncluded(playerID, packet);
         }
-        public static void PlayerRotationAndVelocity(int playerID, Quaternion rotation, Vector2 velocity)
+        public static void PlayerRotationAndVelocity(int playerID, bool isFacingRight, Vector2 velocity)
         {
             Packet packet = new Packet((int)ServerPackets.playerRotationAndVelocity);
             packet.Write(playerID);
-            packet.Write(rotation);
+            packet.Write(isFacingRight);
             packet.Write(velocity);
 
             SendUDPPacketToAllButIncluded(playerID, packet);
@@ -87,11 +87,12 @@ namespace GameServer
 
             SendTCPPacketToAllButIncluded(playerID, packet);
         }
-        public static void PlayerDied(int playerKilledID, int bulletOwnerID)
+        public static void PlayerDied(int playerKilledID, int bulletOwnerID, int typeOfDeath)
         {
             Packet packet = new Packet((int)ServerPackets.playerDied);
             packet.Write(playerKilledID);
             packet.Write(bulletOwnerID);
+            packet.Write(typeOfDeath);
 
             SendTCPPacketToAllButIncluded(playerKilledID, packet);
         }

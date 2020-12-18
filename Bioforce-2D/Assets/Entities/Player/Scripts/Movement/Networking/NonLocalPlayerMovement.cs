@@ -6,7 +6,7 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
 {
     protected float SpeedX { get; set; } // Used to store the input in x direction, as well as in PlayerAnimations
     protected int OwnerClientID { get; set; } = -1;
-    private PlayerManager PlayerManager { get; set; } = null;
+    protected PlayerManager PlayerManager { get; set; } = null;
 
     public float GetRunSpeed()
     {
@@ -22,7 +22,7 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
         OwnerClientID = iD;
     }
 
-    private void Start()
+    protected virtual void Start()
     {
         PlayerManager = GameManager.PlayerDictionary[OwnerClientID];
 
@@ -42,7 +42,7 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
     {
         SpeedX = speedX;
     }
-    private void PlayerCantMoveAndCantBeHit()
+    private void PlayerCantMoveAndCantBeHit(TypeOfDeath typeOfDeath)
     {
         Hitbox.enabled = false;
         FreezeMotion();

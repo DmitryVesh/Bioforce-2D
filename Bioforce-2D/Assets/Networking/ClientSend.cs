@@ -20,12 +20,10 @@ public class ClientSend : MonoBehaviour
         SendUDPPacket(packet);
     }
 
-    
-
-    public static void PlayerMovement(Quaternion rotation, Vector3 position, Vector2 velocity)
+    public static void PlayerMovement(bool isFacingRight, Vector2 position, Vector2 velocity)
     {
         Packet packet = new Packet((int)ClientPackets.playerMovement);
-        packet.Write(rotation);
+        packet.Write(isFacingRight);
         packet.Write(position);
         packet.Write(velocity);
         SendUDPPacket(packet);
@@ -44,11 +42,12 @@ public class ClientSend : MonoBehaviour
         packet.Write(rotation);
         SendTCPPacket(packet);
     }
-    public static void PlayerDied(int bulletOwnerID)
+    public static void PlayerDied(int bulletOwnerID, TypeOfDeath typeOfDeath)
     {
         //TODO: 9000 Implement so see kill score and etc... so send who killed who
         Packet packet = new Packet((int)ClientPackets.playerDied);
         packet.Write(bulletOwnerID);
+        packet.Write((int)typeOfDeath);
         SendTCPPacket(packet);
     }
     public static void PlayerRespawned()
@@ -74,7 +73,6 @@ public class ClientSend : MonoBehaviour
         }
         catch (Exception exception)
         {
-            //TODO: add disconnect if too many packets are lost
             Debug.Log($"Error, sending TCP Packet...\n{exception}");
         }
     }

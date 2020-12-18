@@ -19,8 +19,10 @@ public class LocalPlayerGun : NonLocalPlayerGun
     {
         if (!CanShoot)
             return;
-        base.ShootBullet(FirePointTransform.position, FirePointTransform.rotation);
+        PlayerManager.CallOnBulletShotEvent(FirePointTransform.position, FirePointTransform.rotation);
+        //base.ShootBullet(FirePointTransform.position, FirePointTransform.rotation);
         ClientSend.ShotBullet(FirePointTransform.position, FirePointTransform.rotation);
+        
     }
 
     

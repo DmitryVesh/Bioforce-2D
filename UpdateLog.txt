@@ -7,32 +7,44 @@ Summary
 Main goals is to;
 	Improve overall gameplay response, and game feel, by showing player data.
 		1 Animate the banners in the map
+		1 Add a sound mixer system, which all sound effects sub categorise and use, so can control volume by settings 
+		1 Add sound effects to player running, sprinting, jumping and dying
+		1 add sound effects for bullets being shot
+		1 Add an ip connection setting called manual, which you have to type in the ip address.
 
-		0 Add a sound mixer system, which all sound effects sub categorise and use, so can control volume by settings 
-
-		0 Add sound effects to player running, sprinting, jumping, dying and respawning
-		0 add sound effects for bullets being shot and hitting
-		0 Implement shooting where the player aims their mouse/touch, have a crosshair and dynamic arms holding gun
+		1 change sending playermovement position to vector2 - reduce data sent
+		1 change sending playermovement rotation to bool isGoingRight - reduce data sent
 
 Future tasks;		
 		
 	version 0.5.6
+		add scoreboard, opened when a player holds the Scoreboard button - TAB, or if on mobile, when an scoreboard icon is pressed
+		Make so LAN connection tries to connect to your actual lan connection, and not hard coded values
 		add invincibility frames, after being hit/respawning
 		add chat into game
 		add gamepad support for pc & mac
-
-	Assign each player a color, and change the color of name on kill field to corresponding player color.
-	change sending playermovement position to vector2 - reduce data sent
-	change sending playermovement rotation to bool isGoingRight - reduce data sent	
-		
-	Make server sided, currently very client sided
-	Make so LAN connection tries to connect to your actual lan connection, and not hard coded values
 	
-	Add animations to banners
-	Add trail effects when a player sprints, so can clearly see player sprinting, also maybe zoom camera out a little bit...
+	version 0.5.7
+		Implement shooting where the player aims their mouse/touch, have a crosshair and dynamic arms holding gun
+		Assign each player a color, and change the color of name on kill field to corresponding player color.
+		Add trail effects when a player sprints, so can clearly see player sprinting, also maybe zoom camera out a little bit...
+		make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+	
+	version 0.5.8
+		add breathing camera movement when player is idle, going up and down.
+		using cinemachine add impulses, fast small camera movements in specific directions, for:
+			Player Getting shot
+			Player shooting
+			Player jumping
+			Player running
+		Make a main menu screen, and add a settings menu.
 
-	Add player disconnections if the server suspects the player of movement cheating
-	make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+	version 0.6.0
+		Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard
+		
+	
+	Make server sided, currently very client sided
+
 	make the ThreadManager to work on multi-threading
 	prevent crashing and stopping receiving packets from client to server when 2 or more clients disconnect simultaneosly.
 	imrpove killFeedUI, make entries disappear by decreasing opacity, and popping them back up smoothly instead of vertical layout group which
@@ -41,8 +53,6 @@ Future tasks;
 	improve UI, adding black borders to UI Panels like TimeOutPanel.
 	fix player move validation, when respawned, should ignore any changes that occured lately.	
 
-	add breathing camera movement when player is idle, going up and down.
-	add music Spoiler - Original Mix (Hyper) to game.
 
 TODO Tasks | 1 = done, 0 = not done
 -----------------------------------
@@ -52,6 +62,7 @@ Gimp
 
 Importing assets
 ----------------
+1 Import audio clips for: music, player sound effects. Reduce their quality settings, so original file size is reduced
 
 
 Animator
@@ -61,15 +72,52 @@ Animator
 
 UnityEditor
 -----------
+//Get Sound mixer system to work
+1 Add Main Mixer, set it to be the root of all sound effects. Expose its volume setting.
+	Add sub categories - Music, Sound Effects - Players
+1 Add Sound MusicManager empty gameObject, attach audio source and SoundMusicManager. Set the StartingMusic in the MusicManager script.
+1 Add Sound PlayerManager empty gameObject, attach audio source and SoundPlayerManager. The audioSource is a 3D audio source, 
+	which has a logarthimic range, so if audio lister, which is the main camera, is in range, can hear the sound at a varying volume.
+1 Add audio source and SoundPlayerManager to playerModel gameObject.
 
+//Get manual ip address override to work
+1 Edit IP address dropdown in the Network menu. Add another option, with name Manual.
+1 Add an IPAddressOverride input field, which will be activated so can enter override ip.
 
 Implementing scripts
 --------------------
+//Get sound mixer system to work
+1 Add MusicManager, singleton instance, which controls an audio source which plays the game music. Contains references to AudioTracks, to play.
+	e.g. contains StartingMusic, which is played in the beginning of the game.
+	Contains a AudioListenerTF, which is the mainCamera transform. An audio source, through which the music will be played, attached to gameObject.
+	And checks for KeepFadingIn/Out and Looping. 
+	Is able to effectively, fade music in and out, and change music being played by adjusting the volume of the audioSource
+	By use of IEnumarator, yield return new WaitForSecondsRealtime, which is updated every time.FixedDeltaTime.
+	Can't use WaitForFixedUpdate, because when the game will be paused, it cause the fixedUpdate to stop being called, so can't transition between music.	
+1 Add AudioTrack, non mono behaviour class, which is set to be System.Serializable - so can edit in inspector, when compisited with another object,
+	which holds the information about an audio track. Its audio clip, volume, if it should loop/fade, and its fade time.
+1 Add SoundPlayerManager, Contains all the sound effects a player has, Shoot, Jump, footsteps, wasHit, Die by bullet, Die by fall.
+	Subscribe to PlayerManager OnShootEvent and OnPlayerJump event to play shooting and jumping sounds. For footsteps, it was easy just to add triggers
+	to run and sprint animations, to figure out when to call AnimatorFootsteptSound.
+1 Edit PlayerManager, added an onShootEvent, which is called by LocalPlayerGun when shootbutton is pressed. Added OnPlayerJumped event, 
+	which called by LocalPlayerMovements playerJump.
+1 Added enum TypeOfDeath, which will be used to identify the reason for death of the player. Currently only hold Bullet and Fall.
 
+//Get manual ip address override to work
+1 Edit NetworkMenuUI, add reference to the IPAddressOverrideInputField. Edit ip address dropdown handler.
+	Checks if index is 3 (manual selected), then activate the ipaddress override input field, setting overrideIp to true, else false, and changeIPAddress to connect to
+	in Client Instance.
+	When pressing connect button, and using manual ip setting, the ip address in input field is checked to be in the right format, if it is proceed connection,
+	if not, then display manual ip address format error message.
+1 Edit Client, add a handlder for option "Manual", which is the 3rd index in dropdown list.
+	Changed ConnectToServer takes in a bool IPoverride, and string IP, if override is true, then set ConnectIPAddress to IP address given.
+	Added a static method IsIPAddressValid, which checks if a string is in a corrent IPv4 address format. If correct returns true, else false.
+	has to be 4 inputs in between '.', each input is min 0, max 255. Valid addresses: 0.0.0.0 - 255.255.255.255
 
 GameServer code
 ---------------
-
+1 Edit ServerRead, read the typeOfDeath int from the packet sent from client.
+1 Edit ServerSend, write the typeOfDeath int from the server read, to the packet.
 
 ===============================================================================================================================
 Version 0.5.4

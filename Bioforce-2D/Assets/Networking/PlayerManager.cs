@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -17,17 +18,24 @@ public class PlayerManager : MonoBehaviour
     public delegate void PlayerSpeedX(float speedX);
     public event PlayerSpeedX OnPlayerSpeedXChanged;
 
-    public delegate void IsPlayerAlive();
-    public event IsPlayerAlive OnPlayerDeath;
-    public event IsPlayerAlive OnPlayerRespawn;
-    public static float RespawnTime { get; private set; } = 1.5f;
-    public static float DeadTime { get; private set; } = 2;
+    public delegate void PlayerRespawn();
+    public event PlayerRespawn OnPlayerRespawn;
 
-    //TODO: implement a onFireEvent
-    private IGun PlayerGun;
+    public delegate void PlayerDeath(TypeOfDeath typeOfDeath);
+    public event PlayerDeath OnPlayerDeath;
+
+    public static float RespawnTime { get; private set; } = 1.5f;
+    public static float DeadTime { get; private set; } = 3;
 
     public delegate void PlayerTookDamage(int damage, int currentHealth);
     public event PlayerTookDamage OnPlayerTookDamage;
+
+    public delegate void PlayerShot(Vector2 position, Quaternion rotation);
+    public event PlayerShot OnPlayerShot;
+
+    public delegate void PlayerJumped();
+    public event PlayerJumped OnPlayerJumped;
+
 
     public string GetUsername() =>
         Username;
@@ -37,8 +45,8 @@ public class PlayerManager : MonoBehaviour
     public void SetVelocity(Vector2 velocity) =>
         OnPlayerSpeedXChanged?.Invoke(velocity.x);
 
-    public void PlayerDied() =>
-        OnPlayerDeath?.Invoke();
+    public void PlayerDied(TypeOfDeath typeOfDeath) =>
+        OnPlayerDeath?.Invoke(typeOfDeath);
 
     public IEnumerator IsPlayerDeadUponSpawning(bool isDead)
     {
@@ -46,37 +54,34 @@ public class PlayerManager : MonoBehaviour
         {
             //Prevents calling before the Start methods which subscribe to the event
             yield return new WaitForSeconds(0.3f);
-            OnPlayerDeath?.Invoke();
+            OnPlayerDeath?.Invoke(TypeOfDeath.Bullet);
         }
     }
-    public void PlayerRespawned()
-    {
-        //TODO: 3000 Add a check pointing system, which is like deathmatch avaialbe spawn points
-        //Make seperate class called PlayerSpawning 
+    public void PlayerRespawned() =>
         CallOnPlayerRespawnEvent();        
-    }
+
     public void CallOnPlayerRespawnEvent() =>
         OnPlayerRespawn?.Invoke();
+
+    public void CallOnPlayerJumpedEvent() =>
+        OnPlayerJumped?.Invoke();
 
     public void Initialise(int iD, string username) 
     {
         (ID, Username) = (iD, username);
-        PlayerGun = transform.GetComponentInChildren<IGun>();
-        PlayerGun.SetOwnerClientID(iD);
         SetUsername();
     }
-    public void SetPosition(Vector3 position) =>
+    public void SetPosition(Vector2 position) =>
         PlayerModelObject.transform.position = position; 
 
-    public void SetRotation(Quaternion rotation) =>
-        PlayerModelObject.transform.rotation = rotation;
+        
     
     public void Disconnect() =>
         Destroy(gameObject);
 
-    //TODO: 9000000 make a shoot Bullet event insread of having reference to player gun
-    public void ShotBullet(Vector2 position, Quaternion rotation) =>
-        PlayerGun.ShootBullet(position, rotation);
+
+    public void CallOnBulletShotEvent(Vector2 position, Quaternion rotation) =>
+        OnPlayerShot?.Invoke(position, rotation);
 
     private void Awake()
     {

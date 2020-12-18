@@ -34,8 +34,8 @@ public class ClientRead : MonoBehaviour
     {
         int iD = packet.ReadInt();
         string username = packet.ReadString();
-        Vector3 position = packet.ReadVector3();
-        Quaternion rotation = packet.ReadQuaternion();
+        Vector2 position = packet.ReadVector2();
+        bool isFacingRight = packet.ReadBool();
 
         float runSpeed = packet.ReadFloat();
         float sprintSpeed = packet.ReadFloat();
@@ -43,7 +43,7 @@ public class ClientRead : MonoBehaviour
         bool isDead = packet.ReadBool();
         bool justJoined = packet.ReadBool();
 
-        GameManager.Instance.SpawnPlayer(iD, username, position, rotation, isDead, justJoined);
+        GameManager.Instance.SpawnPlayer(iD, username, position, isFacingRight, isDead, justJoined);
         GameManager.PlayerDictionary[iD].SetPlayerMovementStats(runSpeed, sprintSpeed);
 
     }
@@ -59,7 +59,7 @@ public class ClientRead : MonoBehaviour
     public static void PlayerPosition(Packet packet)
     {
         int iD = packet.ReadInt();
-        Vector3 position = packet.ReadVector3();
+        Vector2 position = packet.ReadVector2();
 
         // Prevents crash when a UDP packet connects before the TCP spawn player call from server
         try
@@ -74,13 +74,13 @@ public class ClientRead : MonoBehaviour
     public static void PlayerRotationAndVelocity(Packet packet)
     {
         int iD = packet.ReadInt();
-        Quaternion rotation = packet.ReadQuaternion();
+        bool isFacingRight = packet.ReadBool();        
         Vector2 velocity = packet.ReadVector2();
 
         // Prevents crash when a UDP packet connects before the TCP spawn player call from server
         try
         {
-            GameManager.PlayerDictionary[iD].SetRotation(rotation);
+            //GameManager.PlayerDictionary[iD].SetRotation(isFacingRight);
             GameManager.PlayerDictionary[iD].SetVelocity(velocity);
         }
         catch (KeyNotFoundException exception)
@@ -96,7 +96,7 @@ public class ClientRead : MonoBehaviour
 
         try
         {
-            GameManager.PlayerDictionary[iD].ShotBullet(position, rotation);
+            GameManager.PlayerDictionary[iD].CallOnBulletShotEvent(position, rotation);
         }
         catch (KeyNotFoundException exception)
         {
@@ -107,8 +107,9 @@ public class ClientRead : MonoBehaviour
     {
         int playerKilledID = packet.ReadInt();
         int bulletOwnerID = packet.ReadInt();
+        TypeOfDeath typeOfDeath = (TypeOfDeath)packet.ReadInt();
         KillFeedUI.Instance.AddKillFeedEntry(playerKilledID, bulletOwnerID);
-        GameManager.PlayerDictionary[playerKilledID].PlayerDied();
+        GameManager.PlayerDictionary[playerKilledID].PlayerDied(typeOfDeath);
     }
     public static void PlayerRespawned(Packet packet)
     {

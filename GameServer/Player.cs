@@ -8,23 +8,23 @@ namespace GameServer
         public int ID { get; private set; }
         public string Username { get; private set; }
 
-        public Vector3 Position { get; private set; }
+        public Vector2 Position { get; private set; }
         public Vector2 Velocity { get; private set; }
-        public Quaternion Rotation { get; private set; }
+        public bool IsFacingRight { get; private set; }
 
-        private Vector3 LastPosition { get; set; }
+        private Vector2 LastPosition { get; set; }
         public float RunSpeed { get; set; } = 0;
         public float SprintSpeed { get; set; } = 0;
         private int MovePlayerSent { get; set; } = 0;
 
         public bool IsDead { get; private set; } = false;
 
-        public Player(int iD, string username, Vector3 position)
+        public Player(int iD, string username, Vector2 position)
         {
             ID = iD;
             Username = username;
             Position = position;
-            Rotation = Quaternion.Identity;
+            IsFacingRight = true;
             LastPosition = position;
         }
         public void Died()
@@ -35,9 +35,9 @@ namespace GameServer
         {
             IsDead = false;
         }
-        public void PlayerMoves(Quaternion rotation, Vector3 position, Vector2 velocity)
+        public void PlayerMoves(bool isFacingRight, Vector2 position, Vector2 velocity)
         {
-            Rotation = rotation;
+            IsFacingRight = isFacingRight;
             Position = position;
             Velocity = velocity;
         }
@@ -68,7 +68,7 @@ namespace GameServer
                 ServerSend.PlayerPositionButLocal(ID, Position);
 
             //ServerSend.PlayerVelocity(ID, Velocity);
-            ServerSend.PlayerRotationAndVelocity(ID, Rotation, Velocity);
+            ServerSend.PlayerRotationAndVelocity(ID, IsFacingRight, Velocity);
             MovePlayerSent += 1;
             //ServerSend.PlayerAnimation(ID, )
         }
@@ -79,7 +79,7 @@ namespace GameServer
             //TODO: fix the x axis validation
 
             return valid;
-            Vector3 validPosition = new Vector3(0, 0, 0);
+            Vector2 validPosition = new Vector2(0, 0);
             //Validating X
             float xLast = LastPosition.X;
             float xMaxTravelledRight = xLast + SprintSpeed + 0.5f;
@@ -103,8 +103,6 @@ namespace GameServer
             //Validating Y
             //TODO: Validate Y
             validPosition.Y = Position.Y;
-
-            validPosition.Z = Position.Z;
 
             LastPosition = validPosition;
 

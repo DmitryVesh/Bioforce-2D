@@ -24,12 +24,12 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
     }
     public void TakeDamage(int damage, int bulletOwnerID)
     {
-        CurrentHealth -= damage;
-        //TODO: display hit effect
-        ClientSend.TookDamage(damage, CurrentHealth);
-        if (CurrentHealth <= 0) 
+        if (CurrentHealth - damage <= 0)
             Die(bulletOwnerID);
+        PlayerManager.TookDamage(damage, CurrentHealth - damage);
+        ClientSend.TookDamage(damage, CurrentHealth);
     }
+
     public void SetOwnerClientID(int iD) =>
         OwnerClientID = iD;
 
@@ -38,7 +38,7 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
 
     public void Die(int bulletOwnerID)
     {
-        GameManager.Instance.PlayerDied(OwnerClientID, bulletOwnerID);
+        GameManager.Instance.PlayerDied(OwnerClientID, bulletOwnerID, TypeOfDeath.Bullet);
         StartCoroutine(WaitBeforeRespawning());
     }
     public void Respawn()
@@ -48,11 +48,10 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
     }
     public void FallDie()
     {
-        GameManager.Instance.PlayerDied(OwnerClientID, OwnerClientID);
+        GameManager.Instance.PlayerDied(OwnerClientID, OwnerClientID, TypeOfDeath.Fall);
         StartCoroutine(WaitBeforeRespawning());
     }
 
-    //TODO: 9000 maybe call Respawn instead of ResetHealth()????????????????????
     private void Start()
     {
         ResetHealth();

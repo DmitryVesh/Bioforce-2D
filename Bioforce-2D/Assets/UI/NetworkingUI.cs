@@ -13,14 +13,29 @@ public class NetworkingUI : MonoBehaviour
     private TMP_InputField UsernameInputField { get; set; }
     private Button ConnectBtn { get; set; }
     private TMP_Dropdown IPAddressDropDown { get; set; }
-    private GameObject TimeOutPanel { get; set; }
+    private GameObject ErrorMessagePanel { get; set; }
+    private TextMeshProUGUI ErrorMessageTextMesh { get; set; }
     private TouchScreenKeyboard MobileUsernameInputKeyboard { get; set; } = null;
+    private TMP_InputField IPAddressManualInputField { get; set; }
+    private bool OverrideIP { get; set; } = false;
 
     public void ConnectToServer()
-    {
+    {        
+        if (OverrideIP)
+        {
+            string overrideIPAddress = IPAddressManualInputField.text;
+            if (Client.IsIPAddressValid(overrideIPAddress))
+                Client.Instance.SetManualIPAddressConnectTo(overrideIPAddress);
+            else
+            {
+                DisplayInvalidIPAddressEntered();
+                return;
+            }
+
+        }
+
         NetworkMenu.SetActive(false);
         UsernameInputField.interactable = false;
-
         Client.Instance.ConnectToServer();
     }
     public string GetUsername()
@@ -54,7 +69,17 @@ public class NetworkingUI : MonoBehaviour
     public void OnIPAddressDropDownChange()
     {
         int index = IPAddressDropDown.value;
-        Client.Instance.ChangeIPAddressConnectTo(index);
+        if (index == 3) //Chosen Manual ip address
+        {
+            IPAddressManualInputField.gameObject.SetActive(true); //Display manual ip address input field
+            OverrideIP = true;
+        }
+        else 
+        {
+            OverrideIP = false;
+            IPAddressManualInputField.gameObject.SetActive(false);
+            Client.Instance.ChangeIPAddressConnectTo(index);
+        }
     }
     public void Disconnected()
     {
@@ -63,13 +88,22 @@ public class NetworkingUI : MonoBehaviour
     }
     public void DisplayTimeOutMessage()
     {
-        TimeOutPanel.SetActive(true);
-
+        ErrorMessageTextMesh.text = "Your connection has timed out...\n\nTry reconnecting using a different\nIP connection setting";
+        ActivateErrorMessagePanel();
+    }
+    public void DisplayInvalidIPAddressEntered()
+    {
+        ErrorMessageTextMesh.text = "The IP address entered is invalid\n\nCheck the entry and\nTry again";
+        ActivateErrorMessagePanel();
+    }
+    private void ActivateErrorMessagePanel()
+    {
+        ErrorMessagePanel.SetActive(true);
         SetInteractableConnectionMenu(false);
     }
-    public void OnTimeOutContinueBtnPress()
+    public void OnErrorMessageContinueBtnPress()
     {
-        TimeOutPanel.SetActive(false);
+        ErrorMessagePanel.SetActive(false);
 
         SetInteractableConnectionMenu(true);
     }
@@ -90,9 +124,11 @@ public class NetworkingUI : MonoBehaviour
         UsernameInputField = NetworkMenu.transform.GetChild(0).GetComponent<TMP_InputField>();
         ConnectBtn = NetworkMenu.transform.GetChild(1).GetComponent<Button>();
         IPAddressDropDown = NetworkMenu.transform.GetChild(2).GetComponent<TMP_Dropdown>();
-
-        TimeOutPanel = NetworkMenu.transform.GetChild(3).gameObject;
-        TimeOutPanel.SetActive(false);
+        IPAddressManualInputField = IPAddressDropDown.gameObject.GetComponentInChildren<TMP_InputField>();
+        IPAddressManualInputField.gameObject.SetActive(false);
+        ErrorMessagePanel = NetworkMenu.transform.GetChild(3).gameObject;
+        ErrorMessageTextMesh = ErrorMessagePanel.GetComponentInChildren<TextMeshProUGUI>();
+        ErrorMessagePanel.SetActive(false);
 
         ConnectBtn.interactable = false;
 

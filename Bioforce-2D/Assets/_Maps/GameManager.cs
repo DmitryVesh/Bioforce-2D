@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
         PlayerDictionary = new Dictionary<int, PlayerManager>();
     }
 
-    public void SpawnPlayer(int iD, string username, Vector3 position, Quaternion rotation, bool isDead, bool justJoined)
+    public void SpawnPlayer(int iD, string username, Vector3 position, bool isFacingRight, bool isDead, bool justJoined)
     {
         GameObject player;
         GameObject prefab;
@@ -51,7 +51,7 @@ public class GameManager : MonoBehaviour
             prefab = PlayerPrefab;
             Debug.Log($"Player: {iD} has been spawned.");
         }
-        player = Instantiate(prefab, position, rotation);
+        player = Instantiate(prefab, position, Quaternion.identity);
 
         PlayerManager playerManager = player.GetComponent<PlayerManager>();
         playerManager.Initialise(iD, username);
@@ -65,6 +65,12 @@ public class GameManager : MonoBehaviour
         
         NonLocalPlayerAnimations playerAnimations = player.GetComponentInChildren<NonLocalPlayerAnimations>();
         playerAnimations?.SetOwnerClientID(iD);
+
+        IGun playerGun = player.GetComponentInChildren<IGun>();
+        playerGun?.SetOwnerClientID(iD);
+
+        if (!isFacingRight)
+            playerAnimations.FlipSprite();
 
         StartCoroutine(playerManager.IsPlayerDeadUponSpawning(isDead));
 
@@ -89,10 +95,10 @@ public class GameManager : MonoBehaviour
         }
         PlayerDictionary.Clear();
     }
-    public void PlayerDied(int playerKilledDiedID, int bulletOwnerID)
+    public void PlayerDied(int playerKilledDiedID, int bulletOwnerID, TypeOfDeath typeOfDeath)
     {
-        ClientSend.PlayerDied(bulletOwnerID);
-        PlayerDictionary[playerKilledDiedID].PlayerDied();
+        ClientSend.PlayerDied(bulletOwnerID, typeOfDeath);
+        PlayerDictionary[playerKilledDiedID].PlayerDied(typeOfDeath);
         KillFeedUI.Instance.AddKillFeedEntry(playerKilledDiedID, bulletOwnerID);
     }
     public void PlayerRespawned(int iD)

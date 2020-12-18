@@ -104,68 +104,8 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
         else // Player is either not moving, moving, or is holding shift without moving  
         {
             SpeedX = moveInputX * RunSpeed; // Set moving speed to normal running speed
-            float regenStamina = BoolToInt(currentStamina < MaxStamina) * (RateStaminaRegen * Time.deltaTime); // determines a regen value either: 0 if currentStamina >= MaxStamina, else regen rate
+            float regenStamina = ((currentStamina < MaxStamina) ? 1 : 0) * (RateStaminaRegen * Time.deltaTime); // determines a regen value either: 0 if currentStamina >= MaxStamina, else regen rate
             currentStamina += regenStamina; // Regenerating stamina
-        }
-    }
-    private void MovementXBranchless() // Calculates SpeedX that will be applied to player, in response to x axis inputs, using branchless (no if statements) technique, to improve execution speed, in fact it reduces exectution speed, after testing its slower...
-    {
-        float moveInputX = Input.GetAxisRaw("Horizontal"); // Get user input in x direction
-
-        bool holdingSprintKey = Input.GetButton("Sprint"); // Is player holding down Sprint key
-        bool isMoving = moveInputX != 0; // Is the player moving in any direction
-        bool CanSprint = currentStamina > 0; // Does the player have any stamina left
-
-        bool willSprint = holdingSprintKey && isMoving && CanSprint; // The player will sprint if all conditions met: sprint key being held, is moving left or right, has stamina left
-        int willSprintMultiplier = BoolToInt(willSprint); // Turning the boolean value of True or false into 1 or 0, for calculating if sprint value should be sprintSpeed or 0
-
-        float sprint = moveInputX * willSprintMultiplier * SprintSpeed; // Calculating if sprint value using boolean multiplier
-        currentStamina -= RateStaminaLoss * willSprintMultiplier * Time.deltaTime; // Decreasing stamina, only if the player will be sprinting
-
-        bool noSprint = !holdingSprintKey || !isMoving || !CanSprint; // Checking if player is not sprinting, conditions that must be met: not holding "sprint" key, or not moving left or right, or can't spirnt
-        bool canRegen = (currentStamina < MaxStamina) && !holdingSprintKey; // Checking if can regen stamina, 
-
-        int noSprintMultiplier = BoolToInt(noSprint); // Turning the boolean value of True or false into 1 or 0, for calculating if stamina regen value should be RateStaminaRegen * Time.deltaTime or 0 
-        int canRegenMultiplier = BoolToInt(canRegen); // Turning the boolean value of True or false into 1 or 0, for calculating if stamina regen value should be RateStaminaRegen * Time.deltaTime or 0
-
-        float runOrIdle = moveInputX * RunSpeed; // Calculating run or idle speed, will always be either 0, moving left or right
-        currentStamina += RateStaminaRegen * noSprintMultiplier * canRegenMultiplier * Time.deltaTime; // Regenerating stamina, with 0 values if doesn't satisfy branchless boolean multiplier, or positive RateStaminaRegen * Time.deltaTime
-
-        bool movingLeft = moveInputX < 0; // Boolean statements that check if player is moving left
-
-        SpeedX = ReturnLarger(sprint, runOrIdle) * BoolToInt(!movingLeft) + (ReturnSmaller(sprint, runOrIdle) * BoolToInt(movingLeft)); // Setting the speed variable that is used in fixed update with the lowest speed, or highest speed
-    }
-    private void MovementXHybridBranchless()
-    {
-        float moveInputX = Input.GetAxisRaw("Horizontal"); // Get user input in x direction
-
-        bool holdingSprintKey = Input.GetButton("Sprint"); // Is player holding down Sprint key
-        bool isMoving = moveInputX != 0; // Is the player moving in any direction
-        bool CanSprint = currentStamina > 0; // Does the player have any stamina left
-
-        float sprint = 0;
-        if (holdingSprintKey && isMoving && CanSprint) // The player will sprint if all conditions met: sprint key being held, is moving left or right, has stamina left
-        {
-            sprint = moveInputX * SprintSpeed; // Calculating if sprint value using boolean multiplier
-            currentStamina -= RateStaminaLoss * Time.deltaTime; // Decreasing stamina, only if the player will be sprinting
-        }
-
-        bool noSprint = !holdingSprintKey || !isMoving || !CanSprint; // Checking if player is not sprinting, conditions that must be met: not holding "sprint" key, or not moving left or right, or can't spirnt
-        bool canRegen = (currentStamina < MaxStamina) && !holdingSprintKey; // Checking if can regen stamina, 
-
-        float runOrIdle = moveInputX * RunSpeed; // Calculating run or idle speed, will always be either 0, moving left or right
-        if (noSprint && canRegen)
-        {
-            currentStamina += RateStaminaRegen * Time.deltaTime; // Regenerating stamina, with 0 values if doesn't satisfy branchless boolean multiplier, or positive RateStaminaRegen * Time.deltaTime
-        }
-
-        if (moveInputX < 0) // Boolean statements that check if player is moving left
-        {
-            SpeedX = ReturnSmaller(sprint, runOrIdle);
-        }
-        else
-        {
-            SpeedX = ReturnLarger(sprint, runOrIdle);
         }
     }
     
@@ -182,9 +122,7 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
             fGroundedRemember = FGroundedRememberTime; // Restore remember that you are grounded timer
         }
         else if (groundTimerRunOut)
-        {
             groundTimer = GroundCheckTimer; // Reset ground check timer
-        }
 
 
         fJumpPressedRemember -= Time.deltaTime;
@@ -220,8 +158,8 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
     {
         rb.velocity = new Vector2(rb.velocity.x, JumpForce);
         Jumped = true;
+        PlayerManager.CallOnPlayerJumpedEvent();
     }
-    
 
     protected override void FixedUpdate()
     {
@@ -255,46 +193,9 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
         base.PlayerCanMoveAndCanBeHit();
     }
 
-    private void SendMovesToServer(Vector3 velocity)
+    private void SendMovesToServer(Vector2 velocity)
     {
-        ClientSend.PlayerMovement(ModelObject.transform.rotation, ModelObject.transform.position, velocity);
+        ClientSend.PlayerMovement(!(ModelObject.transform.rotation.y == -1), ModelObject.transform.position, velocity);
     }
 
-
-    //TODO: make a seperate class for testing 
-    //TODO: make a class for branchless methods
-    void MethodTimeTesting(Action method, int iterationsPower10)
-    {
-        //Used for testing execution time of methods
-        System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
-        watch.Start();
-        for (int count = 0; count < Math.Pow(10, iterationsPower10); count++)
-        {
-            method.Invoke();
-        }
-        watch.Stop();
-        Debug.Log($"Execution time of {method.Method.Name}: {watch.ElapsedMilliseconds}");
-    }
-    public int BoolToInt(bool value) // Converts boolean values True/False to 1/0, used in branchless programming
-    {
-        return value ? 1 : 0;
-    }
-    public float ReturnLarger(float a, float b)
-    {
-        if (a > b) { return a; }
-        return b;
-        //return (a * BoolToInt(a >= b)) + (b * BoolToInt(a < b));
-    }
-    public float ReturnSmaller(float a, float b)
-    {
-        if (a > b) { return a; }
-        return b;
-        //return (a * BoolToInt(a < b)) + (b * BoolToInt(a >= b));
-    }
-    public float ReturnMod(float value, bool condition)
-    {
-        return (value * -1 * BoolToInt(condition)) + (value * 1 * BoolToInt(!condition));
-    }
-
-    
 }

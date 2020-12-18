@@ -48,9 +48,8 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     public void XAxisAnimations(float speedX)
     {
         if (speedX < 0) //Moving left
-        {
             speedX = -speedX; // Adjusting the horizontal speed to a positive value if moving to left
-        }
+
         Anim.SetBool("Moving", speedX != 0);
         Anim.SetBool("Sprinting", speedX > WalkingPlayer.GetRunSpeed());
     }
@@ -58,7 +57,7 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     {
         Anim.SetBool("Grounded", WalkingPlayer.GetGrounded());
     }
-    public virtual void DieAnimation()
+    public virtual void DieAnimation(TypeOfDeath typeOfDeath)
     {
         Anim.SetTrigger("Die");
     }
@@ -76,9 +75,8 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     protected bool CheckIfNeedToFlipSprite(float speedX)
     {
         if ((speedX < 0 && FacingRight) || (speedX > 0 && !FacingRight))
-        {
             return true;
-        }
+        
         return false;
     }
     public void FlipSprite()

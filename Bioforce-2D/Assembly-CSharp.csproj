@@ -76,7 +76,6 @@
     <Compile Include="Assets\Entities\Player\Scripts\Gun\LocalPlayerGun.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Camera\PlayerCameraController.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Movement\Networking\LocalPlayerAnimations.cs" />
-    <Compile Include="Assets\Entities\Player\Scripts\Movement\PlayerAnimations.cs" />
     <Compile Include="Assets\Networking\ClientRead.cs" />
     <Compile Include="Assets\UI\IgnoreParentRotation.cs" />
     <Compile Include="Assets\UI\KillFeed\KillFeedUI.cs" />
@@ -89,7 +88,6 @@
     <Compile Include="Assets\Entities\Player\Scripts\Health\NonLocalPlayerHealth.cs" />
     <Compile Include="Assets\Networking\ClientSend.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Movement\Networking\MobileLocalPlayerMovement.cs" />
-    <Compile Include="Assets\Entities\Player\Scripts\Movement\PlayerMovement.cs" />
     <Compile Include="Assets\Entities\Walking\InheritedScripts\IHealth.cs" />
     <Compile Include="Assets\Joystick Pack\Scripts\Joysticks\VariableJoystick.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Gun\Bullet.cs" />
@@ -107,6 +105,10 @@
     <Compile Include="Assets\Entities\Effects\DamageNums\Scripts\DamageNumManager.cs" />
     <Compile Include="Assets\Entities\Effects\DamageNums\Scripts\DamageNum.cs" />
     <Compile Include="Assets\Entities\PhysicsHelper.cs" />
+    <Compile Include="Assets\Audio\Scripts\SoundMusicManager.cs" />
+    <Compile Include="Assets\Audio\Scripts\AudioTrack.cs" />
+    <Compile Include="Assets\Audio\Scripts\SoundPlayerManager.cs" />
+    <Compile Include="Assets\Entities\Player\Scripts\Health\TypeOfDeath.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />

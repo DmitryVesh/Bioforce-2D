@@ -89,20 +89,14 @@ namespace GameServer
                     Server.ClientDictionary[ID].Disconnect();
                 }
             }
-            //TODO: Change so not copying and pasting same thing inheret from same class 
+            
             private bool HandleData(byte[] data)
             {
                 int packetLen = 0;
                 ReceivePacket.SetBytes(data);
 
-                if (ReceivePacket.UnreadLength() >= 4)
-                {
-                    packetLen = ReceivePacket.ReadInt();
-                    if (packetLen < 1)
-                    {
-                        return true;
-                    }
-                }
+                if (ExitHandleData(ref packetLen))
+                    return true;
 
                 while (packetLen > 0 && packetLen <= ReceivePacket.UnreadLength())
                 {
@@ -117,20 +111,26 @@ namespace GameServer
                     });
                     packetLen = 0;
 
-                    if (ReceivePacket.UnreadLength() >= 4)
-                    {
-                        packetLen = ReceivePacket.ReadInt();
-                        if (packetLen < 1)
-                        {
-                            return true;
-                        }
-                    }
+                    if (ExitHandleData(ref packetLen))
+                        return true;
                 }
                 if (packetLen < 2)
                 {
                     return true;
                 }
 
+                return false;
+            }
+            private bool ExitHandleData(ref int packetLen)
+            {
+                if (ReceivePacket.UnreadLength() >= 4)
+                {
+                    packetLen = ReceivePacket.ReadInt();
+                    if (packetLen < 1)
+                    {
+                        return true;
+                    }
+                }
                 return false;
             }
             private void StreamBeginRead()
@@ -177,7 +177,7 @@ namespace GameServer
         
         public void SendIntoGame(string username)
         {
-            player = new Player(ID, username, new Vector3(0, 0, 0));
+            player = new Player(ID, username, new Vector2(0, 0));
             
             //Spawning rest of players for the connected user
             foreach (Client client in Server.ClientDictionary.Values)
