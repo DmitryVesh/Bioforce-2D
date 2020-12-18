@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EntityWalking : MonoBehaviour, IWalking
+public abstract class EntityWalking : MonoBehaviour, IWalking
 {
     // Moving in X direction Data
     [SerializeField] protected float RunSpeed = 5; // Used as x velocity multiplier when running

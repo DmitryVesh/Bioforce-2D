@@ -7,10 +7,10 @@ public abstract class UIEntryManager : MonoBehaviour
 {
     [SerializeField] protected float EntryTimeToLive = 8;
 
-    protected GameObject Panel { get; set; }
-    protected List<GameObject> EntryPanels { get; set; }
-    protected List<TextMeshProUGUI> EntryTexts { get; set; }
-    protected Queue<GameObject> ActiveEntries { get; set; }
+    private GameObject Panel { get; set; }
+    private List<GameObject> EntryPanels { get; set; }
+    private List<TextMeshProUGUI> EntryTexts { get; set; }
+    private Queue<GameObject> ActiveEntries { get; set; }
 
 
     protected virtual void Awake()
@@ -35,6 +35,7 @@ public abstract class UIEntryManager : MonoBehaviour
 
         return entry;
     }
+    
     private IEnumerator RemoveKillFeedEntry(GameObject entry)
     {
         yield return new WaitForSeconds(EntryTimeToLive);

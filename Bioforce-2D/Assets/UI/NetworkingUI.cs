@@ -31,7 +31,6 @@ public class NetworkingUI : MonoBehaviour
                 DisplayInvalidIPAddressEntered();
                 return;
             }
-
         }
 
         NetworkMenu.SetActive(false);
@@ -96,11 +95,6 @@ public class NetworkingUI : MonoBehaviour
         ErrorMessageTextMesh.text = "The IP address entered is invalid\n\nCheck the entry and\nTry again";
         ActivateErrorMessagePanel();
     }
-    private void ActivateErrorMessagePanel()
-    {
-        ErrorMessagePanel.SetActive(true);
-        SetInteractableConnectionMenu(false);
-    }
     public void OnErrorMessageContinueBtnPress()
     {
         ErrorMessagePanel.SetActive(false);
@@ -108,6 +102,11 @@ public class NetworkingUI : MonoBehaviour
         SetInteractableConnectionMenu(true);
     }
 
+    private void ActivateErrorMessagePanel()
+    {
+        ErrorMessagePanel.SetActive(true);
+        SetInteractableConnectionMenu(false);
+    }
     private void Awake()
     {
         if (Instance == null)
@@ -121,6 +120,7 @@ public class NetworkingUI : MonoBehaviour
         }
 
         NetworkMenu = transform.GetChild(0).gameObject;
+        NetworkMenu.SetActive(true);
         UsernameInputField = NetworkMenu.transform.GetChild(0).GetComponent<TMP_InputField>();
         ConnectBtn = NetworkMenu.transform.GetChild(1).GetComponent<Button>();
         IPAddressDropDown = NetworkMenu.transform.GetChild(2).GetComponent<TMP_Dropdown>();

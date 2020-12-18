@@ -1,4 +1,99 @@
 ===============================================================================================================================
+Version 0.5.6
+-------------
+
+Summary
+-------
+Main goals is to;
+	Make a competitive feel to the game by adding a scoreboard
+		0 add scoreboard, opened when a player holds the Scoreboard button - TAB, or if on mobile, when an scoreboard icon is pressed
+		0 Make so LAN connection tries to connect to your actual lan connection, and not hard coded values
+		0 add invincibility frames, after being hit/respawning
+		0 add chat into game
+		0 add ping field to Player Score entries in scoreboard
+		0 add gamepad support for pc & mac
+
+Future tasks;	
+	
+	version 0.5.7
+		Implement shooting where the player aims their mouse/touch, have a crosshair and dynamic arms holding gun
+		Assign each player a color, and change the color of name on kill field to corresponding player color.
+		Add trail effects when a player sprints, so can clearly see player sprinting, also maybe zoom camera out a little bit...
+		make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+	
+	version 0.5.8
+		add breathing camera movement when player is idle, going up and down.
+		using cinemachine add impulses, fast small camera movements in specific directions, for:
+			Player Getting shot
+			Player shooting
+			Player jumping
+			Player running
+		Make a main menu screen, and add a settings menu.
+
+	version 0.6.0
+		Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard
+		
+	
+	Make server sided, currently very client sided
+
+	make the ThreadManager to work on multi-threading
+	prevent crashing and stopping receiving packets from client to server when 2 or more clients disconnect simultaneosly.
+	imrpove killFeedUI, make entries disappear by decreasing opacity, and popping them back up smoothly instead of vertical layout group which
+		pops them and moves other entries up instantly.
+	improve UI, adding pop up animations to the UI elements instead of just appearing instantly.
+	improve UI, adding black borders to UI Panels like TimeOutPanel.
+	fix player move validation, when respawned, should ignore any changes that occured lately.	
+
+
+TODO Tasks | 1 = done, 0 = not done
+-----------------------------------
+
+Gimp
+----
+
+Importing assets
+----------------
+1 Imported clock art asset for the scoreboard manager.
+
+Animator
+--------
+
+
+UnityEditor
+-----------
+//Get scoreboard to work
+1 Added Scoreboard to Canvas, empty UI object with a ScoreboardManager script attached to it.
+1 Added Scoreboard Panel to scoreboard, has a vertical layout grop which controls the height of the child game objects, key and player score entries.
+1 Added Key prefab, which is the namings of different attributes in the player score panel. Ping, Player (name), Kills, Deaths and score.
+1 Added Player score Panel prefab, which contains seperate child objects with textmeshes that are used for ping, player (name), kills, deaths and score.
+	Added a panel image to the panel, so when a players are assigned colours, can change the color of the panel, to the player's color. 
+	Attached ScoreboardEntry script, which will control the textMeshes in children objects.
+1 Edit Project settings, added Scoreboard button to input, which is set to TAB.
+
+Implementing scripts
+--------------------
+//Get scoreboard to work
+0 Added ScoreboardManager script, singleton instance, which manages the scoreboard entries. Instantiates a scoreboard entry when adding an entry,
+	and calls the set method for the entry. Stores references to entries in a dictionary of iD, scoreboardEntry, so can quickly add kills/deaths.
+	Has a varialbe named ScoreboardChanged, set to true when an entry changes, if this happens in the next fixedUpdate, the scoreboard dictionary
+	gets sorted by the player's score via use of merge sort. And then the entry objects must be sorted as well.
+	//TODO: Implement sorting the children of the scoreboard panel, seems to be more challenging then expected.
+
+1 Added ScoreboardEntry script, holds the info for a single scoreboard entry, the iD, score, username, kills and deaths. Has references to each 
+	textMeshes found in ScoreboardEntryPrefab, and sets accorignly. Also gets call to add kills and deaths.
+1 Edit ClientRead, in PlayerSpawn packet hanlder, getting the kills death and score, Calling ScoreboardManager to add an entry.
+	In PlayerDied packet, adding kills and deaths to the ScoreboardManager.
+
+
+GameServer code
+---------------
+//Get scoreboard to work
+1 Edit Player, added fields for Kills, Deaths, and score
+1 Edit ServerRead, adds kill to the player if the client who id and the killer's ids dont match.
+1 Edit ServerSend, added player fields Kills, Deaths and Score into the SpawnPlayer packet. So when a player joins, if players already have gotten kills, they are displayed
+	to the player who just joined.
+
+===============================================================================================================================
 Version 0.5.5
 -------------
 

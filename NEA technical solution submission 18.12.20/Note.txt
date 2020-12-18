@@ -1,0 +1,16 @@
+Need to run Bioforce 2D v0.5.6.exe, and choose either LocalHost or Manual ip setting connection in menu, in order to connect to your computer. 
+	As I have not implemented looking through each LAN ip and checking if its a server. Currently set to hard coded value of my computer on network.
+Can run as many same .exe instances of the game, so can have many clients from same device.
+Need to run GameServer.exe in order to establish connection to server.
+
+The game has some music, so might be very loud when you join in.
+No support for gamepad yet, its coming in this finished version.
+I document an UpdateLog.txt file which contains all things i have done with the game since version 0
+
+Controls
+--------------------------------------------------------------------------------------
+Left mouse to Shoot
+Space to jump, (can hold jump to go higher, and releasing jump stops player going up)
+		(Can double jump)
+Hold shift to sprint
+Hold TAB to see scoreboard
