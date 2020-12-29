@@ -31,9 +31,11 @@ public static class LANServerScanner
         for (int ipCount = 1; ipCount < 255; ipCount++) //Start at 1, because 0 identifies network, doesn't reach 255, because 255 is broadcast 
         {
             string ip = string.Concat(LANIP, ipCount.ToString());
+            Debug.Log($"Gonna try to connect to ip: {ip}");
             ScanPortAsync(ip, ipCount - 1);
         }
         await AllIPsChecked();
+        Debug.Log($"Have waited for AllIPsChecked");
 
         string ipToConnectTo;
 
@@ -64,11 +66,13 @@ public static class LANServerScanner
         using (TcpClient scanner = new TcpClient())
         {
             IAsyncResult connectionResult = scanner.ConnectAsync(ip, PortNum);
+            Debug.Log($"Have called Connection Result for IP: {ip}");
             await Task.Run(() =>
             {
-                connectionResult.AsyncWaitHandle.WaitOne(100);
+                connectionResult.AsyncWaitHandle.WaitOne(1000);
             });
 
+            Debug.Log($"Have waited for IP:{ip} second...");
             if (scanner.Connected)
                 IPsWithOpenGamePort.Add(ip);
             scanner.Close();
@@ -80,12 +84,16 @@ public static class LANServerScanner
     {
         while (true)
         {
+            Debug.Log("Calling while true loop...");
             bool allIPsChecked = await Task.Run(() =>
             {
-                foreach (bool ipToCheck in IPsChecked)
+                for (int ipIndex = 0; ipIndex < IPsChecked.Length; ipIndex++)
                 {
-                    if (!ipToCheck)
+                    if (!IPsChecked[ipIndex])
+                    {
+                        Debug.Log($"IP: {ipIndex + 1} is false");
                         return false;
+                    }
                 }
                 return true;
             });
