@@ -178,7 +178,16 @@ namespace GameServer
         public void SendIntoGame(string username)
         {
             player = new Player(ID, username, new Vector2(0, 0));
-            
+
+            //Spawning the player who just joined, for all connected users
+            foreach (Client client in Server.ClientDictionary.Values)
+            {
+                if (client.player != null)
+                {
+                    ServerSend.SpawnPlayer(client.ID, player, true);
+                }
+            }
+
             //Spawning rest of players for the connected user
             foreach (Client client in Server.ClientDictionary.Values)
             {
@@ -192,14 +201,7 @@ namespace GameServer
                 }
             }
 
-            //Spawning the player who just joined, for all connected users
-            foreach (Client client in Server.ClientDictionary.Values)
-            {
-                if (client.player != null)
-                {
-                    ServerSend.SpawnPlayer(client.ID, player, true);
-                }
-            }
+            
         }
         private void Disconnect()
         {

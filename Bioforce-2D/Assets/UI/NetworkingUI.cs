@@ -87,6 +87,7 @@ public class NetworkingUI : MonoBehaviour
     }
     public void DisplayTimeOutMessage()
     {
+        NetworkMenu.SetActive(true);
         ErrorMessageTextMesh.text = "Your connection has timed out...\n\nTry reconnecting using a different\nIP connection setting";
         ActivateErrorMessagePanel();
     }

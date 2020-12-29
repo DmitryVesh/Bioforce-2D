@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class NonLocalPlayerHealth : MonoBehaviour, IHealth
 {
-    [SerializeField] private int MaxHealth = 50;
+    [SerializeField] private int MaxHealth = 0;
     [SerializeField] private int CurrentHealth = 0;
 
     //Set to default of -1, which will mean that the object will take damage from any bullet
@@ -16,6 +16,13 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
         MaxHealth;
     public float GetCurrentHealth() =>
         CurrentHealth;
+    public void SetSpawnedHealth(int maxHealth, int currentHealth)
+    {
+        MaxHealth = maxHealth;
+        CurrentHealth = currentHealth;
+    }
+    public void ResetHealth() =>
+        CurrentHealth = MaxHealth;
 
     public void TookDamage(int damage, int currentHealth)
     {
@@ -58,7 +65,6 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
 
     private void Start()
     {
-        ResetHealth();
         PlayerManager = GameManager.PlayerDictionary[OwnerClientID];
         PlayerManager.OnPlayerTookDamage += TookDamage;
         PlayerManager.OnPlayerRespawn += ResetHealth;
@@ -68,8 +74,5 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
         yield return new WaitForSeconds(PlayerManager.DeadTime);
         Respawn();
     }
-    protected void ResetHealth()
-    {
-        CurrentHealth = MaxHealth;
-    }
+    
 }

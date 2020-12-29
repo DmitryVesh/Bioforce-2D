@@ -3,19 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 
 public class ScoreboardManager : MonoBehaviour
 {
     public static ScoreboardManager Instance { get; set; }
+    private GameObject Scoreboard { get; set; }
     private GameObject ScoreboardPanel { get; set; }
 
     [SerializeField] private GameObject ScoreboardEntryPrefab; //Set in inspector
     private Dictionary<int, ScoreboardEntry> ScoreboardEntriesDictionary { get; set; } = new Dictionary<int, ScoreboardEntry>();
-    private List<ScoreboardEntry> ScoreboardEntriesPanels { get; set; } = new List<ScoreboardEntry>();
     private bool ScoreboardChanged { get; set; }
 
     private GameObject ScoreboardTimer { get; set; }
+    private Button MobileButton { get; set; }
+    private bool ScoreboardActive { get; set; }
 
     public void AddEntry(int iD, string username, int kills, int deaths, int score)
     {
@@ -25,10 +27,18 @@ public class ScoreboardManager : MonoBehaviour
         scoreboardEntry.Set(iD, username, kills, deaths, score);
 
         ScoreboardEntriesDictionary.Add(iD, scoreboardEntry);
-        ScoreboardEntriesPanels.Add(scoreboardEntry);
         ScoreboardChanged = true;
     }
-
+    internal void DeleteEntry(int disconnectedPlayer)
+    {
+        //TODO: instead of destroying gameObject, should setActive(false), and re-use it later
+        try
+        {
+            Destroy(ScoreboardEntriesDictionary[disconnectedPlayer].gameObject);
+            ScoreboardEntriesDictionary.Remove(disconnectedPlayer);
+        }
+        catch (KeyNotFoundException) {}
+    }
     public void AddKill(int bulletOwnerID)
     {
         ScoreboardEntriesDictionary[bulletOwnerID].AddKill();
@@ -39,7 +49,10 @@ public class ScoreboardManager : MonoBehaviour
         ScoreboardEntriesDictionary[ownerClientID].AddDeath();
         ScoreboardChanged = true;
     }
-
+    public void ChangedScoreboardActivity() //Called by OnClickEvent by MobileButton
+    {
+        SetActiveScoreboard(!ScoreboardActive);
+    }
 
 
     private void Awake()
@@ -53,15 +66,27 @@ public class ScoreboardManager : MonoBehaviour
             Debug.Log($"ScoreboardManager instance already exists, destroying {gameObject.name}");
             Destroy(this);
         }
-        ScoreboardPanel = transform.GetChild(0).gameObject;
-        ScoreboardTimer = transform.GetChild(1).gameObject;
+        Scoreboard = transform.GetChild(0).gameObject;
+        ScoreboardPanel = Scoreboard.transform.GetChild(0).gameObject;
+        ScoreboardTimer = Scoreboard.transform.GetChild(2).gameObject;
         SetActiveScoreboard(false);
+
+        MobileButton = transform.GetChild(1).GetComponent<Button>();
+        
+        if (GameManager.Instance.IsMobileSupported())
+            MobileButton.gameObject.SetActive(true);
+        else
+            MobileButton.gameObject.SetActive(false);
     }
     private void Update()
     {
         if (!Client.Instance.Connected)
+        {
+            MobileButton.interactable = false;
             return;
+        }
 
+        MobileButton.interactable = true;
         if (Input.GetButtonDown("Scoreboard"))
             SetActiveScoreboard(true);
         else if (Input.GetButtonUp("Scoreboard"))
@@ -79,15 +104,8 @@ public class ScoreboardManager : MonoBehaviour
 
     private void SortTheChildrenOfScoreboardPanel()
     {
-        /* TODO: implement proper sorting of the entries in the child gameObject.
-        int entryCount = ScoreboardEntriesPanels.Count - 1;
-        Dictionary<int, ScoreboardEntry> temp = new Dictionary<int, ScoreboardEntry>();
-        foreach (KeyValuePair<int, ScoreboardEntry> entryPair in temp)
-        {
-            ScoreboardEntriesPanels[entryCount].Set(entryPair.Value);
-            entryCount--;
-        }
-        */
+        foreach (ScoreboardEntry scoreboardEntry in ScoreboardEntriesDictionary.Values)
+            scoreboardEntry.transform.SetAsFirstSibling();
     }
 
     private Dictionary<int, ScoreboardEntry> MergeSortScoreboardPanelEntries(Dictionary<int, ScoreboardEntry> unsortedList)
@@ -128,37 +146,44 @@ public class ScoreboardManager : MonoBehaviour
             {
                 left = leftEntries.First();
                 right = rightEntries.First();
-                if (left.Value.Score <= right.Value.Score) //left entries score greater or equals to right entries 
+
+                if (left.Value.Score < right.Value.Score) //left entries score lesser 
+                    AddToMerged(left, ref leftEntries, ref merged);
+
+                else if (left.Value.Score > right.Value.Score) // right entries score is lesser
+                    AddToMerged(right, ref rightEntries, ref merged);
+                
+                else // Same score, have to sort by number of deaths
                 {
-                    merged.Add(left.Key, left.Value); //Add left one
-                    leftEntries.Remove(left.Key);
-                }
-                else
-                {
-                    merged.Add(right.Key, right.Value);
-                    rightEntries.Remove(right.Key);
+                    if (left.Value.Deaths <= right.Value.Deaths) //The player with most deaths is added first.
+                        AddToMerged(right, ref rightEntries, ref merged);
+                    else
+                        AddToMerged(left, ref leftEntries, ref merged);
                 }
             }
             else if (leftEntries.Count > 0)
             {
                 left = leftEntries.First();
-                merged.Add(left.Key, left.Value);
-                leftEntries.Remove(left.Key);
+                AddToMerged(left, ref leftEntries, ref merged);
             }
             else if (rightEntries.Count > 0)
             {
                 right = rightEntries.First();
-                merged.Add(right.Key, right.Value);
-                rightEntries.Remove(right.Key);
+                AddToMerged(right, ref rightEntries, ref merged);
             }
         }
         return merged;
     }
+    private void AddToMerged(KeyValuePair<int, ScoreboardEntry> entry, ref Dictionary<int, ScoreboardEntry> entries, ref Dictionary<int, ScoreboardEntry> merged)
+    {
+        merged.Add(entry.Key, entry.Value);
+        entries.Remove(entry.Key);
+    }
 
     private void SetActiveScoreboard(bool isActive)
     {
-        ScoreboardTimer.SetActive(isActive);
-        ScoreboardPanel.SetActive(isActive);
+        Scoreboard.SetActive(isActive);
+        ScoreboardActive = isActive;
     }
 
     

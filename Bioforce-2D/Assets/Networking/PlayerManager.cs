@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
-    [SerializeField] private int ID;
+    [SerializeField] public int ID;
     [SerializeField] private string Username;
 
     public int Kills { get; private set; }

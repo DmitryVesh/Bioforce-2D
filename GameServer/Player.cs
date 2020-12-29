@@ -12,6 +12,9 @@ namespace GameServer
         public int Deaths { get; set; }
         public int Score { get; set; }
 
+        public int MaxHealth { get; set; } = 50;
+        public int CurrentHealth { get; set; }
+
         public Vector2 Position { get; private set; }
         public Vector2 Velocity { get; private set; }
         public bool IsFacingRight { get; private set; }
@@ -30,6 +33,7 @@ namespace GameServer
             Position = position;
             IsFacingRight = true;
             LastPosition = position;
+            CurrentHealth = MaxHealth;
         }
         public void Died()
         {
@@ -44,6 +48,7 @@ namespace GameServer
         public void Respawned()
         {
             IsDead = false;
+            CurrentHealth = MaxHealth;
         }
         public void PlayerMoves(bool isFacingRight, Vector2 position, Vector2 velocity)
         {

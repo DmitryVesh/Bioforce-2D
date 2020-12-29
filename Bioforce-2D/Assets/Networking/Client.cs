@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class Client : MonoBehaviour
@@ -9,8 +11,7 @@ public class Client : MonoBehaviour
     public static Client Instance;
     public static int DataBufferSize = 4096;
 
-    private string IPAddressLocalHost = "127.0.0.1";
-    private string IPAddressLAN = "192.168.1.65";
+    private string IPAddressLAN = "LAN";
     private string IPAddressInternet = "148.252.129.44";
 
     private string IPAddressConnectTo;
@@ -26,6 +27,7 @@ public class Client : MonoBehaviour
     [SerializeField] private float TimerTimeOutTime = 15;
     private bool TimerRunning { get; set; } = false;
     private float Timer { get; set; }
+    private int LastIPAddressChoiceIndex { get; set; }
 
     public static bool IsIPAddressValid(string text)
     {
@@ -47,10 +49,19 @@ public class Client : MonoBehaviour
         }
         return true;
     }
-    public void ConnectToServer()
+    public async void ConnectToServer()
     {
-        InitClientData();
+        ChangeIPAddressConnectTo(LastIPAddressChoiceIndex);
         
+        if (IPAddressConnectTo == IPAddressLAN)
+            IPAddressConnectTo = await LANServerScanner.GetLANIPAddress(PortNum);
+
+        if (IPAddressConnectTo == null) //TODO: Display, couldn't find server running on LAN connection...
+            ConnectionTimedOut();
+
+        Debug.Log($"Going to try and connect to: {IPAddressConnectTo}");
+        InitClientData();
+
         tCP = new TCP();
         uDP = new UDP();
 
@@ -58,17 +69,18 @@ public class Client : MonoBehaviour
 
         tCP.Connect();
     }
+    
 
     public void SuccessfullyConnected(int assignedID)
     {
         Connected = true;
         ResetTimeOutTimer(false);
         ClientID = assignedID;
-        //TODO: Display connected to server sign 
     }
     public void ChangeIPAddressConnectTo(int IPAddressIndex)
     {
-        string[] IPs = new string[] { IPAddressLAN, IPAddressLocalHost, IPAddressInternet };
+        LastIPAddressChoiceIndex = IPAddressIndex;
+        string[] IPs = new string[] { IPAddressLAN, IPAddressInternet };
         IPAddressConnectTo = IPs[IPAddressIndex];
     }
     public void SetManualIPAddressConnectTo(string IPaddress) =>
@@ -110,12 +122,19 @@ public class Client : MonoBehaviour
 
         private void ConnectCallback(IAsyncResult asyncResult)
         {
-            Socket.EndConnect(asyncResult);
-            if (!Socket.Connected) { return; } // No connected yet, then exit
+            try
+            {
+                Socket.EndConnect(asyncResult);
+                if (!Socket.Connected) { return; } // No connected yet, then exit
 
-            Stream = Socket.GetStream();
-            ReceivePacket = new Packet();
-            StreamBeginRead();
+                Stream = Socket.GetStream();
+                ReceivePacket = new Packet();
+                StreamBeginRead();
+            }
+            catch (Exception exception)
+            {
+                Debug.Log($"Error in TCP ConnectCallback\n{exception}");
+            }
         }
 
         private void BeginReadReceiveCallback(IAsyncResult asyncResult)
@@ -202,7 +221,7 @@ public class Client : MonoBehaviour
 
         public UDP()
         {
-            ipEndPoint = new IPEndPoint(System.Net.IPAddress.Parse(Instance.IPAddressConnectTo), Instance.PortNum);
+            ipEndPoint = new IPEndPoint(IPAddress.Parse(Instance.IPAddressConnectTo), Instance.PortNum);
         }
         public void Connect(int localPort)
         {

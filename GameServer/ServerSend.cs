@@ -46,6 +46,9 @@ namespace GameServer
             packet.Write(player.Deaths);
             packet.Write(player.Score);
 
+            packet.Write(player.MaxHealth);
+            packet.Write(player.CurrentHealth);
+
             SendTCPPacket(recipientClient, packet);
         }
         public static void PlayerPosition(int playerID, Vector2 position)

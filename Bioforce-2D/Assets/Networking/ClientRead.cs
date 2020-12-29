@@ -28,6 +28,7 @@ public class ClientRead : MonoBehaviour
     {
         int disconnectedPlayer = packet.ReadInt();
         GameManager.Instance.DisconnectPlayer(disconnectedPlayer);
+        ScoreboardManager.Instance.DeleteEntry(disconnectedPlayer);
     }
 
     public static void SpawnPlayer(Packet packet)
@@ -47,7 +48,10 @@ public class ClientRead : MonoBehaviour
         int deaths = packet.ReadInt();
         int score = packet.ReadInt();
 
-        GameManager.Instance.SpawnPlayer(iD, username, position, isFacingRight, isDead, justJoined);
+        int maxHealth = packet.ReadInt();
+        int currentHealth = packet.ReadInt();
+
+        GameManager.Instance.SpawnPlayer(iD, username, position, isFacingRight, isDead, justJoined, maxHealth, currentHealth);
         GameManager.PlayerDictionary[iD].SetPlayerMovementStats(runSpeed, sprintSpeed);
         ScoreboardManager.Instance.AddEntry(iD, username, kills, deaths, score);
     }

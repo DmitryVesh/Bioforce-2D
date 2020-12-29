@@ -44,7 +44,6 @@ public class ClientSend : MonoBehaviour
     }
     public static void PlayerDied(int bulletOwnerID, TypeOfDeath typeOfDeath)
     {
-        //TODO: 9000 Implement so see kill score and etc... so send who killed who
         Packet packet = new Packet((int)ClientPackets.playerDied);
         packet.Write(bulletOwnerID);
         packet.Write((int)typeOfDeath);

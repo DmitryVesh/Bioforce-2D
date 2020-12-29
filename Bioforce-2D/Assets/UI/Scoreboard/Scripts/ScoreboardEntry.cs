@@ -11,7 +11,7 @@ public class ScoreboardEntry : MonoBehaviour
     public int Score { get; private set; }
     private string Username { get; set; }
     private int Kills { get; set; }
-    private int Deaths { get; set; }
+    public int Deaths { get; private set; }
 
 
     private TextMeshProUGUI PingText { get; set; }

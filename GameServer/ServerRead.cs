@@ -115,7 +115,7 @@ namespace GameServer
             {
                 int damage = packet.ReadInt();
                 int currentHealth = packet.ReadInt();
-
+                Server.ClientDictionary[clientID].player.CurrentHealth = currentHealth;
                 ServerSend.TookDamage(clientID, damage, currentHealth);
             }
             catch (Exception exception)

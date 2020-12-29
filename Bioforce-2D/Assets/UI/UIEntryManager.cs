@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -10,7 +11,7 @@ public abstract class UIEntryManager : MonoBehaviour
     private GameObject Panel { get; set; }
     private List<GameObject> EntryPanels { get; set; }
     private List<TextMeshProUGUI> EntryTexts { get; set; }
-    private Queue<GameObject> ActiveEntries { get; set; }
+    private Queue<(GameObject, Coroutine)> ActiveEntries { get; set; }
 
 
     protected virtual void Awake()
@@ -20,29 +21,37 @@ public abstract class UIEntryManager : MonoBehaviour
 
         InitEntryPanels();
         InitEntryTexts();
-        ActiveEntries = new Queue<GameObject>();
+        ActiveEntries = new Queue<(GameObject, Coroutine)>();
     }
     protected GameObject AddEntry(string text)
     {
         int inactiveEntryIndex = FindIndexOfInactiveEntry();
-        GameObject entry = GetEntry(inactiveEntryIndex);
+        GameObject entry = GetEntry(ref inactiveEntryIndex);
+
         entry.SetActive(true);
 
         EntryTexts[inactiveEntryIndex].text = text;
-        ActiveEntries.Enqueue(entry);
+        Coroutine removingEntryCoroutine = StartCoroutine(RemoveEntry(entry));
 
-        StartCoroutine(RemoveKillFeedEntry(entry));
+        ActiveEntries.Enqueue((entry, removingEntryCoroutine));
 
         return entry;
     }
     
-    private IEnumerator RemoveKillFeedEntry(GameObject entry)
+    private IEnumerator RemoveEntry(GameObject entry)
     {
         yield return new WaitForSeconds(EntryTimeToLive);
         //TODO: make disappering decreasing in alpha, then deactivating
         entry.SetActive(false);
         ActiveEntries.Dequeue();
+        SetSiblingIndexLast(entry);
     }
+
+    private void SetSiblingIndexLast(GameObject entry)
+    {
+        entry.transform.SetAsLastSibling();
+    }
+
     private int FindIndexOfInactiveEntry()
     {
         for (int count = 0; count < EntryPanels.Count; count++)
@@ -53,19 +62,24 @@ public abstract class UIEntryManager : MonoBehaviour
         }
         return -1;
     }
-    private GameObject GetEntry(int inactiveEntryIndex)
+    private GameObject GetEntry(ref int inactiveEntryIndex)
     {
         GameObject entry;
         if (inactiveEntryIndex == -1)
+        {
             entry = GetLongestActiveEntry();
+            inactiveEntryIndex = entry.transform.GetSiblingIndex();
+        }
         else
             entry = EntryPanels[inactiveEntryIndex];
+        SetSiblingIndexLast(entry);
         return entry;
     }
 
     private GameObject GetLongestActiveEntry()
     {
-        GameObject entry = ActiveEntries.Dequeue();
+        (GameObject entry, Coroutine removeCoroutine) = ActiveEntries.Dequeue();
+        StopCoroutine(removeCoroutine);
         entry.SetActive(false);
         return entry;
     }

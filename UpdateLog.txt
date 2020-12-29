@@ -6,8 +6,12 @@ Summary
 -------
 Main goals is to;
 	Make a competitive feel to the game by adding a scoreboard
-		0 add scoreboard, opened when a player holds the Scoreboard button - TAB, or if on mobile, when an scoreboard icon is pressed
-		0 Make so LAN connection tries to connect to your actual lan connection, and not hard coded values
+
+		1 add scoreboard, opened when a player holds the Scoreboard button - TAB, or if on mobile, when an scoreboard icon is pressed
+			- Sorted via merge sort
+
+		0 Make so LAN connection tries to connect to your actual lan connection, and not hard coded values - using parallel asynchronous programming
+
 		0 add invincibility frames, after being hit/respawning
 		0 add chat into game
 		0 add ping field to Player Score entries in scoreboard
@@ -15,20 +19,28 @@ Main goals is to;
 
 Future tasks;	
 	
-	version 0.5.7
+	version 0.5.7.1
 		Implement shooting where the player aims their mouse/touch, have a crosshair and dynamic arms holding gun
+	version 0.5.7.2
 		Assign each player a color, and change the color of name on kill field to corresponding player color.
+	version 0.5.7.3
 		Add trail effects when a player sprints, so can clearly see player sprinting, also maybe zoom camera out a little bit...
+	version 0.5.7.4
 		make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
 	
-	version 0.5.8
+
+	version 0.5.8.1
 		add breathing camera movement when player is idle, going up and down.
 		using cinemachine add impulses, fast small camera movements in specific directions, for:
 			Player Getting shot
 			Player shooting
 			Player jumping
 			Player running
+	version 0.5.8.2
 		Make a main menu screen, and add a settings menu.
+	version 0.5.8.3
+		Make the scoreboard reuse scoreboard entries, instead of destroying them, when a player disconnects.
+
 
 	version 0.6.0
 		Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard
@@ -53,7 +65,7 @@ Gimp
 
 Importing assets
 ----------------
-1 Imported clock art asset for the scoreboard manager.
+1 Imported clock, and Scoreboard button art asset for the scoreboard manager.
 
 Animator
 --------
@@ -69,21 +81,62 @@ UnityEditor
 	Added a panel image to the panel, so when a players are assigned colours, can change the color of the panel, to the player's color. 
 	Attached ScoreboardEntry script, which will control the textMeshes in children objects.
 1 Edit Project settings, added Scoreboard button to input, which is set to TAB.
+1 Add a Scoreboard button, which is only shown on mobile versions, and add an OnClickEvent, which triggers the appearence/disappereance of scoreboard.
+
+//Adding automatic scanning of LAN connection ip
+0 Remove LocalHost option from IP Connection Settings, as LAN option identifies LocalHost option too.
 
 Implementing scripts
 --------------------
 //Get scoreboard to work
-0 Added ScoreboardManager script, singleton instance, which manages the scoreboard entries. Instantiates a scoreboard entry when adding an entry,
+1 Added ScoreboardManager script, singleton instance, which manages the scoreboard entries. Instantiates a scoreboard entry when adding an entry,
 	and calls the set method for the entry. Stores references to entries in a dictionary of iD, scoreboardEntry, so can quickly add kills/deaths.
 	Has a varialbe named ScoreboardChanged, set to true when an entry changes, if this happens in the next fixedUpdate, the scoreboard dictionary
-	gets sorted by the player's score via use of merge sort. And then the entry objects must be sorted as well.
-	//TODO: Implement sorting the children of the scoreboard panel, seems to be more challenging then expected.
-
+	gets sorted by the player's score via use of merge sort, if score's are the same, then the number of deaths is used. 
+	The entries are sorted using linear search, setting the siblingIndex to first,
+	so as foreach runs through ascending order of score, the player with the highest scores is placed on top, ordering in terms of score.
+	On a player disconnection, DeleteEntry is called by GameManager, destroying the entry gameObject and dictionary entry.
+	Added ChangeScoreboardActivity, which sets active scoreboard, to the not, version of what is currently ScoreboardActive set to.
 1 Added ScoreboardEntry script, holds the info for a single scoreboard entry, the iD, score, username, kills and deaths. Has references to each 
 	textMeshes found in ScoreboardEntryPrefab, and sets accorignly. Also gets call to add kills and deaths.
 1 Edit ClientRead, in PlayerSpawn packet hanlder, getting the kills death and score, Calling ScoreboardManager to add an entry.
 	In PlayerDied packet, adding kills and deaths to the ScoreboardManager.
 
+//Fix UI chat entries errors, when 4 or more players join in total
+1 Edit UIEntryManager, GetEntry, changed the param to be a ref, so can set the inactiveEntryIndex to entry's sibling index, before used to get
+	an entry, but the index remained -1, so EntryText was given -1, causing error. Also now the queue of activeEntries is a tuple value,
+	with a GameObject and Coroutine, because each time an entry is added, a coroutine is started to remove the entry.
+	However, if a GetLongestActiveEntry is called, then mutliple coroutines will be called on same entry, causing the activeEntries queue
+	to try and dequeue from an empty queue. So now have reference to the Coroutine with each entry added to queue, so can StopCoroutine on last entry.
+
+//Fix Health bars being out of sync when a player joins, and other players are present, with damaged health bars
+1 Edit ClientRead, SpawnPlayer, read Player's Max & Current Health from packet, and pass it to the GameManager, SpawnPlayer.
+1 Edit GameManager, SpawnPlayer, add params max & current health, and call NonLocalPlayerHealth SetSpawnedHealth.
+1 Edit NonLocalPlayerHealth, Add SetSpawnedHealth, which sets the max and current health.
+
+//Adding automatic scanning of LAN connection ip
+1 Edit Client, 
+	Changed LAN ip address to "LAN",
+	Edit ConnectToServer, made it an async method, if the IPAddressConnectTo is set to "LAN", Sets the ip to connect to the await of LANServerScanner.GetLANIPAddress,
+	giving the PortNum to connect to.
+	Times out if its null, (0 ips found with open game port),
+	Remove the IPAddressLocalHost, as LAN connection can identify if player is not on a network, and run via localHost.
+0 Add LANServerScanner, static class which is used to get a server IP address from LAN connection, via scanning all ip addressses, with specific port open on local network
+	Fields: IPsChecked boolean array, used to identify if all the async methods completed running. 
+		IPsWithOpenGamePort list of string, used to store any successful scans of the ipAddress of the port
+	Gets local network ip address of the machine running the game,
+	If the localNetworkIp is null, then returns null, if the ip startsWith "127.0.0" identifying localHost, then returns the localPlayerIP.
+	Scans the IP addresses in local network, by trying to connect to the ip addresses from range of 1 - 254 on the 4th octete x.x.x.1 - x.x.x.254
+	Using asynchrounous method ScanPortAsync, params string ip and int index. The ScanPortAsync connects to the ip via TcpClient async method, and returns the IAsyncResult,
+	The thread running the scan of the ip then awaits, till the IAsyncResult waits for 0.1 seconds, then checks if the tcpClient isConnected, if it is adds the ip to 
+	IPsWithOpenGamePort, proceeds to close the tcpClient and assigns the IPsChecked boolean array with index arg, as true. The 0.1 seconds acts as a timeout for the connection,
+	Is low, due to LAN connections being fast, and also on machine making the project it takes 3.9s on first/worst run.
+	After calling async methods of each ip in network (not finished executing due to being async), AllIPsChecked is awaited, 
+	which checks if all async methods completed executing, when all indexes are true, returns out of method, completing the await.
+	Returns single ip if only 1 ip was found, returns null if no ips found, returns "many" if more than 1 found.
+	
+0 Test out when multiple users are running the game on same lan connection
+0 Test out when multiple servers are running the game on same lan connection
 
 GameServer code
 ---------------
@@ -92,6 +145,11 @@ GameServer code
 1 Edit ServerRead, adds kill to the player if the client who id and the killer's ids dont match.
 1 Edit ServerSend, added player fields Kills, Deaths and Score into the SpawnPlayer packet. So when a player joins, if players already have gotten kills, they are displayed
 	to the player who just joined.
+
+//Fix Health bars being out of sync when a player joins, and other players are present, with damaged health bars
+1 Edit ServerRead, TookDamageRead, Setting the player's health to value in packet.
+1 Edit Player, Add a MaxHealth & CurrentHealth fields. In constructor, set the maxHealth to currentHealth.
+1 Edit ServerSend, SpawnPlayer, added Player's Max & Current Health fields to packet.
 
 ===============================================================================================================================
 Version 0.5.5

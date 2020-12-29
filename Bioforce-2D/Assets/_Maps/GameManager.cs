@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
         PlayerDictionary = new Dictionary<int, PlayerManager>();
     }
 
-    public void SpawnPlayer(int iD, string username, Vector3 position, bool isFacingRight, bool isDead, bool justJoined)
+    public void SpawnPlayer(int iD, string username, Vector3 position, bool isFacingRight, bool isDead, bool justJoined, int maxHealth, int currentHealth)
     {
         GameObject player;
         GameObject prefab;
@@ -59,6 +59,7 @@ public class GameManager : MonoBehaviour
 
         NonLocalPlayerHealth healthManager = player.GetComponentInChildren<NonLocalPlayerHealth>();
         healthManager?.SetOwnerClientID(iD);
+        healthManager?.SetSpawnedHealth(maxHealth, currentHealth);
 
         NonLocalPlayerMovement playerMovement = player.GetComponentInChildren<NonLocalPlayerMovement>();
         playerMovement?.SetOwnerClientID(iD);
@@ -78,19 +79,28 @@ public class GameManager : MonoBehaviour
     }
     public void DisconnectPlayer(int disconnectedPlayer)
     {
-        Debug.Log($"Player: {disconnectedPlayer} has disconnected.");
-        PlayerManager playerManager = PlayerDictionary[disconnectedPlayer];
+        try 
+        {
+            PlayerManager playerManager = PlayerDictionary[disconnectedPlayer];
 
-        OnPlayerDisconnected?.Invoke(disconnectedPlayer, playerManager.GetUsername());
+            OnPlayerDisconnected?.Invoke(disconnectedPlayer, playerManager.GetUsername());
 
-        playerManager.Disconnect();
-        PlayerDictionary.Remove(disconnectedPlayer);        
+            playerManager.Disconnect();
+            PlayerDictionary.Remove(disconnectedPlayer);
+            Debug.Log($"Player: {disconnectedPlayer} has disconnected.");
+
+        }
+        catch (KeyNotFoundException exception)
+        {
+            Debug.LogWarning($"Player has been probing LAN connection\n{exception}");
+        }
     }
     public void DisconnectAllPlayers()
     {
         Debug.Log($"All players are being disconnected.");
         foreach (PlayerManager player in PlayerDictionary.Values)
         {
+            ScoreboardManager.Instance.DeleteEntry(player.ID);
             player.Disconnect();
         }
         PlayerDictionary.Clear();
@@ -106,7 +116,7 @@ public class GameManager : MonoBehaviour
         ClientSend.PlayerRespawned();
         PlayerDictionary[iD].PlayerRespawned();
     }
-    private bool IsMobileSupported()
+    public bool IsMobileSupported()
     {
         bool result;
         RuntimePlatform platform = Application.platform;
