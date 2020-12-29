@@ -84,7 +84,7 @@ UnityEditor
 1 Add a Scoreboard button, which is only shown on mobile versions, and add an OnClickEvent, which triggers the appearence/disappereance of scoreboard.
 
 //Adding automatic scanning of LAN connection ip
-0 Remove LocalHost option from IP Connection Settings, as LAN option identifies LocalHost option too.
+1 Remove LocalHost option from IP Connection Settings, as LAN option identifies LocalHost option too.
 
 Implementing scripts
 --------------------

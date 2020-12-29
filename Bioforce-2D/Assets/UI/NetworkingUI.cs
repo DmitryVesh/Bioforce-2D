@@ -68,7 +68,7 @@ public class NetworkingUI : MonoBehaviour
     public void OnIPAddressDropDownChange()
     {
         int index = IPAddressDropDown.value;
-        if (index == 3) //Chosen Manual ip address
+        if (index == 2) //Chosen Manual ip address
         {
             IPAddressManualInputField.gameObject.SetActive(true); //Display manual ip address input field
             OverrideIP = true;

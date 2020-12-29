@@ -12,6 +12,9 @@ public static class LANServerScanner
     private static bool[] IPsChecked;
     private static int PortNum;
 
+    private static Dictionary<int, int> IPsCheckedNumberFails;
+    private static int SmallestFalseIPIndex;
+
     public static async Task<string> GetLANIPAddress(int portNum)
     {
         PortNum = portNum;
@@ -34,11 +37,13 @@ public static class LANServerScanner
             Debug.Log($"Gonna try to connect to ip: {ip}");
             ScanPortAsync(ip, ipCount - 1);
         }
+
+        IPsCheckedNumberFails = new Dictionary<int, int>();
+        SmallestFalseIPIndex = 0;
         await AllIPsChecked();
         Debug.Log($"Have waited for AllIPsChecked");
 
         string ipToConnectTo;
-
         if (IPsWithOpenGamePort.Count == 1)
         {
             Debug.Log("1 IP with open game port...");
@@ -58,6 +63,7 @@ public static class LANServerScanner
                 Debug.Log($"\t{ip}");
             }
         }
+
         return ipToConnectTo;
     }
     
@@ -84,14 +90,23 @@ public static class LANServerScanner
     {
         while (true)
         {
+            Thread.Sleep(500);
             Debug.Log("Calling while true loop...");
             bool allIPsChecked = await Task.Run(() =>
             {
-                for (int ipIndex = 0; ipIndex < IPsChecked.Length; ipIndex++)
+                for (int ipIndex = SmallestFalseIPIndex; ipIndex < IPsChecked.Length; ipIndex++)
                 {
                     if (!IPsChecked[ipIndex])
                     {
+                        SmallestFalseIPIndex = ipIndex;
                         Debug.Log($"IP: {ipIndex + 1} is false");
+                        if (!IPsCheckedNumberFails.ContainsKey(ipIndex))
+                            IPsCheckedNumberFails.Add(ipIndex + 1, 1);
+                        else
+                            IPsCheckedNumberFails[ipIndex + 1] += 1;
+
+                        if (IPsCheckedNumberFails[ipIndex + 1] >= 5) //Something went wrong in scan port...
+                            IPsChecked[ipIndex] = true;
                         return false;
                     }
                 }
