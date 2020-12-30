@@ -34,6 +34,7 @@ public static class LANServerScanner
             await Task.Run(() =>
             {
                 Thread thread = new Thread(new ThreadStart(ScanIP));
+                thread.Priority = System.Threading.ThreadPriority.AboveNormal;
                 thread.Start();
                 AllThreads[threadCount] = thread;
             });

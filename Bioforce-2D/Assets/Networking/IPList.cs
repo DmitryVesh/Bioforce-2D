@@ -13,7 +13,7 @@ class IPList
     }
     public int GetDifBetweenLowestAndHighestIP()
     {
-        return (HighestIP - LowestIP) + 1;
+        return ((HighestIP - LowestIP) + 1);
     }
     public int GetNextIP()
     {
