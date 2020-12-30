@@ -11,7 +11,7 @@ public static class LANServerScanner
     private static List<string> IPsWithOpenGamePort { get; set; }
 
     private static int PortNum { get; set; }
-    private static int TimeOut { get; set; } = 1000;
+    private static int TimeOut { get; set; } = 2000;
     private static IPList IPList { get; set; }
     private static string LANIP { get; set; }
 
@@ -27,50 +27,57 @@ public static class LANServerScanner
         IPList = new IPList(lowestIP: 1, highestIP: 254);
         int numberOfThreadsToUse = IPList.GetDifBetweenLowestAndHighestIP();
 
-        Task[] AllThreadsScanning = new Task[numberOfThreadsToUse];
+        Thread[] AllThreads = new Thread[numberOfThreadsToUse];
 
         for (int threadCount = 0; threadCount < numberOfThreadsToUse; threadCount++)
         {
-            Task threadRun = Task.Run(() =>
+            await Task.Run(() =>
             {
                 Thread thread = new Thread(new ThreadStart(ScanIP));
                 thread.Start();
+                AllThreads[threadCount] = thread;
             });
-            AllThreadsScanning[threadCount] = threadRun;
         }
-        await Task.WhenAll(AllThreadsScanning);
+
+        for (int threadCount = 0; threadCount < numberOfThreadsToUse; threadCount++)
+        {
+            AllThreads[threadCount].Join();
+        }
+        Debug.Log("Finished execution");
         return GetIPConnectTo();
     }
 
-    private static void ScanIP()
+    private static async void ScanIP()
     {
         int ipLastByte;
         while ((ipLastByte = IPList.GetNextIP()) != -1)
         {
             string ip = string.Concat(LANIP, ipLastByte);
             bool connected;
-            try { connected = Connect(ip, PortNum, TimeOut); }
+            try { connected = await Connect(ip, PortNum, TimeOut); }
             catch { continue; }
 
             if (connected)
                 IPsWithOpenGamePort.Add(ip);
         }
     }
-    private static bool Connect(string ip, int portNum, int timeOut)
+    private static async Task<bool> Connect(string ip, int portNum, int timeOut)
     {
         TcpClient tcp = new TcpClient();
         IsIPOpen tcpState = new IsIPOpen(tcp, true);
 
         IAsyncResult connectionResult = tcp.BeginConnect(ip, portNum, ConnectCallback, tcpState);
-        tcpState.IsTCPOpen = connectionResult.AsyncWaitHandle.WaitOne(timeOut, false);
+        tcpState.IsTCPOpen = await Task.Run(() =>  connectionResult.AsyncWaitHandle.WaitOne(timeOut, false));
 
         if (tcpState.IsTCPOpen == false || tcp.Connected == false)
         {
+            Debug.Log("Sending false to ip " + ip);
             tcpState.TCP.Close();
             return false;
         }
         else 
         {
+            Debug.Log("Sending true to ip " + ip);
             tcpState.TCP.Close();
             return true;
         }
