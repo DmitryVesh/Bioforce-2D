@@ -49,7 +49,7 @@ public class Client : MonoBehaviour
         }
         return true;
     }
-    public async void ConnectToServer()
+    public async Task ConnectToServer()
     {
         ChangeIPAddressConnectTo(LastIPAddressChoiceIndex);
         

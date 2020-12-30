@@ -19,7 +19,7 @@ public class NetworkingUI : MonoBehaviour
     private TMP_InputField IPAddressManualInputField { get; set; }
     private bool OverrideIP { get; set; } = false;
 
-    public void ConnectToServer()
+    public async void ConnectToServer()
     {        
         if (OverrideIP)
         {
@@ -35,7 +35,7 @@ public class NetworkingUI : MonoBehaviour
 
         NetworkMenu.SetActive(false);
         UsernameInputField.interactable = false;
-        Client.Instance.ConnectToServer();
+        await Client.Instance.ConnectToServer();
     }
     public string GetUsername()
     {
