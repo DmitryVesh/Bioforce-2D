@@ -10,7 +10,7 @@ Main goals is to;
 		1 add scoreboard, opened when a player holds the Scoreboard button - TAB, or if on mobile, when an scoreboard icon is pressed
 			- Sorted via merge sort
 
-		0 Make so LAN connection tries to connect to your actual lan connection, and not hard coded values - using parallel asynchronous programming
+		0 Make so LAN connection tries to connect to your actual lan connection, and not hard coded values - using parallel programming: threading and asynchronous
 
 		0 add invincibility frames, after being hit/respawning
 		0 add chat into game
@@ -121,20 +121,21 @@ Implementing scripts
 	giving the PortNum to connect to.
 	Times out if its null, (0 ips found with open game port),
 	Remove the IPAddressLocalHost, as LAN connection can identify if player is not on a network, and run via localHost.
-0 Add LANServerScanner, static class which is used to get a server IP address from LAN connection, via scanning all ip addressses, with specific port open on local network
-	Fields: IPsChecked boolean array, used to identify if all the async methods completed running. 
+0 Add LANServerScanner, static asynchronous class which is used to get a server IP address from LAN connection, via scanning all ip addressses, with specific port open on local network
+	Fields: 
 		IPsWithOpenGamePort list of string, used to store any successful scans of the ipAddress of the port
+		Port number, timeOut time in miliseconds, IPList, and leadingLANIP
 	Gets local network ip address of the machine running the game,
-	If the localNetworkIp is null, then returns null, if the ip startsWith "127.0.0" identifying localHost, then returns the localPlayerIP.
+	If the localNetworkIp is null, then returns null, if the ip startsWith "127.0.0" identifying localHost, then returns the all the local ip.
 	Scans the IP addresses in local network, by trying to connect to the ip addresses from range of 1 - 254 on the 4th octete x.x.x.1 - x.x.x.254
-	Using asynchrounous method ScanPortAsync, params string ip and int index. The ScanPortAsync connects to the ip via TcpClient async method, and returns the IAsyncResult,
-	The thread running the scan of the ip then awaits, till the IAsyncResult waits for 0.1 seconds, then checks if the tcpClient isConnected, if it is adds the ip to 
-	IPsWithOpenGamePort, proceeds to close the tcpClient and assigns the IPsChecked boolean array with index arg, as true. The 0.1 seconds acts as a timeout for the connection,
-	Is low, due to LAN connections being fast, and also on machine making the project it takes 3.9s on first/worst run.
-	After calling async methods of each ip in network (not finished executing due to being async), AllIPsChecked is awaited, 
-	which checks if all async methods completed executing, when all indexes are true, returns out of method, completing the await.
+	A number of new threads ranging the number of different ips, are started, giving the ScanIP method, and each thread is ran asynchronously/parallel, and added Task array with all the threads.
+	ScanIP, connects to the ip via TcpClient async method, and returns the IAsyncResult,
+	The thread running the scan of the ip then awaits, till the IAsyncResult waits for 1 seconds if the connection is established, then checks if the tcpClient isConnected, if it is adds the ip to 
+	IPsWithOpenGamePort, proceeds to close the tcpClient The 1 seconds acts as a timeout for the connection, is low, due to LAN connections being fast.
+	After all threads are added, they are all awaited till they finish executing the ScanIP method.
 	Returns single ip if only 1 ip was found, returns null if no ips found, returns "many" if more than 1 found.
-	
+1 Add IPList, contains the range of the IP addresses to try and connect to, also responsible for giving out the CurrentIP to all threads, yet to be processed.
+
 0 Test out when multiple users are running the game on same lan connection
 0 Test out when multiple servers are running the game on same lan connection
 

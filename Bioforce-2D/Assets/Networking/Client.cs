@@ -54,10 +54,13 @@ public class Client : MonoBehaviour
         ChangeIPAddressConnectTo(LastIPAddressChoiceIndex);
         
         if (IPAddressConnectTo == IPAddressLAN)
-            IPAddressConnectTo = await LANServerScanner.GetLANIPAddress(PortNum);
+            IPAddressConnectTo = await LANServerScanner.GetLANIPAddressConnectTo(PortNum);
 
-        if (IPAddressConnectTo == null) //TODO: Display, couldn't find server running on LAN connection...
-            ConnectionTimedOut();
+        if (IPAddressConnectTo == null)
+        { 
+            ConnectionTimedOut(); //TODO: Display, couldn't find server running on LAN connection...
+            return;
+        }
 
         Debug.Log($"Going to try and connect to: {IPAddressConnectTo}");
         InitClientData();
@@ -125,7 +128,7 @@ public class Client : MonoBehaviour
             try
             {
                 Socket.EndConnect(asyncResult);
-                if (!Socket.Connected) { return; } // No connected yet, then exit
+                if (!Socket.Connected) { return; } // Not connected yet, then exit
 
                 Stream = Socket.GetStream();
                 ReceivePacket = new Packet();
