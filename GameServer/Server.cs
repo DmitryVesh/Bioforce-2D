@@ -21,7 +21,7 @@ namespace GameServer
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnEndingConsoleApplication);
             (MaxNumPlayers, PortNum) = (maxNumPlayers, portNum);
 
-            Console.WriteLine("Trying to start the server...");
+            Console.WriteLine("\nTrying to start the server...");
             InitServerData();
 
             TCPListener = new TcpListener(IPAddress.Any, portNum);

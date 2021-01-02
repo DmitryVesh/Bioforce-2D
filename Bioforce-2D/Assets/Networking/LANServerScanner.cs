@@ -20,32 +20,35 @@ public  class LANServerScanner : MonoBehaviour
     private static string LANIP { get; set; }
 
     public static string AddressToConnecTo { get; private set; }
-    private static LanManager LanScannerManager { get; set; }
+    public static DiscoveryClient BroadCastManager { get; private set; }
 
     //Calling UDP broadcast...
     public IEnumerator GetLANServerAddressUDPBroadcast(int portNum)
     {
-        //return await OldBroadcast(portNum);
-        LanScannerManager = new LanManager();
-        LanScannerManager.ScanHost();
-        string address = LanScannerManager.StartClient(portNum);
+        BroadCastManager = new DiscoveryClient();
+        BroadCastManager.ScanHost();
+        string address = BroadCastManager.StartClient(portNum);
         if (address != "waiting")
         {
             AddressToConnecTo = address;
             yield break;
         }
 
-        StartCoroutine(LanScannerManager.SendPing(portNum));
+        StartCoroutine(BroadCastManager.SendPing(portNum));
         
-        //lanManager.CloseClient();
-        yield return new WaitForSeconds(LanScannerManager.GetTotalPingTime());
-        LanScannerManager.PrintAllAddressesFound();
-        LanScannerManager.CloseClient();
+        yield return new WaitForSeconds(BroadCastManager.GetTotalPingTime());
+        BroadCastManager.PrintAllAddressesFound();
+        BroadCastManager.CloseClient();
+    }
+    private void OnDestroy()
+    {
+        if (BroadCastManager != null) 
+            BroadCastManager.CloseClient();
     }
 
     //Works on my router, but not on iOS hotspot, probably because of the subnet mask of iOS not being 255.255.255.0 but being 255.255.255.240
     //So have to find subnet mask, in order to show a correct broadcast address...
-    public class LanManager
+    public class DiscoveryClient
     {
         // Addresses of player's machine
         public List<string> LocalFullAddresses { get; private set; } = new List<string>();
@@ -64,9 +67,14 @@ public  class LANServerScanner : MonoBehaviour
         public void PrintAllAddressesFound()
         {
             if (ServerAddresses.Count == 0)
-                Console.WriteLine("No addresses found....");
+            {
+                Debug.Log("No addresses found....");
+                return;
+            }
+
+            Debug.Log("Addresses found:");
             foreach (string address in ServerAddresses)
-                Console.WriteLine(address);
+                Debug.Log(address);
         }
         public float GetTotalPingTime()
         {
@@ -204,8 +212,6 @@ public  class LANServerScanner : MonoBehaviour
             }
             */
         }
-
-        
     }
 
     //Trying to connect to every single ip in local network...

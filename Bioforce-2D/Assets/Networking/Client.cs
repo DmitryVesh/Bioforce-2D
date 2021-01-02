@@ -1,9 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class Client : MonoBehaviour
@@ -13,12 +12,14 @@ public class Client : MonoBehaviour
 
     private string IPAddressLAN = "LAN";
     private string IPAddressInternet = "148.252.129.44";
+    private string IPAddressManual = "Manual";
 
-    private string IPAddressConnectTo;
-    public int PortNum = 28020; //Must be the same as GameServer Port
+    private string IPAddressConnectTo { get; set; }
+    public const int PortNumGame = 28020; //Must be the same as GameServer Port
+    public const int PortNumDiscover = PortNumGame + 1;
     public int ClientID = 0;
     public TCP tCP { get; set; }
-    public UDP uDP;
+    public UDP uDP { get; set; }
 
     private delegate void PacketHandler(Packet packet);
     private static Dictionary<int, PacketHandler> PacketHandlerDictionary;
@@ -27,7 +28,7 @@ public class Client : MonoBehaviour
     [SerializeField] private float TimerTimeOutTime = 15;
     private bool TimerRunning { get; set; } = false;
     private float Timer { get; set; }
-    private int LastIPAddressChoiceIndex { get; set; }
+    private string IPAddressChoice { get; set; }
     private LANServerScanner ServerScanner { get; set; }
 
     public static bool IsIPAddressValid(string text)
@@ -50,25 +51,26 @@ public class Client : MonoBehaviour
         }
         return true;
     }
-    public async Task ConnectToServer()
+    public IEnumerator ConnectToServer()
     {
-        ChangeIPAddressConnectTo(LastIPAddressChoiceIndex); //TODO: error when selecting MANUAL IPSettings chooses last 1 indexed, like LAN and Internet
-        if (ServerScanner == null)
-            ServerScanner = gameObject.AddComponent<LANServerScanner>();
-
-        if (IPAddressConnectTo == IPAddressLAN)
+        if (IPAddressChoice == IPAddressLAN)
         {
-            StartCoroutine(ServerScanner.GetLANServerAddressUDPBroadcast(PortNum));
+            if (ServerScanner == null)
+                ServerScanner = gameObject.AddComponent<LANServerScanner>();
+
+            StartCoroutine(ServerScanner.GetLANServerAddressUDPBroadcast(PortNumDiscover));
+            while (LANServerScanner.BroadCastManager == null)
+                yield return new WaitForSeconds(0.5f); //Gives time for LANServerScanner to make a UDPBroadcaster and scan for local machine ips 
+            yield return new WaitForSeconds(LANServerScanner.BroadCastManager.GetTotalPingTime());
+
             IPAddressConnectTo = LANServerScanner.AddressToConnecTo;
+            if (IPAddressConnectTo == null)
+            {
+                NoLANServerFoundTimeOutMessage(); //TODO: Display, couldn't find server running on LAN connection...
+                yield break;
+            }
         }
-
         
-        if (IPAddressConnectTo == null || IPAddressConnectTo == "LAN")
-        { 
-            ConnectionTimedOut(); //TODO: Display, couldn't find server running on LAN connection...
-            return;
-        }
-
         Debug.Log($"Going to try and connect to: {IPAddressConnectTo}");
         InitClientData();
 
@@ -79,7 +81,6 @@ public class Client : MonoBehaviour
 
         tCP.Connect();
     }
-    
 
     public void SuccessfullyConnected(int assignedID)
     {
@@ -89,15 +90,11 @@ public class Client : MonoBehaviour
     }
     public void ChangeIPAddressConnectTo(int IPAddressIndex)
     {
-        LastIPAddressChoiceIndex = IPAddressIndex;
-        string[] IPs = new string[] { IPAddressLAN, IPAddressInternet };
-        IPAddressConnectTo = IPs[IPAddressIndex];
+        string[] IPs = new string[] { IPAddressLAN, IPAddressInternet, IPAddressManual };
+        IPAddressChoice = IPs[IPAddressIndex];
     }
-    public void SetManualIPAddressConnectTo(string IPaddress)
-    {
-
+    public void SetManualIPAddressConnectTo(string IPaddress) =>
         IPAddressConnectTo = IPaddress;
-    }
 
     public class TCP
     {
@@ -115,7 +112,7 @@ public class Client : MonoBehaviour
 
             ReceiveBuffer = new byte[DataBufferSize];
 
-            Socket.BeginConnect(Instance.IPAddressConnectTo, Instance.PortNum, ConnectCallback, Socket);
+            Socket.BeginConnect(Instance.IPAddressConnectTo, PortNumGame, ConnectCallback, Socket);
         }
         public void SendPacket(Packet packet)
         {
@@ -234,7 +231,7 @@ public class Client : MonoBehaviour
 
         public UDP()
         {
-            ipEndPoint = new IPEndPoint(IPAddress.Parse(Instance.IPAddressConnectTo), Instance.PortNum);
+            ipEndPoint = new IPEndPoint(IPAddress.Parse(Instance.IPAddressConnectTo), PortNumGame);
         }
         public void Connect(int localPort)
         {
@@ -310,7 +307,7 @@ public class Client : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            IPAddressConnectTo = IPAddressLAN; //Set default address
+            IPAddressChoice = IPAddressLAN; //Set default address
         }
         else if (Instance != this)
         {
@@ -331,6 +328,7 @@ public class Client : MonoBehaviour
             ConnectionTimedOut();
         }
     }
+    
     private void ResetTimeOutTimer(bool runTimer = true)
     {
         TimerRunning = runTimer;
@@ -340,6 +338,11 @@ public class Client : MonoBehaviour
     {
         Disconnect();
         NetworkingUI.Instance.DisplayTimeOutMessage();
+    }
+    private void NoLANServerFoundTimeOutMessage()
+    {
+        Disconnect();
+        NetworkingUI.Instance.DisplayNoLANServerFound();
     }
     private void OnApplicationQuit()
     {

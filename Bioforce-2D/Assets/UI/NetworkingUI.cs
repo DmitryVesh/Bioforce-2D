@@ -19,7 +19,7 @@ public class NetworkingUI : MonoBehaviour
     private TMP_InputField IPAddressManualInputField { get; set; }
     private bool OverrideIP { get; set; } = false;
 
-    public async void ConnectToServer()
+    public void ConnectToServer()
     {        
         if (OverrideIP)
         {
@@ -35,7 +35,7 @@ public class NetworkingUI : MonoBehaviour
 
         NetworkMenu.SetActive(false);
         UsernameInputField.interactable = false;
-        await Client.Instance.ConnectToServer();
+        StartCoroutine(Client.Instance.ConnectToServer());
     }
     public string GetUsername()
     {
@@ -68,22 +68,31 @@ public class NetworkingUI : MonoBehaviour
     public void OnIPAddressDropDownChange()
     {
         int index = IPAddressDropDown.value;
+        Client.Instance.ChangeIPAddressConnectTo(index);
+
         if (index == 2) //Chosen Manual ip address
         {
             IPAddressManualInputField.gameObject.SetActive(true); //Display manual ip address input field
             OverrideIP = true;
         }
-        else 
+        else
         {
             OverrideIP = false;
             IPAddressManualInputField.gameObject.SetActive(false);
-            Client.Instance.ChangeIPAddressConnectTo(index);
         }
+            
     }
     public void Disconnected()
     {
         NetworkMenu.SetActive(true);
         UsernameInputField.interactable = true;
+    }
+
+    public void DisplayNoLANServerFound()
+    {
+        NetworkMenu.SetActive(true);
+        ErrorMessageTextMesh.text = "No Server on LAN Connection Found\nTry running a server\nOr connection via Manual IP Setting:\n-UDP Broadcasts might be blocked";
+        ActivateErrorMessagePanel();
     }
     public void DisplayTimeOutMessage()
     {
