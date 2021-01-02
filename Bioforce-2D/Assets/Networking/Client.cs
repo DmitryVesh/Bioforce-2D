@@ -57,9 +57,12 @@ public class Client : MonoBehaviour
             ServerScanner = gameObject.AddComponent<LANServerScanner>();
 
         if (IPAddressConnectTo == IPAddressLAN)
+        {
             StartCoroutine(ServerScanner.GetLANServerAddressUDPBroadcast(PortNum));
-            //IPAddressConnectTo = await LANServerScanner.GetLANIPAddressConnectToScanAllIPs(PortNum);
+            IPAddressConnectTo = LANServerScanner.AddressToConnecTo;
+        }
 
+        
         if (IPAddressConnectTo == null || IPAddressConnectTo == "LAN")
         { 
             ConnectionTimedOut(); //TODO: Display, couldn't find server running on LAN connection...

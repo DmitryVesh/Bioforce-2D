@@ -20,21 +20,27 @@ public  class LANServerScanner : MonoBehaviour
     private static string LANIP { get; set; }
 
     public static string AddressToConnecTo { get; private set; }
+    private static LanManager LanScannerManager { get; set; }
 
     //Calling UDP broadcast...
     public IEnumerator GetLANServerAddressUDPBroadcast(int portNum)
     {
         //return await OldBroadcast(portNum);
-        LanManager lanManager = new LanManager();
-        lanManager.ScanHost();
-        string address = lanManager.StartClient(portNum);
+        LanScannerManager = new LanManager();
+        LanScannerManager.ScanHost();
+        string address = LanScannerManager.StartClient(portNum);
         if (address != "waiting")
-            AddressToConnecTo = null;
+        {
+            AddressToConnecTo = address;
+            yield break;
+        }
 
-        StartCoroutine(lanManager.SendPing(portNum));
-        lanManager.PrintAllAddressesFound();
+        StartCoroutine(LanScannerManager.SendPing(portNum));
+        
         //lanManager.CloseClient();
-        yield return new WaitForSeconds(10);
+        yield return new WaitForSeconds(LanScannerManager.GetTotalPingTime());
+        LanScannerManager.PrintAllAddressesFound();
+        LanScannerManager.CloseClient();
     }
 
     //Works on my router, but not on iOS hotspot, probably because of the subnet mask of iOS not being 255.255.255.0 but being 255.255.255.240
@@ -42,21 +48,19 @@ public  class LANServerScanner : MonoBehaviour
     public class LanManager
     {
         // Addresses of player's machine
-        public List<string> LocalFullAddresses { get; private set; }
-        public List<string> LocalSubAddresses { get; private set; }
-    
+        public List<string> LocalFullAddresses { get; private set; } = new List<string>();
+        public List<string> LocalSubAddresses { get; private set; } = new List<string>();
+
         // Addresses found on the LAN with a server
-        public List<string> ServerAddresses { get; private set; }
-    
+        public List<string> ServerAddresses { get; private set; } = new List<string>();
+
         private Socket ClientSocket { get; set; }
         private EndPoint RemoteEndPoint; //Cant be property due to be used as a ref in BeginReceiveFrom
-    
-        public LanManager()
-        {
-            ServerAddresses = new List<string>();
-            LocalFullAddresses = new List<string>();
-            LocalSubAddresses = new List<string>();
-        }
+
+        private int NumberOfPings { get; set; } = 5;
+        private float WaitBeforePings { get; set; } = 0.5f;
+        private float ExtraTimeGivenForPingsToComplete { get; set; } = 5;
+
         public void PrintAllAddressesFound()
         {
             if (ServerAddresses.Count == 0)
@@ -64,7 +68,11 @@ public  class LANServerScanner : MonoBehaviour
             foreach (string address in ServerAddresses)
                 Console.WriteLine(address);
         }
-    
+        public float GetTotalPingTime()
+        {
+            return (NumberOfPings * LocalSubAddresses.Count * WaitBeforePings) + ExtraTimeGivenForPingsToComplete;
+        }
+
         public string StartClient(int port)
         {
             if (ClientSocket == null)
@@ -75,10 +83,9 @@ public  class LANServerScanner : MonoBehaviour
     
                     if (ClientSocket == null)
                     {
-                        Console.WriteLine("Client socket is null");
+                        Debug.Log("Client socket is null");
                         return null;
                     }
-    
                     ClientSocket.Bind(new IPEndPoint(IPAddress.Any, port));
     
                     ClientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
@@ -89,10 +96,16 @@ public  class LANServerScanner : MonoBehaviour
                     ClientSocket.BeginReceiveFrom(new byte[1024], 0, 1024, SocketFlags.None, ref RemoteEndPoint, new AsyncCallback(AsyncCallbackClient), null);
                     return "waiting";
                 }
-                catch (Exception ex)
+                catch (SocketException SocketException)
                 {
-                    Console.WriteLine(ex);
+                    CloseClient();
+                    Debug.Log($"Error in making and binding the client socket\nA server is probably already running on machine: \n{SocketException}");
                     return LocalFullAddresses[0];
+                }
+                catch (Exception exception)
+                {
+                    Debug.Log($"Unexpected error in Starting client:\n{exception}");
+                    return null;
                 }
             }
             return null;
@@ -112,19 +125,24 @@ public  class LANServerScanner : MonoBehaviour
 
             if (ClientSocket != null)
             {
-                int numberOfPings = 4;
-
-                for (int i = 0; i < numberOfPings; i++)
+                for (int i = 0; i < NumberOfPings; i++)
                 {
+                
                     foreach (string subAddress in LocalSubAddresses)
                     {
-                        //TODO: get a broad cast address, because iOS hotspot has subnet 255.255.255.240, so broadcast address is different
-                        IPEndPoint destinationEndPoint = new IPEndPoint(IPAddress.Parse(subAddress + ".255"), port);
+                        //TODO: get a broad cast address, because iOS hotspot has subnet 255.255.255.240, so broadcast address isdifferent
+                        string ip = subAddress + ".255";
+                        IPEndPoint destinationEndPoint = new IPEndPoint(IPAddress.Parse(ip), port);
                         byte[] str = Encoding.ASCII.GetBytes("ping");
-
-                        ClientSocket.SendTo(str, destinationEndPoint);
-
-                        yield return new WaitForSeconds(1);
+                        try
+                        {
+                            ClientSocket.SendTo(str, destinationEndPoint);
+                        }
+                        catch (Exception exception)
+                        {
+                            Debug.Log($"Error sending out a ping to: {ip}\n{exception}");
+                        }
+                        yield return new WaitForSeconds(WaitBeforePings);
                     }
                 }
             }
@@ -147,9 +165,9 @@ public  class LANServerScanner : MonoBehaviour
     
                     ClientSocket.BeginReceiveFrom(new byte[1024], 0, 1024, SocketFlags.None, ref RemoteEndPoint, new AsyncCallback(AsyncCallbackClient), null);
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
-                    Console.WriteLine(ex);
+                    Debug.Log(exception);
                 }
             }
         }
@@ -170,6 +188,7 @@ public  class LANServerScanner : MonoBehaviour
     
                     if (!LocalSubAddresses.Contains(subAddress))
                         LocalSubAddresses.Add(subAddress);
+                    Debug.Log($"Local machine address: {address}");
                 }
             }
             /*
@@ -185,11 +204,13 @@ public  class LANServerScanner : MonoBehaviour
             }
             */
         }
+
+        
     }
 
-//Trying to connect to every single ip in local network...
-//Works on Windows and Mac, but not on iOS
-public static async Task<string> GetLANIPAddressConnectToScanAllIPs(int portNum)
+    //Trying to connect to every single ip in local network...
+    //Works on Windows and Mac, but not on iOS
+    public static async Task<string> GetLANIPAddressConnectToScanAllIPs(int portNum)
     {
         (string lanIP, bool NullOrLocalHost) = GetLeadingLANIPAddress();
         if (NullOrLocalHost)
