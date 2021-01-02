@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public static class LANServerScanner
+public  class LANServerScanner : MonoBehaviour
 {
     private static List<string> IPsWithOpenGamePort { get; set; }
 
@@ -15,7 +19,177 @@ public static class LANServerScanner
     private static IPList IPList { get; set; }
     private static string LANIP { get; set; }
 
-    public static async Task<string> GetLANIPAddressConnectTo(int portNum)
+    public static string AddressToConnecTo { get; private set; }
+
+    //Calling UDP broadcast...
+    public IEnumerator GetLANServerAddressUDPBroadcast(int portNum)
+    {
+        //return await OldBroadcast(portNum);
+        LanManager lanManager = new LanManager();
+        lanManager.ScanHost();
+        string address = lanManager.StartClient(portNum);
+        if (address != "waiting")
+            AddressToConnecTo = null;
+
+        StartCoroutine(lanManager.SendPing(portNum));
+        lanManager.PrintAllAddressesFound();
+        //lanManager.CloseClient();
+        yield return new WaitForSeconds(10);
+    }
+
+    //Works on my router, but not on iOS hotspot, probably because of the subnet mask of iOS not being 255.255.255.0 but being 255.255.255.240
+    //So have to find subnet mask, in order to show a correct broadcast address...
+    public class LanManager
+    {
+        // Addresses of player's machine
+        public List<string> LocalFullAddresses { get; private set; }
+        public List<string> LocalSubAddresses { get; private set; }
+    
+        // Addresses found on the LAN with a server
+        public List<string> ServerAddresses { get; private set; }
+    
+        private Socket ClientSocket { get; set; }
+        private EndPoint RemoteEndPoint; //Cant be property due to be used as a ref in BeginReceiveFrom
+    
+        public LanManager()
+        {
+            ServerAddresses = new List<string>();
+            LocalFullAddresses = new List<string>();
+            LocalSubAddresses = new List<string>();
+        }
+        public void PrintAllAddressesFound()
+        {
+            if (ServerAddresses.Count == 0)
+                Console.WriteLine("No addresses found....");
+            foreach (string address in ServerAddresses)
+                Console.WriteLine(address);
+        }
+    
+        public string StartClient(int port)
+        {
+            if (ClientSocket == null)
+            {
+                try
+                {
+                    ClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+    
+                    if (ClientSocket == null)
+                    {
+                        Console.WriteLine("Client socket is null");
+                        return null;
+                    }
+    
+                    ClientSocket.Bind(new IPEndPoint(IPAddress.Any, port));
+    
+                    ClientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
+                    ClientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontRoute, 1);
+    
+                    RemoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
+    
+                    ClientSocket.BeginReceiveFrom(new byte[1024], 0, 1024, SocketFlags.None, ref RemoteEndPoint, new AsyncCallback(AsyncCallbackClient), null);
+                    return "waiting";
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    return LocalFullAddresses[0];
+                }
+            }
+            return null;
+        }
+        public void CloseClient()
+        {
+            if (ClientSocket != null)
+            {
+                ClientSocket.Close();
+                ClientSocket = null;
+            }
+        }
+
+        public IEnumerator SendPing(int port)
+        {
+            ServerAddresses.Clear();
+
+            if (ClientSocket != null)
+            {
+                int numberOfPings = 4;
+
+                for (int i = 0; i < numberOfPings; i++)
+                {
+                    foreach (string subAddress in LocalSubAddresses)
+                    {
+                        //TODO: get a broad cast address, because iOS hotspot has subnet 255.255.255.240, so broadcast address is different
+                        IPEndPoint destinationEndPoint = new IPEndPoint(IPAddress.Parse(subAddress + ".255"), port);
+                        byte[] str = Encoding.ASCII.GetBytes("ping");
+
+                        ClientSocket.SendTo(str, destinationEndPoint);
+
+                        yield return new WaitForSeconds(1);
+                    }
+                }
+            }
+        }
+        private void AsyncCallbackClient(IAsyncResult result)
+        {
+            if (ClientSocket != null)
+            {
+                try
+                {
+                    int size = ClientSocket.EndReceiveFrom(result, ref RemoteEndPoint);
+                    string address = RemoteEndPoint.ToString().Split(':')[0];
+    
+                    if (!LocalFullAddresses.Contains(address) && !ServerAddresses.Contains(address))
+                    {
+                        Debug.Log($"Got a server address: {address}");
+                        AddressToConnecTo = address;
+                        ServerAddresses.Add(address);
+                    }
+    
+                    ClientSocket.BeginReceiveFrom(new byte[1024], 0, 1024, SocketFlags.None, ref RemoteEndPoint, new AsyncCallback(AsyncCallbackClient), null);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            }
+        }
+    
+        public void ScanHost()
+        {
+            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
+    
+            foreach (IPAddress ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    
+                    string address = ip.ToString();
+                    string subAddress = address.Remove(address.LastIndexOf('.'));
+    
+                    LocalFullAddresses.Add(address);
+    
+                    if (!LocalSubAddresses.Contains(subAddress))
+                        LocalSubAddresses.Add(subAddress);
+                }
+            }
+            /*
+            foreach (NetworkInterface adapter in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                foreach (UnicastIPAddressInformation unicastIPInfo in adapter.GetIPProperties().UnicastAddresses)
+                {
+                    if (unicastIPInfo.Address.AddressFamily == AddressFamily.InterNetwork)
+                    {
+
+                    }
+                }
+            }
+            */
+        }
+    }
+
+//Trying to connect to every single ip in local network...
+//Works on Windows and Mac, but not on iOS
+public static async Task<string> GetLANIPAddressConnectToScanAllIPs(int portNum)
     {
         (string lanIP, bool NullOrLocalHost) = GetLeadingLANIPAddress();
         if (NullOrLocalHost)

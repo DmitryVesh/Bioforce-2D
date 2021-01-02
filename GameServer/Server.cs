@@ -28,6 +28,7 @@ namespace GameServer
             TCPListener.Start();
             TCPBeginAcceptClient();
 
+            
             UDPClient = new UdpClient(PortNum);
             UDPBeginReceive();
 

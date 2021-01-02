@@ -28,6 +28,7 @@ public class Client : MonoBehaviour
     private bool TimerRunning { get; set; } = false;
     private float Timer { get; set; }
     private int LastIPAddressChoiceIndex { get; set; }
+    private LANServerScanner ServerScanner { get; set; }
 
     public static bool IsIPAddressValid(string text)
     {
@@ -51,12 +52,15 @@ public class Client : MonoBehaviour
     }
     public async Task ConnectToServer()
     {
-        ChangeIPAddressConnectTo(LastIPAddressChoiceIndex);
-        
-        if (IPAddressConnectTo == IPAddressLAN)
-            IPAddressConnectTo = await LANServerScanner.GetLANIPAddressConnectTo(PortNum);
+        ChangeIPAddressConnectTo(LastIPAddressChoiceIndex); //TODO: error when selecting MANUAL IPSettings chooses last 1 indexed, like LAN and Internet
+        if (ServerScanner == null)
+            ServerScanner = gameObject.AddComponent<LANServerScanner>();
 
-        if (IPAddressConnectTo == null)
+        if (IPAddressConnectTo == IPAddressLAN)
+            StartCoroutine(ServerScanner.GetLANServerAddressUDPBroadcast(PortNum));
+            //IPAddressConnectTo = await LANServerScanner.GetLANIPAddressConnectToScanAllIPs(PortNum);
+
+        if (IPAddressConnectTo == null || IPAddressConnectTo == "LAN")
         { 
             ConnectionTimedOut(); //TODO: Display, couldn't find server running on LAN connection...
             return;
@@ -86,8 +90,11 @@ public class Client : MonoBehaviour
         string[] IPs = new string[] { IPAddressLAN, IPAddressInternet };
         IPAddressConnectTo = IPs[IPAddressIndex];
     }
-    public void SetManualIPAddressConnectTo(string IPaddress) =>
+    public void SetManualIPAddressConnectTo(string IPaddress)
+    {
+
         IPAddressConnectTo = IPaddress;
+    }
 
     public class TCP
     {
