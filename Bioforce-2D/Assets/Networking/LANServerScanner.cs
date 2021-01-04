@@ -48,19 +48,11 @@ public  class LANServerScanner : MonoBehaviour
             DiscoveryClientManager.CloseClient();
     }
 
-    //Works on my router, but not on iOS hotspot, probably because of the subnet mask of iOS not being 255.255.255.0 but being 255.255.255.240
-    //So have to find subnet mask, in order to show a correct broadcast address...
     public class DiscoveryClient
     {
-        // Addresses of player's machine
-        public List<string> LocalFullAddresses { get; private set; } = new List<string>();
-        private List<string> LocalSubAddresses { get; set; } = new List<string>();
-        public List<string> BroadcastAddresses { get; private set; } = new List<string>();
-
-        // Addresses found on the LAN with a server
-        private List<string> ServerAddresses { get; set; } = new List<string>();
-
-        
+        public List<string> LocalFullAddresses { get; private set; } = new List<string>(); // Addresses of player's machine
+        public List<string> BroadcastAddresses { get; private set; } = new List<string>(); // Broadcast addresses of the player's LAN connections
+        private List<string> ServerAddresses { get; set; } = new List<string>(); // Addresses found on the LAN with a server
 
         private Socket BroadcastClientSocket { get; set; }
         private EndPoint BroadcastRemoteEndPoint; //Cant be property due to be used as a ref in BeginReceiveFrom
@@ -81,12 +73,8 @@ public  class LANServerScanner : MonoBehaviour
             foreach (string address in ServerAddresses)
                 Debug.Log(address);
         }
-        public float GetTotalPingTime()
-        {
-            //Stable version on Windows, MAC, iOS
-            //return (NumberOfPings * LocalSubAddresses.Count * WaitBeforePings) + ExtraTimeGivenForPingsToComplete;
-            return (NumberOfPings * BroadcastAddresses.Count * WaitBeforePings) + ExtraTimeGivenForPingsToComplete;
-        }
+        public float GetTotalPingTime() =>
+            (NumberOfPings * BroadcastAddresses.Count * WaitBeforePings) + ExtraTimeGivenForPingsToComplete;
 
         public string StartClient(int port)
         {
@@ -130,7 +118,6 @@ public  class LANServerScanner : MonoBehaviour
             }
             return null;
         }
-
         public void CloseClient()
         {
             if (BroadcastClientSocket != null)
@@ -148,28 +135,6 @@ public  class LANServerScanner : MonoBehaviour
             {
                 for (int i = 0; i < NumberOfPings; i++)
                 {
-                    /* Stable version on Windows, MAC, iOS
-                    foreach (string subAddress in LocalSubAddresses)
-                    {
-                        //TODO: get a broad cast address, because iOS hotspot has subnet 255.255.255.240, so broadcast address isdifferent
-
-                        string broadCastIP = subAddress + ".255";
-                        if (subAddress == "172.20.10") //Checking iOS edge case
-                            broadCastIP = subAddress + ".15";
-                        IPEndPoint destinationEndPoint = new IPEndPoint(IPAddress.Parse(broadCastIP), port);
-
-                        byte[] str = Encoding.ASCII.GetBytes("ping");
-                        try
-                        {
-                            ClientSocket.SendTo(str, destinationEndPoint);
-                        }
-                        catch (Exception exception)
-                        {
-                            Debug.Log($"Error sending out a ping to broadcast ip: {broadCastIP}\n{exception}");
-                        }
-                        yield return new WaitForSeconds(WaitBeforePings);
-                    }
-                    */
                     foreach (string ipAddress in BroadcastAddresses)
                     {
                         IPEndPoint ipEndPoint = new IPEndPoint(IPAddress.Parse(ipAddress), port);
@@ -190,28 +155,6 @@ public  class LANServerScanner : MonoBehaviour
         }
         public void ScanHost()
         {
-            //Stable on Windows, MAC and iOS platforms
-            /*
-            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
-    
-            foreach (IPAddress ip in host.AddressList)
-            {
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
-                {
-                    
-                    string address = ip.ToString();
-                    string subAddress = address.Remove(address.LastIndexOf('.'));
-    
-                    LocalFullAddresses.Add(address);
-    
-                    if (!LocalSubAddresses.Contains(subAddress))
-                        LocalSubAddresses.Add(subAddress);
-                    Debug.Log($"Local machine address: {address}");
-                }
-            }
-            */
-
-            //TODO: Test if it works on MAC & iOS 
             Debug.Log("Running scanning host...");
             foreach (NetworkInterface adapter in NetworkInterface.GetAllNetworkInterfaces())
             {
@@ -235,7 +178,6 @@ public  class LANServerScanner : MonoBehaviour
                 }
             }
             Debug.Log("Finished searching Network Interfaces");
-
         }
 
         private void AsyncCallbackBroadcastSocket(IAsyncResult result)
@@ -264,7 +206,6 @@ public  class LANServerScanner : MonoBehaviour
                 }
             }
         }
-
         private static string GetBroadcastAddress(UnicastIPAddressInformation unicastAddress)
         {
             uint ipAddress = BitConverter.ToUInt32(unicastAddress.Address.GetAddressBytes(), 0);
