@@ -7353,7 +7353,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 010abe8fb0ebde34dbfb87dc11a88a20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PortNum: 28020
   ClientID: 0
   TimerTimeOutTime: 5
 --- !u!1 &1671208954

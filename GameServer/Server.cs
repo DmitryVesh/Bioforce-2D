@@ -5,7 +5,7 @@ using System.Net.Sockets;
 
 namespace GameServer
 {
-    class Server
+    static class Server
     {
         public static int MaxNumPlayers { get; private set; }
         public static int PortNum { get; private set; }

@@ -18,6 +18,7 @@ public class ScoreboardManager : MonoBehaviour
     private GameObject ScoreboardTimer { get; set; }
     private Button MobileButton { get; set; }
     private bool ScoreboardActive { get; set; }
+    private bool ClickedOdd { get; set; }
 
     public void AddEntry(int iD, string username, int kills, int deaths, int score)
     {
@@ -51,7 +52,9 @@ public class ScoreboardManager : MonoBehaviour
     }
     public void ChangedScoreboardActivity() //Called by OnClickEvent by MobileButton
     {
-        SetActiveScoreboard(!ScoreboardActive);
+        ClickedOdd = !ClickedOdd;
+        if (ClickedOdd)
+            SetActiveScoreboard(!ScoreboardActive);
     }
 
 

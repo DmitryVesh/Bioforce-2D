@@ -59,9 +59,9 @@ public class Client : MonoBehaviour
                 ServerScanner = gameObject.AddComponent<LANServerScanner>();
 
             StartCoroutine(ServerScanner.GetLANServerAddressUDPBroadcast(PortNumDiscover));
-            while (LANServerScanner.BroadCastManager == null)
+            while (LANServerScanner.DiscoveryClientManager == null)
                 yield return new WaitForSeconds(0.5f); //Gives time for LANServerScanner to make a UDPBroadcaster and scan for local machine ips 
-            yield return new WaitForSeconds(LANServerScanner.BroadCastManager.GetTotalPingTime());
+            yield return new WaitForSeconds(LANServerScanner.DiscoveryClientManager.GetTotalPingTime());
 
             IPAddressConnectTo = LANServerScanner.AddressToConnecTo;
             if (IPAddressConnectTo == null)
