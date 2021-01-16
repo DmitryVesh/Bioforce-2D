@@ -5,78 +5,51 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 
+public enum ScoreboardArrayListIndexes
+{
+    score,
+    username,
+    kills,
+    deaths
+}
 public class ScoreboardEntry : MonoBehaviour, IUIItemListing
 {
-    public int ID { get; private set; }
-    public int Score { get; private set; }
-    private string Username { get; set; }
-    private int Kills { get; set; }
-    public int Deaths { get; private set; }
-
-
+    private List<TextMeshProUGUI> ScoreNameKillsDeathsTexts { get; set; }
+    
     private TextMeshProUGUI PingText { get; set; }
-    private TextMeshProUGUI PlayerText { get; set; }
-    private TextMeshProUGUI KillsText { get; set; }
-    private TextMeshProUGUI DeathsText { get; set; }
-    private TextMeshProUGUI ScoreText { get; set; }
 
-    public void Init(int iD, string username, int kills, int deaths, int score)
-    {
-        PingText = transform.GetChild(0).GetComponent<TextMeshProUGUI>();
-        PlayerText = transform.GetChild(1).GetComponent<TextMeshProUGUI>();
-        KillsText = transform.GetChild(2).GetComponent<TextMeshProUGUI>();
-        DeathsText = transform.GetChild(3).GetComponent<TextMeshProUGUI>();
-        ScoreText = transform.GetChild(4).GetComponent<TextMeshProUGUI>();
-        /*
-        int iD = (int)scoreboardEntryData[0];
-        string username = (string)scoreboardEntryData[1];
-        int kills = (int)scoreboardEntryData[2];
-        int deaths = (int)scoreboardEntryData[3];
-        int score = (int)scoreboardEntryData[4];
-        */
-        Set(iD, username, kills, deaths, score);
-    }
-    public void Set(int iD, string username, int kills, int deaths, int score)
-    {
-        ID = iD;
-        Score = score;
-        Kills = kills;
-        Username = username;
-        Deaths = deaths;
+    private ArrayList ItemList { get; set; }
 
-        ResetTexts();
-    }
-    public void Set(ScoreboardEntry entry)
+    public void Init(int score, string username, int kills, int deaths)
     {
-        ID = entry.ID;
-        Score = entry.Score;
-        Kills = entry.Kills;
-        Username = entry.Username;
-        Deaths = entry.Deaths;
+        ScoreNameKillsDeathsTexts = new List<TextMeshProUGUI>();
+        ScoreNameKillsDeathsTexts.Add(transform.GetChild((int)ScoreboardArrayListIndexes.score).GetComponent<TextMeshProUGUI>());
+        ScoreNameKillsDeathsTexts.Add(transform.GetChild((int)ScoreboardArrayListIndexes.username).GetComponent<TextMeshProUGUI>());
+        ScoreNameKillsDeathsTexts.Add(transform.GetChild((int)ScoreboardArrayListIndexes.kills).GetComponent<TextMeshProUGUI>());
+        ScoreNameKillsDeathsTexts.Add(transform.GetChild((int)ScoreboardArrayListIndexes.deaths).GetComponent<TextMeshProUGUI>());
 
-        ResetTexts();
+        PingText = transform.GetChild(4).GetComponent<TextMeshProUGUI>();
+        SetText(score, username, kills, deaths);
+        SetArrayList(new ArrayList() { score, username, kills, deaths });
     }
-    public void AddKill()
+    public void SetText(int score, string username, int kills, int deaths)
     {
-        Kills++;
-        Score += 3;
-        KillsText.text = Kills.ToString();
-        ScoreText.text = Score.ToString();
+        ScoreNameKillsDeathsTexts[(int)ScoreboardArrayListIndexes.score].text = score.ToString();
+        ScoreNameKillsDeathsTexts[(int)ScoreboardArrayListIndexes.username].text = username;
+        ScoreNameKillsDeathsTexts[(int)ScoreboardArrayListIndexes.kills].text = kills.ToString();
+        ScoreNameKillsDeathsTexts[(int)ScoreboardArrayListIndexes.deaths].text = deaths.ToString();
     }
-    public void AddDeath()
+
+    //Interface methods
+    public void SetArrayList(ArrayList itemList) =>
+        ItemList = itemList;
+    public IComparable GetItemInList(int itemListIndex) =>
+        (IComparable)ItemList[itemListIndex];
+    public GameObject GetGameObject() =>
+        gameObject;
+    public void AddToItemIndex(int itemListIndex, int toAdd)
     {
-        Deaths++;
-        DeathsText.text = Deaths.ToString();
-    }
-    private void ResetTexts()
-    {
-        PlayerText.text = Username;
-        KillsText.text = Kills.ToString();
-        DeathsText.text = Deaths.ToString();
-        ScoreText.text = Score.ToString();
-    }
-    public static void PrintValues(ScoreboardEntry entry)
-    {
-        Debug.Log($"ID: {entry.ID}, Name: {entry.Username}, Kills: {entry.Kills}, Deaths: {entry.Deaths}, Score: {entry.Score}");
+        ItemList[itemListIndex] = (int)ItemList[itemListIndex] + toAdd;
+        ScoreNameKillsDeathsTexts[itemListIndex].text = ItemList[itemListIndex].ToString();
     }
 }

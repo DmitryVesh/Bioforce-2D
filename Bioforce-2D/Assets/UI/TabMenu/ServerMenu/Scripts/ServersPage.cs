@@ -4,6 +4,16 @@ using UnityEngine;
 
 public class ServersPage : UIItemListingManager
 {
+    protected override void SetIndexesToCompare(List<(int, bool)> indexesToCompare)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void SortTransformsItemListingsDictionary()
+    {
+        throw new System.NotImplementedException();
+    }
+
     // Start is called before the first frame update
     void Start()
     {

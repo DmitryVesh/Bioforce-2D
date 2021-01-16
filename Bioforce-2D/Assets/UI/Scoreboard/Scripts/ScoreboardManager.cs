@@ -11,7 +11,7 @@ public class ScoreboardManager : UIItemListingManager
     private GameObject Scoreboard { get; set; }
     private GameObject ScoreboardPanel { get; set; }
 
-    private Dictionary<int, ScoreboardEntry> ScoreboardEntriesDictionary { get; set; } = new Dictionary<int, ScoreboardEntry>();
+    private Dictionary<int, IUIItemListing> ItemList { get; set; } = new Dictionary<int, IUIItemListing>();
     private bool ScoreboardChanged { get; set; }
 
     private GameObject ScoreboardTimer { get; set; }
@@ -23,10 +23,9 @@ public class ScoreboardManager : UIItemListingManager
     {
         GameObject entryToAdd = Instantiate(ItemListingPrefab, ScoreboardPanel.transform);
         ScoreboardEntry scoreboardEntry = entryToAdd.GetComponent<ScoreboardEntry>();
-        scoreboardEntry.Init(iD, username, kills, deaths, score);
-        //scoreboardEntry.Set(iD, username, kills, deaths, score);
+        scoreboardEntry.Init(score, username, kills, deaths);
 
-        ScoreboardEntriesDictionary.Add(iD, scoreboardEntry);
+        ItemList.Add(iD, scoreboardEntry);
         ScoreboardChanged = true;
     }
     internal void DeleteEntry(int disconnectedPlayer)
@@ -34,19 +33,20 @@ public class ScoreboardManager : UIItemListingManager
         //TODO: instead of destroying gameObject, should setActive(false), and re-use it later
         try
         {
-            Destroy(ScoreboardEntriesDictionary[disconnectedPlayer].gameObject);
-            ScoreboardEntriesDictionary.Remove(disconnectedPlayer);
+            Destroy(ItemList[disconnectedPlayer].GetGameObject());
+            ItemList.Remove(disconnectedPlayer);
         }
         catch (KeyNotFoundException) {}
     }
     public void AddKill(int bulletOwnerID)
     {
-        ScoreboardEntriesDictionary[bulletOwnerID].AddKill();
+        ItemList[bulletOwnerID].AddToItemIndex((int)ScoreboardArrayListIndexes.kills, 1);
+        ItemList[bulletOwnerID].AddToItemIndex((int)ScoreboardArrayListIndexes.score, 3);
         ScoreboardChanged = true;
     }
     public void AddDeath(int ownerClientID)
     {
-        ScoreboardEntriesDictionary[ownerClientID].AddDeath();
+        ItemList[ownerClientID].AddToItemIndex((int)ScoreboardArrayListIndexes.deaths, 1);
         ScoreboardChanged = true;
     }
     public void ChangedScoreboardActivity() //Called by OnClickEvent by MobileButton
@@ -56,6 +56,13 @@ public class ScoreboardManager : UIItemListingManager
             SetActiveScoreboard(!ScoreboardActive);
     }
 
+    protected override void SortTransformsItemListingsDictionary()
+    {
+        foreach (ScoreboardEntry scoreboardEntry in ItemList.Values)
+            scoreboardEntry.transform.SetAsFirstSibling();
+    }
+    protected override void SetIndexesToCompare(List<(int, bool)> indexesToCompare) =>
+        IndexesToCompare = indexesToCompare;
 
     private void Awake()
     {
@@ -79,6 +86,8 @@ public class ScoreboardManager : UIItemListingManager
             MobileButton.gameObject.SetActive(true);
         else
             MobileButton.gameObject.SetActive(false);
+
+        SetIndexesToCompare(new List<(int, bool)>() { ((int)ScoreboardArrayListIndexes.score, true), ((int)ScoreboardArrayListIndexes.deaths, false) });
     }
     private void Update()
     {
@@ -98,90 +107,13 @@ public class ScoreboardManager : UIItemListingManager
     {
         if (ScoreboardChanged)
         {
-            ScoreboardEntriesDictionary = MergeSortScoreboardPanelEntries(ScoreboardEntriesDictionary);
-            SortTheChildrenOfScoreboardPanel();
+            ItemList = MergeSortItemListings(ItemList, IndexesToCompare);
+            SortTransformsItemListingsDictionary();
             ScoreboardChanged = false;
         }
     }
 
-    private void SortTheChildrenOfScoreboardPanel()
-    {
-        foreach (ScoreboardEntry scoreboardEntry in ScoreboardEntriesDictionary.Values)
-            scoreboardEntry.transform.SetAsFirstSibling();
-    }
-
-    private Dictionary<int, ScoreboardEntry> MergeSortScoreboardPanelEntries(Dictionary<int, ScoreboardEntry> unsortedList)
-    {
-        if (unsortedList.Count <= 1)
-            return unsortedList;
-
-        Dictionary<int, ScoreboardEntry> leftEntries = new Dictionary<int, ScoreboardEntry>();
-        Dictionary<int, ScoreboardEntry> rightEntries = new Dictionary<int, ScoreboardEntry>();
-
-        int middleIndex = unsortedList.Count / 2;
-        int count = 0;
-        foreach (KeyValuePair<int, ScoreboardEntry> keyValuePair in unsortedList)
-        {
-            if (count < middleIndex)
-                leftEntries.Add(keyValuePair.Key, keyValuePair.Value);
-            else
-                rightEntries.Add(keyValuePair.Key, keyValuePair.Value);
-            count++;
-        }
-
-        leftEntries = MergeSortScoreboardPanelEntries(leftEntries);
-        rightEntries = MergeSortScoreboardPanelEntries(rightEntries);
-
-        return MergeScoreboardPanelEntries(leftEntries, rightEntries);
-        
-    }
-    private Dictionary<int, ScoreboardEntry> MergeScoreboardPanelEntries(Dictionary<int, ScoreboardEntry> leftEntries, Dictionary<int, ScoreboardEntry> rightEntries)
-    {
-        Dictionary<int, ScoreboardEntry> merged = new Dictionary<int, ScoreboardEntry>();
-
-        while (leftEntries.Count > 0 || rightEntries.Count > 0)
-        {
-            KeyValuePair<int, ScoreboardEntry> left;
-            KeyValuePair<int, ScoreboardEntry> right;
-
-            if (leftEntries.Count > 0 && rightEntries.Count > 0) //Both lists have entries to merge
-            {
-                left = leftEntries.First();
-                right = rightEntries.First();
-
-                if (left.Value.Score < right.Value.Score) //left entries score lesser 
-                    AddToMerged(left, ref leftEntries, ref merged);
-
-                else if (left.Value.Score > right.Value.Score) // right entries score is lesser
-                    AddToMerged(right, ref rightEntries, ref merged);
-                
-                else // Same score, have to sort by number of deaths
-                {
-                    //TODO: instead of comparing left.Value.Deaths compare an arrayList index
-                    if (left.Value.Deaths <= right.Value.Deaths) //The player with most deaths is added first.
-                        AddToMerged(right, ref rightEntries, ref merged);
-                    else
-                        AddToMerged(left, ref leftEntries, ref merged);
-                }
-            }
-            else if (leftEntries.Count > 0)
-            {
-                left = leftEntries.First();
-                AddToMerged(left, ref leftEntries, ref merged);
-            }
-            else if (rightEntries.Count > 0)
-            {
-                right = rightEntries.First();
-                AddToMerged(right, ref rightEntries, ref merged);
-            }
-        }
-        return merged;
-    }
-    private void AddToMerged(KeyValuePair<int, ScoreboardEntry> entry, ref Dictionary<int, ScoreboardEntry> entries, ref Dictionary<int, ScoreboardEntry> merged)
-    {
-        merged.Add(entry.Key, entry.Value);
-        entries.Remove(entry.Key);
-    }
+    
 
     private void SetActiveScoreboard(bool isActive)
     {

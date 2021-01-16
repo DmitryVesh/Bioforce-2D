@@ -73,7 +73,7 @@ public class Client : MonoBehaviour
 
 
         }
-        
+
         Debug.Log($"Going to try and connect to: {IPAddressConnectTo}");
         InitClientData();
 
