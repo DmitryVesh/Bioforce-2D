@@ -11,8 +11,10 @@ Main goals is to;
 			- Sorted via merge sort
 
 		0 Make so LAN connection tries to connect to your actual lan connection, and not hard coded values - using parallel programming: threading and asynchronous
+			threaded works on more powerful computers, but found an easier way, UDP Broadcast.
 
 		0 add invincibility frames, after being hit/respawning
+
 		0 add chat into game
 		0 add ping field to Player Score entries in scoreboard
 		0 add gamepad support for pc & mac

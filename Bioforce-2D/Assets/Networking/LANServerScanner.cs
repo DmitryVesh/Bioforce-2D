@@ -42,6 +42,9 @@ public  class LANServerScanner : MonoBehaviour
         DiscoveryClientManager.PrintAllAddressesFound();
         DiscoveryClientManager.CloseClient();
     }
+    public static List<string> GetIPsFromLANScan() =>
+        DiscoveryClientManager.ServerAddresses;
+
     private void OnDestroy()
     {
         if (DiscoveryClientManager != null) 
@@ -50,9 +53,10 @@ public  class LANServerScanner : MonoBehaviour
 
     public class DiscoveryClient
     {
-        public List<string> LocalFullAddresses { get; private set; } = new List<string>(); // Addresses of player's machine
-        public List<string> BroadcastAddresses { get; private set; } = new List<string>(); // Broadcast addresses of the player's LAN connections
-        private List<string> ServerAddresses { get; set; } = new List<string>(); // Addresses found on the LAN with a server
+        public List<string> ServerAddresses { get; set; } = new List<string>(); // Addresses found on the LAN with a server
+
+        private List<string> LocalFullAddresses { get; set; } = new List<string>(); // Addresses of player's machine
+        private List<string> BroadcastAddresses { get; set; } = new List<string>(); // Broadcast addresses of the player's LAN connections
 
         private Socket BroadcastClientSocket { get; set; }
         private EndPoint BroadcastRemoteEndPoint; //Cant be property due to be used as a ref in BeginReceiveFrom

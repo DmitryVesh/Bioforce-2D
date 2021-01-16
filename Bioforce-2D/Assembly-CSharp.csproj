@@ -113,6 +113,13 @@
     <Compile Include="Assets\Joystick Pack\Scripts\Joysticks\VariableJoystick.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Gun\Bullet.cs" />
     <Compile Include="Assets\Networking\Client.cs" />
+    <Compile Include="Assets\UI\TabMenu\Scripts\TabGroup.cs" />
+    <Compile Include="Assets\UI\TabMenu\Scripts\TabButton.cs" />
+    <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\TabGroupPages.cs" />
+    <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\ServerMenu.cs" />
+    <Compile Include="Assets\UI\UIItemListingManager.cs" />
+    <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\ServersPage.cs" />
+    <Compile Include="Assets\UI\IUIItemListing.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />

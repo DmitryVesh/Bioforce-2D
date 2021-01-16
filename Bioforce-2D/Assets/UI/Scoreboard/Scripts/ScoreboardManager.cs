@@ -5,13 +5,12 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ScoreboardManager : MonoBehaviour
+public class ScoreboardManager : UIItemListingManager
 {
     public static ScoreboardManager Instance { get; set; }
     private GameObject Scoreboard { get; set; }
     private GameObject ScoreboardPanel { get; set; }
 
-    [SerializeField] private GameObject ScoreboardEntryPrefab; //Set in inspector
     private Dictionary<int, ScoreboardEntry> ScoreboardEntriesDictionary { get; set; } = new Dictionary<int, ScoreboardEntry>();
     private bool ScoreboardChanged { get; set; }
 
@@ -22,10 +21,10 @@ public class ScoreboardManager : MonoBehaviour
 
     public void AddEntry(int iD, string username, int kills, int deaths, int score)
     {
-        GameObject entryToAdd = Instantiate(ScoreboardEntryPrefab, ScoreboardPanel.transform);
+        GameObject entryToAdd = Instantiate(ItemListingPrefab, ScoreboardPanel.transform);
         ScoreboardEntry scoreboardEntry = entryToAdd.GetComponent<ScoreboardEntry>();
-        scoreboardEntry.Init();
-        scoreboardEntry.Set(iD, username, kills, deaths, score);
+        scoreboardEntry.Init(iD, username, kills, deaths, score);
+        //scoreboardEntry.Set(iD, username, kills, deaths, score);
 
         ScoreboardEntriesDictionary.Add(iD, scoreboardEntry);
         ScoreboardChanged = true;
@@ -158,6 +157,7 @@ public class ScoreboardManager : MonoBehaviour
                 
                 else // Same score, have to sort by number of deaths
                 {
+                    //TODO: instead of comparing left.Value.Deaths compare an arrayList index
                     if (left.Value.Deaths <= right.Value.Deaths) //The player with most deaths is added first.
                         AddToMerged(right, ref rightEntries, ref merged);
                     else
