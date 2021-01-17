@@ -27,11 +27,11 @@ public class SoundPlayerManager : MonoBehaviour
     }
 
     public void PlayShootSound(Vector2 position, Quaternion rotation) =>
-        Play(GetRandomAudioClip(Shoot));
+        Play(SoundMusicManager.GetRandomAudioClip(Shoot));
     public void AnimatorFootstepSound() =>
-        Play(GetRandomAudioClip(Footsteps));
+        Play(SoundMusicManager.GetRandomAudioClip(Footsteps));
     public void PlayJumpSound() =>
-        Play(GetRandomAudioClip(Jump));
+        Play(SoundMusicManager.GetRandomAudioClip(Jump));
     public void PlayGotHitSound(int damage, int bulletOwnerID) =>
         Play(WasHit);
     public void PlayDied(TypeOfDeath typeOfDeath)
@@ -44,7 +44,5 @@ public class SoundPlayerManager : MonoBehaviour
 
     private void Play(AudioClip audioClip) =>
         AudioSource.PlayOneShot(audioClip);
-    private AudioClip GetRandomAudioClip(AudioClip[] audioClips) =>
-        audioClips[UnityEngine.Random.Range(0, audioClips.Length - 1)];
     
 }

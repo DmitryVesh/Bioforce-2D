@@ -16,6 +16,9 @@ public class SoundMusicManager : MonoBehaviour
     private bool KeepFadingOut { get; set; }
     private bool KeepLooping { get; set; }
 
+    public static AudioClip GetRandomAudioClip(AudioClip[] audioClips) =>
+        audioClips[UnityEngine.Random.Range(0, audioClips.Length)];
+
     private void Awake()
     {
         if (Instance == null)
