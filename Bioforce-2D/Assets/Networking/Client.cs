@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
@@ -70,6 +71,8 @@ public class Client : MonoBehaviour
                 NoLANServerFoundTimeOutMessage(); //TODO: Display, couldn't find server running on LAN connection...
                 yield break;
             }
+            else if (IPsFromLANScan.Count == 1)
+                IPAddressConnectTo = IPsFromLANScan.First();
 
 
         }

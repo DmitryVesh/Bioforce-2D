@@ -19,7 +19,6 @@ public  class LANServerScanner : MonoBehaviour
     private static IPList IPList { get; set; }
     private static string LANIP { get; set; }
 
-    public static string AddressToConnecTo { get; private set; }
     public static DiscoveryClient DiscoveryClientManager { get; private set; }
 
     //Calling UDP broadcast...
@@ -31,7 +30,6 @@ public  class LANServerScanner : MonoBehaviour
 
         if (address != "waiting")
         {
-            AddressToConnecTo = address;
             DiscoveryClientManager.CloseClient();
             yield break;   
         }
@@ -109,6 +107,7 @@ public  class LANServerScanner : MonoBehaviour
                     {
                         Debug.Log($"Error in making and binding the client socket\nA server is already running on machine: \n{SocketException}");
                         CloseClient();
+                        ServerAddresses.Add("127.0.0.1");
                         return "127.0.0.1"; //Return localHost due to server running on local machine
                     }
                     Debug.Log($"Unexpected SocketException in Start Client:\n{SocketException}");
@@ -197,7 +196,6 @@ public  class LANServerScanner : MonoBehaviour
                     if (!ServerAddresses.Contains(address) && !LocalFullAddresses.Contains(address))
                     {
                         Debug.Log($"Got a server address: {address}");
-                        AddressToConnecTo = address;
                         ServerAddresses.Add(address);
                     }
                     
