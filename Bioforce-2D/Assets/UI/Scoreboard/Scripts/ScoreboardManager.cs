@@ -11,7 +11,7 @@ public class ScoreboardManager : UIItemListingManager
     private GameObject Scoreboard { get; set; }
     private GameObject ScoreboardPanel { get; set; }
 
-    private Dictionary<int, IUIItemListing> ItemList { get; set; } = new Dictionary<int, IUIItemListing>();
+    private Dictionary<int, IUIItemListing> PlayersItemLists { get; set; } = new Dictionary<int, IUIItemListing>();
     private bool ScoreboardChanged { get; set; }
 
     private GameObject ScoreboardTimer { get; set; }
@@ -25,7 +25,7 @@ public class ScoreboardManager : UIItemListingManager
         ScoreboardEntry scoreboardEntry = entryToAdd.GetComponent<ScoreboardEntry>();
         scoreboardEntry.Init(score, username, kills, deaths);
 
-        ItemList.Add(iD, scoreboardEntry);
+        PlayersItemLists.Add(iD, scoreboardEntry);
         ScoreboardChanged = true;
     }
     internal void DeleteEntry(int disconnectedPlayer)
@@ -33,20 +33,20 @@ public class ScoreboardManager : UIItemListingManager
         //TODO: instead of destroying gameObject, should setActive(false), and re-use it later
         try
         {
-            Destroy(ItemList[disconnectedPlayer].GetGameObject());
-            ItemList.Remove(disconnectedPlayer);
+            Destroy(PlayersItemLists[disconnectedPlayer].GetGameObject());
+            PlayersItemLists.Remove(disconnectedPlayer);
         }
         catch (KeyNotFoundException) {}
     }
     public void AddKill(int bulletOwnerID)
     {
-        ItemList[bulletOwnerID].AddToItemIndex((int)ScoreboardArrayListIndexes.kills, 1);
-        ItemList[bulletOwnerID].AddToItemIndex((int)ScoreboardArrayListIndexes.score, 3);
+        PlayersItemLists[bulletOwnerID].AddToItemIndex((int)ScoreboardArrayListIndexes.kills, 1);
+        PlayersItemLists[bulletOwnerID].AddToItemIndex((int)ScoreboardArrayListIndexes.score, 3);
         ScoreboardChanged = true;
     }
     public void AddDeath(int ownerClientID)
     {
-        ItemList[ownerClientID].AddToItemIndex((int)ScoreboardArrayListIndexes.deaths, 1);
+        PlayersItemLists[ownerClientID].AddToItemIndex((int)ScoreboardArrayListIndexes.deaths, 1);
         ScoreboardChanged = true;
     }
     public void ChangedScoreboardActivity() //Called by OnClickEvent by MobileButton
@@ -58,7 +58,7 @@ public class ScoreboardManager : UIItemListingManager
 
     protected override void SortTransformsItemListingsDictionary()
     {
-        foreach (ScoreboardEntry scoreboardEntry in ItemList.Values)
+        foreach (ScoreboardEntry scoreboardEntry in PlayersItemLists.Values)
             scoreboardEntry.transform.SetAsFirstSibling();
     }
     protected override void SetIndexesToCompare(List<(int, bool)> indexesToCompare) =>
@@ -107,7 +107,7 @@ public class ScoreboardManager : UIItemListingManager
     {
         if (ScoreboardChanged)
         {
-            ItemList = MergeSortItemListings(ItemList, IndexesToCompare);
+            PlayersItemLists = MergeSortItemListings(PlayersItemLists, IndexesToCompare);
             SortTransformsItemListingsDictionary();
             ScoreboardChanged = false;
         }

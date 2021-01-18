@@ -7,10 +7,27 @@ public class ServerMenu : MonoBehaviour
 {
     public static ServerMenu Instance;
 
-    private GameObject ServerMenuHolder { get; set; }
+    private GameObject ServerMenuPanel { get; set; }
+    private GameObject PlayerRegistrationPanel { get; set; }
 
-    public void ShowServerMenu() =>
-        ServerMenuHolder.SetActive(false);
+    [SerializeField] private MenuButton ConnectButton;
+
+    public void ShowServerMenu()
+    {
+        if (!PlayerPrefs.HasKey("Username"))
+            DisplayUserRegistration();
+        else
+            ServerMenuPanel.SetActive(true);
+    }
+    public void HideServerMenu() =>
+        ServerMenuPanel.SetActive(false);
+    public void DisplayUserRegistration()
+    {
+        HideServerMenu();
+        PlayerRegistrationPanel.SetActive(true);
+        PlayerRegistration.Instance.DisplayUserRegistration();
+    }
+
     public void SetSelectedPage(GameObject selectedPage)
     {
         
@@ -25,9 +42,15 @@ public class ServerMenu : MonoBehaviour
             Debug.Log($"ServerMenu instance already exists, destroying {gameObject.name}");
             Destroy(this);
         }
-        ServerMenuHolder = transform.GetChild(0).gameObject;
-        ServerMenuHolder.SetActive(false);
-    }
+        ServerMenuPanel = transform.GetChild(0).gameObject;
+        PlayerRegistrationPanel = transform.GetChild(1).gameObject;
 
+        HideServerMenu();
+        PlayerRegistrationPanel.SetActive(false);
+    }
+    private void Start()
+    {
+        ConnectButton.Interactable = false;
+    }
     
 }

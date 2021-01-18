@@ -1,27 +1,42 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Animator))]
 public class MenuButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
 {
+    public bool Interactable { get; set; } = true;
+    private bool LastInteractibility { get; set; }
+
+    [SerializeField] private UnityEvent OnClickEvent;
+    [SerializeField] private bool AppearInMobile = true;
+
     private Animator Animator { get; set; }
 
-    public void OnPointerClick(PointerEventData eventData)
+    public virtual void OnPointerClick(PointerEventData eventData)
     {
+        if (!Interactable)
+            return;
+
         Animator.SetBool("Pressed", true);
+        OnClickEvent?.Invoke();
+
         MainMenu.Instance.PlayMainMenuSFX(MainMenuSFXs.buttonPressed);
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
+    public virtual void OnPointerEnter(PointerEventData eventData)
     {
+        if (!Interactable)
+            return;
+
         Animator.SetBool("Selected", true);
-        MainMenu.Instance.SetButtonSelected(this);
         MainMenu.Instance.PlayMainMenuSFX(MainMenuSFXs.buttonSelected);
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    public virtual void OnPointerExit(PointerEventData eventData)
     {
         Animator.SetBool("Selected", false);
         Animator.SetBool("Pressed", false);
@@ -31,5 +46,20 @@ public class MenuButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHand
     private void Awake()
     {
         Animator = GetComponent<Animator>();
+        LastInteractibility = Interactable;
+    }
+    private void Start()
+    {
+        if (!AppearInMobile && GameManager.Instance.IsMobileSupported())
+            gameObject.SetActive(false);
+    }
+    private void Update()
+    {
+        if (Interactable != LastInteractibility)
+        {
+            LastInteractibility = Interactable;
+            if (!Interactable)
+                OnPointerExit(null);
+        }
     }
 }

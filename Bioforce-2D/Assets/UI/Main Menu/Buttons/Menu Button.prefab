@@ -69,6 +69,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f00e10519964c494e8091599c6fb5790, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnClickEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  AppearInMobile: 1
 --- !u!1 &5496167699389012966
 GameObject:
   m_ObjectHideFlags: 0

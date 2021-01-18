@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/_Maps/Level - Main Menu/Main Menu.unity
+    guid: 5dfc52c7d138dcd4384fc666d3b9e3e2
+  - enabled: 1
     path: Assets/_Maps/Level 1 - Warped_city/Level 1.unity
     guid: 34407d79a9cd471479b04ec04eb7d658
   m_configObjects: {}
