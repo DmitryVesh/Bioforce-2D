@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -24,6 +23,7 @@ public  class LANServerScanner : MonoBehaviour
     //Calling UDP broadcast...
     public IEnumerator GetLANServerAddressUDPBroadcast(int portNum)
     {
+        PortNum = portNum;
         DiscoveryClientManager.ScanHost();
         string address = DiscoveryClientManager.StartClient(portNum);
 
@@ -64,6 +64,8 @@ public  class LANServerScanner : MonoBehaviour
 
         public delegate void ServerFound(string serverName, int playerCount, string mapName, int ping);
         public event ServerFound OnServerFoundEvent;
+
+        private List<DiscoveryTCP> DiscoveryTCPs { get; set; } = new List<DiscoveryTCP>();
 
         public void PrintAllAddressesFound()
         {
@@ -199,10 +201,10 @@ public  class LANServerScanner : MonoBehaviour
                     {
                         Debug.Log($"Got a server address: {address}");
                         ServerAddresses.Add(address);
-                        OnServerFoundEvent?.Invoke("Example", 10, "Jesus", 250);
-                        DiscoveryTCP tcp = new DiscoveryTCP();
-
-
+                        //OnServerFoundEvent?.Invoke("Example", 10, "Jesus", 250);
+                        DiscoveryTCP discoveryTCP = new DiscoveryTCP();
+                        DiscoveryTCPs.Add(discoveryTCP);
+                        discoveryTCP.Connect(address, PortNum);
                     }
                     
                     //Have to keep listening on the same BroadCast socket, due to other broadcast addresses may reply
