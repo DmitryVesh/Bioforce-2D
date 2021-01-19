@@ -1126,6 +1126,7 @@ GameObject:
   m_Component:
   - component: {fileID: 327493627}
   - component: {fileID: 327493628}
+  - component: {fileID: 327493629}
   m_Layer: 5
   m_Name: ServerMenu
   m_TagString: Untagged
@@ -1167,6 +1168,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ConnectButton: {fileID: 2133616055}
+  ServerPageHolder: {fileID: 1329034720}
+--- !u!114 &327493629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 327493626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3683b5e29fd7764897c309110a872e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &383282429
 GameObject:
   m_ObjectHideFlags: 0
@@ -8527,16 +8541,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6132171740679476975, guid: 5ffe8bca691fd2f49bbe9686db2fa94f,
-        type: 3}
-      propertyPath: m_text
-      value: '?'
-      objectReference: {fileID: 0}
-    - target: {fileID: 6431244498436468963, guid: 5ffe8bca691fd2f49bbe9686db2fa94f,
-        type: 3}
-      propertyPath: m_text
-      value: ?ms
       objectReference: {fileID: 0}
     - target: {fileID: 7467479010125145067, guid: 5ffe8bca691fd2f49bbe9686db2fa94f,
         type: 3}

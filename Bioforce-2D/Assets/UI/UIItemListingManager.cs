@@ -9,7 +9,13 @@ public abstract class UIItemListingManager : MonoBehaviour
     [SerializeField] protected GameObject ItemListingPrefab; //Set in inspector
     protected List<(int, bool)> IndexesToCompare { get; set; }
 
-    protected abstract void SetIndexesToCompare(List<(int, bool)> indexesToCompare);
+    /// <summary>
+    /// Takes in a list of tuples, uses the indexes provided to access specific data in ArrayList
+    /// Which will be used to sort the UIItemListings by.
+    /// </summary>
+    /// <param name="indexesToCompare">List of tuples, integer represents index in ArrayList, bool represents if sort order is ascending</param>
+    protected abstract void SetIndexesToCompareInMergeSort(List<(int, bool)> indexesToCompare);
+    
     protected abstract void SortTransformsItemListingsDictionary();
 
     protected Dictionary<int, IUIItemListing> MergeSortItemListings(Dictionary<int, IUIItemListing> unsortedList, List<(int, bool)> itemCompareIndexes)

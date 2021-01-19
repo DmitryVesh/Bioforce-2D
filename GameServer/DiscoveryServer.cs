@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -46,9 +47,17 @@ namespace GameServer
                 {
                     int size = ServerSocket.EndReceiveFrom(result, ref RemoteEndPoint);
                     Console.WriteLine($"Player has sent out a Discovery call from: {RemoteEndPoint.ToString()}");
-                    byte[] pongBytes = Encoding.ASCII.GetBytes("pong");
 
-                    ServerSocket.SendTo(pongBytes, RemoteEndPoint);
+                    //TODO: Send serverName, playerCount, mapName, ping
+                    //byte[] pongBytes = Encoding.ASCII.GetBytes("pong");
+                    string serverName = "Random Please Work";
+                    int playerCount = 21;
+                    string mapName = "Please";
+                    int ping = 10;
+                    byte[] serverDiscover = Encoding.ASCII.GetBytes(serverName).Concat(BitConverter.GetBytes(playerCount)).Concat(Encoding.ASCII.GetBytes(mapName)).Concat(BitConverter.GetBytes(ping)).ToArray();
+
+                    //ServerSocket.SendTo(pongBytes, RemoteEndPoint);
+                    ServerSocket.SendTo(serverDiscover, RemoteEndPoint);
 
                     ServerSocket.BeginReceiveFrom(new byte[1024], 0, 1024, SocketFlags.None, ref RemoteEndPoint, new AsyncCallback(AsyncCallbackServer), null);
                 }

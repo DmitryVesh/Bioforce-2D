@@ -30,7 +30,8 @@ public class Client : MonoBehaviour
     private bool TimerRunning { get; set; } = false;
     private float Timer { get; set; }
     private string IPAddressChoice { get; set; }
-    private LANServerScanner ServerScanner { get; set; }
+
+    //private LANServerScanner ServerScanner { get; set; }
 
     public static bool IsIPAddressValid(string text)
     {
@@ -56,6 +57,10 @@ public class Client : MonoBehaviour
     {
         if (IPAddressChoice == IPAddressLAN)
         {
+            yield break;
+
+
+            /*
             if (ServerScanner == null)
                 ServerScanner = gameObject.AddComponent<LANServerScanner>();
 
@@ -73,7 +78,7 @@ public class Client : MonoBehaviour
             }
             else if (IPsFromLANScan.Count == 1)
                 IPAddressConnectTo = IPsFromLANScan.First();
-
+            */
 
         }
 
@@ -127,7 +132,6 @@ public class Client : MonoBehaviour
                 if (Socket != null)
                 {
                     Stream.BeginWrite(packet.ToArray(), 0, packet.Length(), null, null);
-
                 }
             }
             catch (Exception exception)
@@ -209,9 +213,7 @@ public class Client : MonoBehaviour
             {
                 packetLen = ReceivePacket.ReadInt();
                 if (packetLen < 1)
-                {
                     return true;
-                }
             }
             return false;
         }

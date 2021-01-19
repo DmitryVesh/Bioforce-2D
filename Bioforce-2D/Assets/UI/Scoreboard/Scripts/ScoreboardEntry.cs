@@ -5,7 +5,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 
-public enum ScoreboardArrayListIndexes
+public enum ScoreboardEntryArrayListIndexes
 {
     score,
     username,
@@ -14,30 +14,32 @@ public enum ScoreboardArrayListIndexes
 }
 public class ScoreboardEntry : MonoBehaviour, IUIItemListing
 {
-    private List<TextMeshProUGUI> ScoreNameKillsDeathsTexts { get; set; }
-    
-    private TextMeshProUGUI PingText { get; set; }
-
+    private List<TextMeshProUGUI> ArrayListTexts { get; set; }
     private ArrayList ItemList { get; set; }
+
+    //TODO: Add pings to the scoreboard entry of players.
+    private TextMeshProUGUI PingText { get; set; }
+    
 
     public void Init(int score, string username, int kills, int deaths)
     {
-        ScoreNameKillsDeathsTexts = new List<TextMeshProUGUI>();
-        ScoreNameKillsDeathsTexts.Add(transform.GetChild((int)ScoreboardArrayListIndexes.score).GetComponent<TextMeshProUGUI>());
-        ScoreNameKillsDeathsTexts.Add(transform.GetChild((int)ScoreboardArrayListIndexes.username).GetComponent<TextMeshProUGUI>());
-        ScoreNameKillsDeathsTexts.Add(transform.GetChild((int)ScoreboardArrayListIndexes.kills).GetComponent<TextMeshProUGUI>());
-        ScoreNameKillsDeathsTexts.Add(transform.GetChild((int)ScoreboardArrayListIndexes.deaths).GetComponent<TextMeshProUGUI>());
+        ArrayListTexts = new List<TextMeshProUGUI>();
+        ArrayListTexts.Add(transform.GetChild((int)ScoreboardEntryArrayListIndexes.score).GetComponent<TextMeshProUGUI>());
+        ArrayListTexts.Add(transform.GetChild((int)ScoreboardEntryArrayListIndexes.username).GetComponent<TextMeshProUGUI>());
+        ArrayListTexts.Add(transform.GetChild((int)ScoreboardEntryArrayListIndexes.kills).GetComponent<TextMeshProUGUI>());
+        ArrayListTexts.Add(transform.GetChild((int)ScoreboardEntryArrayListIndexes.deaths).GetComponent<TextMeshProUGUI>());
 
         PingText = transform.GetChild(4).GetComponent<TextMeshProUGUI>();
         SetText(score, username, kills, deaths);
-        SetArrayList(new ArrayList() { score, username, kills, deaths });
     }
     public void SetText(int score, string username, int kills, int deaths)
     {
-        ScoreNameKillsDeathsTexts[(int)ScoreboardArrayListIndexes.score].text = score.ToString();
-        ScoreNameKillsDeathsTexts[(int)ScoreboardArrayListIndexes.username].text = username;
-        ScoreNameKillsDeathsTexts[(int)ScoreboardArrayListIndexes.kills].text = kills.ToString();
-        ScoreNameKillsDeathsTexts[(int)ScoreboardArrayListIndexes.deaths].text = deaths.ToString();
+        ArrayListTexts[(int)ScoreboardEntryArrayListIndexes.score].text = score.ToString();
+        ArrayListTexts[(int)ScoreboardEntryArrayListIndexes.username].text = username;
+        ArrayListTexts[(int)ScoreboardEntryArrayListIndexes.kills].text = kills.ToString();
+        ArrayListTexts[(int)ScoreboardEntryArrayListIndexes.deaths].text = deaths.ToString();
+
+        SetArrayList(new ArrayList() { score, username, kills, deaths });
     }
 
     //Interface methods
@@ -50,6 +52,6 @@ public class ScoreboardEntry : MonoBehaviour, IUIItemListing
     public void AddToItemIndex(int itemListIndex, int toAdd)
     {
         ItemList[itemListIndex] = (int)ItemList[itemListIndex] + toAdd;
-        ScoreNameKillsDeathsTexts[itemListIndex].text = ItemList[itemListIndex].ToString();
+        ArrayListTexts[itemListIndex].text = ItemList[itemListIndex].ToString();
     }
 }

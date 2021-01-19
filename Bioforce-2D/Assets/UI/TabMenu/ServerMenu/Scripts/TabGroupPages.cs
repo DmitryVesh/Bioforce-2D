@@ -13,10 +13,14 @@ public class TabGroupPages : TabGroup
         base.SelectTabButton(tabButton);
         int tabButtonIndex = tabButton.transform.GetSiblingIndex();
 
+        GameObject pageJustSelected = Pages[tabButtonIndex];
+        if (pageJustSelected == SelectedPage)
+            return;   
+
         if (SelectedPage != null)
             SelectedPage.SetActive(false);
-        
-        SelectedPage = Pages[tabButtonIndex];
+
+        SelectedPage = pageJustSelected;
         SelectedPage.SetActive(true);
 
         ServerMenu.Instance.SetSelectedPage(SelectedPage);

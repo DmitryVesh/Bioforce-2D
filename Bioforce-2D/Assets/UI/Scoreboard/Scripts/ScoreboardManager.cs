@@ -40,13 +40,13 @@ public class ScoreboardManager : UIItemListingManager
     }
     public void AddKill(int bulletOwnerID)
     {
-        PlayersItemLists[bulletOwnerID].AddToItemIndex((int)ScoreboardArrayListIndexes.kills, 1);
-        PlayersItemLists[bulletOwnerID].AddToItemIndex((int)ScoreboardArrayListIndexes.score, 3);
+        PlayersItemLists[bulletOwnerID].AddToItemIndex((int)ScoreboardEntryArrayListIndexes.kills, 1);
+        PlayersItemLists[bulletOwnerID].AddToItemIndex((int)ScoreboardEntryArrayListIndexes.score, 3);
         ScoreboardChanged = true;
     }
     public void AddDeath(int ownerClientID)
     {
-        PlayersItemLists[ownerClientID].AddToItemIndex((int)ScoreboardArrayListIndexes.deaths, 1);
+        PlayersItemLists[ownerClientID].AddToItemIndex((int)ScoreboardEntryArrayListIndexes.deaths, 1);
         ScoreboardChanged = true;
     }
     public void ChangedScoreboardActivity() //Called by OnClickEvent by MobileButton
@@ -56,12 +56,13 @@ public class ScoreboardManager : UIItemListingManager
             SetActiveScoreboard(!ScoreboardActive);
     }
 
+    //Interface methods
     protected override void SortTransformsItemListingsDictionary()
     {
         foreach (ScoreboardEntry scoreboardEntry in PlayersItemLists.Values)
             scoreboardEntry.transform.SetAsFirstSibling();
     }
-    protected override void SetIndexesToCompare(List<(int, bool)> indexesToCompare) =>
+    protected override void SetIndexesToCompareInMergeSort(List<(int, bool)> indexesToCompare) =>
         IndexesToCompare = indexesToCompare;
 
     private void Awake()
@@ -87,7 +88,7 @@ public class ScoreboardManager : UIItemListingManager
         else
             MobileButton.gameObject.SetActive(false);
 
-        SetIndexesToCompare(new List<(int, bool)>() { ((int)ScoreboardArrayListIndexes.score, true), ((int)ScoreboardArrayListIndexes.deaths, false) });
+        SetIndexesToCompareInMergeSort(new List<(int, bool)>() { ((int)ScoreboardEntryArrayListIndexes.score, true), ((int)ScoreboardEntryArrayListIndexes.deaths, false) });
     }
     private void Update()
     {
@@ -112,14 +113,9 @@ public class ScoreboardManager : UIItemListingManager
             ScoreboardChanged = false;
         }
     }
-
-    
-
     private void SetActiveScoreboard(bool isActive)
     {
         Scoreboard.SetActive(isActive);
         ScoreboardActive = isActive;
     }
-
-    
 }
