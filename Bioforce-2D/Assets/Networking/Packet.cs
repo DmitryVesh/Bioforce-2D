@@ -3,6 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
+public enum DiscoveryClientPackets
+{
+
+}
+public enum DiscoveryServerPackets
+{
+    serverData
+}
 /// <summary>Sent from server to client.</summary>
 public enum ServerPackets
 {
@@ -17,7 +25,6 @@ public enum ServerPackets
     playerDied,
     playerRespawned,
     tookDamage
-
 }
 
 /// <summary>Sent from client to server.</summary>

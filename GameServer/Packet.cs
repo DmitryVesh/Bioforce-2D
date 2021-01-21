@@ -5,6 +5,14 @@ using System.Text;
 
 namespace GameServer
 {
+    public enum DiscoveryClientPackets
+    {
+
+    }
+    public enum DiscoveryServerPackets
+    {
+        serverData
+    }
     /// <summary>Sent from server to client.</summary>
     public enum ServerPackets
     {

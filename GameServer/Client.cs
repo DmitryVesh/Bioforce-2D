@@ -66,6 +66,10 @@ namespace GameServer
                 ReceivePacket = null;
             }
 
+            private void StreamBeginRead()
+            {
+                Stream.BeginRead(ReceiveBuffer, 0, DataBufferSize, BeginReadReceiveCallback, null);
+            }
             private void BeginReadReceiveCallback(IAsyncResult asyncResult)
             {
                 try
@@ -80,7 +84,8 @@ namespace GameServer
                     byte[] data = new byte[byteLen];
                     Array.Copy(ReceiveBuffer, data, byteLen);
 
-                    ReceivePacket.Reset(HandleData(data));
+                    bool resetData = HandleData(data);
+                    ReceivePacket.Reset(resetData);
                     StreamBeginRead();
                 }
                 catch (Exception exception)
@@ -88,8 +93,7 @@ namespace GameServer
                     Console.WriteLine($"\nError in BeginReadReceiveCallback of client {ID}...\nError: {exception}");
                     Server.ClientDictionary[ID].Disconnect();
                 }
-            }
-            
+            }            
             private bool HandleData(byte[] data)
             {
                 int packetLen = 0;
@@ -133,10 +137,7 @@ namespace GameServer
                 }
                 return false;
             }
-            private void StreamBeginRead()
-            {
-                Stream.BeginRead(ReceiveBuffer, 0, DataBufferSize, BeginReadReceiveCallback, null);
-            }
+            
             
         }
         public class UDP

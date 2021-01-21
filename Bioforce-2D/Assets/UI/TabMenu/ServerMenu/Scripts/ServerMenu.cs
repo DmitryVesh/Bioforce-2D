@@ -111,12 +111,9 @@ public class ServerMenu : MonoBehaviour
         SelectedServersPage.EnqueEntry(serverName, playerCount, mapName, ping);
 }
 
-public enum DiscoveryServerPackets
-{
-    serverData
-}
+
 //TODO: make so Client.TCP Inherits from lesser version of this one
-public class DiscoveryTCP
+public class DiscoveryTCPClient
 {
     public TcpClient Socket { get; private set; }
     private byte[] ReceiveBuffer;
@@ -128,7 +125,7 @@ public class DiscoveryTCP
     private delegate void PacketHandler(Packet packet);
     private static Dictionary<int, PacketHandler> PacketHandlerDictionary { get; set; } = new Dictionary<int, PacketHandler>();
 
-    public DiscoveryTCP()
+    public DiscoveryTCPClient()
     {
         PacketHandlerDictionary.Add((int)DiscoveryServerPackets.serverData, ServerMenu.ReadServerDataPacket);
     }
@@ -160,10 +157,11 @@ public class DiscoveryTCP
     {
         try
         {
+            //Error occurs here due to the server socket not establishing a connection with the client socket
             Socket.EndConnect(asyncResult);
             if (!Socket.Connected) 
                 return; // Not connected yet, then exit
-
+            
             Stream = Socket.GetStream();
             ReceivePacket = new Packet();
             StreamBeginRead();

@@ -65,7 +65,7 @@ public  class LANServerScanner : MonoBehaviour
         public delegate void ServerFound(string serverName, int playerCount, string mapName, int ping);
         public event ServerFound OnServerFoundEvent;
 
-        private List<DiscoveryTCP> DiscoveryTCPs { get; set; } = new List<DiscoveryTCP>();
+        private List<DiscoveryTCPClient> DiscoveryTCPs { get; set; } = new List<DiscoveryTCPClient>();
 
         public void PrintAllAddressesFound()
         {
@@ -112,6 +112,9 @@ public  class LANServerScanner : MonoBehaviour
                         Debug.Log($"Error in making and binding the client socket\nA server is already running on machine: \n{SocketException}");
                         CloseClient();
                         ServerAddresses.Add("127.0.0.1");
+                        DiscoveryTCPClient discoveryTCP = new DiscoveryTCPClient();
+                        DiscoveryTCPs.Add(discoveryTCP);
+                        discoveryTCP.Connect("127.0.0.1", PortNum);
                         return "127.0.0.1"; //Return localHost due to server running on local machine
                     }
                     Debug.Log($"Unexpected SocketException in Start Client:\n{SocketException}");
@@ -202,7 +205,7 @@ public  class LANServerScanner : MonoBehaviour
                         Debug.Log($"Got a server address: {address}");
                         ServerAddresses.Add(address);
                         //OnServerFoundEvent?.Invoke("Example", 10, "Jesus", 250);
-                        DiscoveryTCP discoveryTCP = new DiscoveryTCP();
+                        DiscoveryTCPClient discoveryTCP = new DiscoveryTCPClient();
                         DiscoveryTCPs.Add(discoveryTCP);
                         discoveryTCP.Connect(address, PortNum);
                     }
