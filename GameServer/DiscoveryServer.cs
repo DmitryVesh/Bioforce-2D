@@ -74,6 +74,8 @@ namespace GameServer
                 {
                     Console.WriteLine($"Player has sent out a Discovery call from: {UDPRemoteEndPoint}");
                     int size = UDPBroadCastSocket.EndReceiveFrom(result, ref UDPRemoteEndPoint);
+                    byte[] initialBytesToSend = new byte[10];
+                    UDPBroadCastSocket.SendTo(initialBytesToSend, UDPRemoteEndPoint);
                     UDPBeginReceiveDiscoveryCalls();                    
                 }
                 catch (Exception exception)
