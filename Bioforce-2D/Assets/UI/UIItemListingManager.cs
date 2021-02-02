@@ -11,24 +11,24 @@ public abstract class UIItemListingManager : MonoBehaviour
 
     /// <summary>
     /// Takes in a list of tuples, uses the indexes provided to access specific data in ArrayList
-    /// Which will be used to sort the UIItemListings by.
+    /// which will be used to sort the UIItemListings by.
     /// </summary>
     /// <param name="indexesToCompare">List of tuples, integer represents index in ArrayList, bool represents if sort order is ascending</param>
     protected abstract void SetIndexesToCompareInMergeSort(List<(int, bool)> indexesToCompare);
     
     protected abstract void SortTransformsItemListingsDictionary();
 
-    protected Dictionary<int, IUIItemListing> MergeSortItemListings(Dictionary<int, IUIItemListing> unsortedList, List<(int, bool)> itemCompareIndexes)
+    protected Dictionary<object, IUIItemListing> MergeSortItemListings(Dictionary<object, IUIItemListing> unsortedList, List<(int, bool)> itemCompareIndexes)
     {
         if (unsortedList.Count <= 1) // terminal case
             return unsortedList;
 
-        Dictionary<int, IUIItemListing> leftEntries = new Dictionary<int, IUIItemListing>();
-        Dictionary<int, IUIItemListing> rightEntries = new Dictionary<int, IUIItemListing>();
+        Dictionary<object, IUIItemListing> leftEntries = new Dictionary<object, IUIItemListing>();
+        Dictionary<object, IUIItemListing> rightEntries = new Dictionary<object, IUIItemListing>();
 
         int middleIndex = unsortedList.Count / 2;
         int count = 0;
-        foreach (KeyValuePair<int, IUIItemListing> keyValuePair in unsortedList)
+        foreach (KeyValuePair<object, IUIItemListing> keyValuePair in unsortedList)
         {
             if (count < middleIndex)
                 leftEntries.Add(keyValuePair.Key, keyValuePair.Value);
@@ -43,14 +43,14 @@ public abstract class UIItemListingManager : MonoBehaviour
         return MergeItemListings(leftEntries, rightEntries, itemCompareIndexes);
 
     }
-    private Dictionary<int, IUIItemListing> MergeItemListings(Dictionary<int, IUIItemListing> leftEntries, Dictionary<int, IUIItemListing> rightEntries, List<(int, bool)> itemCompareIndexes)
+    private Dictionary<object, IUIItemListing> MergeItemListings(Dictionary<object, IUIItemListing> leftEntries, Dictionary<object, IUIItemListing> rightEntries, List<(int, bool)> itemCompareIndexes)
     {
-        Dictionary<int, IUIItemListing> merged = new Dictionary<int, IUIItemListing>();
+        Dictionary<object, IUIItemListing> merged = new Dictionary<object, IUIItemListing>();
 
         while (leftEntries.Count > 0 || rightEntries.Count > 0)
         {
-            KeyValuePair<int, IUIItemListing> left;
-            KeyValuePair<int, IUIItemListing> right;
+            KeyValuePair<object, IUIItemListing> left;
+            KeyValuePair<object, IUIItemListing> right;
 
             if (leftEntries.Count > 0 && rightEntries.Count > 0) //Both lists have entries to merge
             {
@@ -107,7 +107,7 @@ public abstract class UIItemListingManager : MonoBehaviour
         }
         return merged;
     }
-    private void AddToMerged(KeyValuePair<int, IUIItemListing> entry, ref Dictionary<int, IUIItemListing> entries, ref Dictionary<int, IUIItemListing> merged)
+    private void AddToMerged(KeyValuePair<object, IUIItemListing> entry, ref Dictionary<object, IUIItemListing> entries, ref Dictionary<object, IUIItemListing> merged)
     {
         merged.Add(entry.Key, entry.Value);
         entries.Remove(entry.Key);

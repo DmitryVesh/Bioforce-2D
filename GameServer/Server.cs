@@ -7,8 +7,11 @@ namespace GameServer
 {
     static class Server
     {
+        public static string ServerName { get; private set; }
         public static int MaxNumPlayers { get; private set; }
-        public static int PortNum { get; private set; }
+        public static string MapName { get; private set; }
+        public static int PortNum { get; private set; }        
+
         public static Dictionary<int, Client> ClientDictionary = new Dictionary<int, Client>();
         private static TcpListener TCPListener { get; set; }
         private static UdpClient UDPClient { get; set; }
@@ -16,8 +19,22 @@ namespace GameServer
         public delegate void PacketHandler(int clientID, Packet packet);
         public static Dictionary<int, PacketHandler> PacketHandlerDictionary;
 
-        public static void StartServer(int maxNumPlayers, int portNum)
+        public static int GetCurrentNumPlayers()
         {
+            int playerCount = 0;
+            foreach (Client client in ClientDictionary.Values)
+            {
+                if (client.player != null)
+                    playerCount++;
+            }
+            return playerCount;
+        }
+
+        public static void StartServer(string serverName, int maxNumPlayers, string mapName, int portNum)
+        {
+            ServerName = serverName;
+            MapName = mapName;
+
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnEndingConsoleApplication);
             (MaxNumPlayers, PortNum) = (maxNumPlayers, portNum);
 
@@ -32,9 +49,11 @@ namespace GameServer
             UDPClient = new UdpClient(PortNum);
             UDPBeginReceive();
 
-            Console.WriteLine($"\nServer started... " +
-                $"\n\tPort number:  {PortNum}" +
-                $"\n\tMax Players:  {MaxNumPlayers}");
+            Console.WriteLine($"" +
+                $"\nServer: {ServerName}" +
+                $"\n\tMap:          {MapName}" +
+                $"\n\tMax Players:  {MaxNumPlayers}"+
+                $"\n\tPort number:  {PortNum}");
         }
         public static void SendUDPPacket(IPEndPoint clientIPEndPoint, Packet packet)
         {

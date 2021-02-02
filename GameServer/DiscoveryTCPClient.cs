@@ -40,12 +40,13 @@ namespace GameServer
         }
 
         //Sending packets
-        public void SendServerData(string serverName, int playerCount, string mapName, int ping)
+        public void SendServerData(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping)
         {
             using (Packet packet = new Packet((int)DiscoveryServerPackets.serverData))
             {
                 packet.Write(serverName);
-                packet.Write(playerCount);
+                packet.Write(currentPlayerCount);
+                packet.Write(maxPlayerCount);
                 packet.Write(mapName);
                 packet.Write(ping);
                 SendPacket(packet);

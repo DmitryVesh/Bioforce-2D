@@ -12,15 +12,21 @@ namespace GameServer
 
         static void Main()
         {
+            //TODO: Set the values for ServerName, MaxPlayerCount, Map
+            string serverName = "My Server";
+            int maxNumPlayers = 10;
+            string mapName = "Level 1";
+
             string programTitleName = "GameServer";
             Console.Title = programTitleName;
 
-            int maxNumPlayers = 10;
+            
             int portNumGame = 28020; //Unused port, checked Wiki page https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers for unused ports
             int portNumDiscover = portNumGame + 1;
 
+
             DiscoveryServer.StartServer(portNumDiscover);
-            Server.StartServer(maxNumPlayers, portNumGame);
+            Server.StartServer(serverName, maxNumPlayers, mapName, portNumGame);
 
             Thread mainThread = new Thread(new ThreadStart(MainThread));
             mainThread.Start();

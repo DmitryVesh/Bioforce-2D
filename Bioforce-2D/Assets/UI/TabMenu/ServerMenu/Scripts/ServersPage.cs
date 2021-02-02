@@ -1,17 +1,52 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ServersPage : UIItemListingManager
 {
-    private Dictionary<int, IUIItemListing> ServerInfoItemLists { get; set; } = new Dictionary<int, IUIItemListing>();
+    [SerializeField] private Color ServerEntryHoverColor;
+    [SerializeField] private Color ServerEntrySelectColor;
+    [SerializeField] private Color ServerEntryExitColor;
+    private ServerEntry SelectedEntry { get; set; }
+
+    private Dictionary<object, IUIItemListing> ServerInfoItemLists { get; set; } = new Dictionary<object, IUIItemListing>();
     private bool ServerAdded { get; set; }
     private bool SortByChanged { get; set; }
-    private int ServerCount { get; set; } = 0;
+    
 
-    private Queue<(string, int, string, int)> ServersToAdd = new Queue<(string, int, string, int)>();
-    public void EnqueEntry(string serverName, int playerCount, string mapName, int ping) =>
-        ServersToAdd.Enqueue((serverName, playerCount, mapName, ping));
+    private Queue<(string, int, int, string, int, string)> ServersToAdd = new Queue<(string, int, int, string, int, string)>();
+    public void EnqueEntry(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping, string ip) =>
+        ServersToAdd.Enqueue((serverName, currentPlayerCount, maxPlayerCount, mapName, ping, ip));
+
+    public void OnServerEntryHover(ServerEntry serverEntry)
+    {
+        ResetNonSelectedEntries();
+        if (serverEntry != SelectedEntry)
+            serverEntry.SetBackgroundColor(ServerEntryHoverColor);
+    }
+    public void OnServerEntrySelect(ServerEntry serverEntry)
+    {
+        serverEntry.SetBackgroundColor(ServerEntrySelectColor);
+        SelectedEntry = serverEntry;
+        ServerMenu.SetEntrySelected(SelectedEntry);
+        ResetNonSelectedEntries();
+    }
+    public void OnServerEntryExit(ServerEntry serverEntry)
+    {
+        ResetNonSelectedEntries();
+    }
+
+    private void ResetNonSelectedEntries()
+    {
+        foreach (ServerEntry serverEntry in ServerInfoItemLists.Values)
+        {
+            if (serverEntry != SelectedEntry)
+                ResetEntry(serverEntry);
+        }
+    }
+    private void ResetEntry(ServerEntry serverEntry) =>
+        serverEntry.SetBackgroundColor(ServerEntryExitColor);
 
     //Interface methods
     protected override void SetIndexesToCompareInMergeSort(List<(int, bool)> indexesToCompare) =>
@@ -35,6 +70,8 @@ public class ServersPage : UIItemListingManager
         {
             ServerInfoItemLists = MergeSortItemListings(ServerInfoItemLists, IndexesToCompare);
             SortTransformsItemListingsDictionary();
+            ServerAdded = false;
+            SortByChanged = false;
         }
 
         
@@ -42,14 +79,13 @@ public class ServersPage : UIItemListingManager
 
     private void AddEntry()
     {
-        (string serverName, int playerCount, string mapName, int ping) = ServersToAdd.Dequeue();
+        (string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping, string ip) = ServersToAdd.Dequeue();
 
         GameObject entryToAdd = Instantiate(ItemListingPrefab, transform);
         ServerEntry serverEntry = entryToAdd.GetComponent<ServerEntry>();
-        serverEntry.Init(serverName, playerCount, mapName, ping);
+        serverEntry.Init(this, serverName, currentPlayerCount, maxPlayerCount, mapName, ping, ip);
 
-        ServerInfoItemLists.Add(ServerCount, serverEntry);
-        ServerCount++;
+        ServerInfoItemLists.Add(ip, serverEntry);
         ServerAdded = true;
     }
 }

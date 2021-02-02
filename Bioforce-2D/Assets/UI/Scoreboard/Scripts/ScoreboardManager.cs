@@ -11,7 +11,7 @@ public class ScoreboardManager : UIItemListingManager
     private GameObject Scoreboard { get; set; }
     private GameObject ScoreboardPanel { get; set; }
 
-    private Dictionary<int, IUIItemListing> PlayersItemLists { get; set; } = new Dictionary<int, IUIItemListing>();
+    private Dictionary<object, IUIItemListing> PlayersItemLists { get; set; } = new Dictionary<object, IUIItemListing>();
     private bool ScoreboardChanged { get; set; }
 
     private GameObject ScoreboardTimer { get; set; }

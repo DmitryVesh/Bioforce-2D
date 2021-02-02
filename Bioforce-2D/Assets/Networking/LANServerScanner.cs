@@ -62,8 +62,7 @@ public  class LANServerScanner : MonoBehaviour
         private float WaitBeforePings { get; set; } = 0.5f;
         private float ExtraTimeGivenForPingsToComplete { get; set; } = 5;
 
-        public delegate void ServerFound(string serverName, int playerCount, string mapName, int ping);
-        public event ServerFound OnServerFoundEvent;
+        public delegate void ServerFound(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping);
 
         private List<DiscoveryTCPClient> DiscoveryTCPs { get; set; } = new List<DiscoveryTCPClient>();
 
@@ -165,7 +164,6 @@ public  class LANServerScanner : MonoBehaviour
         }
         public void ScanHost()
         {
-            Debug.Log("Running scanning host...");
             foreach (NetworkInterface adapter in NetworkInterface.GetAllNetworkInterfaces())
             {
                 if (!adapter.OperationalStatus.Equals(OperationalStatus.Up))
@@ -182,12 +180,12 @@ public  class LANServerScanner : MonoBehaviour
                         if (BroadcastAddresses.Contains(broadcastAddress))
                             continue;
 
-                        Debug.Log($"Local machine ip address: {unicastIPInfo.Address}");
-                        BroadcastAddresses.Add(GetBroadcastAddress(unicastIPInfo));
+                        Debug.Log($"Local machine ip address: {unicastIPInfo.Address}, {unicastIPInfo.IPv4Mask}, broadCast address: {broadcastAddress}");
+                        BroadcastAddresses.Add(broadcastAddress);
                     }
                 }
             }
-            Debug.Log("Finished searching Network Interfaces");
+            Debug.Log("Finished searching local network addresses.");
         }
 
         private void AsyncCallbackBroadcastSocket(IAsyncResult result)

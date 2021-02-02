@@ -34,8 +34,12 @@ public class SoundMusicManager : MonoBehaviour
     }
     private void Start() =>
         PlayClip(StartingMusic);
-    private void FixedUpdate() =>
+    private void FixedUpdate()
+    {
+        if (AudioListenerTF == null)
+            AudioListenerTF = Camera.main.transform;
         transform.position = AudioListenerTF.position;
+    }
 
     private void ChangeMusic(AudioTrack audioTrack) =>
         StartCoroutine(ActuallyChangeMusic(audioTrack));

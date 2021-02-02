@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ClientRead : MonoBehaviour
 {
@@ -14,10 +15,10 @@ public class ClientRead : MonoBehaviour
 
         Debug.Log($"Message from server:\n{message}");
         Client.Instance.SuccessfullyConnected(id);
-
-        ClientSend.WelcomePacketReply();
-
         Client.Instance.uDP.Connect(((IPEndPoint)Client.Instance.tCP.Socket.Client.LocalEndPoint).Port);
+        SceneManager.LoadScene(ServerMenu.Instance.ServerEntryConnectTo.MapName);
+
+        ClientSend.WelcomePacketReply();        
     }
     public static void UDPTestRead(Packet packet)
     {

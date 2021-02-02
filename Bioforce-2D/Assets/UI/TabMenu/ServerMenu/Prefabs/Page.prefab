@@ -117,3 +117,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ItemListingPrefab: {fileID: 5338299166805515156, guid: f8403f7eea76f47429e421af10bdad1b,
     type: 3}
+  ServerEntryHoverColor: {r: 0.31132078, g: 0.31132078, b: 0.31132078, a: 1}
+  ServerEntrySelectColor: {r: 0.99607843, g: 0.6117647, b: 0, a: 1}
+  ServerEntryExitColor: {r: 0.4245283, g: 0.4245283, b: 0.4245283, a: 1}

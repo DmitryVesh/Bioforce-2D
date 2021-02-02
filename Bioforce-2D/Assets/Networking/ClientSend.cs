@@ -9,7 +9,7 @@ public class ClientSend : MonoBehaviour
     {
         Packet packet = new Packet((int)ClientPackets.welcomeReceived);
         packet.Write(Client.Instance.ClientID);
-        packet.Write(NetworkingUI.Instance.GetUsername());
+        packet.Write(PlayerRegistration.GetUsername());
         SendTCPPacket(packet);
     }
     public static void UDPTestPacketReply()

@@ -16,6 +16,9 @@ public class PlayerRegistration : MonoBehaviour
     private TMP_InputField UsernameInputField { get; set; }
     private MenuButton OKMenuButton { get; set; }
 
+    public static string GetUsername() =>
+        PlayerPrefs.GetString("Username");
+
     public void DisplayUserRegistration()
     {
         if (PlayerPrefs.HasKey("Username"))

@@ -16,8 +16,6 @@ namespace GameServer
         private static EndPoint UDPRemoteEndPoint;
         private static int PortNum { get; set; }
 
-        private static List<DiscoveryTCPClient> DiscoveryClients { get; set; }
-
         public delegate void PacketHandler(int client, Packet packet);
         public static Dictionary<int, PacketHandler> PacketHandlerDictionary;
         private static Dictionary<int, DiscoveryTCPClient> ClientDictionary = new Dictionary<int, DiscoveryTCPClient>();
@@ -25,7 +23,6 @@ namespace GameServer
         public static void StartServer(int port)
         {
             PortNum = port;
-            DiscoveryClients = new List<DiscoveryTCPClient>();
 
             Console.WriteLine("\nTrying to start the Discovery Server...");
             if (UDPBroadCastSocket == null)
@@ -75,23 +72,9 @@ namespace GameServer
             {
                 try
                 {
-                    Console.WriteLine($"Player has sent out a Discovery call from: {UDPRemoteEndPoint.ToString()}");
+                    Console.WriteLine($"Player has sent out a Discovery call from: {UDPRemoteEndPoint}");
                     int size = UDPBroadCastSocket.EndReceiveFrom(result, ref UDPRemoteEndPoint);
-                    
-                    //string address = RemoteEndPoint.ToString().Split(':')[0];
-                    //AddNewDiscoveryClient(address, PortNum);
-
-                    //TODO: Send serverName, playerCount, mapName, ping
-                    //string serverName = "Random Please Work";
-                    //int playerCount = 21;
-                    //string mapName = "Please";
-                    //int ping = 10;
-                    //byte[] serverDiscover = Encoding.ASCII.GetBytes(serverName).Concat(BitConverter.GetBytes(playerCount)).Concat(Encoding.ASCII.GetBytes(mapName)).Concat(BitConverter.GetBytes(ping)).ToArray();
-                    //
-                    //client.SendTo(serverDiscover, RemoteEndPoint);
-
-                    UDPBeginReceiveDiscoveryCalls();
-                    
+                    UDPBeginReceiveDiscoveryCalls();                    
                 }
                 catch (Exception exception)
                 {
@@ -111,10 +94,13 @@ namespace GameServer
             Console.WriteLine($"\nUser {client.Client.RemoteEndPoint} is trying to connect to the discovery server...");
             TCPBeginReceiveDiscoveryClients();
 
-            //TODO: Actually have values for these
-            string serverName = "Random Please Work";
-            int playerCount = 21;
-            string mapName = "Please";
+            
+            string serverName = Server.ServerName;
+            int currentPlayerCount = Server.GetCurrentNumPlayers();
+            int maxPlayerCount = Server.MaxNumPlayers;
+            string mapName = Server.MapName;
+
+            //TODO: Actually get ping value for
             int ping = 10;
 
             int discoveryClientCount = -1;
@@ -134,7 +120,7 @@ namespace GameServer
             }
 
             ClientDictionary[discoveryClientCount].Connect(client);
-            ClientDictionary[discoveryClientCount].SendServerData(serverName, playerCount, mapName, ping);
+            ClientDictionary[discoveryClientCount].SendServerData(serverName, currentPlayerCount, maxPlayerCount, mapName, ping);
             Console.WriteLine($"Sent Server Data packet to: {client.Client.RemoteEndPoint}");
         }
 

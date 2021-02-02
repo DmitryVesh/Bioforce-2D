@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public enum ServerEntryArrayListIndexes
 {
@@ -11,30 +13,46 @@ public enum ServerEntryArrayListIndexes
     mapName,
     ping
 }
-public class ServerEntry : MonoBehaviour, IUIItemListing
+public class ServerEntry : MonoBehaviour, IUIItemListing, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
 {
-    private List<TextMeshProUGUI> ArrayListTexts { get; set; }
-    private ArrayList ItemList { get; set; }
+    public string ServerIP { get; private set; }
+    public string MapName { get; private set; }
 
-    public void Init(string serverName, int playerCount, string mapName, int ping)
+    private List<TextMeshProUGUI> ArrayListTexts { get; set; }
+    private Image TextBackground { get; set; }
+    private ArrayList ItemList { get; set; }
+    private ServersPage ParentServersPage { get; set; }
+
+    public void Init(ServersPage parentPage, string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping, string ip)
     {
+        ParentServersPage = parentPage;
+        ServerIP = ip;
+        MapName = mapName;
+
         ArrayListTexts = new List<TextMeshProUGUI>();
         ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.serverName).GetComponent<TextMeshProUGUI>());
         ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.playerCount).GetComponent<TextMeshProUGUI>());
         ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.mapName).GetComponent<TextMeshProUGUI>());
         ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.ping).GetComponent<TextMeshProUGUI>());
 
-        SetText(serverName, playerCount, mapName, ping);
+        TextBackground = GetComponent<Image>();
+
+        SetText(serverName, currentPlayerCount, maxPlayerCount, mapName, ping);
     }
-    public void SetText(string serverName, int playerCount, string mapName, int ping)
+    public void SetText(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping)
     {
         ArrayListTexts[(int)ServerEntryArrayListIndexes.serverName].text = serverName;
-        ArrayListTexts[(int)ServerEntryArrayListIndexes.playerCount].text = playerCount.ToString();
+        ArrayListTexts[(int)ServerEntryArrayListIndexes.playerCount].text = $"{currentPlayerCount}/{maxPlayerCount}";
         ArrayListTexts[(int)ServerEntryArrayListIndexes.mapName].text = mapName;
         ArrayListTexts[(int)ServerEntryArrayListIndexes.ping].text = ping.ToString();
 
-        SetArrayList(new ArrayList() { serverName, playerCount, mapName, ping });
+        SetArrayList(new ArrayList() { serverName, currentPlayerCount, mapName, ping });
     }
+    public void SetBackgroundColor(Color backgroundColor)
+    {
+        TextBackground.color = backgroundColor;
+    }
+        
 
     //Interface methods
     public void AddToItemIndex(int itemListIndex, int toAdd) //Unused in this class
@@ -49,4 +67,17 @@ public class ServerEntry : MonoBehaviour, IUIItemListing
         (IComparable)ItemList[itemListIndex];
     public void SetArrayList(ArrayList itemList) =>
         ItemList = itemList;
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        ParentServersPage.OnServerEntryHover(this);
+    }
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        ParentServersPage.OnServerEntrySelect(this);
+    }
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        ParentServersPage.OnServerEntryExit(this);
+    }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using UnityEngine;
@@ -7,32 +6,63 @@ using UnityEngine;
 public class ServerMenu : MonoBehaviour
 {
     public static ServerMenu Instance;
+    public ServerEntry ServerEntryConnectTo { get; private set; } = null;
 
     private GameObject ServerMenuPanel { get; set; }
     private GameObject PlayerRegistrationPanel { get; set; }
 
-    [SerializeField] private MenuButton ConnectButton;
+    [SerializeField] private MenuButton ConnectButton;    
 
     [SerializeField] private GameObject ServerPageHolder;
+    [SerializeField] private GameObject KeyServerFields;
+
+
+    //Server pages & Manual Entries
     private ServersPage SelectedServersPage { get; set; } = null;
     private Dictionary<GameObject, ServersPage> ServerPagesDict { get; set; }
-
-    //All the server pages
     private ServersPage InternetServersPage { get; set; }
     private ServersPage LANServersPage { get; set; }
+    private GameObject ManualEntryObject { get; set; }
+    private bool SelectedManualEntry { get; set; }
 
     private LANServerScanner ServerScanner { get; set; }
 
-    public static void ReadServerDataPacket(Packet packet)
+    public static void ReadServerDataPacket(string serverIP, Packet packet)
     {
         string serverName = packet.ReadString();
-        int playerCount = packet.ReadInt();
+        int currentPlayerCount = packet.ReadInt();
+        int maxPlayerCount = packet.ReadInt();
         string mapName = packet.ReadString();
         int ping = packet.ReadInt(); //TODO: look into how to calculate ping
 
-        Instance.AddServerToPage(serverName, playerCount, mapName, ping);
+        Instance.AddServerToPage(serverName, currentPlayerCount, maxPlayerCount, mapName, ping, serverIP);
     }
+    public static void SetManualIPAddress(bool ipValid) =>
+        Instance.ConnectButton.Interactable = ipValid;
 
+    public static void SetEntrySelected(ServerEntry serverEntry)
+    {
+        Instance.ServerEntryConnectTo = serverEntry;
+        Instance.ConnectButton.Interactable = true;
+    }
+    public static void ServerConnectionTimeOut()
+    {
+        throw new NotImplementedException();
+    }
+    public static void Disconnected() =>
+        Instance.ServerMenuPanel.SetActive(true);
+
+    public void OnConnectButtonPressed()
+    {        
+        ServerMenuPanel.SetActive(false);
+        //TODO: Deal when the player count is full, e.g. 10/10 players
+        if (SelectedManualEntry) //TODO: Make so Discovery tcp client is made to check out the ip address
+            throw new NotImplementedException();
+        else
+            Client.Instance.ConnectToServer(ServerEntryConnectTo.ServerIP);
+        
+
+    }
     public void ShowServerMenu()
     {
         if (!PlayerPrefs.HasKey("Username"))
@@ -43,7 +73,6 @@ public class ServerMenu : MonoBehaviour
             LoadServersForSelectedServersPage();
         }
     }
-
     public void HideServerMenu() =>
         ServerMenuPanel.SetActive(false);
     public void DisplayUserRegistration()
@@ -55,10 +84,17 @@ public class ServerMenu : MonoBehaviour
 
     public void SetSelectedPage(GameObject selectedPage)
     {
-        SelectedServersPage = ServerPagesDict[selectedPage];
-        LoadServersForSelectedServersPage();
+        ConnectButton.Interactable = false;
+        SelectedManualEntry = selectedPage == ManualEntryObject;
+
+        if (!SelectedManualEntry)
+        {
+            SelectedServersPage = ServerPagesDict[selectedPage];
+            LoadServersForSelectedServersPage();    
+        }
+        else
+            KeyServerFields.SetActive(false);            
     }
-    
 
     private void Awake()
     {
@@ -78,37 +114,47 @@ public class ServerMenu : MonoBehaviour
     private void Start()
     {
         ConnectButton.Interactable = false;
-        int pages = ServerPageHolder.transform.childCount;
-        ServerPagesDict = new Dictionary<GameObject, ServersPage>(pages);
+        ServerPagesDict = new Dictionary<GameObject, ServersPage>();
+
 
         GameObject InternetPage = ServerPageHolder.transform.GetChild(0).gameObject;
         InternetServersPage = InternetPage.GetComponent<ServersPage>();
-
         GameObject LANPage = ServerPageHolder.transform.GetChild(1).gameObject;
         LANServersPage = LANPage.GetComponent<ServersPage>();
 
         ServerPagesDict.Add(InternetPage, InternetServersPage);
         ServerPagesDict.Add(LANPage, LANServersPage);
 
-        LANServerScanner.DiscoveryClientManager.OnServerFoundEvent += AddServerToPage;
+        ManualEntryObject = ServerPageHolder.transform.GetChild(2).gameObject;
+
         ServerScanner = gameObject.AddComponent<LANServerScanner>();
     }
 
     private void LoadServersForSelectedServersPage()
     {
-        if (SelectedServersPage == null)
+        if (SelectedManualEntry)
+            return;
+
+        if (SelectedServersPage == null) //Set default case
             SelectedServersPage = InternetServersPage;
 
+        KeyServerFields.SetActive(true);
         if (SelectedServersPage == LANServersPage)
         {
             //TODO: Fix problem when a server is running on local machine, an error occurs, currently just
             //Adding localHost, however this would cause to miss other potential Servers found in LAN
             StartCoroutine(ServerScanner.GetLANServerAddressUDPBroadcast(Client.PortNumDiscover));
         }
+        else //SelectedServerPage is InterntServersPage
+        {
+
+        }
 
     }
-    private void AddServerToPage(string serverName, int playerCount, string mapName, int ping) =>
-        SelectedServersPage.EnqueEntry(serverName, playerCount, mapName, ping);
+    private void AddServerToPage(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping, string ip) =>
+        SelectedServersPage.EnqueEntry(serverName, currentPlayerCount, maxPlayerCount, mapName, ping, ip);
+
+    
 }
 
 
@@ -122,7 +168,7 @@ public class DiscoveryTCPClient
 
     private int DataBufferSize = 4096;
 
-    private delegate void PacketHandler(Packet packet);
+    private delegate void PacketHandler(string ip, Packet packet);
     private static Dictionary<int, PacketHandler> PacketHandlerDictionary { get; set; } = new Dictionary<int, PacketHandler>();
 
     public DiscoveryTCPClient()
@@ -210,7 +256,8 @@ public class DiscoveryTCPClient
             {
                 Packet packet = new Packet(bytes);
                 int packetID = packet.ReadInt();
-                PacketHandlerDictionary[packetID](packet);
+                string ipAddress = Socket.Client.RemoteEndPoint.ToString().Split(':')[0];
+                PacketHandlerDictionary[packetID](ipAddress, packet);
             });
             packetLen = 0;
 
