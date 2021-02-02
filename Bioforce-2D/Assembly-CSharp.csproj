@@ -86,7 +86,6 @@
     <Compile Include="Assets\Entities\PhysicsHelper.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Camera\CameraBoundries.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\UI\StatsBar.cs" />
-    <Compile Include="Assets\Networking\IPList.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Gun\LocalPlayerGun.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\UI\Bar.cs" />
     <Compile Include="Assets\_Maps\RespawnPoints\RespawnPoint.cs" />
@@ -132,6 +131,7 @@
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Overlay.shader" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap.shader" />
+     <None Include="Assets\UML Diagram\Game Class Diagram.cd" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface.shader" />
      <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />

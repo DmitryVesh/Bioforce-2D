@@ -11,14 +11,9 @@ using UnityEngine;
 
 public  class LANServerScanner : MonoBehaviour
 {
-    private static List<string> IPsWithOpenGamePort { get; set; }
-
     private static int PortNum { get; set; }
-    private static int TimeOut { get; set; } = 1000;
-    private static IPList IPList { get; set; }
-    private static string LANIP { get; set; }
 
-    public static DiscoveryClient DiscoveryClientManager { get; private set; } = new DiscoveryClient();
+    public static DiscoveryUDPClient DiscoveryClientManager { get; private set; } = new DiscoveryUDPClient();
 
     //Calling UDP broadcast...
     public IEnumerator GetLANServerAddressUDPBroadcast(int portNum)
@@ -39,18 +34,15 @@ public  class LANServerScanner : MonoBehaviour
         DiscoveryClientManager.PrintAllAddressesFound();
         DiscoveryClientManager.CloseClient();
     }
-    public static List<string> GetIPsFromLANScan() =>
-        DiscoveryClientManager.ServerAddresses;
-    
     private void OnDestroy()
     {
         if (DiscoveryClientManager != null) 
             DiscoveryClientManager.CloseClient();
     }
 
-    public class DiscoveryClient
+    public class DiscoveryUDPClient
     {
-        public List<string> ServerAddresses { get; set; } = new List<string>(); // Addresses found on the LAN with a server
+        public List<string> ServerAddresses { get; set; } = new List<string>(); // IP Addresses found on the LAN with a server
 
         private List<string> LocalFullAddresses { get; set; } = new List<string>(); // Addresses of player's machine
         private List<string> BroadcastAddresses { get; set; } = new List<string>(); // Broadcast addresses of the player's LAN connections
@@ -196,13 +188,11 @@ public  class LANServerScanner : MonoBehaviour
                 {
                     int size = BroadcastClientSocket.EndReceiveFrom(result, ref BroadcastRemoteEndPoint);
                     string address = BroadcastRemoteEndPoint.ToString().Split(':')[0];
-                    //Stable
-                    //if (!LocalFullAddresses.Contains(address) && !ServerAddresses.Contains(address))
+                    
                     if (!ServerAddresses.Contains(address) && !LocalFullAddresses.Contains(address))
                     {
                         Debug.Log($"Got a server address: {address}");
                         ServerAddresses.Add(address);
-                        //OnServerFoundEvent?.Invoke("Example", 10, "Jesus", 250);
                         DiscoveryTCPClient discoveryTCP = new DiscoveryTCPClient();
                         DiscoveryTCPs.Add(discoveryTCP);
                         discoveryTCP.Connect(address, PortNum);
@@ -226,140 +216,4 @@ public  class LANServerScanner : MonoBehaviour
             return new IPAddress(BitConverter.GetBytes(broadCastIpAddress)).ToString();
         }
     }
-
-    //Trying to connect to every single ip in local network...
-    //Works on Windows and Mac (sometimes doesn't work though), but not on iOS
-    public static async Task<string> GetLANIPAddressConnectToScanAllIPs(int portNum)
-    {
-        (string lanIP, bool NullOrLocalHost) = GetLeadingLANIPAddress();
-        if (NullOrLocalHost)
-            return lanIP;
-
-        LANIP = lanIP;
-        PortNum = portNum;
-        IPsWithOpenGamePort = new List<string>();
-        IPList = new IPList(lowestIP: 1, highestIP: 254);
-        int numberOfThreadsToUse = IPList.GetDifBetweenLowestAndHighestIP();
-
-        Thread[] AllThreadsScanning = new Thread[numberOfThreadsToUse];
-
-        for (int threadCount = 0; threadCount < numberOfThreadsToUse; threadCount++)
-        {
-            await Task.Run(() =>
-            {
-                Thread thread = new Thread(new ThreadStart(ScanIP));
-                thread.Priority = System.Threading.ThreadPriority.AboveNormal;
-                thread.Start();
-                AllThreadsScanning[threadCount] = thread;
-            });
-        }
-        foreach (Thread thread in AllThreadsScanning)
-            thread.Join();
-
-        Debug.Log("Finished LAN scanning execution");
-        return GetIPConnectTo();
-    }
-
-    private static async void ScanIP()
-    {
-        int ipLastByte;
-        while ((ipLastByte = IPList.GetNextIP()) != -1)
-        {
-            string ip = string.Concat(LANIP, ipLastByte);
-            bool connected;
-            try { connected = await Connect(ip, PortNum, TimeOut); }
-            catch { continue; }
-
-            if (connected)
-                IPsWithOpenGamePort.Add(ip);
-        }
-    }
-    private static async Task<bool> Connect(string ip, int portNum, int timeOut)
-    {
-        TcpClient tcp = new TcpClient();
-        IsIPOpen tcpState = new IsIPOpen(tcp, true);
-
-        IAsyncResult connectionResult = tcp.BeginConnect(ip, portNum, ConnectCallback, tcpState);
-        tcpState.IsTCPOpen = await Task.Run(() => connectionResult.AsyncWaitHandle.WaitOne(timeOut, false));
-
-        if (tcpState.IsTCPOpen == false || tcp.Connected == false)
-        {
-            Debug.Log("Sending false to ip " + ip);
-            tcpState.TCP.Close();
-            return false;
-        }
-        else 
-        {
-            Debug.Log("Sending true to ip " + ip);
-            tcpState.TCP.Close();
-            return true;
-        }
-    }
-    private static void ConnectCallback(IAsyncResult asyncResult)
-    {
-        IsIPOpen currentState = (IsIPOpen)asyncResult.AsyncState;
-        TcpClient tcp = currentState.TCP;
-
-        try { tcp.EndConnect(asyncResult); }
-        catch { return; }
-
-        if (tcp.Connected && currentState.IsTCPOpen)
-            return;
-
-        tcp.Close();
-    }
-    private class IsIPOpen
-    {
-        public TcpClient TCP { get; private set; }
-        public bool IsTCPOpen { get; set; }
-
-        public IsIPOpen(TcpClient tcp, bool isTCPOpen) => 
-            (TCP, IsTCPOpen) = (tcp, isTCPOpen);
-    }
-
-    private static string GetIPConnectTo()
-    {
-        string ipToConnectTo;
-        if (IPsWithOpenGamePort.Count == 1)
-        {
-            Debug.Log("1 IP with open game port...");
-            ipToConnectTo = IPsWithOpenGamePort[0];
-        }
-        else if (IPsWithOpenGamePort.Count == 0)
-        {
-            Debug.LogWarning("No ips with open game port...");
-            ipToConnectTo = null;
-        }
-        else
-        {
-            ipToConnectTo = "many";
-            Debug.LogWarning("Multiple ips with open game port...");
-            foreach (string ip in IPsWithOpenGamePort)
-            {
-                Debug.Log($"\t{ip}");
-            }
-        }
-        return ipToConnectTo;
-    }
-    private static (string, bool) GetLeadingLANIPAddress()
-    {
-        string ip = GetLocalIPAddress();
-        if (ip == null || ip.StartsWith("127.0.0"))
-            return (ip, true); 
-
-        string[] splitLocalIP = ip.Split('.');
-        return (string.Concat(splitLocalIP[0], '.', splitLocalIP[1], '.', splitLocalIP[2], '.'), false);
-    }   
-    private static string GetLocalIPAddress()
-    {
-        IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
-        foreach (IPAddress ip in host.AddressList)
-        {
-            if (ip.AddressFamily == AddressFamily.InterNetwork)
-                return ip.ToString();
-        }
-        Debug.LogWarning("Couldn't find any hosts on LAN network...");
-        return null;
-    }
-    
 }

@@ -302,7 +302,6 @@ public class Client : MonoBehaviour
     private void ConnectionTimedOut()
     {
         Disconnect();
-        //NetworkingUI.Instance.DisplayTimeOutMessage();
         ServerMenu.ServerConnectionTimeOut();
     }
 

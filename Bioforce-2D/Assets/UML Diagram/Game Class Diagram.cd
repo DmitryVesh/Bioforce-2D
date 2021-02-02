@@ -1,0 +1,561 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="GameManager">
+    <Position X="43.75" Y="0.75" Width="1.5" />
+    <NestedTypes>
+      <Delegate Name="GameManager.PlayerConnected" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\_Maps\GameManager.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="GameManager.PlayerDisconnected" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\_Maps\GameManager.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAACAQAAAIBCAAAAAAAAAAIAAAAAABQoAQAAIAEUA=</HashCode>
+      <FileName>Assets\_Maps\GameManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RespawnPoint">
+    <Position X="46" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAgAAAAAAAAAABAAAABAEAQAAAAAAAAEA=</HashCode>
+      <FileName>Assets\_Maps\RespawnPoints\RespawnPoint.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AudioTrack">
+    <Position X="72.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAAAAAAAABAAAAAAAABAAAIIAAAAAAAA=</HashCode>
+      <FileName>Assets\Audio\Scripts\AudioTrack.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SoundMusicManager">
+    <Position X="72.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>IACAgAAIgiCAAAIAAAAAAAAQAADAAAIAwgEAAAAAAEA=</HashCode>
+      <FileName>Assets\Audio\Scripts\SoundMusicManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SoundPlayerManager">
+    <Position X="72.5" Y="8.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>ABAgABAAQgAABACAAAAAACAQEAAAAAAAoAAAAAEBAEA=</HashCode>
+      <FileName>Assets\Audio\Scripts\SoundPlayerManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DamageNum">
+    <Position X="37.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEARAAAAhAABEhIAAAAAABECAAAAAACAAgAAIgAAEA=</HashCode>
+      <FileName>Assets\Entities\Effects\DamageNums\Scripts\DamageNum.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DamageNumManager">
+    <Position X="37.75" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAAAAIIAAAAAAAAAAEIAQAAAAAABAEA=</HashCode>
+      <FileName>Assets\Entities\Effects\DamageNums\Scripts\DamageNumManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CameraBoundries">
+    <Position X="44.25" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAEA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Camera\CameraBoundries.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PlayerCameraController">
+    <Position X="42" Y="9.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>gAABABAAACAAAQAACAAIAAAAAAAAAAAAAAAAgAAAAEA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Camera\PlayerCameraController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Bullet">
+    <Position X="47.25" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAgAEhABEAAAAAAJBAAAAAgAQAAggAISAAEA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Gun\Bullet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LocalPlayerGun">
+    <Position X="16.5" Y="8.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAACAAAAAAAAAAAAAAAQAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Gun\LocalPlayerGun.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MobileLocalPlayerGun">
+    <Position X="16.25" Y="11.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAgQAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Gun\MobileLocalPlayerGun.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MuzzelFlash">
+    <Position X="45.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAASAAEA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Gun\MuzzelFlash.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NonLocalPlayerGun">
+    <Position X="16.75" Y="2.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>EAABgFAABCAAAAAAAAAACABAAAAAAAQ0AAggACAAAMA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Gun\NonLocalPlayerGun.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="LocalPlayerHealth" Collapsed="true">
+    <Position X="19.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Health\LocalPlayerHealth.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NonLocalPlayerHealth">
+    <Position X="19.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABFAAACAACAAgCAAAAgRARAAAAAAAAEAAgCIAEAA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Health\NonLocalPlayerHealth.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="LocalPlayerAnimations">
+    <Position X="21.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAACAAAAAAAAAAAIAAAAAAAAAAEA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Movement\Networking\LocalPlayerAnimations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LocalPlayerMovement">
+    <Position X="25.75" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>EAQIkAQAAoAIICAElAAAAEAQAIggMAABiCBBARACAFA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Movement\Networking\LocalPlayerMovement.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="MobileLocalPlayerMovement">
+    <Position X="27" Y="9.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AABBoCAAAgIAACAAgAAAAAAAAgAAAAABAAAwAAACAEA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Movement\Networking\MobileLocalPlayerMovement.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NonLocalPlayerAnimations">
+    <Position X="21.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>YAAFgFAAAqAAAAAAAQCAIQBAACAAAAAAAAAAAAEAAEA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Movement\Networking\NonLocalPlayerAnimations.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="NonLocalPlayerMovement">
+    <Position X="23.5" Y="5.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAABAFAAACAAAAAAAAgAAEhBAAEAAAAAAAAAAAIAIBA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Movement\Networking\NonLocalPlayerMovement.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Bar">
+    <Position X="31.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAABAAAAAAAAAAAAACAQAAAAAAAAABEA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\UI\Bar.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HealthBar">
+    <Position X="32.5" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABCAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\UI\HealthBar.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="StaminaBar">
+    <Position X="34.25" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgEA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\UI\StaminaBar.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="StatsBar">
+    <Position X="33.25" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABGAAAAAAiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\UI\StatsBar.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EntityWalking">
+    <Position X="23.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>ABAYECgAAgAMCAAEAAAAAAAACAAAAAAAAAAACAAAAEA=</HashCode>
+      <FileName>Assets\Entities\Walking\InheritedScripts\EntityWalking.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Client">
+    <Position X="66.25" Y="0.5" Width="2" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Delegate Name="Client.PacketHandler">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Networking\Client.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Class Name="Client.TCP">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Networking\Client.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Client.UDP">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Networking\Client.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>hQwAABAAAwIAQAAEAAgCAAABABACAAAgQAAAAAAEAEA=</HashCode>
+      <FileName>Assets\Networking\Client.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientRead">
+    <Position X="70.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACBAAAAQAIAACAAAAIAAEAAAACAACgAAAAAAAQA=</HashCode>
+      <FileName>Assets\Networking\ClientRead.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ClientSend">
+    <Position X="68.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAAAAAACAAACAEAkAAAAAAAAgAAAAAAEBA=</HashCode>
+      <FileName>Assets\Networking\ClientSend.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LANServerScanner">
+    <Position X="58.25" Y="0.5" Width="2.75" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="LANServerScanner.DiscoveryUDPClient">
+        <Compartments>
+          <Compartment Name="Nested Types" Collapsed="false" />
+        </Compartments>
+        <NestedTypes>
+          <Delegate Name="LANServerScanner.DiscoveryUDPClient.ServerFound">
+            <TypeIdentifier>
+              <NewMemberFileName>Assets\Networking\LANServerScanner.cs</NewMemberFileName>
+            </TypeIdentifier>
+          </Delegate>
+        </NestedTypes>
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Networking\LANServerScanner.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAABAAABAAAAAAAAAAAAAAAAAAAAAEAAAQAAAAAAAAA=</HashCode>
+      <FileName>Assets\Networking\LANServerScanner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PlayerManager">
+    <Position X="42" Y="0.75" Width="1.5" />
+    <NestedTypes>
+      <Delegate Name="PlayerManager.PlayerMovementStats" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Networking\PlayerManager.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="PlayerManager.PlayerSpeedX" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Networking\PlayerManager.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="PlayerManager.PlayerRespawn" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Networking\PlayerManager.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="PlayerManager.PlayerDeath" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Networking\PlayerManager.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="PlayerManager.PlayerTookDamage" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Networking\PlayerManager.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="PlayerManager.PlayerShot" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Networking\PlayerManager.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="PlayerManager.PlayerJumped" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Networking\PlayerManager.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>QRcAACQEAAAAiQggCTAAAAQAIAAAEgBgBgAQIAAAAGA=</HashCode>
+      <FileName>Assets\Networking\PlayerManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InGameChat">
+    <Position X="7" Y="5.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAACAAAAIAAAAAAAAAAAAAAAAAQQABAAAAAEA=</HashCode>
+      <FileName>Assets\UI\Chat\InGameChat.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="KillFeedUI">
+    <Position X="9.5" Y="5.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAQACAAAAAQAAAAAAAAAAIACAAAAAAAEQAAAAAAAAEA=</HashCode>
+      <FileName>Assets\UI\KillFeed\KillFeedUI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MainMenuButton">
+    <Position X="32.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAAAAAAAAAAAAgAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Assets\UI\Main Menu\Buttons\Scripts\MainMenuButton.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MenuButton">
+    <Position X="32.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACQAAAAAAiAAAAAAEAAQAAAAAAAgACAAAAAAAQQAAEA=</HashCode>
+      <FileName>Assets\UI\Main Menu\Buttons\Scripts\MenuButton.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="MainMenu">
+    <Position X="50.25" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>SQQAAAAQAKAACBAAAAIAAAAQAAAEQAAAQVAAABAAgEA=</HashCode>
+      <FileName>Assets\UI\Main Menu\MainMenu.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ScoreboardEntry" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACARgAAAAAAAAAAAIAAgAAAAAAAAAAgAAgCAAAAAAA=</HashCode>
+      <FileName>Assets\UI\Scoreboard\Scripts\ScoreboardEntry.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ScoreboardManager">
+    <Position X="0.5" Y="4" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>CAQBgAAAAwAAEAAAAAAIAAAABQKCAABAQAQAAEAAIEA=</HashCode>
+      <FileName>Assets\UI\Scoreboard\Scripts\ScoreboardManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TabButton" BaseTypeListCollapsed="true">
+    <Position X="35.75" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAACAAIAAAAAAgAAAAAgAAAQAgAEA=</HashCode>
+      <FileName>Assets\UI\TabMenu\Scripts\TabButton.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="TabGroup">
+    <Position X="35.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgBQBAACAAAAAAAAAACAAAAAUAAEAAAAAEAAQAgAI=</HashCode>
+      <FileName>Assets\UI\TabMenu\Scripts\TabGroup.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ManualServerEntry">
+    <Position X="52.75" Y="7.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAEAAgAAAAAAAAAAAAAAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\UI\TabMenu\ServerMenu\Scripts\ManualServerEntry.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PlayerRegistration">
+    <Position X="55.5" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AQAIAiAAAIAQBAAAgAAAAgAAAAggAgAAQAAAAAAAAEA=</HashCode>
+      <FileName>Assets\UI\TabMenu\ServerMenu\Scripts\PlayerRegistration.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ServerEntry" BaseTypeListCollapsed="true">
+    <Position X="4.5" Y="10.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AACAQgAAAgAAAAAAEKAAgBAAABAgAAAgAAgGAQAAAAA=</HashCode>
+      <FileName>Assets\UI\TabMenu\ServerMenu\Scripts\ServerEntry.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.132" />
+  </Class>
+  <Class Name="ServerMenu">
+    <Position X="52.75" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIQEADACBCAgAAAAACIACIgBAABAyAIMAgYAwEA=</HashCode>
+      <FileName>Assets\UI\TabMenu\ServerMenu\Scripts\ServerMenu.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiscoveryTCPClient">
+    <Position X="61.25" Y="0.5" Width="2" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Delegate Name="DiscoveryTCPClient.PacketHandler">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\UI\TabMenu\ServerMenu\Scripts\ServerMenu.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AgwQAAEAAAAAAAAAAAAAgIAAABCIAQAEAAAAABCAAAA=</HashCode>
+      <FileName>Assets\UI\TabMenu\ServerMenu\Scripts\ServerMenu.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ServersPage">
+    <Position X="3.75" Y="4" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAkEFAAgAgAAAgAAQMAAIAAAAgQBAAIAQACAAAAEA=</HashCode>
+      <FileName>Assets\UI\TabMenu\ServerMenu\Scripts\ServersPage.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TabGroupPages">
+    <Position X="35.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAgAAAAAAAAAAAAAAAAAAAAAAACwAA=</HashCode>
+      <FileName>Assets\UI\TabMenu\ServerMenu\Scripts\TabGroupPages.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UIEntryManager">
+    <Position X="8" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAIAQAAAAQAQECAAAAAAQAAAQAABABAAQAAAAFA=</HashCode>
+      <FileName>Assets\UI\UIEntryManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UIItemListingManager">
+    <Position X="1" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>CAAAAgAAAAkAAAAAAAAIAAAAAAAAAAAQAAQAAAAAAAA=</HashCode>
+      <FileName>Assets\UI\UIItemListingManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="IGun">
+    <Position X="16.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAACABAAAAAAAQAAAAgAAAAAAA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Gun\IGun.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="IAnimations">
+    <Position X="21.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAAAAQCAAQAAACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Movement\Networking\IAnimations.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="IWalkingLocalPlayer">
+    <Position X="23.25" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAACAAABAAAAA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Movement\Networking\IWalkingLocalPlayer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="IWalkingPlayer">
+    <Position X="25" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Movement\Networking\IWalkingPlayer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="IHealth">
+    <Position X="19.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAgAAAAAAAARAAAAAAAAEAAgCAAAAA=</HashCode>
+      <FileName>Assets\Entities\Walking\InheritedScripts\IHealth.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="IWalking">
+    <Position X="23.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Entities\Walking\InheritedScripts\IWalking.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="IUIItemListing">
+    <Position X="2.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAQgAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>Assets\UI\IUIItemListing.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="TypeOfDeath">
+    <Position X="43.75" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAQAAA=</HashCode>
+      <FileName>Assets\Entities\Player\Scripts\Health\TypeOfDeath.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DiscoveryClientPackets" Collapsed="true">
+    <Position X="61.25" Y="6.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Networking\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DiscoveryServerPackets">
+    <Position X="61.25" Y="7.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Networking\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ServerPackets">
+    <Position X="68.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEiAAEAAIAAAAAgAAADAAAAAAAAAAAAABAAAAgIA=</HashCode>
+      <FileName>Assets\Networking\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ClientPackets">
+    <Position X="68.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABgEAAIABAAAgAAACAAAAAAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>Assets\Networking\Packet.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="MainMenuSFXs">
+    <Position X="74.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAQIA=</HashCode>
+      <FileName>Assets\UI\Main Menu\MainMenu.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ScoreboardEntryArrayListIndexes">
+    <Position X="0.5" Y="12.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAAAAAAIAAEAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Assets\UI\Scoreboard\Scripts\ScoreboardEntry.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ServerEntryArrayListIndexes">
+    <Position X="6.5" Y="10.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAAIAAAAAAAAAAAABAAAAAAAAQAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\UI\TabMenu\ServerMenu\Scripts\ServerEntry.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
