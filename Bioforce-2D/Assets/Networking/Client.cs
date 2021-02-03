@@ -134,7 +134,7 @@ public class Client : MonoBehaviour
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"\nError in BeginReadReceiveCallback...\nError: {exception}");
+                Debug.Log($"\nError in BeginReadReceiveCallback...\nError: {exception}");
                 Disconnect();
             }
         }

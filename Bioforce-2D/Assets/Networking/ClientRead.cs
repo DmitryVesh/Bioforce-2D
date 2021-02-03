@@ -12,11 +12,11 @@ public class ClientRead : MonoBehaviour
         //PacketSender.Welcome(count, $"Welcome to the server client {count}");
         string message = packet.ReadString();
         int id = packet.ReadInt();
-
+        string mapName = packet.ReadString();
         Debug.Log($"Message from server:\n{message}");
         Client.Instance.SuccessfullyConnected(id);
         Client.Instance.uDP.Connect(((IPEndPoint)Client.Instance.tCP.Socket.Client.LocalEndPoint).Port);
-        SceneManager.LoadScene(ServerMenu.Instance.ServerEntryConnectTo.MapName);
+        SceneManager.LoadScene(mapName);
 
         ClientSend.WelcomePacketReply();        
     }

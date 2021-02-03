@@ -48,6 +48,7 @@ public class ServerMenu : MonoBehaviour
     }
     public static void ServerConnectionTimeOut()
     {
+        //TODO: 9000 Implement Server Connection Time out
         throw new NotImplementedException();
     }
     public static void Disconnected()
@@ -83,6 +84,8 @@ public class ServerMenu : MonoBehaviour
         PlayerRegistrationPanel.SetActive(true);
         PlayerRegistration.Instance.DisplayUserRegistration();
     }
+
+    
 
     public void SetSelectedPage(GameObject selectedPage)
     {       
@@ -240,7 +243,7 @@ public class DiscoveryTCPClient
         }
         catch (Exception exception)
         {
-            Console.WriteLine($"\nError in BeginReadReceiveCallback...\nError: {exception}");
+            Debug.Log($"\nError in BeginReadReceiveCallback...\nError: {exception}");
             Disconnect();
         }
     }
