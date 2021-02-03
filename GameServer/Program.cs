@@ -13,7 +13,7 @@ namespace GameServer
         static void Main()
         {
             //TODO: Set the values for ServerName, MaxPlayerCount, Map
-            string serverName = "My Server";
+            string serverName = "Windows Server";
             int maxNumPlayers = 10;
             string mapName = "Level 1";
 

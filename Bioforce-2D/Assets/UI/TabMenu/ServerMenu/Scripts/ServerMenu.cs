@@ -24,6 +24,7 @@ public class ServerMenu : MonoBehaviour
     private ServersPage LANServersPage { get; set; }
     private GameObject ManualEntryObject { get; set; }
     private bool SelectedManualEntry { get; set; }
+    private GameObject CreateServerObject { get; set; }
 
     private LANServerScanner ServerScanner { get; set; }
 
@@ -49,8 +50,11 @@ public class ServerMenu : MonoBehaviour
     {
         throw new NotImplementedException();
     }
-    public static void Disconnected() =>
-        Instance.ServerMenuPanel.SetActive(true);
+    public static void Disconnected()
+    {
+        if (Instance != null)
+            Instance.ServerMenuPanel.SetActive(true);
+    }
 
     public void OnConnectButtonPressed()
     {        
@@ -60,8 +64,6 @@ public class ServerMenu : MonoBehaviour
             throw new NotImplementedException();
         else
             Client.Instance.ConnectToServer(ServerEntryConnectTo.ServerIP);
-        
-
     }
     public void ShowServerMenu()
     {
@@ -83,11 +85,11 @@ public class ServerMenu : MonoBehaviour
     }
 
     public void SetSelectedPage(GameObject selectedPage)
-    {
+    {       
         ConnectButton.Interactable = false;
         SelectedManualEntry = selectedPage == ManualEntryObject;
-
-        if (!SelectedManualEntry)
+        bool hasPage = ServerPagesDict.ContainsKey(selectedPage);
+        if (hasPage)
         {
             SelectedServersPage = ServerPagesDict[selectedPage];
             LoadServersForSelectedServersPage();    
@@ -126,6 +128,7 @@ public class ServerMenu : MonoBehaviour
         ServerPagesDict.Add(LANPage, LANServersPage);
 
         ManualEntryObject = ServerPageHolder.transform.GetChild(2).gameObject;
+        CreateServerObject = ServerPageHolder.transform.GetChild(3).gameObject;
 
         ServerScanner = gameObject.AddComponent<LANServerScanner>();
     }

@@ -126,6 +126,7 @@
     <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\ServerEntry.cs" />
     <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\ManualServerEntry.cs" />
     <Compile Include="Assets\_Maps\MainManager.cs" />
+    <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\CreateServer.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />
