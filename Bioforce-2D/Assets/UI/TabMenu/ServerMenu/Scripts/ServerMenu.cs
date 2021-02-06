@@ -28,6 +28,9 @@ public class ServerMenu : MonoBehaviour
 
     private LANServerScanner ServerScanner { get; set; }
 
+    [SerializeField] private GameObject ServerConnectionTimeOutPanel { get; set; }
+
+
     public static void ReadServerDataPacket(string serverIP, Packet packet)
     {
         string serverName = packet.ReadString();
@@ -48,8 +51,7 @@ public class ServerMenu : MonoBehaviour
     }
     public static void ServerConnectionTimeOut()
     {
-        //TODO: 9000 Implement Server Connection Time out
-        throw new NotImplementedException();
+        Instance.ServerConnectionTimeOutPanel.SetActive(true);
     }
     public static void Disconnected()
     {
@@ -115,6 +117,7 @@ public class ServerMenu : MonoBehaviour
 
         HideServerMenu();
         PlayerRegistrationPanel.SetActive(false);
+        ServerConnectionTimeOutPanel.SetActive(false);
     }
     private void Start()
     {
@@ -146,12 +149,8 @@ public class ServerMenu : MonoBehaviour
 
         KeyServerFields.SetActive(true);
         if (SelectedServersPage == LANServersPage)
-        {
-            //TODO: Fix problem when a server is running on local machine, an error occurs, currently just
-            //Adding localHost, however this would cause to miss other potential Servers found in LAN
             StartCoroutine(ServerScanner.GetLANServerAddressUDPBroadcast(Client.PortNumDiscover));
-        }
-        else //SelectedServerPage is InterntServersPage
+        else //TODO: SelectedServerPage is InterntServersPage
         {
 
         }

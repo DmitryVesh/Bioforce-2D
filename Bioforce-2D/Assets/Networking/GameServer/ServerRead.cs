@@ -88,8 +88,6 @@ namespace GameServer
                 if (clientID != bulletOwnerID)
                     Server.ClientDictionary[bulletOwnerID].player.AddKill();
                 Server.ClientDictionary[clientID].player.Died();
-                //TODO: UPDATE GAMELOGIC kill score
-                //GameLogic.
             }
             catch (Exception exception)
             {
