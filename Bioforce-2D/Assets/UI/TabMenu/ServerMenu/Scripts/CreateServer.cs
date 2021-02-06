@@ -87,7 +87,7 @@ public class CreateServer : MonoBehaviour
     public void OnStartServer()
     {
         //TODO: Implement the Public/Private servers
-        bool startedSuccessfully = ServerProgram.Start(ServerNameSelected, MaxPlayerSelected, MapSelected);
+        bool startedSuccessfully = ServerProgram.StartServerProgram(ServerNameSelected, MaxPlayerSelected, MapSelected);
         if (!startedSuccessfully)
             return;
 

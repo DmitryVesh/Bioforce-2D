@@ -11,7 +11,7 @@ namespace GameServer
 
         private static bool isRunning = true;
 
-        public static bool Start(string serverName, int maxNumPlayers, string mapName)
+        public static bool StartServerProgram(string serverName, int maxNumPlayers, string mapName)
         {
             try
             {

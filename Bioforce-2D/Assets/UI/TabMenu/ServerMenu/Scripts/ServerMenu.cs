@@ -133,7 +133,7 @@ public class ServerMenu : MonoBehaviour
         ManualEntryObject = ServerPageHolder.transform.GetChild(2).gameObject;
         CreateServerObject = ServerPageHolder.transform.GetChild(3).gameObject;
 
-        ServerScanner = gameObject.AddComponent<LANServerScanner>();
+        ServerScanner = gameObject.GetComponent<LANServerScanner>();
     }
 
     private void LoadServersForSelectedServersPage()
@@ -175,7 +175,7 @@ public class DiscoveryTCPClient
     private int DataBufferSize = 4096;
 
     private delegate void PacketHandler(string ip, Packet packet);
-    private static Dictionary<int, PacketHandler> PacketHandlerDictionary { get; set; } = new Dictionary<int, PacketHandler>();
+    private Dictionary<int, PacketHandler> PacketHandlerDictionary { get; set; } = new Dictionary<int, PacketHandler>();
 
     public DiscoveryTCPClient()
     {
@@ -191,6 +191,7 @@ public class DiscoveryTCPClient
         ReceiveBuffer = new byte[DataBufferSize];
 
         Socket.BeginConnect(ipAddressConnectTo, portNum, ConnectCallback, Socket);
+        Debug.Log($"A DiscoveryTCPClient trying to connect to: {ipAddressConnectTo}...");
     }
     public void SendPacket(Packet packet)
     {

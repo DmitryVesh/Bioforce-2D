@@ -80,7 +80,7 @@ public class ServersPage : UIItemListingManager
     private void AddEntry()
     {
         (string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping, string ip) = ServersToAdd.Dequeue();
-
+        Debug.Log($"Adding server at IP: {ip}, to server page");
         GameObject entryToAdd = Instantiate(ItemListingPrefab, transform);
         ServerEntry serverEntry = entryToAdd.GetComponent<ServerEntry>();
         serverEntry.Init(this, serverName, currentPlayerCount, maxPlayerCount, mapName, ping, ip);

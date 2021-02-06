@@ -29,6 +29,7 @@ namespace GameServer
             ReceivePacket = new Packet();
 
             StreamBeginRead();
+            Console.WriteLine($"A DiscoveryTCPClient has been setup for: {TCPClient.Client.RemoteEndPoint}");
         }
         public void Disconnect()
         {

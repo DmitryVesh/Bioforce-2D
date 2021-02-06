@@ -8,8 +8,8 @@ namespace GameServer
     class ClientServer
     {
         public int ID { get; private set; }
-        public TCP tCP { get; private set; }
-        public UDP uDP { get; private set; }
+        public TCPServer tCP { get; private set; }
+        public UDPServer uDP { get; private set; }
         private static int DataBufferSize { get; set; } = 4096;
 
         public PlayerServer player { get; private set; }
@@ -17,11 +17,11 @@ namespace GameServer
         public ClientServer(int iD)
         {
             ID = iD;
-            tCP = new TCP(iD);
-            uDP = new UDP(iD);
+            tCP = new TCPServer(iD);
+            uDP = new UDPServer(iD);
         }
 
-        public class TCP
+        public class TCPServer
         {
             public TcpClient Socket { get; private set; }
             private int ID { get; }
@@ -29,7 +29,7 @@ namespace GameServer
             private NetworkStream Stream;
             private Packet ReceivePacket;
 
-            public TCP(int iD) => ID = iD;
+            public TCPServer(int iD) => ID = iD;
             public void Connect(TcpClient socket)
             {
                 Socket = socket;
@@ -140,12 +140,12 @@ namespace GameServer
             
             
         }
-        public class UDP
+        public class UDPServer
         {
             public IPEndPoint ipEndPoint;
             private int ID { get; }
 
-            public UDP(int iD) => ID = iD;
+            public UDPServer(int iD) => ID = iD;
 
             public void Connect(IPEndPoint ipEndPoint)
             {
