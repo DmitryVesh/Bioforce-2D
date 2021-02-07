@@ -12,7 +12,10 @@ public class Client : MonoBehaviour
     public static int DataBufferSize = 4096;
 
     public const int PortNumGame = 28020; //Must be the same as GameServer Port
-    public const int PortNumDiscover = PortNumGame + 1;
+    public const int PortNumLANDiscover = PortNumGame + 1;
+    public const int PortNumInternetDiscover = PortNumGame + 2;
+    public const string InternetMainServerIP = "85.255.235.193";
+
     public int ClientID = 0;
     public TCP tCP { get; set; }
     public UDP uDP { get; set; }
@@ -24,6 +27,7 @@ public class Client : MonoBehaviour
     [SerializeField] private float TimerTimeOutTime = 15;
     private bool TimerRunning { get; set; } = false;
     private float Timer { get; set; }
+    
 
     public static bool IsIPAddressValid(string text)
     {
@@ -57,7 +61,28 @@ public class Client : MonoBehaviour
 
         tCP.Connect(ip);
     }
+    public void Disconnect()
+    {
+        if (Connected)
+        {
+            try
+            {
+                tCP.Socket.Close();
+                uDP.Socket.Close();
+            }
+            catch (Exception exception)
+            {
+                Debug.Log($"Error, tried to close TCP and UDP sockets:\n{exception}");
+            }
+            ServerMenu.Disconnected();
+            Connected = false;
 
+            Debug.Log($"You, client: {ClientID} have been disconnected.");
+
+            GameManager.Instance.DisconnectAllPlayers();
+
+        }
+    }
     public void SuccessfullyConnected(int assignedID)
     {
         Connected = true;
@@ -309,6 +334,10 @@ public class Client : MonoBehaviour
     {
         Disconnect();
     }
+    private void OnDestroy()
+    {
+        Disconnect();
+    }
 
     private void InitClientData()
     {
@@ -324,27 +353,7 @@ public class Client : MonoBehaviour
         PacketHandlerDictionary.Add((int)ServerPackets.playerDied, ClientRead.PlayerDied);
         PacketHandlerDictionary.Add((int)ServerPackets.playerRespawned, ClientRead.PlayerRespawned);
         PacketHandlerDictionary.Add((int)ServerPackets.tookDamage, ClientRead.TookDamage);
+        PacketHandlerDictionary.Add((int)ServerPackets.serverIsFull, ClientRead.ServerIsFull);
     }
-    private void Disconnect()
-    {
-        if (Connected)
-        {
-            try
-            {
-                tCP.Socket.Close();
-                uDP.Socket.Close();
-            }
-            catch (Exception exception)
-            {
-                Debug.Log($"Error, tried to close TCP and UDP sockets:\n{exception}");
-            }
-            ServerMenu.Disconnected();
-            Connected = false;
-
-            Debug.Log($"You, client: {ClientID} have been disconnected.");
-            
-            GameManager.Instance.DisconnectAllPlayers();
-            
-        }
-    }    
+       
 }

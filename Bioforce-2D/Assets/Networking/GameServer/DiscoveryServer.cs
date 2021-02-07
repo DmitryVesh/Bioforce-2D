@@ -97,15 +97,6 @@ namespace GameServer
             Debug.Log($"\nUser {client.Client.RemoteEndPoint} is trying to connect to the discovery server...");
             TCPBeginReceiveDiscoveryClients();
 
-            
-            string serverName = Server.ServerName;
-            int currentPlayerCount = Server.GetCurrentNumPlayers();
-            int maxPlayerCount = Server.MaxNumPlayers;
-            string mapName = Server.MapName;
-
-            //TODO: Actually get ping value for
-            int ping = 10;
-
             int discoveryClientCount = -1;
             while (true)
             {
@@ -123,6 +114,15 @@ namespace GameServer
             }
 
             ClientDictionary[discoveryClientCount].Connect(client);
+
+            //TODO: 9001 Make a seperate packet for this, that a server must hear for - like the InternetDiscoveryClientPackets listened for
+            string serverName = Server.ServerName;
+            int currentPlayerCount = Server.GetCurrentNumPlayers();
+            int maxPlayerCount = Server.MaxNumPlayers;
+            string mapName = Server.MapName;
+
+            //TODO: Actually get ping value for
+            int ping = 10;
             ClientDictionary[discoveryClientCount].SendServerData(serverName, currentPlayerCount, maxPlayerCount, mapName, ping);
             Debug.Log($"Sent Server Data packet to: {client.Client.RemoteEndPoint}");
         }

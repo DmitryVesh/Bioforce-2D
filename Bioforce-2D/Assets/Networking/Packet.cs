@@ -3,14 +3,33 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-public enum DiscoveryClientPackets
+
+
+public enum InternetDiscoveryClientPackets
+{
+    firstAskForServers,
+    askForServerChanges,
+    addServer, //TODO: over 9000 addServer when creating server
+    deletedServer,
+    modifiedServer
+}
+public enum InternetDiscoveryServerPackets
+{
+    welcome,
+    serverData, //Same as added
+    serverDeleted,
+    serverModified
+}
+
+public enum LANDiscoveryClientPackets
 {
 
 }
-public enum DiscoveryServerPackets
+public enum LANDiscoveryServerPackets
 {
     serverData
 }
+
 /// <summary>Sent from server to client.</summary>
 public enum ServerPackets
 {
@@ -24,7 +43,8 @@ public enum ServerPackets
     bulleShot,
     playerDied,
     playerRespawned,
-    tookDamage
+    tookDamage,
+    serverIsFull
 }
 
 /// <summary>Sent from client to server.</summary>

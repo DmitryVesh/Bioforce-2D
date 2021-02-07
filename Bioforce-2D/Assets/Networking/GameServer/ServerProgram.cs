@@ -16,10 +16,10 @@ namespace GameServer
             try
             {
                 int portNumGame = 28020; //Unused port, checked Wiki page https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers for unused ports
-                int portNumDiscover = portNumGame + 1;
+                int portNumLANDiscover = portNumGame + 1;
 
 
-                DiscoveryServer.StartServer(portNumDiscover);
+                DiscoveryServer.StartServer(portNumLANDiscover);
                 Server.StartServer(serverName, maxNumPlayers, mapName, portNumGame);
 
                 return true;

@@ -55,6 +55,8 @@ namespace GameServer
                 $"\n\tMap:          {MapName}" +
                 $"\n\tMax Players:  {MaxNumPlayers}"+
                 $"\n\tPort number:  {PortNum}");
+
+            InternetServerScanner.ContactMainServerToAddOwnServer(Client.PortNumInternetDiscover);
         }
         public static void SendUDPPacket(IPEndPoint clientIPEndPoint, Packet packet)
         {
@@ -108,11 +110,22 @@ namespace GameServer
                 }
             }
             Debug.Log($"\nThe server is full... {client.Client.RemoteEndPoint} couldn't connect...");
+            SendServerIsFullPacket(client);
         }
         private static void TCPBeginAcceptClient()
         {
             TCPListener.BeginAcceptTcpClient(new AsyncCallback(TCPConnectAsyncCallback), null);
         }
+        private static void SendServerIsFullPacket(TcpClient client)
+        {
+            using (Packet packet = new Packet())
+            {
+                packet.Write((int)ServerPackets.serverIsFull);
+                packet.WriteLength();
+                SendUDPPacket((IPEndPoint)client.Client.RemoteEndPoint, packet); //TODO: The (IPEndPoint) might cause issues
+            }
+        }
+        
 
         private static void UDPConnectAsyncCallback(IAsyncResult asyncResult)
         {

@@ -83,11 +83,11 @@ public class CreateServer : MonoBehaviour
         PublicPrivateText.text = toggleText;
         PublicPrivateBackground.color = toggleBackgroundColor;
     }
-
     public void OnStartServer()
     {
         //TODO: Implement the Public/Private servers
-        bool startedSuccessfully = ServerProgram.StartServerProgram(ServerNameSelected, MaxPlayerSelected, MapSelected);
+        bool startedSuccessfully = ServerProgram.StartServerProgram(ServerNameSelected, MaxPlayerSelected, MapSelected);        
+
         if (!startedSuccessfully)
             return;
 

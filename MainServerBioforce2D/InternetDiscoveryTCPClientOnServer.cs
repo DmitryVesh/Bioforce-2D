@@ -1,23 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Net.Sockets;
 using System.Text;
-using UnityEngine;
 
-namespace GameServer
+namespace MainServerBioforce2D
 {
-    class DiscoveryTCPClientServer
+    class InternetDiscoveryTCPClientOnServer
     {
         public TcpClient TCPClient { get; private set; }
         public int ID { get; private set; }
+        public ImmutableList<Server> ServersAlreadyGiven { get; set; }
 
         private static int DataBufferSize { get; set; } = 4096;
+        
+
         private byte[] ReceiveBuffer;
         private NetworkStream Stream;
         private Packet ReceivePacket;
 
-        public DiscoveryTCPClientServer(int id) => 
-            ID = id;
+        public InternetDiscoveryTCPClientOnServer(int id) =>
+            (ID) = (id);
         public void Connect(TcpClient client)
         {
             TCPClient = client;
@@ -40,24 +43,9 @@ namespace GameServer
             ReceivePacket = null;
         }
 
-        //Sending packets
-        public void SendServerData(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping)
-        {
-            using (Packet packet = new Packet((int)LANDiscoveryServerPackets.serverData))
-            {
-                packet.Write(serverName);
-                packet.Write(currentPlayerCount);
-                packet.Write(maxPlayerCount);
-                packet.Write(mapName);
-                packet.Write(ping);
-                SendPacket(packet);
-            }
-        }
-
-        private void SendPacket(Packet packet)
+        public void SendPacket(Packet packet)
         {
             packet.WriteLength();
-
             try
             {
                 if (TCPClient != null)
@@ -66,7 +54,7 @@ namespace GameServer
             catch (Exception exception)
             {
                 //Disconnect();
-                Debug.Log($"\nError, occured when sending TCP data from client {ID}\nError{exception}");
+                Console.WriteLine($"\nError, occured when sending TCP data from client {ID}\nError{exception}");
             }
         }
 
@@ -94,7 +82,7 @@ namespace GameServer
             }
             catch (Exception exception)
             {
-                Debug.Log($"\nError in BeginReadReceiveCallback of client {TCPClient.Client.RemoteEndPoint}...\nError: {exception}");
+                Console.WriteLine($"\nError in BeginReadReceiveCallback of client {TCPClient.Client.RemoteEndPoint}...\nError: {exception}");
                 Disconnect();
             }
         }
@@ -114,9 +102,9 @@ namespace GameServer
                     using (Packet packet = new Packet(bytes))
                     {
                         int packetId = packet.ReadInt();
-                        DiscoveryServer.PacketHandlerDictionary[packetId](ID, packet);
+                        InternetDiscoveryTCPServer.PacketHandlerDictionary[packetId](ID, packet);
                     }
-                });
+                });                
                 packetLen = 0;
 
                 if (ExitHandleData(ref packetLen))
@@ -141,7 +129,5 @@ namespace GameServer
             }
             return false;
         }
-
-        
     }
 }

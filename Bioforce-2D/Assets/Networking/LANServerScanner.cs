@@ -102,11 +102,9 @@ public  class LANServerScanner : MonoBehaviour
                     {
                         Debug.Log($"Error in making and binding the client socket\nA server is already running on machine: \n{SocketException}");
                         CloseClient();
-                        ServerAddresses.Add("127.0.0.1");
-                        DiscoveryTCPClient discoveryTCP = new DiscoveryTCPClient();
-                        DiscoveryTCPs.Add(discoveryTCP);
-                        discoveryTCP.Connect("127.0.0.1", PortNum);
-                        return "127.0.0.1"; //Return localHost due to server running on local machine
+                        string localHostIP = "127.0.0.1";
+                        AddNewClient(localHostIP);
+                        return localHostIP; //Return localHost due to server running on local machine
                     }
                     Debug.Log($"Unexpected SocketException in Start Client:\n{SocketException}");
                     return null;
@@ -125,6 +123,7 @@ public  class LANServerScanner : MonoBehaviour
             {
                 BroadcastClientSocket.Close();
                 BroadcastClientSocket = null;
+                BroadcastRemoteEndPoint = null;
             }
         }
 
@@ -192,12 +191,9 @@ public  class LANServerScanner : MonoBehaviour
                     if (!ServerAddresses.Contains(address) && !LocalFullAddresses.Contains(address))
                     {
                         Debug.Log($"Got a server address: {address}");
-                        ServerAddresses.Add(address);
-                        DiscoveryTCPClient discoveryTCP = new DiscoveryTCPClient();
-                        DiscoveryTCPs.Add(discoveryTCP);
-                        discoveryTCP.Connect(address, PortNum);
+                        AddNewClient(address);
                     }
-                    
+
                     //Have to keep listening on the same BroadCast socket, due to other broadcast addresses may reply
                     BroadcastClientSocket.BeginReceiveFrom(new byte[1024], 0, 1024, SocketFlags.None, ref BroadcastRemoteEndPoint, new AsyncCallback(AsyncCallbackBroadcastSocket), null);
                 }
@@ -207,6 +203,15 @@ public  class LANServerScanner : MonoBehaviour
                 }
             }
         }
+
+        private void AddNewClient(string address)
+        {
+            ServerAddresses.Add(address);
+            LANDiscoveryClient discoveryTCP = new LANDiscoveryClient();
+            DiscoveryTCPs.Add(discoveryTCP);
+            discoveryTCP.Connect(address, PortNum);
+        }
+
         private static string GetBroadcastAddress(UnicastIPAddressInformation unicastAddress)
         {
             uint ipAddress = BitConverter.ToUInt32(unicastAddress.Address.GetAddressBytes(), 0);

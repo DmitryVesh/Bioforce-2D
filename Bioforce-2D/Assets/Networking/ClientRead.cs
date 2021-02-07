@@ -137,4 +137,9 @@ public class ClientRead : MonoBehaviour
 
         GameManager.PlayerDictionary[iD].TookDamage(damage, currentHealth);
     }
+
+    internal static void ServerIsFull(Packet packet)
+    {
+        ServerMenu.ServerConnectionFull();
+    }
 }
