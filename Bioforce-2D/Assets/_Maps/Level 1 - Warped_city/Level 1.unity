@@ -629,6 +629,125 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &163539787
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 1310.1964
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 62.073013
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 213.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 645259533758767524, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7667192909660145960, guid: fae23e7a51196c14bb208880ec5fc960,
+        type: 3}
+      propertyPath: m_Name
+      value: Player score Panel
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: fae23e7a51196c14bb208880ec5fc960, type: 3}
 --- !u!1 &247832105
 GameObject:
   m_ObjectHideFlags: 0
@@ -1542,7 +1661,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &691252174
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1560,10 +1679,10 @@ RectTransform:
   m_Father: {fileID: 824876257}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 15.2}
-  m_SizeDelta: {x: 1323.4661, y: 715.67505}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 15.200012}
+  m_SizeDelta: {x: -596.53394, y: -364.32495}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &691252175
 MonoBehaviour:
@@ -4045,10 +4164,10 @@ RectTransform:
   m_Father: {fileID: 691252174}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0.000061035156, y: 0}
-  m_SizeDelta: {x: 1346.2327, y: 112.379944}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 112.379944}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1001 &1515830291
 PrefabInstance:
@@ -5929,9 +6048,9 @@ MonoBehaviour:
     m_Bottom: 0
   m_ChildAlignment: 1
   m_Spacing: 0
-  m_ChildForceExpandWidth: 0
-  m_ChildForceExpandHeight: 0
-  m_ChildControlWidth: 0
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 1
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 1
   m_ChildScaleHeight: 1
