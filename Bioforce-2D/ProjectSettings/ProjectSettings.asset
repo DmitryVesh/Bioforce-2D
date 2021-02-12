@@ -171,7 +171,8 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    iPhone: com.HellTraversersInc.Bioforce2D
+    Standalone: com.HellTraversersInc.Bioforce2DTesting
+    iPhone: com.HellTraversersInc.Bioforce2DTesting
   buildNumber: {}
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 19
