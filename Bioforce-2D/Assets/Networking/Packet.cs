@@ -3,22 +3,24 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-
-
 public enum InternetDiscoveryClientPackets
 {
     firstAskForServers,
     askForServerChanges,
     addServer, //TODO: over 9000 addServer when creating server
     deletedServer,
-    modifiedServer
+    modifiedServer,
+    joinServerNamed
 }
 public enum InternetDiscoveryServerPackets
 {
     welcome,
     serverData, //Same as added
     serverDeleted,
-    serverModified
+    serverModified,
+    cantJoinServerDeleted,
+    noMoreServersAvailable,
+    joinServer
 }
 
 public enum LANDiscoveryClientPackets

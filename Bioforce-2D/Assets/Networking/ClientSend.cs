@@ -26,7 +26,7 @@ public class ClientSend : MonoBehaviour
         packet.Write(isFacingRight);
         packet.Write(position);
         packet.Write(velocity);
-        SendUDPPacket(packet);
+        SendTCPPacket(packet);
     }
     public static void PlayerMovementStats(float runSpeed, float sprintSpeed)
     {
@@ -55,6 +55,7 @@ public class ClientSend : MonoBehaviour
         //Can send empty packet because the server knows which clients sent a packet
         SendTCPPacket(packet);
     }
+
     public static void TookDamage(int damage, int currentHealth)
     {
         Packet packet = new Packet((int)ClientPackets.tookDamage);

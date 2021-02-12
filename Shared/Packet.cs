@@ -3,22 +3,35 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 
-namespace MainServerBioforce2D
+namespace Shared
 {
+    public enum MainServerToServer
+    {
+
+    }
+    public enum ServerToMainServer
+    {
+
+    }
+
     public enum InternetDiscoveryClientPackets
     {
         firstAskForServers,
         askForServerChanges,
         addServer,
         deletedServer,
-        modifiedServer
+        modifiedServer,
+        joinServerNamed
     }
     public enum InternetDiscoveryServerPackets
     {
         welcome,
         serverData, //Same as added
         serverDeleted,
-        serverModified
+        serverModified,
+        cantJoinServerDeleted,
+        noMoreServersAvailable,
+        joinServer
     }
 
     public enum LANDiscoveryClientPackets
@@ -464,5 +477,4 @@ namespace MainServerBioforce2D
             GC.SuppressFinalize(this);
         }
     }
-
 }

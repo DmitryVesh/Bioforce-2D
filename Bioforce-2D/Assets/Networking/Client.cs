@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameServer;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +12,12 @@ public class Client : MonoBehaviour
     public static Client Instance;
     public static int DataBufferSize = 4096;
 
-    public const int PortNumGame = 28020; //Must be the same as GameServer Port
-    public const int PortNumLANDiscover = PortNumGame + 1;
-    public const int PortNumInternetDiscover = PortNumGame + 2;
-    public const string InternetMainServerIP = "85.255.235.193";
+    public const int PortNumInternetDiscover = 28020;
+    public const int PortNumLANDiscover = 28021;
+    
+    public static int PortNumGame { get; private set; }
+    public const string InternetMainServerIP = "18.130.250.31";
+    //public const string InternetMainServerIP = "127.0.0.1";
 
     public int ClientID = 0;
     public TCP tCP { get; set; }
@@ -49,9 +52,10 @@ public class Client : MonoBehaviour
         }
         return true;
     }
-    public void ConnectToServer(string ip)
+    public void ConnectToServer(string ip, int port)
     {
-        Debug.Log($"Client going to try and connect to: {ip}");
+        PortNumGame = port;
+        Debug.Log($"Client going to try and connect to: {ip}:{port}");
         InitClientData();
 
         tCP = new TCP();
@@ -59,6 +63,12 @@ public class Client : MonoBehaviour
 
         ResetTimeOutTimer();
 
+        StartCoroutine(ConnectTCP(ip));
+               
+    }
+    private IEnumerator ConnectTCP(string ip)
+    {
+        yield return new WaitForSeconds(1); //Delays connection to server, as problems when query it too fast
         tCP.Connect(ip);
     }
     public void Disconnect()
@@ -107,6 +117,7 @@ public class Client : MonoBehaviour
             ReceiveBuffer = new byte[DataBufferSize];
 
             Socket.BeginConnect(ip, PortNumGame, ConnectCallback, Socket);
+            
         }
         public void SendPacket(Packet packet)
         {

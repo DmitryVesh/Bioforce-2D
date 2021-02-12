@@ -1,26 +1,23 @@
-﻿using System;
+﻿using Shared;
+using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Net.Sockets;
 using System.Text;
-using Shared;
 
-namespace MainServerBioforce2D
+
+namespace GameServer
 {
-    class InternetDiscoveryTCPClientOnServer
+    class DiscoveryTCPClientServer
     {
         public TcpClient TCPClient { get; private set; }
         public int ID { get; private set; }
-        public ImmutableList<Server> ServersAlreadyGiven { get; set; }
 
         private static int DataBufferSize { get; set; } = 4096;
-        
-
         private byte[] ReceiveBuffer;
         private NetworkStream Stream;
         private Packet ReceivePacket;
 
-        public InternetDiscoveryTCPClientOnServer(int id) =>
+        public DiscoveryTCPClientServer(int id) => 
             ID = id;
         public void Connect(TcpClient client)
         {
@@ -42,13 +39,26 @@ namespace MainServerBioforce2D
             Stream = null;
             ReceiveBuffer = null;
             ReceivePacket = null;
-
-            Console.WriteLine($"MainServer client: {ID} has disconnected...");
         }
 
-        public void SendPacket(Packet packet)
+        //Sending packets
+        public void SendServerData(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping)
+        {
+            using (Packet packet = new Packet((int)LANDiscoveryServerPackets.serverData))
+            {
+                packet.Write(serverName);
+                packet.Write(currentPlayerCount);
+                packet.Write(maxPlayerCount);
+                packet.Write(mapName);
+                packet.Write(ping);
+                SendPacket(packet);
+            }
+        }
+
+        private void SendPacket(Packet packet)
         {
             packet.WriteLength();
+
             try
             {
                 if (TCPClient != null)
@@ -57,7 +67,7 @@ namespace MainServerBioforce2D
             catch (Exception exception)
             {
                 //Disconnect();
-                Console.WriteLine($"\nError, occured when sending TCP data from client {ID}\nError{exception}");
+                Console.WriteLine($"\n\tError, occured when sending TCP data from client {ID}\nError{exception}");
             }
         }
 
@@ -85,7 +95,7 @@ namespace MainServerBioforce2D
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"\nError in BeginReadReceiveCallback of client {TCPClient.Client.RemoteEndPoint}...\nError: {exception}");
+                Console.WriteLine($"\n\tError in BeginReadReceiveCallback of client {TCPClient.Client.RemoteEndPoint}...\nError: {exception}");
                 Disconnect();
             }
         }
@@ -105,9 +115,9 @@ namespace MainServerBioforce2D
                     using (Packet packet = new Packet(bytes))
                     {
                         int packetId = packet.ReadInt();
-                        InternetDiscoveryTCPServer.PacketHandlerDictionary[packetId](ID, packet);
+                        DiscoveryServer.PacketHandlerDictionary[packetId](ID, packet);
                     }
-                });                
+                });
                 packetLen = 0;
 
                 if (ExitHandleData(ref packetLen))
@@ -132,5 +142,7 @@ namespace MainServerBioforce2D
             }
             return false;
         }
+
+        
     }
 }

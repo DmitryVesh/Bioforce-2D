@@ -15,19 +15,19 @@ public enum ServerEntryArrayListIndexes
 }
 public class ServerEntry : MonoBehaviour, IUIItemListing, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
 {
-    public string ServerIP { get; private set; }
     public string MapName { get; private set; }
+    public string ServerName { get; private set; }
 
     private List<TextMeshProUGUI> ArrayListTexts { get; set; }
     private Image TextBackground { get; set; }
     private ArrayList ItemList { get; set; }
     private ServersPage ParentServersPage { get; set; }
 
-    public void Init(ServersPage parentPage, string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping, string ip)
+    public void Init(ServersPage parentPage, string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping)
     {
         ParentServersPage = parentPage;
-        ServerIP = ip;
         MapName = mapName;
+        ServerName = serverName;
 
         ArrayListTexts = new List<TextMeshProUGUI>();
         ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.serverName).GetComponent<TextMeshProUGUI>());

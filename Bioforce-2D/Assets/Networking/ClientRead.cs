@@ -69,7 +69,6 @@ public class ClientRead : MonoBehaviour
     {
         int iD = packet.ReadInt();
         Vector2 position = packet.ReadVector2();
-
         // Prevents crash when a UDP packet connects before the TCP spawn player call from server
         try
         {

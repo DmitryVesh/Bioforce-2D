@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using UnityEngine;
+using Shared;
 
 namespace GameServer
 {
@@ -33,28 +33,49 @@ namespace GameServer
 
         public static void StartServer(string serverName, int maxNumPlayers, string mapName, int portNum)
         {
-            ServerName = serverName;
-            MapName = mapName;
+            try
+            {
+                ServerName = serverName;
+                MapName = mapName;
 
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnEndingConsoleApplication);
-            (MaxNumPlayers, PortNum) = (maxNumPlayers, portNum);
+                AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnEndingConsoleApplication);
+                (MaxNumPlayers, PortNum) = (maxNumPlayers, portNum);
 
-            Debug.Log("\nTrying to start the server...");
-            InitServerData();
+                Console.WriteLine($"\n\tTrying to start server: {ServerName}, port: {PortNum}...");
+                InitServerData();
 
-            TCPListener = new TcpListener(IPAddress.Any, portNum);
-            TCPListener.Start();
-            TCPBeginAcceptClient();
+                TCPListener = new TcpListener(IPAddress.Any, PortNum);
+                TCPListener.Start();
+                TCPBeginAcceptClient();
 
-            
-            UDPClient = new UdpClient(PortNum);
-            UDPBeginReceive();
 
-            Debug.Log($"" +
-                $"\nServer: {ServerName}" +
-                $"\n\tMap:          {MapName}" +
-                $"\n\tMax Players:  {MaxNumPlayers}"+
-                $"\n\tPort number:  {PortNum}");
+                UDPClient = new UdpClient(PortNum);
+                UDPBeginReceive();
+
+                Console.WriteLine($"\n\tSuccess Starting Server:" +
+                    $"\n\t\tServer: {ServerName}" +
+                    $"\n\t\tMap:          {MapName}" +
+                    $"\n\t\tMax Players:  {MaxNumPlayers}" +
+                    $"\n\t\tPort number:  {PortNum}");
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"\tError in making the Server: {ServerName}...\n{exception}");
+                CloseServer();
+            }
+        }
+        public static void CloseServer()
+        {
+            try
+            {
+                TCPListener.Stop();
+                UDPClient.Close();
+                Console.WriteLine($"\tClosed Server: {ServerName}");
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"\tError closing Server: {ServerName}...\n{exception}");
+            }
         }
         public static void SendUDPPacket(IPEndPoint clientIPEndPoint, Packet packet)
         {
@@ -67,7 +88,7 @@ namespace GameServer
             }
             catch (Exception exception)
             {
-                Debug.Log($"Error, sending data to Client from Server: {clientIPEndPoint} via UDP.\nException {exception}");
+                Console.WriteLine($"\tError, sending data to Client from Server: {clientIPEndPoint} via UDP.\nException {exception}");
             }
         }
         
@@ -89,26 +110,26 @@ namespace GameServer
             PacketHandlerDictionary.Add((int)ClientPackets.playerRespawned, ServerRead.PlayerRespawnedRead);
             PacketHandlerDictionary.Add((int)ClientPackets.tookDamage, ServerRead.TookDamageRead);
 
-            Debug.Log("Initialised server packets.");
+            Console.WriteLine("\tInitialised server packets.");
         }
 
         private static void TCPConnectAsyncCallback(IAsyncResult asyncResult)
         {
             TcpClient client = TCPListener.EndAcceptTcpClient(asyncResult);
             TCPBeginAcceptClient();
-            Debug.Log($"\nUser {client.Client.RemoteEndPoint} is trying to connect...");
+            Console.WriteLine($"\n\tServer: {ServerName}, user {client.Client.RemoteEndPoint} is trying to connect...");
 
             for (int count = 1; count < MaxNumPlayers + 1; count++)
             {
                 if (ClientDictionary[count].tCP.Socket == null)
                 {
                     ClientDictionary[count].tCP.Connect(client);
-                    Debug.Log($"Sent welcome packet to: {count}");
+                    Console.WriteLine($"\tServer: {ServerName}, sent welcome packet to: {count}");
                     ServerSend.Welcome(count, $"Welcome to {ServerName} server client: {count}", MapName);
                     return;
                 }
             }
-            Debug.Log($"\nThe server is full... {client.Client.RemoteEndPoint} couldn't connect...");
+            Console.WriteLine($"\n\tThe server is full... {client.Client.RemoteEndPoint} couldn't connect...");
             SendServerIsFullPacket(client);
         }
         private static void TCPBeginAcceptClient()
@@ -159,7 +180,7 @@ namespace GameServer
             catch (Exception exception)
             {
                 //TODO: maybe Disconnect client, error caused when 2 or more clients disconnect at same time.
-                Debug.Log($"Error, in UDP data:\n{exception}");
+                Console.WriteLine($"\tError, in UDP data:\n{exception}");
             }
         }
         private static void UDPBeginReceive()
@@ -169,8 +190,8 @@ namespace GameServer
 
         private static void OnEndingConsoleApplication(object sender, EventArgs e)
         {
-            TCPListener.Stop();
-            UDPClient.Close();
+            Console.WriteLine($"\tEnding Server: {ServerName} Console");
+            CloseServer();
         }
         
     }

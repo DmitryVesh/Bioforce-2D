@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using UnityEngine;
 
 namespace GameServer
@@ -11,12 +10,12 @@ namespace GameServer
 
         private static bool isRunning = true;
 
-        public static bool StartServerProgram(string serverName, int maxNumPlayers, string mapName)
+        public static bool StartServerProgram(string serverName, int maxNumPlayers, string mapName, int port)
         {
             try
             {
-                int portNumGame = 28020; //Unused port, checked Wiki page https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers for unused ports
-                int portNumLANDiscover = portNumGame + 1;
+                int portNumGame = port; //Unused port, checked Wiki page https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers for unused ports
+                int portNumLANDiscover = 28021;
 
 
                 DiscoveryServer.StartServer(portNumLANDiscover);
@@ -30,6 +29,7 @@ namespace GameServer
                 return false;
             }
         }
+
         private void Awake()
         {
             DontDestroyOnLoad(this);

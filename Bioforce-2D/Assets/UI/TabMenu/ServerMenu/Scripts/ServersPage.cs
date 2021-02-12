@@ -15,9 +15,9 @@ public class ServersPage : UIItemListingManager
     private bool SortByChanged { get; set; }
     
 
-    private Queue<(string, int, int, string, int, string)> ServersToAdd = new Queue<(string, int, int, string, int, string)>();
-    public void EnqueEntry(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping, string ip) =>
-        ServersToAdd.Enqueue((serverName, currentPlayerCount, maxPlayerCount, mapName, ping, ip));
+    private Queue<(string, int, int, string, int)> ServersToAdd = new Queue<(string, int, int, string, int)>();
+    public void EnqueEntry(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping) =>
+        ServersToAdd.Enqueue((serverName, currentPlayerCount, maxPlayerCount, mapName, ping));
 
     public void OnServerEntryHover(ServerEntry serverEntry)
     {
@@ -79,13 +79,13 @@ public class ServersPage : UIItemListingManager
 
     private void AddEntry()
     {
-        (string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping, string ip) = ServersToAdd.Dequeue();
-        Debug.Log($"Adding server at IP: {ip}, to server page");
+        (string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping) = ServersToAdd.Dequeue();
+        Debug.Log($"Adding server: {serverName}, to server page");
         GameObject entryToAdd = Instantiate(ItemListingPrefab, transform);
         ServerEntry serverEntry = entryToAdd.GetComponent<ServerEntry>();
-        serverEntry.Init(this, serverName, currentPlayerCount, maxPlayerCount, mapName, ping, ip);
+        serverEntry.Init(this, serverName, currentPlayerCount, maxPlayerCount, mapName, ping);
 
-        ServerInfoItemLists.Add(ip, serverEntry);
+        ServerInfoItemLists.Add(serverName, serverEntry);
         ServerAdded = true;
     }
 }

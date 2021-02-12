@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameServer;
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using TMPro;
@@ -21,8 +22,12 @@ public class ServerMenu : MonoBehaviour
     //Server pages & Manual Entries
     private ServersPage SelectedServersPage { get; set; } = null;
     private Dictionary<GameObject, ServersPage> ServerPagesDict { get; set; }
+
+    
+
     private ServersPage InternetServersPage { get; set; }
     private ServersPage LANServersPage { get; set; }
+
     private GameObject ManualEntryObject { get; set; }
     private bool SelectedManualEntry { get; set; }
 
@@ -31,6 +36,8 @@ public class ServerMenu : MonoBehaviour
     [SerializeField] private GameObject ServerConnectionErrorPanel;
     [SerializeField] private TextMeshProUGUI ServerConnectionErrorText;
 
+    
+
     //Packet handler methods
     internal static void ReadWelcomePacket(string ip, Packet packet)
     {
@@ -38,8 +45,6 @@ public class ServerMenu : MonoBehaviour
         Debug.Log($"Connection with MainServer established.\nMessage from MainServer: {message}");
         if (Instance.AskingForServers)
             InternetServerScanner.SendFirstAskForServersPacket();
-        else
-            InternetServerScanner.SendAddServerPacket();
     }
     internal static void ReadServerDeletedPacket(string ip, Packet packet)
     {
@@ -67,17 +72,52 @@ public class ServerMenu : MonoBehaviour
 
         if (serverIP == Client.InternetMainServerIP)
         {
-            string ip = packet.ReadString();
-            Instance.AddInternetServerToPage(serverName, currentPlayerCount, maxPlayerCount, mapName, ping, ip);
+            Instance.AddInternetServerToPage(serverName, currentPlayerCount, maxPlayerCount, mapName, ping);
         }
         else
-            Instance.AddLANServerToPage(serverName, currentPlayerCount, maxPlayerCount, mapName, ping, serverIP);
+            Instance.AddLANServerToPage(serverName, currentPlayerCount, maxPlayerCount, mapName, ping);
     }
-    
+    internal static void ReadJoinServer(string ip, Packet packet)
+    {
+        
+        string serverIP = packet.ReadString();
+        int serverPort = packet.ReadInt();
+        Debug.Log($"Read JoinServer Packet, Server: {serverIP}:{serverPort}");
+
+        Client.Instance.ConnectToServer(serverIP, serverPort);
+    }
+
+    internal static void ReadNoMoreServersAvailable(string ip, Packet packet)
+    {
+        throw new NotImplementedException();
+    }
+    internal static void ReadCantJoinServerDeleted(string ip, Packet packet)
+    {
+        throw new NotImplementedException();
+    }
+
+    public static void DisconnectedMainServer()
+    {
+        Instance.ServerConnectionErrorText.text =
+            "Lost connection to Main Server..." +
+            "\nCheck your Internet connection" +
+            "\n\nPress Continue to proceed";
+
+        Instance.ServerConnectionErrorPanel.SetActive(true);
+    }
+    public static void TimedOutMainServer()
+    {
+        Instance.ServerConnectionErrorText.text =
+            "Connection to Main Server Timed Out..." +
+            "\nCheck your Internet connection" +
+            "\n\nPress Continue to proceed";
+
+        Instance.ServerConnectionErrorPanel.SetActive(true);
+        Instance.ServerMenuPanel.SetActive(false);
+    }
 
     public static void SetManualIPAddress(bool ipValid) =>
         Instance.ConnectButton.Interactable = ipValid;
-
     public static void SetEntrySelected(ServerEntry serverEntry)
     {
         Instance.ServerEntryConnectTo = serverEntry;
@@ -87,8 +127,9 @@ public class ServerMenu : MonoBehaviour
     {
         Instance.ServerConnectionErrorText.text =
             "Connection to selected Server timed out..." +
-            "\nPress Continue to proceed";
+            "\n\nPress Continue to proceed";
         Instance.ServerConnectionErrorPanel.SetActive(true);
+        Instance.ServerMenuPanel.SetActive(false);
     }
     public static void Disconnected()
     {
@@ -108,7 +149,11 @@ public class ServerMenu : MonoBehaviour
         if (SelectedManualEntry) //TODO: Make so Discovery tcp client is made to check out the ip address
             throw new NotImplementedException();
         else
-            Client.Instance.ConnectToServer(ServerEntryConnectTo.ServerIP);
+        {
+            //Send packet to MainServer that you want to join a specific server
+            InternetServerScanner.SendJoinServerPacket(Client.PortNumInternetDiscover, ServerEntryConnectTo.ServerName);
+        }
+            
     }
     public void ShowServerMenu()
     {
@@ -117,7 +162,6 @@ public class ServerMenu : MonoBehaviour
         else
         {
             ServerMenuPanel.SetActive(true);
-            LoadServersForSelectedServersPage();
         }
     }
     public void HideServerMenu() =>
@@ -197,9 +241,9 @@ public class ServerMenu : MonoBehaviour
             InternetServerScanner.ContactMainServerForServers(Client.PortNumInternetDiscover);
 
     }
-    private void AddLANServerToPage(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping, string ip) =>
-        LANServersPage.EnqueEntry(serverName, currentPlayerCount, maxPlayerCount, mapName, ping, ip);
-    private void AddInternetServerToPage(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping, string ip) =>
-        InternetServersPage.EnqueEntry(serverName, currentPlayerCount, maxPlayerCount, mapName, ping, ip);
+    private void AddLANServerToPage(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping) =>
+        LANServersPage.EnqueEntry(serverName, currentPlayerCount, maxPlayerCount, mapName, ping);
+    private void AddInternetServerToPage(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping) =>
+        InternetServersPage.EnqueEntry(serverName, currentPlayerCount, maxPlayerCount, mapName, ping);
 
 }

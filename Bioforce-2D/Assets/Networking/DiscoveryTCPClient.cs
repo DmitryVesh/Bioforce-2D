@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
 
@@ -14,6 +15,7 @@ public abstract class DiscoveryTCPClient
     private int DataBufferSize = 4096;
 
     public Action OnDisconnectAction { get; set; }
+    public Action OnTimedOutAction { get; set; }
 
     protected delegate void PacketHandler(string ip, Packet packet);
     protected Dictionary<int, PacketHandler> PacketHandlerDictionary { get; set; } = new Dictionary<int, PacketHandler>();
@@ -32,7 +34,6 @@ public abstract class DiscoveryTCPClient
         Socket.SendBufferSize = DataBufferSize;
 
         ReceiveBuffer = new byte[DataBufferSize];
-
         Socket.BeginConnect(ipAddressConnectTo, portNum, ConnectCallback, Socket);
         Debug.Log($"A DiscoveryTCPClient trying to connect to: {ipAddressConnectTo}...");
     }
@@ -47,9 +48,10 @@ public abstract class DiscoveryTCPClient
         catch (Exception exception)
         {
             Debug.Log($"Error, sending data to server from Client via TCP.\nException {exception}");
+            Disconnect(false, true);
         }
     }
-    public void Disconnect()
+    public void Disconnect(bool crashed, bool timedOut)
     {
         if (Socket != null)
             Socket.Close();
@@ -60,7 +62,10 @@ public abstract class DiscoveryTCPClient
         ReceiveBuffer = null;
         ReceivePacket = null;
 
-        OnDisconnectAction?.Invoke();
+        if (crashed)
+            OnDisconnectAction?.Invoke();
+        else if (timedOut)
+            OnTimedOutAction?.Invoke();
     }
 
     private void ConnectCallback(IAsyncResult asyncResult)
@@ -78,6 +83,7 @@ public abstract class DiscoveryTCPClient
         }
         catch (Exception exception)
         {
+            Disconnect(true, false);
             Debug.Log($"Error in TCP ConnectCallback\n{exception}");
         }
     }
@@ -89,7 +95,7 @@ public abstract class DiscoveryTCPClient
             int byteLen = Stream.EndRead(asyncResult);
             if (byteLen <= 0)
             {
-                Disconnect();
+                Disconnect(true, false);
                 return;
             }
 
@@ -101,8 +107,8 @@ public abstract class DiscoveryTCPClient
         }
         catch (Exception exception)
         {
-            Debug.Log($"\nError in BeginReadReceiveCallback...\nError: {exception}");
-            Disconnect();
+            Debug.Log($"Error in BeginReadReceiveCallback: {Socket.Client.RemoteEndPoint}...\nError: {exception}");
+            Disconnect(true, false);
         }
     }
     private bool HandleData(byte[] data)

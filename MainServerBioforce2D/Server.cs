@@ -13,16 +13,14 @@ namespace MainServerBioforce2D
         public string MapName { get; private set; }
         public int CurrentNumPlayers { get; private set; }
         public int Ping { get; private set; }
-        public string IP { get; private set; }
 
-        public Server(string serverName, int maxNumPlayers, string mapName, int currentNumPlayers, int ping, string iP)
+        public Server(string serverName, int maxNumPlayers, string mapName, int currentNumPlayers, int ping)
         {
             ServerName = serverName;
             MaxNumPlayers = maxNumPlayers;
             MapName = mapName;
             CurrentNumPlayers = currentNumPlayers;
             Ping = ping;
-            IP = iP;
 
             TimeStamp = DateTime.Now;
         }

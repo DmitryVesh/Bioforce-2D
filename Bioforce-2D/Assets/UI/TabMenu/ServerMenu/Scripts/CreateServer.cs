@@ -4,7 +4,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using GameServer;
-using System.Net;
 
 public class CreateServer : MonoBehaviour
 {
@@ -25,16 +24,20 @@ public class CreateServer : MonoBehaviour
     [SerializeField] TextMeshProUGUI MaxPlayersText;
 
     //Public/Private server
-    [SerializeField] Toggle PublicPrivateGameToggle;
     [SerializeField] Text PublicPrivateText;
     [SerializeField] Image PublicPrivateBackground;
     [SerializeField] Color PublicBackground;
     [SerializeField] Color PrivateBackground;
-    private bool ClickedOdd { get; set; }
+    private bool ClickedOddPublic { get; set; }
+
+    //Internet/LAN server
+    [SerializeField] Text InternetLANText;
+    [SerializeField] Image InternetLANBackground;
+    private bool ClickedOddInternet { get; set; }
 
 
     //Start Server
-    [SerializeField] Button StartServerButton;
+    [SerializeField] MenuButton StartServerButton;
     [SerializeField] GameObject ServerGameObject;
 
     //Final Server Data
@@ -42,6 +45,7 @@ public class CreateServer : MonoBehaviour
     public string MapSelected { get; private set; }
     public int MaxPlayerSelected { get; private set; }
     public bool PublicServerSelected { get; private set; } = true;
+    public bool InternetServerSelected { get; private set; } = true;
 
 
     //Events subscribed by Inspector
@@ -50,7 +54,7 @@ public class CreateServer : MonoBehaviour
         ServerNameSelected = ServerNameInputField.text;
         ServerNameSelected = ServerNameSelected.Replace(" ", null);
         ServerNameInputField.text = ServerNameSelected;
-        StartServerButton.interactable = IsServerNameValid(ServerNameSelected);
+        StartServerButton.Interactable = IsServerNameValid(ServerNameSelected);
     }
     public void OnMapDropdownChanged()
     {
@@ -63,8 +67,8 @@ public class CreateServer : MonoBehaviour
     }
     public void OnPublicPrivateGameToggle()
     {
-        ClickedOdd = !ClickedOdd;
-        if (!ClickedOdd)
+        ClickedOddPublic = !ClickedOddPublic;
+        if (!ClickedOddPublic)
             return;
 
         PublicServerSelected = !PublicServerSelected;
@@ -83,23 +87,57 @@ public class CreateServer : MonoBehaviour
         PublicPrivateText.text = toggleText;
         PublicPrivateBackground.color = toggleBackgroundColor;
     }
-    public void OnStartServer()
+    public void OnInternetLANGameToggle()
     {
-        //TODO: Implement the Public/Private servers
-        bool startedSuccessfully = ServerProgram.StartServerProgram(ServerNameSelected, MaxPlayerSelected, MapSelected);        
-
-        if (!startedSuccessfully)
+        ClickedOddInternet = !ClickedOddInternet;
+        if (!ClickedOddInternet)
             return;
 
-        Instantiate(ServerGameObject);
-        Client.Instance.ConnectToServer(IPAddress.Loopback.ToString());
+        InternetServerSelected = !InternetServerSelected;
+        string toggleText;
+        Color toggleBackgroundColor;
+        if (InternetServerSelected)
+        {
+            toggleBackgroundColor = PublicBackground;
+            toggleText = "Internet Server";
+        }
+        else
+        {
+            toggleBackgroundColor = PrivateBackground;
+            toggleText = "LAN Server";
+        }
+        InternetLANText.text = toggleText;
+        InternetLANBackground.color = toggleBackgroundColor;
+    }
+    public void OnStartServer()
+    {
+        bool successStart;
+        if (!InternetServerSelected)
+        {
+            int port = 28025; //TODO: Make so not hardcoded, maybe player assigns their own?
+            successStart = ServerProgram.StartServerProgram(ServerNameSelected, MaxPlayerSelected, MapSelected, port);
+            Instantiate(ServerGameObject);
+            Client.Instance.ConnectToServer("127.0.0.1", port);
+        }
+        else 
+        {
+            successStart = InternetServerScanner.ContactMainServerToAddOwnServer(ServerNameSelected, MaxPlayerSelected, MapSelected, Client.PortNumInternetDiscover);
+            //Waiting for response packet from MainServer
+        }
+        //TODO: Implement the Public/Private servers
+
+        if (!successStart)
+        {
+            Debug.Log($"Error, {(InternetServerSelected ? "Internet" : "LAN" )} server not started...");
+            return;
+        }
     }
 
     void Start()
     {
         SetMapDropdownOptions();
         OnMaxPlayerSliderChanged();
-        StartServerButton.interactable = false;
+        StartServerButton.Interactable = false;
     }
 
     private bool IsServerNameValid(string serverName) =>

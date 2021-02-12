@@ -14,10 +14,15 @@ public  class LANServerScanner : MonoBehaviour
     private static int PortNum { get; set; }
 
     public static DiscoveryUDPClient DiscoveryClientManager { get; private set; } = new DiscoveryUDPClient();
+    private bool AskedAlready { get; set; }
 
     //Calling UDP broadcast...
     public IEnumerator GetLANServerAddressUDPBroadcast(int portNum)
     {
+        if (AskedAlready)
+            yield break;
+        AskedAlready = true;
+
         PortNum = portNum;
         DiscoveryClientManager.ScanHost();
         string address = DiscoveryClientManager.StartClient(portNum);
@@ -33,6 +38,8 @@ public  class LANServerScanner : MonoBehaviour
         yield return new WaitForSeconds(DiscoveryClientManager.GetTotalPingTime());
         DiscoveryClientManager.PrintAllAddressesFound();
         DiscoveryClientManager.CloseClient();
+
+        AskedAlready = false;
     }
     private void OnDestroy()
     {

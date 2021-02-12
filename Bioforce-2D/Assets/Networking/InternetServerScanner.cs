@@ -25,10 +25,20 @@ public class InternetServerScanner : MonoBehaviour
         //4.
         Instance.ResetReAskTimer(true);
     }
-    public static void ContactMainServerToAddOwnServer(int port)
+    public static bool ContactMainServerToAddOwnServer(string serverName, int maxNumPlayers, string mapName, int port)
     {
-        ServerMenu.Instance.AskingForServers = false;
-        StartMainServerSocket(port);
+        try
+        {
+            ServerMenu.Instance.AskingForServers = false;
+            StartMainServerSocket(port);
+            SendAddServerPacket(serverName, maxNumPlayers, mapName);
+            return true;
+        }
+        catch (Exception exception)
+        {
+            Debug.Log($"Error contacting MainServer to add own server.\n{exception}");
+            return false;
+        }
     }
     private static void StartMainServerSocket(int port)
     {
@@ -39,14 +49,14 @@ public class InternetServerScanner : MonoBehaviour
 
             Instance.MainServerSocket = new InternetDiscoveryClient();
             Instance.MainServerSocket.OnDisconnectAction += Instance.OnMainServerSocketDisconnected;
-
+            Instance.MainServerSocket.OnTimedOutAction += Instance.OnMainServerSocketTimedOut;
             //1.
             Instance.MainServerSocket.Connect(Client.InternetMainServerIP, port);
         }
         catch (Exception exception)
         {
             Debug.Log($"Error in contacting MainServer...\n{exception}");
-            Instance.MainServerSocket.Disconnect();
+            Instance.MainServerSocket.Disconnect(false, true);
         }
     }
 
@@ -59,20 +69,24 @@ public class InternetServerScanner : MonoBehaviour
             packet.Write((int)InternetDiscoveryClientPackets.firstAskForServers);
             Instance.MainServerSocket.SendPacket(packet);
         }
+        Debug.Log("Sent FirstAskForServers Packet to MainServer");
     }
     
-    internal static void SendAddServerPacket()
+    internal static void SendAddServerPacket(string serverName, int maxNumPlayers, string mapName)
     {
+        Debug.Log($"Sent Add Server Packet: {serverName}");
         using (Packet packet = new Packet())
         {
             packet.Write((int)InternetDiscoveryClientPackets.addServer);
-            packet.Write(GameServer.Server.ServerName);
-            packet.Write(GameServer.Server.MaxNumPlayers);
-            packet.Write(GameServer.Server.MapName);
-            packet.Write(GameServer.Server.GetCurrentNumPlayers());
+            packet.Write(serverName);
+            packet.Write(maxNumPlayers);
+            packet.Write(mapName);
+            packet.Write(1);
             packet.Write(10); //TODO: calculate actualy ping
+
             Instance.MainServerSocket.SendPacket(packet);
         }
+        //Now wait for 
     }
     private void SendAskForServerChangesPacket()
     {
@@ -82,15 +96,36 @@ public class InternetServerScanner : MonoBehaviour
             MainServerSocket.SendPacket(packet);
         }
     }
+    internal static void SendJoinServerPacket(int port, string serverName)
+    {
+        try
+        {
+            StartMainServerSocket(port);
+            using (Packet packet = new Packet((int)InternetDiscoveryClientPackets.joinServerNamed))
+            {
+                packet.Write(serverName);
+                Instance.MainServerSocket.SendPacket(packet);
+            }
+        }
+        catch (Exception exception)
+        {
+            Debug.Log($"Error SendJoinServerPacket to server: {serverName}...\n{exception}");
+        }
+    }
 
 
     //5.3
     private void OnMainServerSocketDisconnected()
     {
-        //TODO: Display error message when communication with the MainServer stopped
         ResetReAskTimer(false);
         MainServerSocket = null;
-        throw new NotImplementedException("Display error message when communication with the MainServer stopped");
+        ServerMenu.DisconnectedMainServer();
+    }
+    private void OnMainServerSocketTimedOut()
+    {
+        ResetReAskTimer(false);
+        MainServerSocket = null;
+        ServerMenu.TimedOutMainServer();
     }
     private void ResetReAskTimer(bool shouldRun)
     {
@@ -126,9 +161,10 @@ public class InternetServerScanner : MonoBehaviour
     {
         //5.2
         if (MainServerSocket != null)
-            MainServerSocket.Disconnect();
+            MainServerSocket.Disconnect(false, false);
         MainServerSocket = null;
         ResetReAskTimer(false);
     }
 
+    
 }

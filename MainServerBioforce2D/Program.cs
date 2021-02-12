@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Threading;
+using Shared;
+using GameServer;
+using System.Linq;
 
 namespace MainServerBioforce2D
 {
@@ -8,18 +11,22 @@ namespace MainServerBioforce2D
         public const int Ticks = 30;
         public const int MillisecondsInTick = 1000 / Ticks;
 
-        const int Port = 28022;
+        const int Port = 28020;
         static bool IsRunning = true;
 
-        static void Main()
+        static void Main(string[] args)
         {
-            Server server1 = new Server("Hello", 10, "Jesus", 2, 10, "127.1");
-            Server server2 = new Server("Jimbo", 24, "GCPD", 2, 10, "127.1");
-
-            InternetDiscoveryTCPServer.StartServer(Port);
-
-            Thread mainThread = new Thread(new ThreadStart(MainThread));
-            mainThread.Start();
+            if (args.Length == 0 || args[0] == "MainServer")
+            {
+                InternetDiscoveryTCPServer.StartServer(Port);
+                Thread mainThread = new Thread(new ThreadStart(MainThread));
+                mainThread.Start();
+            }
+            else if (args[0] == "GameServer")
+            {
+                args = args.Skip(1).ToArray();
+                ServerProgram.StartServerProgram(args);
+            }
         }
 
         private static void MainThread()

@@ -1250,7 +1250,7 @@ MonoBehaviour:
   ServerPageHolder: {fileID: 1329034720}
   KeyServerFields: {fileID: 872623789}
   ServerConnectionErrorPanel: {fileID: 216496247}
-  ServerConnectionErrorText: {fileID: 0}
+  ServerConnectionErrorText: {fileID: 524567148}
 --- !u!114 &327493629
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1593,8 +1593,8 @@ MonoBehaviour:
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1080}
-  m_ScreenMatchMode: 2
-  m_MatchWidthOrHeight: 0
+  m_ScreenMatchMode: 1
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -2595,11 +2595,13 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'The Server you tried to connect to is Full...
+  m_text: 'Connection to Main Server Timed Out...
+
+    Check your Internet connection
 
 
-    Press Continue to
-    proceed'
+    Press
+    Continue to proceed'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4347,10 +4349,10 @@ RectTransform:
   m_Father: {fileID: 1978578678}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.099853516, y: -534.4}
-  m_SizeDelta: {x: -117.06055, y: 699.62866}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -0.099853516, y: 5.5999756}
+  m_SizeDelta: {x: 1802.9395, y: 699.62866}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &1071930162 stripped
 RectTransform:
@@ -5226,18 +5228,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerModelUsernameText: {fileID: 131377725}
   InvalidChars: 71007a005a005d005b002700220040002b004a003b00280029005c002f0023002a0025002400a30021005e0026003d007e003f003c003e007c00
---- !u!114 &1228640218 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1228640218, guid: 7850bf9606fcbe344b4dc29fc7e6823a,
-    type: 3}
-  m_PrefabInstance: {fileID: 8062327124455689005}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1232685984
 GameObject:
   m_ObjectHideFlags: 0
@@ -5370,6 +5360,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1232685984}
   m_CullTransparentMesh: 0
+--- !u!114 &1273856485 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4223794603724611857, guid: 7850bf9606fcbe344b4dc29fc7e6823a,
+    type: 3}
+  m_PrefabInstance: {fileID: 8062327124455689005}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f00e10519964c494e8091599c6fb5790, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1290776051
 GameObject:
   m_ObjectHideFlags: 0
@@ -8726,18 +8728,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2137421460}
   m_CullTransparentMesh: 0
---- !u!114 &820650619723857663 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 820650619723857663, guid: 7850bf9606fcbe344b4dc29fc7e6823a,
-    type: 3}
-  m_PrefabInstance: {fileID: 8062327124455689005}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43a9e5c26010a0d4d8bef339bbd4fab2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &893024505633968651 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1638589376989360908, guid: f3c5ecf3f6ad1f4468fdb7513bf3c96d,
@@ -8812,7 +8802,7 @@ PrefabInstance:
     - target: {fileID: 953515855932439946, guid: ec54d0d24e5e16149992f64717e29396,
         type: 3}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 953515855932439946, guid: ec54d0d24e5e16149992f64717e29396,
         type: 3}
@@ -8822,7 +8812,7 @@ PrefabInstance:
     - target: {fileID: 953515855932439946, guid: ec54d0d24e5e16149992f64717e29396,
         type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 953515855932439946, guid: ec54d0d24e5e16149992f64717e29396,
         type: 3}
@@ -8832,7 +8822,7 @@ PrefabInstance:
     - target: {fileID: 953515855932439946, guid: ec54d0d24e5e16149992f64717e29396,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: -117.05994
+      value: 1802.9401
       objectReference: {fileID: 0}
     - target: {fileID: 953515855932439946, guid: ec54d0d24e5e16149992f64717e29396,
         type: 3}
@@ -9895,33 +9885,31 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1329034721}
     m_Modifications:
-    - target: {fileID: 1228640218, guid: 7850bf9606fcbe344b4dc29fc7e6823a, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 820650619723857663}
-    - target: {fileID: 1228640218, guid: 7850bf9606fcbe344b4dc29fc7e6823a, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnStartServer
+    - target: {fileID: 774159751, guid: 7850bf9606fcbe344b4dc29fc7e6823a, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.18367347
       objectReference: {fileID: 0}
-    - target: {fileID: 1228640218, guid: 7850bf9606fcbe344b4dc29fc7e6823a, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: CreateServer, Assembly-CSharp
+    - target: {fileID: 774159751, guid: 7850bf9606fcbe344b4dc29fc7e6823a, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 1228640218, guid: 7850bf9606fcbe344b4dc29fc7e6823a, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
+    - target: {fileID: 1555034752, guid: 7850bf9606fcbe344b4dc29fc7e6823a, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.18367347
       objectReference: {fileID: 0}
-    - target: {fileID: 820650619723857663, guid: 7850bf9606fcbe344b4dc29fc7e6823a,
-        type: 3}
-      propertyPath: ServerGameObject
-      value: 
-      objectReference: {fileID: 6066158761810390762, guid: 7af8c469d8a4ad64a932d38fd99138e9,
-        type: 3}
+    - target: {fileID: 1555034752, guid: 7850bf9606fcbe344b4dc29fc7e6823a, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1555034752, guid: 7850bf9606fcbe344b4dc29fc7e6823a, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.18367347
+      objectReference: {fileID: 0}
     - target: {fileID: 820650619723857663, guid: 7850bf9606fcbe344b4dc29fc7e6823a,
         type: 3}
       propertyPath: StartServerButton
       value: 
-      objectReference: {fileID: 1228640218}
+      objectReference: {fileID: 1273856485}
     - target: {fileID: 1100517954780525096, guid: 7850bf9606fcbe344b4dc29fc7e6823a,
         type: 3}
       propertyPath: m_Pivot.x
@@ -10031,6 +10019,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Create Server
+      objectReference: {fileID: 0}
+    - target: {fileID: 7241975846816560595, guid: 7850bf9606fcbe344b4dc29fc7e6823a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7850bf9606fcbe344b4dc29fc7e6823a, type: 3}
