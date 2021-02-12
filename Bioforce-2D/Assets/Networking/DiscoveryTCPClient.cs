@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
@@ -29,13 +30,21 @@ public abstract class DiscoveryTCPClient
 
     public void Connect(string ipAddressConnectTo, int portNum)
     {
-        Socket = new TcpClient();
-        Socket.ReceiveBufferSize = DataBufferSize;
-        Socket.SendBufferSize = DataBufferSize;
+        try
+        {
+            Socket = new TcpClient();
+            Socket.ReceiveBufferSize = DataBufferSize;
+            Socket.SendBufferSize = DataBufferSize;
 
-        ReceiveBuffer = new byte[DataBufferSize];
-        Socket.BeginConnect(ipAddressConnectTo, portNum, ConnectCallback, Socket);
-        Debug.Log($"A DiscoveryTCPClient trying to connect to: {ipAddressConnectTo}...");
+            ReceiveBuffer = new byte[DataBufferSize];
+            Socket.BeginConnect(ipAddressConnectTo, portNum, ConnectCallback, Socket);
+            Debug.Log($"A DiscoveryTCPClient trying to connect to: {ipAddressConnectTo}...");
+        }
+        catch (Exception exception)
+        {
+            Debug.Log($"Error Connecting DiscoveryTCPClient...{exception}");
+            Disconnect(false, true);
+        }
     }
     public void SendPacket(Packet packet)
     {

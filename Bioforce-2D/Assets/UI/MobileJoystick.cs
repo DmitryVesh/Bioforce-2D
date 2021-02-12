@@ -5,7 +5,7 @@ using UnityEngine;
 public class MobileJoystick : MonoBehaviour
 {
     public static MobileJoystick Instance;
-    private static bool Destroyed;
+    private bool Destroyed;
 
     public void SetActive(bool active)
     {
