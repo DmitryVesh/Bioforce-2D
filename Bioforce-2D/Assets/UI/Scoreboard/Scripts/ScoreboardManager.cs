@@ -74,7 +74,7 @@ public class ScoreboardManager : UIItemListingManager
         else if (Instance != this)
         {
             Debug.Log($"ScoreboardManager instance already exists, destroying {gameObject.name}");
-            Destroy(this);
+            Destroy(gameObject);
         }
         Scoreboard = transform.GetChild(0).gameObject;
         ScoreboardPanel = Scoreboard.transform.GetChild(0).gameObject;

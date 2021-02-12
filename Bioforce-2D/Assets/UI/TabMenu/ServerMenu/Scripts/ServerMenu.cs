@@ -196,7 +196,7 @@ public class ServerMenu : MonoBehaviour
         else if (Instance != this)
         {
             Debug.Log($"ServerMenu instance already exists, destroying {gameObject.name}");
-            Destroy(this);
+            Destroy(gameObject);
         }
         ServerMenuPanel = transform.GetChild(0).gameObject;
         PlayerRegistrationPanel = transform.GetChild(1).gameObject;

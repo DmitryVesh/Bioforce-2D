@@ -74,7 +74,7 @@ public class PlayerRegistration : MonoBehaviour
         else if (Instance != this)
         {
             Debug.Log($"PlayerRegistration instance already exists, destroying {gameObject.name}");
-            Destroy(this);
+            Destroy(gameObject);
         }
         UsernameInputField = transform.GetChild(0).GetComponent<TMP_InputField>();
         OKMenuButton = transform.GetChild(1).GetComponent<MenuButton>();

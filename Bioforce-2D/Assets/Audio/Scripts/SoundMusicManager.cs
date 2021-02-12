@@ -26,7 +26,7 @@ public class SoundMusicManager : MonoBehaviour
         else if (Instance != this)
         {
             Debug.Log($"MusicManager instance already exists, destroying {gameObject.name}");
-            Destroy(this);
+            Destroy(gameObject);
         }
 
         AudioSource = GetComponent<AudioSource>();

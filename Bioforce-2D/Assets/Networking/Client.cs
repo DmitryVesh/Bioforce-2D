@@ -63,8 +63,7 @@ public class Client : MonoBehaviour
 
         ResetTimeOutTimer();
 
-        StartCoroutine(ConnectTCP(ip));
-               
+        StartCoroutine(ConnectTCP(ip));   
     }
     private IEnumerator ConnectTCP(string ip)
     {
@@ -313,7 +312,7 @@ public class Client : MonoBehaviour
         else if (Instance != this)
         {
             Debug.Log($"Client instance already exists, destroying {gameObject.name}");
-            Destroy(this);
+            Destroy(gameObject);
         }
     }
     private void FixedUpdate()
@@ -348,6 +347,13 @@ public class Client : MonoBehaviour
     private void OnDestroy()
     {
         Disconnect();
+    }
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause)
+        {
+
+        }
     }
 
     private void InitClientData()

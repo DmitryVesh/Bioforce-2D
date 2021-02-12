@@ -16,7 +16,7 @@ public class CameraBoundries : MonoBehaviour
         else if (Instance != this)
         {
             Debug.Log($"{GetType().Name} instance already exists, destroying {gameObject.name}");
-            Destroy(this);
+            Destroy(gameObject);
         }
 
         CameraCollider = GetComponent<PolygonCollider2D>();

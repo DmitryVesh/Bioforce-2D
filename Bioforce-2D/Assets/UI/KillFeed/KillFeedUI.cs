@@ -43,7 +43,7 @@ public class KillFeedUI : UIEntryManager
         else if (Instance != this)
         {
             Debug.Log($"KillFeedUI instance already exists, destorying {gameObject.name}");
-            Destroy(this);
+            Destroy(gameObject);
         }
         base.Awake();
     }

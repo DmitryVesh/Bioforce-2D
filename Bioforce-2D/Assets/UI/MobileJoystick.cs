@@ -5,7 +5,7 @@ using UnityEngine;
 public class MobileJoystick : MonoBehaviour
 {
     public static MobileJoystick Instance;
-    private static bool Destroyed = false;
+    private static bool Destroyed;
 
     public void SetActive(bool active)
     {
@@ -21,8 +21,9 @@ public class MobileJoystick : MonoBehaviour
         else if (Instance != this)
         {
             Debug.Log($"MobileJoystick instance already exists, destroying {gameObject.name}");
-            Destroy(this);
+            Destroy(gameObject);
         }
+        Destroyed = false;
         SetActive(false);
     }
     private void OnDestroy()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 
 public class InternetServerScanner : MonoBehaviour
@@ -25,13 +26,13 @@ public class InternetServerScanner : MonoBehaviour
         //4.
         Instance.ResetReAskTimer(true);
     }
-    public static bool ContactMainServerToAddOwnServer(string serverName, int maxNumPlayers, string mapName, int port)
+    public bool ContactMainServerToAddOwnServer(string serverName, int maxNumPlayers, string mapName, int port)
     {
         try
         {
             ServerMenu.Instance.AskingForServers = false;
             StartMainServerSocket(port);
-            SendAddServerPacket(serverName, maxNumPlayers, mapName);
+            StartCoroutine(Instance.SendAddServerPacket(serverName, maxNumPlayers, mapName));
             return true;
         }
         catch (Exception exception)
@@ -72,8 +73,9 @@ public class InternetServerScanner : MonoBehaviour
         Debug.Log("Sent FirstAskForServers Packet to MainServer");
     }
     
-    internal static void SendAddServerPacket(string serverName, int maxNumPlayers, string mapName)
+    internal IEnumerator SendAddServerPacket(string serverName, int maxNumPlayers, string mapName)
     {
+        yield return new WaitForSeconds(0.5f);
         Debug.Log($"Sent Add Server Packet: {serverName}");
         using (Packet packet = new Packet())
         {
@@ -140,7 +142,7 @@ public class InternetServerScanner : MonoBehaviour
         else if (Instance != this)
         {
             Debug.Log($"InternetSeverScanner instance already exists, destroying {gameObject.name}");
-            Destroy(this);
+            Destroy(gameObject);
         }
     }
     private void FixedUpdate()

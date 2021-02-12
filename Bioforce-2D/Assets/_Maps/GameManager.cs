@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
 
     public delegate void PlayerDisconnected (int iD, string username);
     public event PlayerDisconnected OnPlayerDisconnected;
+    private bool ShouldLoadMainMenu { get; set; }
 
     private void Awake()
     {
@@ -27,9 +28,24 @@ public class GameManager : MonoBehaviour
         else if (Instance != this)
         {
             Debug.Log($"GameManager instance already exists, destroying {gameObject.name}");
-            Destroy(this);
+            Destroy(gameObject);
         }
         PlayerDictionary = new Dictionary<int, PlayerManager>();
+    }
+    private void FixedUpdate()
+    {
+        if (ShouldLoadMainMenu)
+        {
+            foreach (PlayerManager player in PlayerDictionary.Values)
+            {
+                ScoreboardManager.Instance.DeleteEntry(player.ID);
+                player.Disconnect();
+            }
+            PlayerDictionary.Clear();
+
+            SceneManager.LoadScene("Main Menu");
+            ShouldLoadMainMenu = false;
+        }
     }
 
     public void SpawnPlayer(int iD, string username, Vector3 position, bool isFacingRight, bool isDead, bool justJoined, int maxHealth, int currentHealth)
@@ -99,14 +115,8 @@ public class GameManager : MonoBehaviour
     public void DisconnectAllPlayers()
     {
         Debug.Log($"All players are being disconnected.");
-        foreach (PlayerManager player in PlayerDictionary.Values)
-        {
-            ScoreboardManager.Instance.DeleteEntry(player.ID);
-            player.Disconnect();
-        }
-        PlayerDictionary.Clear();
         //Return to MainMenu
-        SceneManager.LoadScene("Main Menu");
+        ShouldLoadMainMenu = true;
     }
     public void PlayerDied(int playerKilledDiedID, int bulletOwnerID, TypeOfDeath typeOfDeath)
     {

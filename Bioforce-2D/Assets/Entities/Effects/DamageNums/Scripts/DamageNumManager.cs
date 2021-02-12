@@ -26,7 +26,7 @@ public class DamageNumManager : MonoBehaviour
         else if (Instance != this)
         {
             Debug.Log($"DamageNumManager instance already exists, destroying {gameObject.name}");
-            Destroy(this);
+            Destroy(gameObject);
         }
     }
 

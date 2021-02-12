@@ -18,7 +18,7 @@ public class InGameChat : UIEntryManager
         else if (Instance != this)
         {
             Debug.Log($"InGameChat instance already exists, destorying {gameObject.name}");
-            Destroy(this);
+            Destroy(gameObject);
         }
         base.Awake();
     }

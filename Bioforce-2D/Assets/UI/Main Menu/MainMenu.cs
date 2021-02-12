@@ -90,7 +90,7 @@ public class MainMenu : MonoBehaviour
         else if (Instance != this)
         {
             Debug.Log($"MainMenu instance already exists, destroying {gameObject.name}");
-            Destroy(this);
+            Destroy(gameObject);
         }
         AudioSource = GetComponent<AudioSource>();
         MainMenuPanel = transform.GetChild(0).gameObject;

@@ -32,7 +32,7 @@ public class RespawnPoint : MonoBehaviour
         else if (Instance != this)
         {
             Debug.Log($"RespawnPoint instance already exists, destroying {gameObject.name}");
-            Destroy(this);
+            Destroy(gameObject);
         }
 
         int numPoints = transform.childCount;
