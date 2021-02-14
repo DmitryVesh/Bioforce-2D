@@ -1894,7 +1894,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5858864ec9c76c4494f7d1258f8eda6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TestingTouchInEditor: 1
+  TestingTouchInEditor: 0
   LocalPlayerPrefab: {fileID: 5321615058723665281, guid: 46915cd5231142d4d922fed68d8abf79,
     type: 3}
   PlayerPrefab: {fileID: 598685846401911508, guid: ab14d8c5b57b353488ff9af910ecd732,

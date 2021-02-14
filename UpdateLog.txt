@@ -1,4 +1,53 @@
 ===============================================================================================================================
+Version 0.5.7.2
+---------------
+
+Summary
+-------
+Main goals is to;
+	Assign each player a color, and change the color of name on kill field to corresponding player color
+
+Future tasks;	
+		
+	version 0.5.7.3
+		Add trail effects when a player sprints, so can clearly see player sprinting, also maybe zoom camera out a little bit...
+	version 0.5.7.4
+		make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+	version 0.5.7.5
+		Add invincibility frames, after being hit/respawning
+
+	version 0.5.8.1
+		add breathing camera movement when player is idle, going up and down.
+		using cinemachine add impulses, fast small camera movements in specific directions, for:
+			Player Getting shot
+			Player shooting
+			Player jumping
+			Player running
+	version 0.5.8.2
+		Make a main menu screen, and add a settings menu.
+	version 0.5.8.3
+		Make the scoreboard reuse scoreboard entries, instead of destroying them, when a player disconnects.
+
+
+	version 0.6.0
+		Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard
+		
+	
+	
+	Add chat into game
+	Add ping field to Player Score entries in scoreboard
+	Add gamepad support for pc & mac
+	Make server sided, currently very client sided
+
+	make the ThreadManager to work on multi-threading
+	prevent crashing and stopping receiving packets from client to server when 2 or more clients disconnect simultaneosly.
+	imrpove killFeedUI, make entries disappear by decreasing opacity, and popping them back up smoothly instead of vertical layout group which
+		pops them and moves other entries up instantly.
+	improve UI, adding pop up animations to the UI elements instead of just appearing instantly.
+	improve UI, adding black borders to UI Panels like TimeOutPanel.
+	fix player move validation, when respawned, should ignore any changes that occured lately.	
+
+===============================================================================================================================
 Version 0.5.7.1
 --------------
 
@@ -14,7 +63,7 @@ Main goals is to;
 		1 When player shoots, shoots in the direction where player's pointing
 		1 Sync muzzelFlash with arms
 		1 Sync player rotation on Multiplayer
-		0 Add mobile support
+		1 Add mobile support
 Future tasks;	
 	version 0.5.7.2
 		Assign each player a color, and change the color of name on kill field to corresponding player color.
