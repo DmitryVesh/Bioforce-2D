@@ -371,6 +371,7 @@ public class Client : MonoBehaviour
         PacketHandlerDictionary.Add((int)ServerPackets.playerRespawned, ClientRead.PlayerRespawned);
         PacketHandlerDictionary.Add((int)ServerPackets.tookDamage, ClientRead.TookDamage);
         PacketHandlerDictionary.Add((int)ServerPackets.serverIsFull, ClientRead.ServerIsFull);
+        PacketHandlerDictionary.Add((int)ServerPackets.armPositionRotation, ClientRead.ArmPositionRotation);
     }
        
 }

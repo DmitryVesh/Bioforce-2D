@@ -13,7 +13,7 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
 
 
     //Fields for X axis animations
-    [SerializeField] private bool FacingRight = true;
+    [SerializeField] protected bool FacingRight = true;
     private float SpeedXNonLocal { get; set; }
 
     //TODO: add Jumped sent animations so can play sound effect
@@ -79,7 +79,7 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
         
         return false;
     }
-    public void FlipSprite()
+    public virtual void FlipSprite()
     {
         FacingRight = !FacingRight;
         PlayerModelObject.transform.Rotate(0, 180, 0);

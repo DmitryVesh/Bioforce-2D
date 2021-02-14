@@ -18,6 +18,7 @@ namespace GameServer
 
         public Vector2 Position { get; private set; }
         public Vector2 Velocity { get; private set; }
+        public Quaternion Rotation { get; private set; }
         public bool IsFacingRight { get; private set; }
 
         private Vector2 LastPosition { get; set; }
@@ -51,11 +52,12 @@ namespace GameServer
             IsDead = false;
             CurrentHealth = MaxHealth;
         }
-        public void PlayerMoves(bool isFacingRight, Vector2 position, Vector2 velocity)
+        public void PlayerMoves(bool isFacingRight, Vector2 position, Vector2 velocity, Quaternion rotation)
         {
             IsFacingRight = isFacingRight;
             Position = position;
             Velocity = velocity;
+            Rotation = rotation;
         }
         public void SetPlayerMovementStats(float runSpeed, float sprintSpeed)
         {
@@ -84,7 +86,7 @@ namespace GameServer
                 ServerSend.PlayerPositionButLocal(ID, Position);
 
             //ServerSend.PlayerVelocity(ID, Velocity);
-            ServerSend.PlayerRotationAndVelocity(ID, IsFacingRight, Velocity);
+            ServerSend.PlayerRotationAndVelocity(ID, IsFacingRight, Velocity, Rotation);
             MovePlayerSent += 1;
             //ServerSend.PlayerAnimation(ID, )
         }

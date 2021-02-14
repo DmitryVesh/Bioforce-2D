@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,8 +32,29 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
         PlayerManager.OnPlayerDeath += PlayerCantMoveAndCantBeHit;
         PlayerManager.OnPlayerRespawn += PlayerCanMoveAndCanBeHit;
 
+        PlayerManager.OnPlayerPosition += PlayerPosition;
+        PlayerManager.OnPlayerRotation += PlayerRotation;
+
         PlayerCanMoveAndCanBeHit();
     }
+
+    private void PlayerPosition(Vector2 position)
+    {
+        LastRealPosition = RealPosition;
+        RealPosition = position;
+        if (RealPosition != (Vector2)ModelObject.transform.position)
+            ShouldLerpPosition = true;
+        TimeStartLerpPosition = Time.time;
+    }
+    private void PlayerRotation(Quaternion rotation)
+    {
+        LastRealRotation = RealRotation;
+        RealRotation = rotation;
+        if (RealRotation.eulerAngles != ModelObject.transform.rotation.eulerAngles)
+            ShouldLerpRotation = true;
+        TimeStartLerpRotation = Time.time;
+    }
+    
 
     private void ChangedPlayerMovementStats(float runSpeed)
     {
@@ -55,7 +77,7 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
     {
         yield return new WaitForSeconds(PlayerManager.RespawnTime);
         UnFreezeMotion();
-        Hitbox.enabled = true;        
+        Hitbox.enabled = true;
     }
     
     private void OnDestroy()

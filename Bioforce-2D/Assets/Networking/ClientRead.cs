@@ -82,14 +82,15 @@ public class ClientRead : MonoBehaviour
     public static void PlayerRotationAndVelocity(Packet packet)
     {
         int iD = packet.ReadInt();
-        bool isFacingRight = packet.ReadBool();        
+        bool isFacingRight = packet.ReadBool();
         Vector2 velocity = packet.ReadVector2();
+        Quaternion rotation = packet.ReadQuaternion();
 
         // Prevents crash when a UDP packet connects before the TCP spawn player call from server
         try
         {
-            //GameManager.PlayerDictionary[iD].SetRotation(isFacingRight);
             GameManager.PlayerDictionary[iD].SetVelocity(velocity);
+            //GameManager.PlayerDictionary[iD].SetRotation(rotation);
         }
         catch (KeyNotFoundException exception)
         {
@@ -125,7 +126,9 @@ public class ClientRead : MonoBehaviour
     public static void PlayerRespawned(Packet packet)
     {
         int iD = packet.ReadInt();
+        Vector2 respawnPoint = packet.ReadVector2();
         GameManager.PlayerDictionary[iD].PlayerRespawned();
+        GameManager.PlayerDictionary[iD].SetRespawnPosition(respawnPoint);
     }
 
     internal static void TookDamage(Packet packet)
@@ -140,5 +143,20 @@ public class ClientRead : MonoBehaviour
     internal static void ServerIsFull(Packet packet)
     {
         ServerMenu.ServerConnectionFull();
+    }
+
+    internal static void ArmPositionRotation(Packet packet)
+    {
+        int iD = packet.ReadInt();
+        Vector2 position = packet.ReadVector2();
+        Quaternion rotation = packet.ReadQuaternion();
+        try
+        {
+            GameManager.PlayerDictionary[iD].SetArmPositionRotation(position, rotation);
+        }
+        catch (Exception exception)
+        {
+            Debug.Log($"Player's: {iD} ArmPositionRotation caused an error.\n{exception}");
+        }
     }
 }

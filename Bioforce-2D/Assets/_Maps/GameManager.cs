@@ -126,8 +126,8 @@ public class GameManager : MonoBehaviour
     }
     public void PlayerRespawned(int iD)
     {
-        ClientSend.PlayerRespawned();
         PlayerDictionary[iD].PlayerRespawned();
+        ClientSend.PlayerRespawned(PlayerDictionary[iD].RespawnPosition);
     }
     public bool IsMobileSupported()
     {

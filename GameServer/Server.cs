@@ -109,6 +109,7 @@ namespace GameServer
             PacketHandlerDictionary.Add((int)ClientPackets.playerDied, ServerRead.PlayerDiedRead);
             PacketHandlerDictionary.Add((int)ClientPackets.playerRespawned, ServerRead.PlayerRespawnedRead);
             PacketHandlerDictionary.Add((int)ClientPackets.tookDamage, ServerRead.TookDamageRead);
+            PacketHandlerDictionary.Add((int)ClientPackets.armPositionRotation, ServerRead.ArmPositionRotation);
 
             Console.WriteLine("\tInitialised server packets.");
         }

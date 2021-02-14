@@ -37,11 +37,11 @@ namespace GameServer
             try
             {
                 bool isFacingRight = packet.ReadBool();
-                //TODO: Change position to be vector2
                 Vector2 position = packet.ReadVector2();
                 Vector2 velocity = packet.ReadVector2();
+                Quaternion rotation = packet.ReadQuaternion();
                 //Sometimes System.NullReferenceException when a player disconnects
-                Server.ClientDictionary[clientID].player.PlayerMoves(isFacingRight, position, velocity);
+                Server.ClientDictionary[clientID].player.PlayerMoves(isFacingRight, position, velocity, rotation);
             }
             catch (Exception exception)
             {
@@ -99,7 +99,8 @@ namespace GameServer
         {
             try
             {
-                ServerSend.PlayerRespawned(clientID);
+                Vector2 respawnPoint = packet.ReadVector2();
+                ServerSend.PlayerRespawned(clientID, respawnPoint);
                 Server.ClientDictionary[clientID].player.Respawned();
             }
             catch (Exception exception)
@@ -123,5 +124,20 @@ namespace GameServer
             }
         }
 
+        internal static void ArmPositionRotation(int clientID, Packet packet)
+        {
+            try
+            {
+                Vector2 position = packet.ReadVector2();
+                Quaternion rotation = packet.ReadQuaternion();
+                //TODO: make so all packets from player are sent in Update, apart from bullet
+                //Server.ClientDictionary[clientID].player.SetArmPositionRotation(position, rotation);
+                ServerSend.ArmPositionRotation(clientID, position, rotation);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"\tError, trying to read player's arm position and rotation, from player: {clientID}\n{exception}");
+            }
+        }
     }
 }

@@ -46,7 +46,8 @@ public enum ServerPackets
     playerDied,
     playerRespawned,
     tookDamage,
-    serverIsFull
+    serverIsFull,
+    armPositionRotation
 }
 
 /// <summary>Sent from client to server.</summary>
@@ -59,7 +60,8 @@ public enum ClientPackets
     bulletShot,
     playerDied,
     playerRespawned,
-    tookDamage
+    tookDamage,
+    armPositionRotation
 }
 
 public class Packet : IDisposable

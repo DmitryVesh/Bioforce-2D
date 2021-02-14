@@ -4,10 +4,12 @@ using System;
 public class LocalPlayerAnimations : NonLocalPlayerAnimations
 {
     private IWalkingLocalPlayer LocalPlayerMoveInterface { get; set; } = null;
+    private LocalPlayerGun LocalPlayerGun { get; set; }
 
     protected override void Awake()
     {
         LocalPlayerMoveInterface = GetComponent<IWalkingLocalPlayer>();
+        LocalPlayerGun = GetComponent<LocalPlayerGun>();
         base.Awake();
     }
 
@@ -18,4 +20,9 @@ public class LocalPlayerAnimations : NonLocalPlayerAnimations
             Anim.SetTrigger("Jumped");
     }
 
+    public override void FlipSprite()
+    {
+        base.FlipSprite();
+        LocalPlayerGun.SetLookDir(FacingRight);
+    }
 }

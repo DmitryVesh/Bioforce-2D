@@ -137,11 +137,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae780744dcf160347b2dc81e3de6ef26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BulletPrefab: {fileID: 8231054374207678704, guid: aa2eb6671e351654d96393916723c4e3,
+  BulletPrefab: {fileID: 8231054374207678704, guid: 0b974c8333e182941a37ff116a034aba,
     type: 3}
   PlayerColor: {r: 1, g: 0, b: 0, a: 1}
   MuzzelFlash: {fileID: 6625398418777097005}
-  FirePointTransform: {fileID: 4192087018930569236}
+  ArmsTransform: {fileID: 4192087018930569236}
+  FirePointTransform: {fileID: 4013754101938960510}
+  TurnedPositionOffset: 0.137
 --- !u!1001 &840800003725817419
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -464,16 +466,16 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: f3482d74ce666f64180c2372f5706508, type: 2}
-    - target: {fileID: 5237609012544596363, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+    - target: {fileID: 7883486896244927212, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
         type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.512
+      propertyPath: m_SortingOrder
+      value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 5237609012544596363, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+    - target: {fileID: 7883486896244927212, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
         type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0
-      objectReference: {fileID: 0}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: f3482d74ce666f64180c2372f5706508, type: 2}
     - target: {fileID: 9208764478554025956, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
         type: 3}
       propertyPath: m_Color.b
@@ -500,6 +502,12 @@ Transform:
 --- !u!4 &4192087018930569236 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5237609012544596363, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+    type: 3}
+  m_PrefabInstance: {fileID: 8251422772928506271}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4013754101938960510 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4985846923072000481, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
     type: 3}
   m_PrefabInstance: {fileID: 8251422772928506271}
   m_PrefabAsset: {fileID: 0}

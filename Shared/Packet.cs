@@ -57,7 +57,8 @@ namespace Shared
         playerDied,
         playerRespawned,
         tookDamage,
-        serverIsFull
+        serverIsFull,
+        armPositionRotation
     }
 
     /// <summary>Sent from client to server.</summary>
@@ -70,7 +71,8 @@ namespace Shared
         bulletShot,
         playerDied,
         playerRespawned,
-        tookDamage
+        tookDamage,
+        armPositionRotation
     }
 
     public class Packet : IDisposable

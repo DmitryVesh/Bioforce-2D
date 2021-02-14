@@ -15,7 +15,11 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
     [SerializeField] private Color PlayerColor; //Set in inspector, colors the muzzel flash and bulletPrefab
     [SerializeField] private MuzzelFlash MuzzelFlash; //Set in inspector
 
-    public virtual void ShootBullet(Vector2 position, Quaternion rotation)
+    [SerializeField] protected Transform ArmsTransform;
+    private Vector2 ArmPosition { get; set; }
+    private Quaternion ArmRotation{ get; set; }
+
+    public virtual void ShootBullet(Vector2 position, Quaternion rotation) //Has to be public to satisfy interface
     {
         Bullet bullet;
         bullet = GetBullet();
@@ -34,7 +38,13 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
     {
         OwnerClientID = iD;
     }
-    
+    private void SetArmPositionRotation(Vector2 position, Quaternion rotation)
+    {
+        //Need to call in late update so anims don't override the position x...
+        ArmPosition = position;
+        ArmRotation = rotation;
+    }
+
     public void Disable(TypeOfDeath typeOfDeath) =>
         CanShoot = false;
 
@@ -44,7 +54,7 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
     private void SetCanShootTrue() =>
         CanShoot = true;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         BulletList = new List<Bullet>();
     }
@@ -54,7 +64,13 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
         PlayerManager.OnPlayerDeath += Disable;
         PlayerManager.OnPlayerRespawn += Enable;
         PlayerManager.OnPlayerShot += ShootBullet;
+        PlayerManager.OnArmPositionRotation += SetArmPositionRotation;
         SetToPlayerColor(MuzzelFlash.gameObject);
+    }
+    protected virtual void LateUpdate()
+    {
+        ArmsTransform.localPosition = ArmPosition;
+        ArmsTransform.localRotation = ArmRotation;
     }
 
     private Bullet AddBullet()

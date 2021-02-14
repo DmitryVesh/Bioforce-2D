@@ -1,6 +1,7 @@
 ﻿
 
 using Shared;
+using System;
 using System.Numerics;
 
 namespace GameServer
@@ -69,12 +70,13 @@ namespace GameServer
 
             SendUDPPacketToAllButIncluded(playerID, packet);
         }
-        public static void PlayerRotationAndVelocity(int playerID, bool isFacingRight, Vector2 velocity)
+        public static void PlayerRotationAndVelocity(int playerID, bool isFacingRight, Vector2 velocity, Quaternion rotation)
         {
             Packet packet = new Packet((int)ServerPackets.playerRotationAndVelocity);
             packet.Write(playerID);
             packet.Write(isFacingRight);
             packet.Write(velocity);
+            packet.Write(rotation);
 
             SendUDPPacketToAllButIncluded(playerID, packet);
         }
@@ -105,12 +107,15 @@ namespace GameServer
 
             SendTCPPacketToAllButIncluded(playerKilledID, packet);
         }
-        public static void PlayerRespawned(int playerID)
+        public static void PlayerRespawned(int playerID, Vector2 respawnPoint)
         {
-            Packet packet = new Packet((int)ServerPackets.playerRespawned);
-            packet.Write(playerID);
+            using (Packet packet = new Packet((int)ServerPackets.playerRespawned))
+            {
+                packet.Write(playerID);
+                packet.Write(respawnPoint);
 
-            SendTCPPacketToAllButIncluded(playerID, packet);
+                SendTCPPacketToAllButIncluded(playerID, packet);
+            }            
         }
         internal static void TookDamage(int clientID, int damage, int currentHealth)
         {
@@ -121,7 +126,17 @@ namespace GameServer
 
             SendTCPPacketToAllButIncluded(clientID, packet);
         }
+        internal static void ArmPositionRotation(int playerID, Vector2 position, Quaternion rotation)
+        {
+            using (Packet packet = new Packet((int)ServerPackets.armPositionRotation))
+            {
+                packet.Write(playerID);
+                packet.Write(position);
+                packet.Write(rotation);
 
+                SendTCPPacketToAllButIncluded(playerID, packet);
+            }
+        }
 
         private static void SendTCPPacket(int recipientClient, Packet packet)
         {
@@ -148,6 +163,7 @@ namespace GameServer
             }
         }
 
+        
 
         private static void SendUDPPacket(int RecipientClient, Packet packet)
         {

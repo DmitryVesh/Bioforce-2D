@@ -12,6 +12,7 @@ public class PlayerManager : MonoBehaviour
     public int Deaths { get; private set; }
     public int Score { get; private set; }
 
+    public Vector2 RespawnPosition { get; set; }
     private GameObject PlayerModelObject { get; set; }
     private TextMeshProUGUI UsernameText { get; set; }
 
@@ -24,10 +25,8 @@ public class PlayerManager : MonoBehaviour
 
     public delegate void PlayerRespawn();
     public event PlayerRespawn OnPlayerRespawn;
-
     public delegate void PlayerDeath(TypeOfDeath typeOfDeath);
     public event PlayerDeath OnPlayerDeath;
-
     public static float RespawnTime { get; private set; } = 1.5f;
     public static float DeadTime { get; private set; } = 3;
 
@@ -36,11 +35,16 @@ public class PlayerManager : MonoBehaviour
 
     public delegate void PlayerShot(Vector2 position, Quaternion rotation);
     public event PlayerShot OnPlayerShot;
-
+    
     public delegate void PlayerJumped();
     public event PlayerJumped OnPlayerJumped;
 
+    public delegate void PlayerPosition(Vector2 position);
+    public event PlayerPosition OnPlayerPosition;
+    public delegate void PlayerRotation(Quaternion rotation);
+    public event PlayerRotation OnPlayerRotation;
 
+    public event PlayerShot OnArmPositionRotation;
 
 
     public string GetUsername() =>
@@ -64,9 +68,6 @@ public class PlayerManager : MonoBehaviour
         }
     }
     public void PlayerRespawned() =>
-        CallOnPlayerRespawnEvent();        
-
-    public void CallOnPlayerRespawnEvent() =>
         OnPlayerRespawn?.Invoke();
 
     public void CallOnPlayerJumpedEvent() =>
@@ -77,8 +78,16 @@ public class PlayerManager : MonoBehaviour
         (ID, Username) = (iD, username);
         SetUsername();
     }
+
+    public void SetRespawnPosition(Vector2 position)
+    {
+        PlayerModelObject.transform.position = position;
+        SetPosition(position);
+    }
     public void SetPosition(Vector2 position) =>
-        PlayerModelObject.transform.position = position; 
+        OnPlayerPosition?.Invoke(position); 
+    public void SetRotation(Quaternion rotation) =>
+        OnPlayerRotation?.Invoke(rotation); 
 
         
     
@@ -108,4 +117,6 @@ public class PlayerManager : MonoBehaviour
         OnPlayerTookDamage?.Invoke(damage, currentHealth);
     }
 
+    internal void SetArmPositionRotation(Vector2 position, Quaternion rotation) =>
+        OnArmPositionRotation?.Invoke(position, rotation);
 }

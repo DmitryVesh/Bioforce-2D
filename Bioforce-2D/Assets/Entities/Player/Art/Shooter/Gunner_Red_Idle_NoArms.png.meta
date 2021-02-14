@@ -1,16 +1,22 @@
 fileFormatVersion: 2
-guid: 45732827925b9144e8bfbd36084621d6
+guid: a50275373dac5b94f9991823717316a4
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6874598932150887524
-    second: Gunner_Red_Crouch_0
+      213: -5200753986682505280
+    second: Gunner_Red_Idle_NoArms_0
   - first:
-      213: -874900498602687444
-    second: Gunner_Red_Crouch_1
+      213: 4337312018113529257
+    second: Gunner_Red_Idle_NoArms_1
   - first:
-      213: -6496867729382972095
-    second: Gunner_Red_Crouch_2
+      213: -8241177035825072294
+    second: Gunner_Red_Idle_NoArms_2
+  - first:
+      213: -5479148169839552514
+    second: Gunner_Red_Idle_NoArms_3
+  - first:
+      213: -7483639601657075365
+    second: Gunner_Red_Idle_NoArms_4
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -57,7 +63,7 @@ TextureImporter:
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 30
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spriteGenerateFallbackPhysicsShape: 0
+  spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
@@ -75,7 +81,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 3
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -87,7 +93,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 3
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -99,7 +105,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 3
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -111,7 +117,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 3
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -123,7 +129,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 3
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -134,13 +140,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Gunner_Red_Crouch_0
+      name: Gunner_Red_Idle_NoArms_0
       rect:
         serializedVersion: 2
-        x: 12
-        y: 9
-        width: 28
-        height: 33
+        x: 0
+        y: 0
+        width: 48
+        height: 48
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -148,20 +154,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c9bddd3c1b48890a0800000000000000
-      internalID: -6874598932150887524
+      spriteID: 0c7b79bcdc533d7b0800000000000000
+      internalID: -5200753986682505280
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Gunner_Red_Crouch_1
+      name: Gunner_Red_Idle_NoArms_1
       rect:
         serializedVersion: 2
-        x: 60
-        y: 9
-        width: 28
-        height: 32
+        x: 48
+        y: 0
+        width: 48
+        height: 48
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -169,20 +175,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c2489f6c1aabbd3f0800000000000000
-      internalID: -874900498602687444
+      spriteID: 9a580b7ec4a313c30800000000000000
+      internalID: 4337312018113529257
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Gunner_Red_Crouch_2
+      name: Gunner_Red_Idle_NoArms_2
       rect:
         serializedVersion: 2
-        x: 109
-        y: 9
-        width: 28
-        height: 29
+        x: 96
+        y: 0
+        width: 48
+        height: 48
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -190,8 +196,50 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 145ed65d83d76d5a0800000000000000
-      internalID: -6496867729382972095
+      spriteID: a573a88462571ad80800000000000000
+      internalID: -8241177035825072294
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gunner_Red_Idle_NoArms_3
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 0
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ef75bf0f4c726f3b0800000000000000
+      internalID: -5479148169839552514
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Gunner_Red_Idle_NoArms_4
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 0
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b592f2cae65c42890800000000000000
+      internalID: -7483639601657075365
       vertices: []
       indices: 
       edges: []

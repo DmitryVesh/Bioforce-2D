@@ -1,22 +1,13 @@
 fileFormatVersion: 2
-guid: 9e9eb8c5212db90468a9b0c516085cfb
+guid: f0adcc24a451e2e419315c15d6d26b8b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8337842169589889817
-    second: Gunner_Red_Idle_0
+      213: -6330484933802502348
+    second: Arms Idle_0
   - first:
-      213: -2758518361414754215
-    second: Gunner_Red_Idle_1
-  - first:
-      213: -3518842775449019827
-    second: Gunner_Red_Idle_2
-  - first:
-      213: 5926205116766971294
-    second: Gunner_Red_Idle_3
-  - first:
-      213: -8294995440773728840
-    second: Gunner_Red_Idle_4
+      213: 3935580958692122817
+    second: Arms Idle_1
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -81,7 +72,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 3
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -93,7 +84,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 3
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -105,7 +96,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 3
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -117,7 +108,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 3
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -129,7 +120,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 3
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -140,106 +131,43 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Gunner_Red_Idle_0
+      name: Arms Idle_0
       rect:
         serializedVersion: 2
-        x: 12
-        y: 9
-        width: 28
-        height: 33
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 0
+        y: 0
+        width: 48
+        height: 48
+      alignment: 9
+      pivot: {x: 0.35, y: 0.52}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7e48258f8b80a4c80800000000000000
-      internalID: -8337842169589889817
+      spriteID: 4375db83e799528a0800000000000000
+      internalID: -6330484933802502348
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Gunner_Red_Idle_1
+      name: Arms Idle_1
       rect:
         serializedVersion: 2
-        x: 60
-        y: 9
-        width: 28
-        height: 33
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 48
+        y: 0
+        width: 48
+        height: 48
+      alignment: 9
+      pivot: {x: 0.35, y: 0.52}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9502b716a26c7b9d0800000000000000
-      internalID: -2758518361414754215
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Gunner_Red_Idle_2
-      rect:
-        serializedVersion: 2
-        x: 108
-        y: 9
-        width: 28
-        height: 33
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d4a59eca32f8a2fc0800000000000000
-      internalID: -3518842775449019827
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Gunner_Red_Idle_3
-      rect:
-        serializedVersion: 2
-        x: 156
-        y: 9
-        width: 28
-        height: 33
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: e956ff2c72c1e3250800000000000000
-      internalID: 5926205116766971294
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Gunner_Red_Idle_4
-      rect:
-        serializedVersion: 2
-        x: 204
-        y: 9
-        width: 28
-        height: 33
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 8b5723b689142ec80800000000000000
-      internalID: -8294995440773728840
+      spriteID: 1c0a2a3c70efd9630800000000000000
+      internalID: 3935580958692122817
       vertices: []
       indices: 
       edges: []

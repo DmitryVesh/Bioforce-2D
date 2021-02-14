@@ -168,14 +168,13 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
         Vector2 velocity = new Vector2(SpeedX, rb.velocity.y);
         if (CanMove)
             rb.velocity = velocity; // Applying movement in x direction, SpeedX calculated in Update, calculated in Update in order to increase responsiveness, applied in FixedUpdate to keep physics interaction reliable
-        
         SendMovesToServer(velocity);
     }
 
     protected override IEnumerator UnFreezeMotionAndHitBoxAfterRespawnAnimation()
     {
         SetRespawnPointLocation();
-        return base.UnFreezeMotionAndHitBoxAfterRespawnAnimation();
+        yield return base.UnFreezeMotionAndHitBoxAfterRespawnAnimation();
     }
     protected override void UnFreezeMotion()
     {
@@ -185,6 +184,7 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
     private void SetRespawnPointLocation()
     {
         ModelObject.transform.position = RespawnPoint.GetRandomSpawnPoint(ModelObject.transform.position);
+        PlayerManager.RespawnPosition = ModelObject.transform.position;
         rb.velocity.Set(0, 0);
     }
     protected override void PlayerCanMoveAndCanBeHit()
@@ -195,7 +195,7 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
 
     private void SendMovesToServer(Vector2 velocity)
     {
-        ClientSend.PlayerMovement(!(ModelObject.transform.rotation.y == -1), ModelObject.transform.position, velocity);
+        ClientSend.PlayerMovement(!(ModelObject.transform.rotation.y == -1), ModelObject.transform.position, velocity, ModelObject.transform.rotation);
     }
 
 }

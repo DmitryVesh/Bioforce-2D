@@ -20,13 +20,17 @@ public class ClientSend : MonoBehaviour
         SendUDPPacket(packet);
     }
 
-    public static void PlayerMovement(bool isFacingRight, Vector2 position, Vector2 velocity)
+    public static void PlayerMovement(bool isFacingRight, Vector2 position, Vector2 velocity, Quaternion rotation)
     {
-        Packet packet = new Packet((int)ClientPackets.playerMovement);
-        packet.Write(isFacingRight);
-        packet.Write(position);
-        packet.Write(velocity);
-        SendTCPPacket(packet);
+        using (Packet packet = new Packet((int)ClientPackets.playerMovement))
+        {
+            packet.Write(isFacingRight);
+            packet.Write(position);
+            packet.Write(velocity);
+            packet.Write(rotation);
+
+            SendTCPPacket(packet);
+        }        
     }
     public static void PlayerMovementStats(float runSpeed, float sprintSpeed)
     {
@@ -35,6 +39,17 @@ public class ClientSend : MonoBehaviour
         packet.Write(sprintSpeed);
         SendTCPPacket(packet); // Only sending once, so want to make sure it gets there
     }
+
+    internal static void ArmPositionAndRotation(Vector2 localPosition, Quaternion localRotation)
+    {
+        using (Packet packet = new Packet((int)ClientPackets.armPositionRotation))
+        {
+            packet.Write(localPosition);
+            packet.Write(localRotation);
+            SendTCPPacket(packet);
+        }
+    }
+
     public static void ShotBullet(Vector2 position, Quaternion rotation)
     {
         Packet packet = new Packet((int)ClientPackets.bulletShot);
@@ -49,11 +64,13 @@ public class ClientSend : MonoBehaviour
         packet.Write((int)typeOfDeath);
         SendTCPPacket(packet);
     }
-    public static void PlayerRespawned()
+    public static void PlayerRespawned(Vector2 respawnPosition)
     {
-        Packet packet = new Packet((int)ClientPackets.playerRespawned);
-        //Can send empty packet because the server knows which clients sent a packet
-        SendTCPPacket(packet);
+        using (Packet packet = new Packet((int)ClientPackets.playerRespawned))
+        {
+            packet.Write(respawnPosition);
+            SendTCPPacket(packet);
+        }        
     }
 
     public static void TookDamage(int damage, int currentHealth)

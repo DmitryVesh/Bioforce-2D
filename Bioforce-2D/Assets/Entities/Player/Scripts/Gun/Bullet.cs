@@ -83,7 +83,7 @@ public class Bullet : MonoBehaviour
                 int damage = UnityEngine.Random.Range(DamageMin, DamageMax + 1);
                 health.TakeDamage(damage, OwnerClientID);
             }
-            else if (ownClient && ownBullet)
+            else if (ownBullet)
                 return;
         }
         BulletHit();
