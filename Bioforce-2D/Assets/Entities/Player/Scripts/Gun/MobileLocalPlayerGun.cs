@@ -27,7 +27,7 @@ public class MobileLocalPlayerGun : LocalPlayerGun
         if (holdingJoystick && !AlreadyTouchedJoystick)
         {
             //Wait for like 0.05s before shooting
-            TimeCanFireAfterFirstTouch = Time.time;// + 0.05f;
+            TimeCanFireAfterFirstTouch = Time.time + 0.05f;
             AlreadyTouchedJoystick = true;
             return;
         }
