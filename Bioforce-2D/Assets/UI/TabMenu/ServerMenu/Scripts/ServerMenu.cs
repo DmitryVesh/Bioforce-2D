@@ -99,23 +99,23 @@ public class ServerMenu : MonoBehaviour
     public static void DisconnectedMainServer()
     {
         Debug.Log("Changing txt mesh pro text and activate error panel start...");
+        Instance.ServerConnectionErrorPanel.SetActive(true);
         Instance.ServerConnectionErrorText.text =
             "Lost connection to Main Server..." +
             "\nCheck your Internet connection" +
             "\n\nPress Continue to proceed";
 
-        Instance.ServerConnectionErrorPanel.SetActive(true);
+        
         Debug.Log("Last changes to txtMeshPro ended...");
     }
     public static void TimedOutMainServer()
     {
+        Instance.ServerConnectionErrorPanel.SetActive(true);
+        Instance.ServerMenuPanel.SetActive(false);
         Instance.ServerConnectionErrorText.text =
             "Connection to Main Server Timed Out..." +
             "\nCheck your Internet connection" +
             "\n\nPress Continue to proceed";
-
-        Instance.ServerConnectionErrorPanel.SetActive(true);
-        Instance.ServerMenuPanel.SetActive(false);
     }
 
     public static void SetManualIPAddress(bool ipValid) =>
