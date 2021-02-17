@@ -81,11 +81,16 @@ public abstract class DiscoveryTCPClient
     {
         try
         {
+            Debug.Log("ConnectCallback1");
             //Error occurs here due to the server socket not establishing a connection with the client socket
             Socket.EndConnect(asyncResult);
+            Debug.Log("ConnectCallback2");
             if (!Socket.Connected)
+            {
+                Debug.Log("ConnectCallback3");
                 return; // Not connected yet, then exit
-
+            }
+            Debug.Log("ConnectCallback4");
             Stream = Socket.GetStream();
             ReceivePacket = new Packet();
             StreamBeginRead();

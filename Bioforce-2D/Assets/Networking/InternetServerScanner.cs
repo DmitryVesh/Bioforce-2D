@@ -43,8 +43,7 @@ public class InternetServerScanner : MonoBehaviour
     }
     private static void StartMainServerSocket(int port)
     {
-        try
-        {
+        //try {
             if (Instance.MainServerSocket != null) //Already communicating with MainServer for servers
                 return;
 
@@ -53,12 +52,14 @@ public class InternetServerScanner : MonoBehaviour
             Instance.MainServerSocket.OnTimedOutAction += Instance.OnMainServerSocketTimedOut;
             //1.
             Instance.MainServerSocket.Connect(Client.InternetMainServerIP, port);
-        }
+        //}
+        /*
         catch (Exception exception)
         {
             Debug.Log($"Error in contacting MainServer...\n{exception}");
             Instance.MainServerSocket.Disconnect(false, true);
         }
+        */
     }
 
     //Sending Packets
