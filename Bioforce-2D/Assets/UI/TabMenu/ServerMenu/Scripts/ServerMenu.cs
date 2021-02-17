@@ -98,15 +98,7 @@ public class ServerMenu : MonoBehaviour
 
     public static void DisconnectedMainServer()
     {
-        Debug.Log("Changing txt mesh pro text and activate error panel start...");
-        Instance.ServerConnectionErrorPanel.SetActive(true);
-        Instance.ServerConnectionErrorText.text =
-            "Lost connection to Main Server..." +
-            "\nCheck your Internet connection" +
-            "\n\nPress Continue to proceed";
-
-        
-        Debug.Log("Last changes to txtMeshPro ended...");
+        Instance.InternetServersPage.LostConnectionToMainServer();   
     }
     public static void TimedOutMainServer()
     {

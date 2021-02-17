@@ -13,11 +13,24 @@ public class ServersPage : UIItemListingManager
     private Dictionary<object, IUIItemListing> ServerInfoItemLists { get; set; } = new Dictionary<object, IUIItemListing>();
     private bool ServerAdded { get; set; }
     private bool SortByChanged { get; set; }
+
+    [SerializeField] private GameObject NoConnectionToMainServerEntryPrefab;
     
 
     private Queue<(string, int, int, string, int)> ServersToAdd = new Queue<(string, int, int, string, int)>();
     public void EnqueEntry(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping) =>
         ServersToAdd.Enqueue((serverName, currentPlayerCount, maxPlayerCount, mapName, ping));
+    internal void LostConnectionToMainServer()
+    {
+        //Might have to run on MainThread so might error...
+        foreach (ServerEntry serverEntry in ServerInfoItemLists.Values)
+            Destroy(serverEntry.GetGameObject());
+        ServerInfoItemLists.Clear();
+
+        Debug.Log($"Removed all internet servers");
+        NoConnectionToMainServerEntryPrefab.SetActive(true);
+        //Need to also add a NoServersGivenByMainServerEntryPrefab
+    }
 
     public void OnServerEntryHover(ServerEntry serverEntry)
     {
@@ -60,6 +73,7 @@ public class ServersPage : UIItemListingManager
     private void Awake()
     {
         SetIndexesToCompareInMergeSort(new List<(int, bool)>()); //By default set to not sort by anything
+        NoConnectionToMainServerEntryPrefab.SetActive(false);
     }
     private void FixedUpdate()
     {
@@ -88,4 +102,6 @@ public class ServersPage : UIItemListingManager
         ServerInfoItemLists.Add(serverName, serverEntry);
         ServerAdded = true;
     }
+
+    
 }
