@@ -62,6 +62,7 @@ public abstract class DiscoveryTCPClient
     }
     public void Disconnect(bool crashed, bool timedOut)
     {
+        Debug.Log("Started Disconnect");
         if (Socket != null)
             Socket.Close();
         if (Stream != null)
@@ -71,6 +72,7 @@ public abstract class DiscoveryTCPClient
         ReceiveBuffer = null;
         ReceivePacket = null;
 
+        Debug.Log("Ended Disconnect");
         if (crashed)
             OnDisconnectAction?.Invoke();
         else if (timedOut)
@@ -97,6 +99,7 @@ public abstract class DiscoveryTCPClient
         }
         catch (Exception exception)
         {
+            Debug.Log("Caught ConnectCallback exception...");
             Disconnect(true, false);
             Debug.Log($"Error in TCP ConnectCallback\n{exception}");
         }
