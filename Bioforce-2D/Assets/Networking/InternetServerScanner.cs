@@ -120,11 +120,9 @@ public class InternetServerScanner : MonoBehaviour
     //5.3
     private void OnMainServerSocketDisconnected()
     {
-        Debug.Log("MainServerSocketDisconnected started.");
         ResetReAskTimer(false);
         MainServerSocket = null;
         ServerMenu.DisconnectedMainServer();
-        Debug.Log("MainServerSocketDisconnected ended final.");
     }
     private void OnMainServerSocketTimedOut()
     {

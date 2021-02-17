@@ -62,7 +62,6 @@ public abstract class DiscoveryTCPClient
     }
     public void Disconnect(bool crashed, bool timedOut)
     {
-        Debug.Log("Started Disconnect");
         if (Socket != null)
             Socket.Close();
         if (Stream != null)
@@ -72,7 +71,6 @@ public abstract class DiscoveryTCPClient
         ReceiveBuffer = null;
         ReceivePacket = null;
 
-        Debug.Log("Ended Disconnect");
         if (crashed)
             OnDisconnectAction?.Invoke();
         else if (timedOut)
@@ -83,25 +81,18 @@ public abstract class DiscoveryTCPClient
     {
         try
         {
-            Debug.Log("ConnectCallback1");
             //Error occurs here due to the server socket not establishing a connection with the client socket
             Socket.EndConnect(asyncResult);
-            Debug.Log("ConnectCallback2");
             if (!Socket.Connected)
-            {
-                Debug.Log("ConnectCallback3");
                 return; // Not connected yet, then exit
-            }
-            Debug.Log("ConnectCallback4");
             Stream = Socket.GetStream();
             ReceivePacket = new Packet();
             StreamBeginRead();
         }
         catch (Exception exception)
         {
-            Debug.Log("Caught ConnectCallback exception...");
-            Disconnect(true, false);
             Debug.Log($"Error in TCP ConnectCallback\n{exception}");
+            Disconnect(true, false);            
         }
     }
 

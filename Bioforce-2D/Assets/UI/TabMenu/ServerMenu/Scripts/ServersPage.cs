@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class ServersPage : UIItemListingManager
@@ -15,6 +16,7 @@ public class ServersPage : UIItemListingManager
     private bool SortByChanged { get; set; }
 
     [SerializeField] private GameObject NoConnectionToMainServerEntryPrefab;
+    [SerializeField] private GameObject NoServersFoundEntryPrefab;
     
 
     private Queue<(string, int, int, string, int)> ServersToAdd = new Queue<(string, int, int, string, int)>();
@@ -22,14 +24,30 @@ public class ServersPage : UIItemListingManager
         ServersToAdd.Enqueue((serverName, currentPlayerCount, maxPlayerCount, mapName, ping));
     internal void LostConnectionToMainServer()
     {
-        //Might have to run on MainThread so might error...
+        ThreadManager.ExecuteOnMainThread(() =>
+        {
+            NoServersFoundEntryPrefab.SetActive(false);
+            DeleteAllServers();
+            NoConnectionToMainServerEntryPrefab.SetActive(true);
+        });
+    }
+    public void DeleteServer(string serverName)
+    {
+        try
+        {
+            Destroy(ServerInfoItemLists[serverName].GetGameObject());
+            ServerInfoItemLists.Remove(serverName);
+
+            if (ServerInfoItemLists.Count == 0)
+                NoServersFoundEntryPrefab.SetActive(true);
+        }
+        catch (KeyNotFoundException) {}
+    }
+    private void DeleteAllServers()
+    {
         foreach (ServerEntry serverEntry in ServerInfoItemLists.Values)
             Destroy(serverEntry.GetGameObject());
         ServerInfoItemLists.Clear();
-
-        Debug.Log($"Removed all internet servers");
-        NoConnectionToMainServerEntryPrefab.SetActive(true);
-        //Need to also add a NoServersGivenByMainServerEntryPrefab
     }
 
     public void OnServerEntryHover(ServerEntry serverEntry)
@@ -74,6 +92,7 @@ public class ServersPage : UIItemListingManager
     {
         SetIndexesToCompareInMergeSort(new List<(int, bool)>()); //By default set to not sort by anything
         NoConnectionToMainServerEntryPrefab.SetActive(false);
+        NoServersFoundEntryPrefab.SetActive(true);
     }
     private void FixedUpdate()
     {
@@ -93,6 +112,8 @@ public class ServersPage : UIItemListingManager
 
     private void AddEntry()
     {
+        NoServersFoundEntryPrefab.SetActive(false);
+
         (string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping) = ServersToAdd.Dequeue();
         Debug.Log($"Adding server: {serverName}, to server page");
         GameObject entryToAdd = Instantiate(ItemListingPrefab, transform);
