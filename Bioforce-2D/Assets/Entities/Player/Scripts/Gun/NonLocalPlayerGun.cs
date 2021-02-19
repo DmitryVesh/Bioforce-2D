@@ -9,15 +9,16 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
     protected List<Bullet> BulletList;
 
     private int OwnerClientID = -1;
-    protected bool CanShoot = true;
+    protected bool CanShootAndAim = true;
     protected PlayerManager PlayerManager { get; set; } = null;
-
-    [SerializeField] private Color PlayerColor; //Set in inspector, colors the muzzel flash and bulletPrefab
+    
     [SerializeField] private MuzzelFlash MuzzelFlash; //Set in inspector
 
     [SerializeField] protected Transform ArmsTransform;
     private Vector2 ArmPosition { get; set; }
     private Quaternion ArmRotation{ get; set; }
+
+    public Color PlayerColor { get; set; }
 
     public virtual void ShootBullet(Vector2 position, Quaternion rotation) //Has to be public to satisfy interface
     {
@@ -46,13 +47,16 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
     }
 
     public void Disable(TypeOfDeath typeOfDeath) =>
-        CanShoot = false;
+        CanShootAndAim = false;
 
     public void Enable() =>
         Invoke("SetCanShootTrue", PlayerManager.RespawnTime);
+    private void SetCanShootTrue() => //Needed for Enable
+        CanShootAndAim = true;
 
-    private void SetCanShootTrue() =>
-        CanShoot = true;
+
+    public void SetColor(Color playerColor) =>
+        PlayerColor = playerColor;
 
     protected virtual void Awake()
     {
@@ -114,4 +118,6 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
         PlayerManager.OnPlayerDeath -= Disable;
         PlayerManager.OnPlayerRespawn -= Enable;
     }
+
+    
 }

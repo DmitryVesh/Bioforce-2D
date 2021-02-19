@@ -41,7 +41,7 @@ namespace GameServer
                 Vector2 velocity = packet.ReadVector2();
                 Quaternion rotation = packet.ReadQuaternion();
                 //Sometimes System.NullReferenceException when a player disconnects
-                Server.ClientDictionary[clientID].player.PlayerMoves(isFacingRight, position, velocity, rotation);
+                Server.ClientDictionary[clientID].Player.PlayerMoves(isFacingRight, position, velocity, rotation);
             }
             catch (Exception exception)
             {
@@ -55,7 +55,7 @@ namespace GameServer
                 float runSpeed = packet.ReadFloat();
                 float sprintSpeed = packet.ReadFloat();
 
-                Server.ClientDictionary[clientID].player.SetPlayerMovementStats(runSpeed, sprintSpeed);
+                Server.ClientDictionary[clientID].Player.SetPlayerMovementStats(runSpeed, sprintSpeed);
                 ServerSend.PlayerMovementStats(clientID, runSpeed, sprintSpeed);
             }
             catch (Exception exception)
@@ -87,8 +87,8 @@ namespace GameServer
                 int typeOfDeath = packet.ReadInt();
                 ServerSend.PlayerDied(clientID, bulletOwnerID, typeOfDeath);
                 if (clientID != bulletOwnerID)
-                    Server.ClientDictionary[bulletOwnerID].player.AddKill();
-                Server.ClientDictionary[clientID].player.Died();
+                    Server.ClientDictionary[bulletOwnerID].Player.AddKill();
+                Server.ClientDictionary[clientID].Player.Died();
             }
             catch (Exception exception)
             {
@@ -101,7 +101,7 @@ namespace GameServer
             {
                 Vector2 respawnPoint = packet.ReadVector2();
                 ServerSend.PlayerRespawned(clientID, respawnPoint);
-                Server.ClientDictionary[clientID].player.Respawned();
+                Server.ClientDictionary[clientID].Player.Respawned();
             }
             catch (Exception exception)
             {
@@ -115,7 +115,7 @@ namespace GameServer
             {
                 int damage = packet.ReadInt();
                 int currentHealth = packet.ReadInt();
-                Server.ClientDictionary[clientID].player.CurrentHealth = currentHealth;
+                Server.ClientDictionary[clientID].Player.CurrentHealth = currentHealth;
                 ServerSend.TookDamage(clientID, damage, currentHealth);
             }
             catch (Exception exception)

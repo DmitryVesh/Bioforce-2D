@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using Shared;
 
 namespace GameServer
@@ -14,6 +16,8 @@ namespace GameServer
         public static int PortNum { get; private set; }        
 
         public static Dictionary<int, ClientServer> ClientDictionary = new Dictionary<int, ClientServer>();
+        public static Dictionary<int, ClientServer> NotConnectedClients = new Dictionary<int, ClientServer>();
+
         private static TcpListener TCPListener { get; set; }
         private static UdpClient UDPClient { get; set; }
 
@@ -25,7 +29,7 @@ namespace GameServer
             int playerCount = 0;
             foreach (ClientServer client in ClientDictionary.Values)
             {
-                if (client.player != null)
+                if (client.Player != null)
                     playerCount++;
             }
             return playerCount;
@@ -57,6 +61,8 @@ namespace GameServer
                     $"\n\t\tMap:          {MapName}" +
                     $"\n\t\tMax Players:  {MaxNumPlayers}" +
                     $"\n\t\tPort number:  {PortNum}");
+                
+                PlayerColor.GetRandomColor();
             }
             catch (Exception exception)
             {
@@ -98,6 +104,7 @@ namespace GameServer
             for (int count = 1; count < MaxNumPlayers + 1; count++)
             {
                 ClientDictionary.Add(count, new ClientServer(count));
+                NotConnectedClients.Add(count, new ClientServer(count));
             }
 
             PacketHandlerDictionary = new Dictionary<int, PacketHandler>();
@@ -130,22 +137,22 @@ namespace GameServer
                     return;
                 }
             }
-            Console.WriteLine($"\n\tThe server is full... {client.Client.RemoteEndPoint} couldn't connect...");
-            SendServerIsFullPacket(client);
+            for (int count = 0; count < MaxNumPlayers + 1; count++)
+            {
+                if (NotConnectedClients[count].tCP.Socket == null)
+                {
+                    NotConnectedClients[count].tCP.Connect(client);
+                    ServerSend.ServerIsFullPacket(count);
+                    Console.WriteLine($"\n\tThe server is full... {client.Client.RemoteEndPoint} couldn't connect...");
+                }
+            }
+            
         }
         private static void TCPBeginAcceptClient()
         {
             TCPListener.BeginAcceptTcpClient(new AsyncCallback(TCPConnectAsyncCallback), null);
         }
-        private static void SendServerIsFullPacket(TcpClient client)
-        {
-            using (Packet packet = new Packet())
-            {
-                packet.Write((int)ServerPackets.serverIsFull);
-                packet.WriteLength();
-                SendUDPPacket((IPEndPoint)client.Client.RemoteEndPoint, packet); //TODO: The (IPEndPoint) might cause issues
-            }
-        }
+        
         
 
         private static void UDPConnectAsyncCallback(IAsyncResult asyncResult)

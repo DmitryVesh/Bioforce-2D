@@ -28,7 +28,10 @@ namespace GameServer
 
         public bool IsDead { get; private set; } = false;
 
-        public PlayerServer(int iD, string username, Vector2 position)
+        public PlayerColor PlayerColor { get; private set; }
+        
+
+        public PlayerServer(int iD, string username, Vector2 position, PlayerColor playerColor)
         {
             ID = iD;
             Username = username;
@@ -36,6 +39,7 @@ namespace GameServer
             IsFacingRight = true;
             LastPosition = position;
             CurrentHealth = MaxHealth;
+            PlayerColor = playerColor;
         }
         public void Died()
         {

@@ -11,6 +11,10 @@ public class MobileLocalPlayerGun : LocalPlayerGun
     private float TimeNextShot { get; set; }
     private bool AlreadyTouchedJoystick { get; set; }
     private float TimeCanFireAfterFirstTouch { get; set; }
+    
+    private float LastX { get; set; }
+    private float LastY { get; set; }
+    
 
     protected override void Awake()
     {
@@ -20,6 +24,10 @@ public class MobileLocalPlayerGun : LocalPlayerGun
         ShootingJoystick.Instance.SetActive(true);
 
         Crosshair.Instance.SetActive(false);
+    }
+    protected override void Start()
+    {
+        base.Start();
     }
     protected override void Update()
     {
@@ -47,7 +55,13 @@ public class MobileLocalPlayerGun : LocalPlayerGun
         float x = Joystick.Horizontal;
         float y = Joystick.Vertical;
 
-        Aim(x, y);
+        if (x != 0 && y != 0)
+        {
+            LastX = x;
+            LastY = y;
+        }
+
+        Aim(LastX, LastY);
     }
 
     protected override bool IsPlayerTryingToShoot()

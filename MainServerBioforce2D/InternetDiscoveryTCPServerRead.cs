@@ -76,7 +76,7 @@ namespace MainServerBioforce2D
             gameServerProcess.OnGameServerExited += InternetDiscoveryTCPServer.OnGameServerExited;
 
             InternetDiscoveryTCPServer.GameServerDict.Add(serverName, gameServerProcess);
-            
+            //TODO: send TCP packet to GameServer
             InternetDiscoveryTCPServerSend.SendJoinServer(client, gameServerPort);
         }
         internal static void ReadDeleteServer(int client, Packet packet)

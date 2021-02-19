@@ -24,7 +24,7 @@ public class MenuButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHand
         Animator.SetBool("Pressed", true);
         OnClickEvent?.Invoke();
 
-        MainMenu.Instance.PlayMainMenuSFX(MainMenuSFXs.buttonPressed);
+        SoundMusicManager.PlayMainMenuSFX(MainMenuSFXs.buttonPressed);
     }
 
     public virtual void OnPointerEnter(PointerEventData eventData)
@@ -33,14 +33,14 @@ public class MenuButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHand
             return;
 
         Animator.SetBool("Selected", true);
-        MainMenu.Instance.PlayMainMenuSFX(MainMenuSFXs.buttonSelected);
+        SoundMusicManager.PlayMainMenuSFX(MainMenuSFXs.buttonSelected);
     }
 
     public virtual void OnPointerExit(PointerEventData eventData)
     {
         Animator.SetBool("Selected", false);
         Animator.SetBool("Pressed", false);
-        MainMenu.Instance.PlayMainMenuSFX(MainMenuSFXs.buttonDeselected);
+        SoundMusicManager.PlayMainMenuSFX(MainMenuSFXs.buttonDeselected);
     }
 
     private void Awake()
@@ -50,7 +50,7 @@ public class MenuButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHand
     }
     private void Start()
     {
-        if (!AppearInMobile && GameManager.Instance.IsMobileSupported())
+        if (!AppearInMobile && GameManager.Instance.IsMobileSupported)
             gameObject.SetActive(false);
     }
     private void Update()

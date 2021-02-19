@@ -112,6 +112,7 @@ public class ServersPage : UIItemListingManager
 
     private void AddEntry()
     {
+        NoConnectionToMainServerEntryPrefab.SetActive(false);
         NoServersFoundEntryPrefab.SetActive(false);
 
         (string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping) = ServersToAdd.Dequeue();

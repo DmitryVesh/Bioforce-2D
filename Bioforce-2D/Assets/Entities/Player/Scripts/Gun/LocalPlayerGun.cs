@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class LocalPlayerGun : NonLocalPlayerGun
 {
@@ -22,12 +20,16 @@ public class LocalPlayerGun : NonLocalPlayerGun
             RotateExtra = 180;
         }
     }
-
     protected override void Awake()
     {
         base.Awake();
         MainCamera = Camera.main;
         Physics2D.IgnoreLayerCollision(11, 16, true); //Ignore layer collision between LocalPlayer and Bullet LocalPlayer
+    }
+    protected override void Start()
+    {
+        base.Start();
+        GameManager.Instance.OnPauseEvent += SetCanShootAndAim;
     }
 
     protected virtual bool IsPlayerTryingToShoot()
@@ -37,13 +39,14 @@ public class LocalPlayerGun : NonLocalPlayerGun
     }
     protected virtual void Update()
     {
-        if (IsPlayerTryingToShoot())
+        if (IsPlayerTryingToShoot() && CanShootAndAim)
             ShootBullet();
     }
 
     protected override void LateUpdate()
     {
-        AimWherePointing();
+        if (CanShootAndAim)
+            AimWherePointing();
         ClientSend.ArmPositionAndRotation(ArmsTransform.localPosition, ArmsTransform.localRotation);
     }
 
@@ -79,10 +82,12 @@ public class LocalPlayerGun : NonLocalPlayerGun
         }
     }
 
+    private void SetCanShootAndAim(bool paused)
+    {
+        CanShootAndAim = !paused;
+    }
     private void ShootBullet()
     {
-        if (!CanShoot)
-            return;
         Crosshair.Instance.ShotBullet();
         PlayerManager.CallOnBulletShotEvent(FirePointTransform.position, FirePointTransform.rotation);
         //base.ShootBullet(FirePointTransform.position, FirePointTransform.rotation);

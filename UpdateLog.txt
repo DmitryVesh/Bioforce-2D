@@ -5,17 +5,27 @@ Version 0.5.7.2
 Summary
 -------
 Main goals is to;
-	Assign each player a color, and change the color of name on kill field to corresponding player color
+	1 Implement quit current game option
+	1 Make a main menu screen, and add a volume settings menu, pause menu
+	1 Assign each player a color, and change the color of name on kill field to corresponding player color
+	1 Fix bug when a player is killed multiple times at once, (probably have to set a field which states when can call that you can die)
+	0 Add server updates, how many players playing on the server
 
 Future tasks;	
 		
 	version 0.5.7.3
+		Make all inputs passed through valid chars, instead of invalid chars
+		Fix muzzelflash anim being stuck in wrong frame.
+		Fix bug where player spawned in, and is in 1 position only, however after respawn changes position, 
+			so must be problem with getting the other player's position, in UpdateMain of server
+		Make servers be able to sort by Name, Players, Map, etc...
+		Lookahead at where the user is pointing
+		Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard
 		Add trail effects when a player sprints, so can clearly see player sprinting, also maybe zoom camera out a little bit...
 	version 0.5.7.4
 		make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
 	version 0.5.7.5
 		Add invincibility frames, after being hit/respawning
-
 	version 0.5.8.1
 		add breathing camera movement when player is idle, going up and down.
 		using cinemachine add impulses, fast small camera movements in specific directions, for:
@@ -24,13 +34,9 @@ Future tasks;
 			Player jumping
 			Player running
 	version 0.5.8.2
-		Make a main menu screen, and add a settings menu.
-	version 0.5.8.3
 		Make the scoreboard reuse scoreboard entries, instead of destroying them, when a player disconnects.
-
-
 	version 0.6.0
-		Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard
+		
 		
 	
 	

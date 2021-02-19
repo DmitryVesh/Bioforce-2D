@@ -12,9 +12,11 @@ public class PlayerManager : MonoBehaviour
     public int Deaths { get; private set; }
     public int Score { get; private set; }
 
+    public Color PlayerColor { get; private set; }
+
     public Vector2 RespawnPosition { get; set; }
     private GameObject PlayerModelObject { get; set; }
-    private TextMeshProUGUI UsernameText { get; set; }
+    [SerializeField] private TextMeshProUGUI UsernameText;
 
     // Delegate and event used to notify when movement stats are read from server
     public delegate void PlayerMovementStats(float runSpeed);
@@ -73,10 +75,10 @@ public class PlayerManager : MonoBehaviour
     public void CallOnPlayerJumpedEvent() =>
         OnPlayerJumped?.Invoke();
 
-    public void Initialise(int iD, string username) 
+    public void Initialise(int iD, string username, Color playerColor) 
     {
         (ID, Username) = (iD, username);
-        SetUsername();
+        SetUsername(playerColor);
     }
 
     public void SetRespawnPosition(Vector2 position)
@@ -101,12 +103,15 @@ public class PlayerManager : MonoBehaviour
     private void Awake()
     {
         PlayerModelObject = transform.GetChild(0).gameObject;
-        UsernameText = PlayerModelObject.transform.GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>();
         SetUsername("");
     }
-    
-    private void SetUsername() =>
-        UsernameText.text = Username; 
+
+    private void SetUsername(Color playerColor)
+    {
+        UsernameText.text = Username;
+        PlayerColor = playerColor;
+        UsernameText.color = PlayerColor;
+    }
 
     private void SetUsername(string username) =>
         UsernameText.text = username;

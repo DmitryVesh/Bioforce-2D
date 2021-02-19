@@ -7,6 +7,10 @@ public class Crosshair : MonoBehaviour
     public static Crosshair Instance { get; set; }
 
     private Animator Animator { get; set; }
+
+    
+    
+
     public void SetActive(bool active) =>
         gameObject.SetActive(active);
     public void ShotBullet()
@@ -26,10 +30,15 @@ public class Crosshair : MonoBehaviour
         }
 
         Animator = GetComponent<Animator>();
-        Cursor.visible = false;
+        GameManager.ShowMouse(false);
     }
     private void Update()
     {
         transform.position = Input.mousePosition;
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.ShowMouse(true);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,11 +17,19 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     [SerializeField] protected bool FacingRight = true;
     private float SpeedXNonLocal { get; set; }
 
+    [SerializeField] private SpriteRenderer PlayerBodySprite;
+    [SerializeField] private SpriteRenderer PlayerArmsSprite;
+
     //TODO: add Jumped sent animations so can play sound effect
 
     public void SetOwnerClientID(int iD)
     {
         OwnerClientID = iD;
+    }
+    internal void SetColor(Color playerColor)
+    {
+        PlayerBodySprite.color = playerColor;
+        PlayerArmsSprite.color = playerColor;
     }
 
     protected virtual void Awake()
@@ -91,4 +100,5 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
         PlayerManager.OnPlayerRespawn -= RespawnAnimation;
     }
 
+    
 }

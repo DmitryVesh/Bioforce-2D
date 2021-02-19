@@ -6,4 +6,5 @@ public interface IGun
     void SetOwnerClientID(int iD);
     void Disable(TypeOfDeath typeOfDeath);
     void Enable();
+    void SetColor(Color playerColor);
 }

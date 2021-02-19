@@ -23,7 +23,7 @@ public class ScoreboardManager : UIItemListingManager
     {
         GameObject entryToAdd = Instantiate(ItemListingPrefab, ScoreboardPanel.transform);
         ScoreboardEntry scoreboardEntry = entryToAdd.GetComponent<ScoreboardEntry>();
-        scoreboardEntry.Init(score, username, kills, deaths);
+        scoreboardEntry.Init(iD, score, username, kills, deaths);
 
         PlayersItemLists.Add(iD, scoreboardEntry);
         ScoreboardChanged = true;
@@ -83,7 +83,7 @@ public class ScoreboardManager : UIItemListingManager
 
         MobileButton = transform.GetChild(1).GetComponent<Button>();
         
-        if (GameManager.Instance.IsMobileSupported())
+        if (GameManager.Instance.IsMobileSupported)
             MobileButton.gameObject.SetActive(true);
         else
             MobileButton.gameObject.SetActive(false);

@@ -2,13 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class SoundMusicManager : MonoBehaviour
 {
     public static SoundMusicManager Instance { get; set; }
     private Transform AudioListenerTF { get; set; }
 
-    private AudioSource AudioSource { get; set; }
+    private AudioSource MusicAudioSource { get; set; }
     [SerializeField] private AudioTrack StartingMusic = null;
 
     private AudioTrack CurrentAudioTrack { get; set; }
@@ -16,8 +17,36 @@ public class SoundMusicManager : MonoBehaviour
     private bool KeepFadingOut { get; set; }
     private bool KeepLooping { get; set; }
 
+    [SerializeField] private AudioClip[] ButtonPressedSFXs;
+    [SerializeField] private AudioClip[] ButtonSelectedSFXs;
+    [SerializeField] private AudioClip[] ButtonDeselectedSFXs;
+
+    [SerializeField] private AudioMixerGroup MasterMixer;
+    [SerializeField] private AudioMixerGroup MusicMixer;
+    [SerializeField] private AudioMixerGroup SFXMixer;
+
+    [SerializeField] private AudioSource SoundEffectAudioSource;
+
     public static AudioClip GetRandomAudioClip(AudioClip[] audioClips) =>
         audioClips[UnityEngine.Random.Range(0, audioClips.Length)];
+    
+    public static void PlayMainMenuSFX(MainMenuSFXs mainMenuSFX)
+    {
+        AudioClip SFX = null;
+        switch (mainMenuSFX)
+        {
+            case MainMenuSFXs.buttonPressed:
+                SFX = GetRandomAudioClip(Instance.ButtonPressedSFXs);
+                break;
+            case MainMenuSFXs.buttonSelected:
+                SFX = GetRandomAudioClip(Instance.ButtonSelectedSFXs);
+                break;
+            case MainMenuSFXs.buttonDeselected:
+                SFX = GetRandomAudioClip(Instance.ButtonDeselectedSFXs);
+                break;
+        }
+        Instance.SoundEffectAudioSource.PlayOneShot(SFX);
+    }
 
     private void Awake()
     {
@@ -25,15 +54,28 @@ public class SoundMusicManager : MonoBehaviour
             Instance = this;
         else if (Instance != this)
         {
-            Debug.Log($"MusicManager instance already exists, destroying {gameObject.name}");
+            Debug.Log($"SoundMusicManager instance already exists, destroying {gameObject.name}");
             Destroy(gameObject);
         }
 
-        AudioSource = GetComponent<AudioSource>();
+        MusicAudioSource = GetComponent<AudioSource>();
         AudioListenerTF = Camera.main.transform;
+
+    } 
+    
+    private void SetMixerStored(string param, ref AudioMixerGroup mixer, float defaultVal)
+    {
+        float val = PlayerPrefs.GetFloat(param, defaultVal);
+        mixer.audioMixer.SetFloat(param, Mathf.Log10(val) * 30f);
     }
-    private void Start() =>
+
+    private void Start()
+    {
+        SetMixerStored("Master", ref MasterMixer, 0.8f);
+        SetMixerStored("Music", ref MusicMixer, 1);
+        SetMixerStored("Sound Effects", ref SFXMixer, 1);
         PlayClip(StartingMusic);
+    }
     private void FixedUpdate()
     {
         if (AudioListenerTF == null)
@@ -50,7 +92,7 @@ public class SoundMusicManager : MonoBehaviour
         while (KeepFadingOut)
             yield return new WaitForSecondsRealtime(Time.fixedDeltaTime);
 
-        AudioSource.Stop();
+        MusicAudioSource.Stop();
         PlayClip(audioTrack);
     }
     private IEnumerator FadeIn()
@@ -58,13 +100,13 @@ public class SoundMusicManager : MonoBehaviour
         KeepFadingIn = true;
         KeepFadingOut = false;
 
-        AudioSource.volume = 0;
+        MusicAudioSource.volume = 0;
         float maxVolume = CurrentAudioTrack.Volume;
         float fadeSpeed = 1 / CurrentAudioTrack.FadeTime * Time.fixedDeltaTime;
 
-        while(AudioSource.volume < maxVolume && KeepFadingIn)
+        while(MusicAudioSource.volume < maxVolume && KeepFadingIn)
         {
-            AudioSource.volume += fadeSpeed;
+            MusicAudioSource.volume += fadeSpeed;
             yield return new WaitForSecondsRealtime(Time.fixedDeltaTime);
         }
         KeepFadingIn = false;
@@ -76,9 +118,9 @@ public class SoundMusicManager : MonoBehaviour
 
         float fadeSpeed = 1 / CurrentAudioTrack.FadeTime * Time.fixedDeltaTime;
 
-        while (AudioSource.volume > 0 && KeepFadingOut)
+        while (MusicAudioSource.volume > 0 && KeepFadingOut)
         {
-            AudioSource.volume -= fadeSpeed;
+            MusicAudioSource.volume -= fadeSpeed;
             yield return new WaitForSecondsRealtime(Time.fixedDeltaTime);
         }
         KeepFadingOut = false;
@@ -93,9 +135,9 @@ public class SoundMusicManager : MonoBehaviour
 
     private void PlayClip(AudioTrack audioTrack, bool dontFadeOverride = false)
     {
-        AudioSource.clip = audioTrack.AudioClip;
-        AudioSource.volume = audioTrack.Volume;
-        AudioSource.Play();
+        MusicAudioSource.clip = audioTrack.AudioClip;
+        MusicAudioSource.volume = audioTrack.Volume;
+        MusicAudioSource.Play();
         CurrentAudioTrack = audioTrack;
         if (audioTrack.Fade && !dontFadeOverride)
             StartCoroutine(FadeIn());

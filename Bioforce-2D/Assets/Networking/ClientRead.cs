@@ -18,7 +18,9 @@ public class ClientRead : MonoBehaviour
         Client.Instance.uDP.Connect(((IPEndPoint)Client.Instance.tCP.Socket.Client.LocalEndPoint).Port);
         SceneManager.LoadScene(mapName);
 
-        ClientSend.WelcomePacketReply();        
+        ClientSend.WelcomePacketReply();
+
+        GameManager.Instance.InGame = true;
     }
     public static void UDPTestRead(Packet packet)
     {
@@ -52,7 +54,12 @@ public class ClientRead : MonoBehaviour
         int maxHealth = packet.ReadInt();
         int currentHealth = packet.ReadInt();
 
-        GameManager.Instance.SpawnPlayer(iD, username, position, isFacingRight, isDead, justJoined, maxHealth, currentHealth);
+        int R = packet.ReadInt();
+        int G = packet.ReadInt();
+        int B = packet.ReadInt();
+        Color color = new Color((float)R / (float)255, (float)G / (float)255, (float)B / (float)255);
+
+        GameManager.Instance.SpawnPlayer(iD, username, position, isFacingRight, isDead, justJoined, maxHealth, currentHealth, color);
         GameManager.PlayerDictionary[iD].SetPlayerMovementStats(runSpeed, sprintSpeed);
         ScoreboardManager.Instance.AddEntry(iD, username, kills, deaths, score);
     }

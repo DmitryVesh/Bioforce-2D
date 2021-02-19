@@ -11,6 +11,7 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
     public int OwnerClientID { get; private set; } = -1;
 
     private PlayerManager PlayerManager { get; set; }
+    private bool CantDieBeforeRespawn { get; set; }
 
     public float GetMaxHealth() =>
         MaxHealth;
@@ -31,7 +32,7 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
     }
     public void TakeDamage(int damage, int bulletOwnerID)
     {
-        if (CurrentHealth - damage <= 0)
+        if (CurrentHealth - damage <= 0 && !CantDieBeforeRespawn)
             Die(bulletOwnerID);
 
         PlayerManager.TookDamage(damage, CurrentHealth - damage);
@@ -46,6 +47,7 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
 
     public void Die(int bulletOwnerID)
     {
+        CantDieBeforeRespawn = true;
         GameManager.Instance.PlayerDied(OwnerClientID, bulletOwnerID, TypeOfDeath.Bullet);
         ScoreboardManager.Instance.AddKill(bulletOwnerID);
         ScoreboardManager.Instance.AddDeath(OwnerClientID);
@@ -54,6 +56,7 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
     public void Respawn()
     {
         ResetHealth();
+        CantDieBeforeRespawn = false;
         GameManager.Instance.PlayerRespawned(OwnerClientID);
     }
     public void FallDie()

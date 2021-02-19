@@ -13,7 +13,7 @@ namespace GameServer
         public UDPServer uDP { get; private set; }
         private static int DataBufferSize { get; set; } = 4096;
 
-        public PlayerServer player { get; private set; }
+        public PlayerServer Player { get; private set; }
 
         public ClientServer(int iD)
         {
@@ -179,25 +179,25 @@ namespace GameServer
         
         public void SendIntoGame(string username)
         {
-            player = new PlayerServer(ID, username, new Vector2(0, 0));
+            Player = new PlayerServer(ID, username, new Vector2(0, 0), PlayerColor.GetRandomColor());
 
             //Spawning the player who just joined, for all connected users
             foreach (ClientServer client in Server.ClientDictionary.Values)
             {
-                if (client.player != null)
+                if (client.Player != null)
                 {
-                    ServerSend.SpawnPlayer(client.ID, player, true);
+                    ServerSend.SpawnPlayer(client.ID, Player, true);
                 }
             }
 
             //Spawning rest of players for the connected user
             foreach (ClientServer client in Server.ClientDictionary.Values)
             {
-                if (client.player != null)
+                if (client.Player != null)
                 {
                     if (client.ID != ID)
                     {
-                        PlayerServer player = client.player;
+                        PlayerServer player = client.Player;
                         ServerSend.SpawnPlayer(ID, player, false);
                     }
                 }
@@ -205,16 +205,17 @@ namespace GameServer
 
             
         }
-        private void Disconnect()
+        public void Disconnect()
         {
             //TODO: crashes when 2 players disconnect simultaneously, or stops receiving packets from players
+            PlayerColor.GiveBackRandomColor(Player.PlayerColor);
             Console.WriteLine($"\tPlayer: {ID} has disconnected. {tCP.Socket.Client.RemoteEndPoint}");
             ServerSend.DisconnectPlayer(ID);
             
             tCP.Disconnect();
             uDP.Disconnect();
 
-            player = null;
+            Player = null;
         }
     }
 }

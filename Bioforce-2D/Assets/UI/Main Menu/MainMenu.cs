@@ -20,12 +20,8 @@ public class MainMenu : MonoBehaviour
 
     private bool KeyIsDown { get; set; }
 
-    private AudioSource AudioSource { get; set; }
     private GameObject MainMenuPanel { get; set; }
-
-    [SerializeField] private AudioClip[] ButtonPressedSFXs;
-    [SerializeField] private AudioClip[] ButtonSelectedSFXs;
-    [SerializeField] private AudioClip[] ButtonDeselectedSFXs;
+    [SerializeField] private Menu SettingsMenu;
 
     //Specific Button Click events - the MenuButton subscribes to these events via the Inspector
     public void MultiplayerButtonClicked()
@@ -39,7 +35,8 @@ public class MainMenu : MonoBehaviour
     }
     public void SettingsButtonClicked()
     {
-
+        HideMainMenu();
+        SettingsMenu.Activate();
     }
     public void TutorialButtonClicked()
     {
@@ -65,23 +62,6 @@ public class MainMenu : MonoBehaviour
         MenuButtons[LastSelectedButtonIndex].OnPointerExit(null);
         LastSelectedButtonIndex = CurrentSelectedButtonIndex;
     }
-    public void PlayMainMenuSFX(MainMenuSFXs mainMenuSFX)
-    {
-        AudioClip SFX = null;
-        switch (mainMenuSFX)
-        {
-            case MainMenuSFXs.buttonPressed:
-                SFX = SoundMusicManager.GetRandomAudioClip(ButtonPressedSFXs);
-                break;
-            case MainMenuSFXs.buttonSelected:
-                SFX = SoundMusicManager.GetRandomAudioClip(ButtonSelectedSFXs);
-                break;
-            case MainMenuSFXs.buttonDeselected:
-                SFX = SoundMusicManager.GetRandomAudioClip(ButtonDeselectedSFXs);
-                break;
-        }
-        AudioSource.PlayOneShot(SFX);
-    }
 
     private void Awake()
     {
@@ -92,7 +72,6 @@ public class MainMenu : MonoBehaviour
             Debug.Log($"MainMenu instance already exists, destroying {gameObject.name}");
             Destroy(gameObject);
         }
-        AudioSource = GetComponent<AudioSource>();
         MainMenuPanel = transform.GetChild(0).gameObject;
     }
     private void Start()

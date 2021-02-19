@@ -2,12 +2,18 @@
 
 using Shared;
 using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
 using System.Numerics;
+using System.Threading;
 
 namespace GameServer
 {
     class ServerSend
     {
+        static List<Thread> DelayedThreads = new List<Thread>();
+
         public static void Welcome(int recipientClient, string message, string mapName)
         {
             Packet packet = new Packet((int)ServerPackets.welcome);
@@ -27,7 +33,7 @@ namespace GameServer
         {
             Packet packet = new Packet((int)ServerPackets.playerDisconnect);
             packet.Write(disconnectedPlayer);
-            SendTCPPacketToAll(packet); // Packet has to arrive, so sending via TCP to make sure
+            SendTCPPacketToAllButIncluded(disconnectedPlayer, packet); // Packet has to arrive, so sending via TCP to make sure
         }
 
 
@@ -51,6 +57,10 @@ namespace GameServer
 
             packet.Write(player.MaxHealth);
             packet.Write(player.CurrentHealth);
+
+            packet.Write(player.PlayerColor.R);
+            packet.Write(player.PlayerColor.G);
+            packet.Write(player.PlayerColor.B);
 
             SendTCPPacket(recipientClient, packet);
         }
@@ -163,7 +173,38 @@ namespace GameServer
             }
         }
 
-        
+        public static void ServerIsFullPacket(int notConnectedClient)
+        {
+            using (Packet packet = new Packet())
+            {
+                packet.Write((int)ServerPackets.serverIsFull);
+                packet.WriteLength();
+                Server.NotConnectedClients[notConnectedClient].tCP.SendPacket(packet);   
+            }
+            //TODO: test the need to wait like 5 seconds before disconnecting
+            ThreadStart threadStart = new ThreadStart(() => DisconnectAfterTime(notConnectedClient, 5000));
+            Thread newThread = new Thread(threadStart);
+            newThread.Start();
+
+            bool added = false;
+            for (int threadCount = 0; threadCount < DelayedThreads.Count; threadCount++)
+            {
+                Thread existingThread = DelayedThreads[threadCount];
+                if (existingThread.ThreadState == ThreadState.Stopped)
+                {
+                    DelayedThreads[threadCount] = newThread;
+                    added = true;
+                }
+            }
+            if (!added)
+                DelayedThreads.Add(newThread);
+        }
+        private static void DisconnectAfterTime(int notConnectedClient, int ms)
+        {
+            Thread.Sleep(ms);
+            Server.NotConnectedClients[notConnectedClient].Disconnect();
+            Console.WriteLine("\n\tDisconnected not connected client...");
+        }
 
         private static void SendUDPPacket(int RecipientClient, Packet packet)
         {

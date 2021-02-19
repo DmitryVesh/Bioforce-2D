@@ -23,6 +23,7 @@ namespace GameServer
             {
                 //int portNumLANDiscover = 28021;
                 //DiscoveryServer.StartServer(portNumLANDiscover);
+                MainServerCommunication.StartServer()
                 Server.StartServer(serverName, maxNumPlayers, mapName, port);
             }
             catch (Exception exception)
@@ -46,9 +47,7 @@ namespace GameServer
                     TickTimer = TickTimer.AddMilliseconds(MillisecondsInTick);
 
                     if (TickTimer > DateTime.Now)
-                    {
                         Thread.Sleep(TickTimer - DateTime.Now);
-                    }
                 }
             }
             Console.WriteLine("\tEnding server");

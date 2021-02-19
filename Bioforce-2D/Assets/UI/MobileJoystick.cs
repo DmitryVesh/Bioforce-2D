@@ -1,12 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class MobileJoystick : MonoBehaviour
 {
     public static MobileJoystick Instance;
     private bool Destroyed;
+    [SerializeField] private Image HandleImage;
 
+    public void SetPlayerColor(Color playerColor) =>
+        HandleImage.color = playerColor;
     public void SetActive(bool active)
     {
         if (!Destroyed)

@@ -8,7 +8,7 @@ public class InGameChat : UIEntryManager
 
     public void AddInGameChatEntry(string text)
     {
-        AddEntry(text);
+        AddEntry(text, null, null);
     }
 
     protected override void Awake()

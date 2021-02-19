@@ -19,7 +19,7 @@ namespace MainServerBioforce2D
 
         public delegate void PacketHandler(int client, Packet packet);
         public static Dictionary<int, PacketHandler> PacketHandlerDictionary { get; set; }
-        public static Dictionary<int, InternetDiscoveryTCPClientOnServer> ClientDictionary { get; set; } = new Dictionary<int, InternetDiscoveryTCPClientOnServer>();
+        public static Dictionary<int, InternetDiscoveryTCPClientOnServer> ClientDictionary = new Dictionary<int, InternetDiscoveryTCPClientOnServer>();
         public static ImmutableList<Server> ServersAvailable { get; set; } = ImmutableList.Create<Server>();
         public static Dictionary<string, GameServerProcess> GameServerDict { get; set; } = new Dictionary<string, GameServerProcess>();
         private static Queue<int> PortQueue = new Queue<int>(PortsAvailable);
@@ -35,6 +35,7 @@ namespace MainServerBioforce2D
             }
         }
 
+        public static Dictionary<int, InternetDiscoveryTCPClientOnServer> GameServerTCPs = new Dictionary<int, InternetDiscoveryTCPClientOnServer>();
         
 
         public static void StartServer(int port)
@@ -90,27 +91,42 @@ namespace MainServerBioforce2D
             Console.WriteLine($"\nUser {client.Client.RemoteEndPoint} is trying to connect to the discovery server...");
             TCPBeginReceiveDiscoveryClients();
 
-            int discoveryClientCount = 0;
-            while (true)
+            //TODO: PRobably remove this
+            if (client.Client.RemoteEndPoint.ToString().StartsWith("127.0.0.1"))
             {
-                discoveryClientCount++;
+                //That is a GameServer
+                int discoveryGameServerCount = SearchForDictSpace(ref GameServerTCPs);
+                GameServerTCPs[discoveryGameServerCount].Connect(client);
 
-                if (ClientDictionary.ContainsKey(discoveryClientCount))
-                {
-                    if (ClientDictionary[discoveryClientCount].TCPClient != null)
-                        continue;
-                }
-                else
-                    ClientDictionary.Add(discoveryClientCount, new InternetDiscoveryTCPClientOnServer(discoveryClientCount));
-
-                break;
             }
+
+            int discoveryClientCount = SearchForDictSpace(ref ClientDictionary);
             ClientDictionary[discoveryClientCount].Connect(client);
             InternetDiscoveryTCPServerSend.SendWelcome(discoveryClientCount);
             Console.WriteLine($"Connected and sent welcome to new DiscoveryTCPClient: {client.Client.RemoteEndPoint}");
         }
 
-        
+        private static int SearchForDictSpace(ref Dictionary<int, InternetDiscoveryTCPClientOnServer> dict)
+        {
+            int discoveryClientCount = 0;
+            while (true)
+            {
+                discoveryClientCount++;
+
+                if (dict.ContainsKey(discoveryClientCount))
+                {
+                    if (dict[discoveryClientCount].TCPClient != null)
+                        continue;
+                }
+                else
+                    dict.Add(discoveryClientCount, new InternetDiscoveryTCPClientOnServer(discoveryClientCount));
+
+                break;
+            }
+
+            return discoveryClientCount;
+        }
+
 
         private static void InitPacketHandlerDictionary()
         {

@@ -28,6 +28,16 @@ namespace Shared
             }
         }
 
+        public static void ExecuteAfterTime(Action action, int miliseconds)
+        {
+            if (action == null)
+            {
+                Console.WriteLine("Null action was given to thread...");
+                return;
+            }
+
+        }
+
         /// <summary>Executes all code meant to run on the main thread. NOTE: Call this ONLY from the main thread.</summary>
         public static void UpdateMain()
         {
@@ -47,6 +57,7 @@ namespace Shared
                 }
             }
         }
+        
     }
 
 }

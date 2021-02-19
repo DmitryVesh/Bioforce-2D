@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -19,6 +21,24 @@ public class GameManager : MonoBehaviour
     public event PlayerDisconnected OnPlayerDisconnected;
     private bool ShouldLoadMainMenu { get; set; }
 
+    public bool IsMobileSupported { get; private set; }
+    public bool InGame { get; set; }
+
+    public delegate void OnPause(bool pause);
+    public event OnPause OnPauseEvent;
+    public bool Paused { get; private set; } = false;
+
+    public static void ConfyMouse() =>
+        Cursor.lockState = CursorLockMode.Confined;
+    public static void ShowMouse(bool showing) =>
+        Cursor.visible = showing;
+
+    public void InvokePauseEvent(bool pause)
+    {
+        Paused = pause;
+        OnPauseEvent?.Invoke(pause);
+    }
+
     private void Awake()
     {
         if (Instance == null)
@@ -31,7 +51,25 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
         PlayerDictionary = new Dictionary<int, PlayerManager>();
+        ConfyMouse();
+        IsMobileSupported = CheckIfOnMobile();
+
     }
+    private void Update()
+    {
+        if (InGame && PressedPauseButton())
+        {
+            InvokePauseEvent(!Paused);
+        }
+    }
+    
+    private bool PressedPauseButton()
+    {
+        if (!IsMobileSupported && Input.GetButtonDown("Pause"))
+            return true;
+        return false;
+    }
+
     private void FixedUpdate()
     {
         if (ShouldLoadMainMenu)
@@ -48,7 +86,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void SpawnPlayer(int iD, string username, Vector3 position, bool isFacingRight, bool isDead, bool justJoined, int maxHealth, int currentHealth)
+    public void SpawnPlayer(int iD, string username, Vector3 position, bool isFacingRight, bool isDead, bool justJoined, int maxHealth, int currentHealth, Color playerColor)
     {
         GameObject player;
         GameObject prefab;
@@ -57,10 +95,12 @@ public class GameManager : MonoBehaviour
 
         if (localClient)
         {
-            if (IsMobileSupported())
+            if (IsMobileSupported)
                 prefab = MobileLocalPlayerPrefab;
             else 
                 prefab = LocalPlayerPrefab;
+            MobileJoystick.Instance.SetPlayerColor(playerColor);
+            ShootingJoystick.Instance.SetPlayerColor(playerColor);
             Debug.Log($"You, player: {iD} have been spawned.");
         }
         else
@@ -71,7 +111,7 @@ public class GameManager : MonoBehaviour
         player = Instantiate(prefab, position, Quaternion.identity);
 
         PlayerManager playerManager = player.GetComponent<PlayerManager>();
-        playerManager.Initialise(iD, username);
+        playerManager.Initialise(iD, username, playerColor);
         PlayerDictionary.Add(iD, playerManager);
 
         NonLocalPlayerHealth healthManager = player.GetComponentInChildren<NonLocalPlayerHealth>();
@@ -83,14 +123,18 @@ public class GameManager : MonoBehaviour
         
         NonLocalPlayerAnimations playerAnimations = player.GetComponentInChildren<NonLocalPlayerAnimations>();
         playerAnimations?.SetOwnerClientID(iD);
+        playerAnimations?.SetColor(playerColor);
 
         IGun playerGun = player.GetComponentInChildren<IGun>();
         playerGun?.SetOwnerClientID(iD);
+        playerGun?.SetColor(playerColor);
 
         if (!isFacingRight)
             playerAnimations.FlipSprite();
 
         StartCoroutine(playerManager.IsPlayerDeadUponSpawning(isDead));
+
+        
 
         OnPlayerConnected?.Invoke(iD, username, justJoined);
     }
@@ -117,6 +161,7 @@ public class GameManager : MonoBehaviour
         Debug.Log($"All players are being disconnected.");
         //Return to MainMenu
         ShouldLoadMainMenu = true;
+        InGame = false;
     }
     public void PlayerDied(int playerKilledDiedID, int bulletOwnerID, TypeOfDeath typeOfDeath)
     {
@@ -129,7 +174,9 @@ public class GameManager : MonoBehaviour
         PlayerDictionary[iD].PlayerRespawned();
         ClientSend.PlayerRespawned(PlayerDictionary[iD].RespawnPosition);
     }
-    public bool IsMobileSupported()
+    
+    
+    private bool CheckIfOnMobile()
     {
         bool result;
         RuntimePlatform platform = Application.platform;

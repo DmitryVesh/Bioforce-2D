@@ -39,6 +39,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     private Camera cam;
 
     private Vector2 input = Vector2.zero;
+    protected bool CanAim { get; set; } = true;
 
     protected virtual void Start()
     {
@@ -55,6 +56,13 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         handle.anchorMax = center;
         handle.pivot = center;
         handle.anchoredPosition = Vector2.zero;
+
+        GameManager.Instance.OnPauseEvent += OnGamePaused;
+    }
+    private void OnGamePaused(bool pause)
+    {
+        CanAim = !pause;
+        OnPointerUp(null);
     }
 
     public virtual void OnPointerDown(PointerEventData eventData)
@@ -64,6 +72,9 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (!CanAim)
+            return;
+
         cam = null;
         if (canvas.renderMode == RenderMode.ScreenSpaceCamera)
             cam = canvas.worldCamera;

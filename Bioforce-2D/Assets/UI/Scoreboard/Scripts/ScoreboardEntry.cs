@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum ScoreboardEntryArrayListIndexes
 {
@@ -14,14 +14,15 @@ public enum ScoreboardEntryArrayListIndexes
 }
 public class ScoreboardEntry : MonoBehaviour, IUIItemListing
 {
+    [SerializeField] Image Background;
+
     private List<TextMeshProUGUI> ArrayListTexts { get; set; }
     private ArrayList ItemList { get; set; }
 
     //TODO: Add pings to the scoreboard entry of players.
-    private TextMeshProUGUI PingText { get; set; }
-    
+    private TextMeshProUGUI PingText { get; set; }    
 
-    public void Init(int score, string username, int kills, int deaths)
+    public void Init(int iD, int score, string username, int kills, int deaths)
     {
         ArrayListTexts = new List<TextMeshProUGUI>();
         ArrayListTexts.Add(transform.GetChild((int)ScoreboardEntryArrayListIndexes.score).GetComponent<TextMeshProUGUI>());
@@ -31,6 +32,10 @@ public class ScoreboardEntry : MonoBehaviour, IUIItemListing
 
         PingText = transform.GetChild(4).GetComponent<TextMeshProUGUI>();
         SetText(score, username, kills, deaths);
+
+        Color color = GameManager.PlayerDictionary[iD].PlayerColor;
+        color = new Color(color.r, color.g, color.b, (float)100 / (float)255);
+        Background.color = color;
     }
     public void SetText(int score, string username, int kills, int deaths)
     {

@@ -306,9 +306,7 @@ public class Client : MonoBehaviour
     private void Awake()
     {
         if (Instance == null)
-        {
             Instance = this;
-        }
         else if (Instance != this)
         {
             Debug.Log($"Client instance already exists, destroying {gameObject.name}");
@@ -350,9 +348,9 @@ public class Client : MonoBehaviour
     }
     private void OnApplicationPause(bool pause)
     {
-        if (pause)
+        if (pause && Connected)
         {
-
+            //TODO: add handler when paused in game
         }
     }
 

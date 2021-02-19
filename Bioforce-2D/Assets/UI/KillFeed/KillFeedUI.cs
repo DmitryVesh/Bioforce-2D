@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -11,20 +12,41 @@ public class KillFeedUI : UIEntryManager
     [SerializeField] private Color BorderColor = new Color(212, 0, 0);
     [SerializeField] private Color NormalFillColor = new Color(0, 0, 0);
 
-    public void AddKillFeedEntry(int playerDiedID, int bulletOwnerID)
-    {
-        string playerDiedName = GameManager.PlayerDictionary[playerDiedID].GetUsername();
-        string killerPlayerName = GameManager.PlayerDictionary[bulletOwnerID].GetUsername();
+    [SerializeField] private Sprite DeathBullet;
+    [SerializeField] private Sprite DeathFall;
 
-        GameObject killFeedEntry = AddEntry($"{killerPlayerName} killed {playerDiedName}");
+    public void AddKillFeedEntry(int diedID, int killerID)
+    {
+        string killerName = "";
+        string diedName = GameManager.PlayerDictionary[diedID].GetUsername();
+
+        Sprite deathSprite;
+
+        Color imageColor;
+        Color killerColor = GameManager.PlayerDictionary[killerID].PlayerColor;
+        Color diedColor = GameManager.PlayerDictionary[diedID].PlayerColor;
+        
+
+        if (diedID == killerID)
+        {
+            deathSprite = DeathFall;
+            imageColor = diedColor;
+        }
+        else
+        {
+            deathSprite = DeathBullet;
+            killerName = GameManager.PlayerDictionary[killerID].GetUsername();
+            imageColor = killerColor;
+        }
+        GameObject killFeedEntry = AddEntry(killerName, diedName, deathSprite, imageColor, killerColor, diedColor);
 
         int clientInstanceID = Client.Instance.ClientID;
-        if (clientInstanceID == playerDiedID)
+        if (clientInstanceID == diedID)
         {
             TurnOnRedBorder(killFeedEntry);
             TurnOnRedFilling(killFeedEntry);
         }
-        else if (clientInstanceID == bulletOwnerID)
+        else if (clientInstanceID == killerID)
         {
             TurnOnRedBorder(killFeedEntry);
             TurnOnNormalFilling(killFeedEntry);
@@ -35,6 +57,8 @@ public class KillFeedUI : UIEntryManager
             TurnOnNormalFilling(killFeedEntry);
         }
     }
+
+    
 
     protected override void Awake()
     {

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public abstract class UIEntryManager : MonoBehaviour
 {
@@ -10,7 +11,8 @@ public abstract class UIEntryManager : MonoBehaviour
 
     private GameObject Panel { get; set; }
     private List<GameObject> EntryPanels { get; set; }
-    private List<TextMeshProUGUI> EntryTexts { get; set; }
+    private List<(TextMeshProUGUI, TextMeshProUGUI)> EntryTexts { get; set; }
+    private List<Image> EntryImage { get; set; }
     private Queue<(GameObject, Coroutine)> ActiveEntries { get; set; }
 
 
@@ -23,21 +25,32 @@ public abstract class UIEntryManager : MonoBehaviour
         InitEntryTexts();
         ActiveEntries = new Queue<(GameObject, Coroutine)>();
     }
-    protected GameObject AddEntry(string text)
+    protected (GameObject, int) AddEntry(string text1, string text2, Sprite image)
     {
         int inactiveEntryIndex = FindIndexOfInactiveEntry();
         GameObject entry = GetEntry(ref inactiveEntryIndex);
 
         entry.SetActive(true);
 
-        EntryTexts[inactiveEntryIndex].text = text;
+        EntryTexts[inactiveEntryIndex].Item1.text = text1;
+        EntryTexts[inactiveEntryIndex].Item2.text = text2;
+        EntryImage[inactiveEntryIndex].sprite = image;
         Coroutine removingEntryCoroutine = StartCoroutine(RemoveEntry(entry));
 
         ActiveEntries.Enqueue((entry, removingEntryCoroutine));
 
+        return (entry, inactiveEntryIndex);
+    }
+    protected GameObject AddEntry(string killerName, string diedName, Sprite deathSprite, Color imageColor, Color killerColor, Color diedColor)
+    {
+        (GameObject entry, int entryIndex) = AddEntry(killerName, diedName, deathSprite);
+        EntryTexts[entryIndex].Item1.color = killerColor;
+        EntryTexts[entryIndex].Item2.color = diedColor;
+        EntryImage[entryIndex].color = imageColor;
+
         return entry;
     }
-    
+
     private IEnumerator RemoveEntry(GameObject entry)
     {
         yield return new WaitForSeconds(EntryTimeToLive);
@@ -85,9 +98,15 @@ public abstract class UIEntryManager : MonoBehaviour
     }
     private void InitEntryTexts()
     {
-        EntryTexts = new List<TextMeshProUGUI>(EntryPanels.Count);
+        EntryTexts = new List<(TextMeshProUGUI, TextMeshProUGUI)>(EntryPanels.Count);
+        EntryImage = new List<Image>(EntryPanels.Count);
         foreach (GameObject entry in EntryPanels)
-            EntryTexts.Add(entry.GetComponentInChildren<TextMeshProUGUI>());
+        {
+            EntryTexts.Add((entry.transform.GetChild(1).GetComponent<TextMeshProUGUI>(),
+                entry.transform.GetChild(2).GetComponent<TextMeshProUGUI>()));
+            EntryImage.Add(entry.transform.GetChild(3).GetComponent<Image>());
+        }
+
     }
     private void InitEntryPanels()
     {
