@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Net.Sockets;
 using System.Text;
 using Shared;
@@ -11,7 +10,7 @@ namespace MainServerBioforce2D
     {
         public TcpClient TCPClient { get; private set; }
         public int ID { get; private set; }
-        public ImmutableList<Server> ServersAlreadyGiven { get; set; }
+        public List<Server> ServersAlreadyGiven { get; set; }
 
         private static int DataBufferSize { get; set; } = 4096;
         

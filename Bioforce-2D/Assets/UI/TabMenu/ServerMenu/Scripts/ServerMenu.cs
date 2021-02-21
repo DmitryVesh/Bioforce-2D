@@ -43,16 +43,31 @@ public class ServerMenu : MonoBehaviour
     {
         string message = packet.ReadString();
         Debug.Log($"Connection with MainServer established.\nMessage from MainServer: {message}");
+        
         if (Instance.AskingForServers)
             InternetServerScanner.SendFirstAskForServersPacket();
+        Instance.InternetServersPage.RegainedConnectionToMainServer();
     }
     internal static void ReadServerDeletedPacket(string ip, Packet packet)
     {
-        throw new NotImplementedException();
+        ThreadManager.ExecuteOnMainThread(() =>
+        {
+            string serverName = packet.ReadString();
+            Instance.InternetServersPage.DeleteServer(serverName);
+        });
     }
     internal static void ReadServerModifiedPacket(string ip, Packet packet)
     {
-        throw new NotImplementedException();
+        string serverName = packet.ReadString();
+        int currentNumPlayers = packet.ReadInt();
+        int maxNumPlayers = packet.ReadInt();
+        string mapName = packet.ReadString();
+        int ping = packet.ReadInt();
+
+        ThreadManager.ExecuteOnMainThread(() =>
+        {
+            Instance.InternetServersPage.ModifyServer(serverName, currentNumPlayers, maxNumPlayers, mapName, ping);
+        });
     }
     internal static void ServerConnectionFull()
     {
@@ -93,7 +108,12 @@ public class ServerMenu : MonoBehaviour
     }
     internal static void ReadCantJoinServerDeleted(string ip, Packet packet)
     {
-        throw new NotImplementedException();
+        ThreadManager.ExecuteOnMainThread(() =>
+        {
+            string serverName = packet.ReadString();
+            Instance.InternetServersPage.DeleteServer(serverName);
+            ServerConnectionTimeOut();
+        });
     }
 
     public static void DisconnectedMainServer()

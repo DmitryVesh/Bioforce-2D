@@ -55,6 +55,7 @@ public class ClientSend : MonoBehaviour
         Packet packet = new Packet((int)ClientPackets.bulletShot);
         packet.Write(position);
         packet.Write(rotation);
+
         SendTCPPacket(packet);
     }
     public static void PlayerDied(int bulletOwnerID, TypeOfDeath typeOfDeath)
@@ -62,6 +63,7 @@ public class ClientSend : MonoBehaviour
         Packet packet = new Packet((int)ClientPackets.playerDied);
         packet.Write(bulletOwnerID);
         packet.Write((int)typeOfDeath);
+
         SendTCPPacket(packet);
     }
     public static void PlayerRespawned(Vector2 respawnPosition)
@@ -69,6 +71,7 @@ public class ClientSend : MonoBehaviour
         using (Packet packet = new Packet((int)ClientPackets.playerRespawned))
         {
             packet.Write(respawnPosition);
+
             SendTCPPacket(packet);
         }        
     }
@@ -78,8 +81,19 @@ public class ClientSend : MonoBehaviour
         Packet packet = new Packet((int)ClientPackets.tookDamage);
         packet.Write(damage);
         packet.Write(currentHealth);
+
         SendTCPPacket(packet);
     }
+    internal static void PausedGame(bool paused)
+    {
+        using (Packet packet = new Packet((int)ClientPackets.pausedGame))
+        {
+            packet.Write(paused);
+
+            SendTCPPacket(packet);
+        }
+    }
+
 
     private static void SendTCPPacket(Packet packet)
     {

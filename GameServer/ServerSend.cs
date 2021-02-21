@@ -62,6 +62,8 @@ namespace GameServer
             packet.Write(player.PlayerColor.G);
             packet.Write(player.PlayerColor.B);
 
+            packet.Write(player.Paused);
+
             SendTCPPacket(recipientClient, packet);
         }
         public static void PlayerPosition(int playerID, Vector2 position)
@@ -70,7 +72,7 @@ namespace GameServer
             packet.Write(playerID);
             packet.Write(position);
 
-            SendUDPPacketToAll(packet);
+            SendTCPPacketToAll(packet);
         }
         public static void PlayerPositionButLocal(int playerID, Vector2 position)
         {
@@ -78,7 +80,7 @@ namespace GameServer
             packet.Write(playerID);
             packet.Write(position);
 
-            SendUDPPacketToAllButIncluded(playerID, packet);
+            SendTCPPacketToAllButIncluded(playerID, packet);
         }
         public static void PlayerRotationAndVelocity(int playerID, bool isFacingRight, Vector2 velocity, Quaternion rotation)
         {
@@ -88,7 +90,7 @@ namespace GameServer
             packet.Write(velocity);
             packet.Write(rotation);
 
-            SendUDPPacketToAllButIncluded(playerID, packet);
+            SendTCPPacketToAllButIncluded(playerID, packet);
         }
         public static void PlayerMovementStats(int playerID, float runSpeed, float sprintSpeed)
         {
@@ -145,6 +147,17 @@ namespace GameServer
                 packet.Write(rotation);
 
                 SendTCPPacketToAllButIncluded(playerID, packet);
+            }
+        }
+
+        internal static void PlayerPausedGame(int clientID, bool paused)
+        {
+            using (Packet packet = new Packet((int)ServerPackets.playerPausedGame))
+            {
+                packet.Write(clientID);
+                packet.Write(paused);
+
+                SendTCPPacketToAllButIncluded(clientID, packet);
             }
         }
 

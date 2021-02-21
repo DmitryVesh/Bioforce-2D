@@ -25,8 +25,8 @@ public class PlayerManager : MonoBehaviour
     public delegate void PlayerSpeedX(float speedX);
     public event PlayerSpeedX OnPlayerSpeedXChanged;
 
-    public delegate void PlayerRespawn();
-    public event PlayerRespawn OnPlayerRespawn;
+    public delegate void NoParams();
+    public event NoParams OnPlayerRespawn;
     public delegate void PlayerDeath(TypeOfDeath typeOfDeath);
     public event PlayerDeath OnPlayerDeath;
     public static float RespawnTime { get; private set; } = 1.5f;
@@ -35,19 +35,20 @@ public class PlayerManager : MonoBehaviour
     public delegate void PlayerTookDamage(int damage, int currentHealth);
     public event PlayerTookDamage OnPlayerTookDamage;
 
-    public delegate void PlayerShot(Vector2 position, Quaternion rotation);
-    public event PlayerShot OnPlayerShot;
+    public delegate void Vector2andQuaternion(Vector2 position, Quaternion rotation);
+    public event Vector2andQuaternion OnPlayerShot;
     
-    public delegate void PlayerJumped();
-    public event PlayerJumped OnPlayerJumped;
+    public event NoParams OnPlayerJumped;
 
     public delegate void PlayerPosition(Vector2 position);
     public event PlayerPosition OnPlayerPosition;
     public delegate void PlayerRotation(Quaternion rotation);
     public event PlayerRotation OnPlayerRotation;
 
-    public event PlayerShot OnArmPositionRotation;
+    public event Vector2andQuaternion OnArmPositionRotation;
 
+    public delegate void Bool(bool boolean);
+    public event Bool OnPlayerPaused;
 
     public string GetUsername() =>
         Username;
@@ -124,4 +125,7 @@ public class PlayerManager : MonoBehaviour
 
     internal void SetArmPositionRotation(Vector2 position, Quaternion rotation) =>
         OnArmPositionRotation?.Invoke(position, rotation);
+
+    internal void SetPlayerPaused(bool paused) =>
+        OnPlayerPaused?.Invoke(paused);
 }

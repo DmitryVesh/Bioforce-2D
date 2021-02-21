@@ -31,6 +31,14 @@ public class ServersPage : UIItemListingManager
             NoConnectionToMainServerEntryPrefab.SetActive(true);
         });
     }
+    internal void RegainedConnectionToMainServer()
+    {
+        ThreadManager.ExecuteOnMainThread(() =>
+        {
+            NoConnectionToMainServerEntryPrefab.SetActive(false);
+            NoServersFoundEntryPrefab.SetActive(true);
+        });
+    }
     public void DeleteServer(string serverName)
     {
         try
@@ -48,6 +56,12 @@ public class ServersPage : UIItemListingManager
         foreach (ServerEntry serverEntry in ServerInfoItemLists.Values)
             Destroy(serverEntry.GetGameObject());
         ServerInfoItemLists.Clear();
+    }
+
+    public void ModifyServer(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping)
+    {
+        if (ServerInfoItemLists.ContainsKey(serverName))
+            ((ServerEntry)ServerInfoItemLists[serverName]).SetText(serverName, currentPlayerCount, maxPlayerCount, mapName, ping);
     }
 
     public void OnServerEntryHover(ServerEntry serverEntry)
@@ -112,10 +126,14 @@ public class ServersPage : UIItemListingManager
 
     private void AddEntry()
     {
+        (string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping) = ServersToAdd.Dequeue();
+        if (ServerInfoItemLists.ContainsKey(serverName))
+            return;
+
         NoConnectionToMainServerEntryPrefab.SetActive(false);
         NoServersFoundEntryPrefab.SetActive(false);
 
-        (string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping) = ServersToAdd.Dequeue();
+        
         Debug.Log($"Adding server: {serverName}, to server page");
         GameObject entryToAdd = Instantiate(ItemListingPrefab, transform);
         ServerEntry serverEntry = entryToAdd.GetComponent<ServerEntry>();

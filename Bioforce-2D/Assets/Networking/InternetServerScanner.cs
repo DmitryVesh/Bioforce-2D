@@ -7,7 +7,7 @@ public class InternetServerScanner : MonoBehaviour
     public static InternetServerScanner Instance { get; set; }
     private InternetDiscoveryClient MainServerSocket { get; set; }
     private bool ReAskTimerIsOn { get; set; }
-    private const float ReAskTimerMax = 15f;
+    private const float ReAskTimerMax = 5f;
     private float ReAskTimerCurrent { get; set; }
 
     public static void ContactMainServerForServers(int port)

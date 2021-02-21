@@ -11,7 +11,11 @@ public class PlayerRegistration : MonoBehaviour
     public bool IsUsernameValid { get; set; }
 
     [SerializeField] private TextMeshProUGUI PlayerModelUsernameText;
-    [SerializeField] private char[] InvalidChars = new char[] { 'q', 'z', 'Z', ']', '[', '\'', '\"', '@', '+', 'J', ';', '(', ')', '\\', '/', '#', '*', '%', '$', '£', '!', '^', '&', '=', '~', '?', '<', '>', '|' };
+    private char[] InvalidChars = new char[] { 'q', 'z', 'Z', ']', '[', '\'', '\"', '@', '+', 'J', ';', '(', ')', '\\', '/', '#', '*', '%', '$', '£', '!', '^', '&', '=', '~', '?', '<', '>', '|' };
+    private char[] ValidChars = new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+                                             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+                                             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                                             ' ', '\''};
 
     private TMP_InputField UsernameInputField { get; set; }
     private MenuButton OKMenuButton { get; set; }
@@ -84,7 +88,7 @@ public class PlayerRegistration : MonoBehaviour
 
     private bool IsInputFieldValid(string inputField)
     {
-        if (inputField == null || inputField == "" || inputField.Length < 3)
+        if (inputField == null || inputField == "" || inputField.Length < 3 || inputField.Contains("  "))
             return false;
         return true;
     }
@@ -94,14 +98,18 @@ public class PlayerRegistration : MonoBehaviour
 
         for (int count = 0; count < String.Length; count++)
         {
-            foreach (char invalidChar in InvalidChars)
+            bool valid = false;
+            foreach (char validChar in ValidChars)
             {
-                if (String[count] == invalidChar)
+                if (String[count] == validChar)
                 {
-                    indexesRemove.Add(count);
+                    valid = true;
                     break;
                 }
             }
+
+            if (!valid)
+                indexesRemove.Add(count);
         }
 
         int decrimentIndexer = 0;

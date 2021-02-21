@@ -20,18 +20,28 @@ namespace MainServerBioforce2D
 
         public static void SendServerData(int client, Server server)
         {
-            using (Packet packet = new Packet())
-            {
-                packet.Write((int)InternetDiscoveryServerPackets.serverData);
-                packet.Write(server.ServerName);
-                packet.Write(server.CurrentNumPlayers);
-                packet.Write(server.MaxNumPlayers);
-                packet.Write(server.MapName);
-                packet.Write(server.Ping); //TODO: Actually get ping value for
+            if (server == null)
+                return;
 
-                SendPacket(client, packet);
+            try
+            {
+                using (Packet packet = new Packet())
+                {
+                    packet.Write((int)InternetDiscoveryServerPackets.serverData);
+                    packet.Write(server.ServerName);
+                    packet.Write(server.CurrentNumPlayers);
+                    packet.Write(server.MaxNumPlayers);
+                    packet.Write(server.MapName);
+                    packet.Write(server.Ping); //TODO: Actually get ping value for
+
+                    SendPacket(client, packet);
+                }
+                Console.WriteLine($"Sent ServerData of: {server.ServerName} to client:{client}");
             }
-            Console.WriteLine($"Sent ServerData of: {server.ServerName} to client:{client}");
+            catch (Exception exception)
+            {
+                Console.WriteLine($"Error sending server data to client: {client}\n{exception}");
+            }
         }
 
         public static void SendServerDeleted(int client, Server server)

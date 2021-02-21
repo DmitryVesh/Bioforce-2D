@@ -7,11 +7,13 @@ namespace Shared
 {
     public enum MainServerToServer
     {
-
+        welcome
     }
     public enum ServerToMainServer
     {
-
+        welcomeReceived,
+        serverData,
+        shuttingDown
     }
 
     public enum InternetDiscoveryClientPackets
@@ -58,7 +60,8 @@ namespace Shared
         playerRespawned,
         tookDamage,
         serverIsFull,
-        armPositionRotation
+        armPositionRotation,
+        playerPausedGame
     }
 
     /// <summary>Sent from client to server.</summary>
@@ -72,7 +75,8 @@ namespace Shared
         playerDied,
         playerRespawned,
         tookDamage,
-        armPositionRotation
+        armPositionRotation,
+        pausedGame
     }
 
     public class Packet : IDisposable

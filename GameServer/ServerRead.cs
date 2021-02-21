@@ -40,8 +40,10 @@ namespace GameServer
                 Vector2 position = packet.ReadVector2();
                 Vector2 velocity = packet.ReadVector2();
                 Quaternion rotation = packet.ReadQuaternion();
+                ServerSend.PlayerPositionButLocal(clientID, position);
+                ServerSend.PlayerRotationAndVelocity(clientID, isFacingRight, velocity, rotation);
                 //Sometimes System.NullReferenceException when a player disconnects
-                Server.ClientDictionary[clientID].Player.PlayerMoves(isFacingRight, position, velocity, rotation);
+                //Server.ClientDictionary[clientID].Player.PlayerMoves(isFacingRight, position, velocity, rotation);
             }
             catch (Exception exception)
             {
@@ -121,6 +123,22 @@ namespace GameServer
             catch (Exception exception)
             {
                 Console.WriteLine($"\tError, trying to read player took damage, from player: {clientID}\n{exception}");
+            }
+        }
+
+        internal static void PlayerPausedGame(int clientID, Packet packet)
+        {
+            try
+            {
+                bool paused = packet.ReadBool();
+                Server.ClientDictionary[clientID].Player.SetPaused(paused);
+
+                ServerSend.PlayerPausedGame(clientID, paused);
+
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"\tError, trying to read PausedGame, from player: {clientID}\n{exception}");
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿using Shared;
 using System;
 using System.Numerics;
+using System.Timers;
 
 namespace GameServer
 {
@@ -29,7 +30,9 @@ namespace GameServer
         public bool IsDead { get; private set; } = false;
 
         public PlayerColor PlayerColor { get; private set; }
-        
+
+        public bool Paused { get; private set; }
+        public Timer PausedTimer { get; private set; }
 
         public PlayerServer(int iD, string username, Vector2 position, PlayerColor playerColor)
         {
@@ -62,6 +65,7 @@ namespace GameServer
             Position = position;
             Velocity = velocity;
             Rotation = rotation;
+            MovePlayer();
         }
         public void SetPlayerMovementStats(float runSpeed, float sprintSpeed)
         {
@@ -70,11 +74,15 @@ namespace GameServer
         }
         public void Update()
         {
-            MovePlayer();
+            //MovePlayer();
         }
 
         private void MovePlayer()
         {
+            ServerSend.PlayerPositionButLocal(ID, Position);
+            ServerSend.PlayerRotationAndVelocity(ID, IsFacingRight, Velocity, Rotation);
+
+            /*
             if (MovePlayerSent >= ServerProgram.Ticks)
             {
                 if (ValidMove())
@@ -92,6 +100,7 @@ namespace GameServer
             //ServerSend.PlayerVelocity(ID, Velocity);
             ServerSend.PlayerRotationAndVelocity(ID, IsFacingRight, Velocity, Rotation);
             MovePlayerSent += 1;
+            */
             //ServerSend.PlayerAnimation(ID, )
         }
 
@@ -100,7 +109,6 @@ namespace GameServer
             bool valid = true;
             //TODO: fix the x axis validation
 
-            return valid;
             Vector2 validPosition = new Vector2(0, 0);
             //Validating X
             float xLast = LastPosition.X;
@@ -129,6 +137,21 @@ namespace GameServer
             LastPosition = validPosition;
 
             return valid;
+        }
+
+        internal void SetPaused(bool paused)
+        {
+            Paused = paused;
+            int disconnectAfterTimeMs = 30000;
+            PausedTimer = new Timer(disconnectAfterTimeMs);
+            PausedTimer.Elapsed += PausedTimer_Elapsed;
+        }
+
+        private void PausedTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            if (Paused)
+                Server.ClientDictionary[ID].Disconnect();
+            PausedTimer.Dispose();
         }
     }
 }

@@ -19,6 +19,7 @@ namespace MainServerBioforce2D
             if (args.Length == 0 || args[0] == "MainServer")
             {
                 InternetDiscoveryTCPServer.StartServer(Port);
+
                 Thread mainThread = new Thread(new ThreadStart(MainThread));
                 mainThread.Start();
             }

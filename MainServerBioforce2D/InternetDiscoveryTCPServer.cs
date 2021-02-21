@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using MainServer;
 using Shared;
 
 namespace MainServerBioforce2D
@@ -12,6 +13,7 @@ namespace MainServerBioforce2D
     class InternetDiscoveryTCPServer
     {
         public const string MyIP = "18.130.250.31";
+        //public const string MyIP = "127.0.0.1";
 
         private static TcpListener TCPBroadCastTcpListener { get; set; }
 
@@ -20,23 +22,21 @@ namespace MainServerBioforce2D
         public delegate void PacketHandler(int client, Packet packet);
         public static Dictionary<int, PacketHandler> PacketHandlerDictionary { get; set; }
         public static Dictionary<int, InternetDiscoveryTCPClientOnServer> ClientDictionary = new Dictionary<int, InternetDiscoveryTCPClientOnServer>();
-        public static ImmutableList<Server> ServersAvailable { get; set; } = ImmutableList.Create<Server>();
+        public static List<Server> ServersAvailable { get; set; } = new List<Server>();
         public static Dictionary<string, GameServerProcess> GameServerDict { get; set; } = new Dictionary<string, GameServerProcess>();
+
         private static Queue<int> PortQueue = new Queue<int>(PortsAvailable);
         private static List<int> PortsAvailable
         {
             get
             {
-                int minPort = 28030, maxPort = 28040;
+                int minPort = 28030, maxPort = 28129;
                 List<int> ports = new List<int>();
                 for (int port = minPort; port < maxPort; port++)
                     ports.Add(port);
                 return ports;
             }
         }
-
-        public static Dictionary<int, InternetDiscoveryTCPClientOnServer> GameServerTCPs = new Dictionary<int, InternetDiscoveryTCPClientOnServer>();
-        
 
         public static void StartServer(int port)
         {
@@ -73,12 +73,15 @@ namespace MainServerBioforce2D
             foreach (GameServerProcess gameServer in GameServerDict.Values)
                 gameServer.Kill();
         }
-        internal static int GetAvailablePort()
+        internal static (int, int) GetAvailablePort()
         {
             if (PortQueue.Count != 0)
-                return PortQueue.Dequeue();
+            {
+                int gamePort = PortQueue.Dequeue();
+                return (gamePort, gamePort + 100);
+            }
             else
-                return -1;
+                return (-1, -1);
         }
 
         private static void TCPBeginReceiveDiscoveryClients()
@@ -90,15 +93,6 @@ namespace MainServerBioforce2D
             TcpClient client = TCPBroadCastTcpListener.EndAcceptTcpClient(asyncResult);
             Console.WriteLine($"\nUser {client.Client.RemoteEndPoint} is trying to connect to the discovery server...");
             TCPBeginReceiveDiscoveryClients();
-
-            //TODO: PRobably remove this
-            if (client.Client.RemoteEndPoint.ToString().StartsWith("127.0.0.1"))
-            {
-                //That is a GameServer
-                int discoveryGameServerCount = SearchForDictSpace(ref GameServerTCPs);
-                GameServerTCPs[discoveryGameServerCount].Connect(client);
-
-            }
 
             int discoveryClientCount = SearchForDictSpace(ref ClientDictionary);
             ClientDictionary[discoveryClientCount].Connect(client);
@@ -141,27 +135,29 @@ namespace MainServerBioforce2D
 
         internal static void OnGameServerExited(object sender, GameServerArgs args)
         {
-            
             string serverName = args.ServerName;
             int port = args.ServerPort;
             PortQueue.Enqueue(port);
 
-            Console.WriteLine($"\nGameServer: {serverName} exited...\n");
+            Console.WriteLine("" +
+                $"\n-------------------------------------------" +
+                $"\nGameServer: {serverName} exited..." +
+                $"\n-------------------------------------------");
 
-            Server[] servers = new Server[ServersAvailable.Count - 1];
-            int takeAwayOne = 0;
-            for (int serverCount = 0; serverCount < ServersAvailable.Count; serverCount++)
+            lock (ServersAvailable)
             {
-                Server serverAvailable = ServersAvailable[serverCount];
-                if (serverAvailable.ServerName == serverName)
+                int serverIndexToDelete = -1;
+                for (int serverCount = 0; serverCount < ServersAvailable.Count; serverCount++)
                 {
-                    takeAwayOne = 1;
-                    continue;
+                    if (ServersAvailable[serverCount].ServerName == serverName)
+                        serverIndexToDelete = serverCount;
                 }
-                servers[serverCount - takeAwayOne] = serverAvailable;
+                if (serverIndexToDelete != -1)
+                    ServersAvailable.RemoveAt(serverIndexToDelete);
+
+                GameServerDict.Remove(serverName);
+                GameServerComms.GameServerConnection.Remove(serverName);
             }
-            ServersAvailable = ImmutableList.Create(servers.ToArray());
-            GameServerDict.Remove(serverName);
         }
     }
 }

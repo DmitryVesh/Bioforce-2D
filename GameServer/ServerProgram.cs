@@ -10,21 +10,21 @@ namespace GameServer
         public const int MillisecondsInTick = 1000 / Ticks;
 
         public static bool IsRunning { get; private set; } = true;
+        private static int PortGame { get; set; }
 
         static void Main() { }
 
         public static void StartServerProgram(string[] args)
         {
-            (string serverName, int maxNumPlayers, string mapName, int port) = (args[0], int.Parse(args[1]), args[2], int.Parse(args[3]));
+            (string serverName, int maxNumPlayers, string mapName, int portGame, int portMainServer) = (args[0], int.Parse(args[1]), args[2], int.Parse(args[3]), int.Parse(args[4]));
             Thread mainThread = new Thread(new ThreadStart(MainThread));
             mainThread.Start();
+            PortGame = portGame;
 
             try
             {
-                //int portNumLANDiscover = 28021;
-                //DiscoveryServer.StartServer(portNumLANDiscover);
-                MainServerCommunication.StartServer()
-                Server.StartServer(serverName, maxNumPlayers, mapName, port);
+                MainServerComms.Connect(portMainServer, serverName);
+                Server.StartServer(serverName, maxNumPlayers, mapName, portGame);
             }
             catch (Exception exception)
             {
@@ -50,7 +50,7 @@ namespace GameServer
                         Thread.Sleep(TickTimer - DateTime.Now);
                 }
             }
-            Console.WriteLine("\tEnding server");
+            Console.WriteLine($"\tEnding server: {PortGame}");
         }
     }
 }

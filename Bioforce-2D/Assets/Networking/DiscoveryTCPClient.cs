@@ -132,10 +132,17 @@ public abstract class DiscoveryTCPClient
             byte[] bytes = ReceivePacket.ReadBytes(packetLen);
             ThreadManager.ExecuteOnMainThread(() =>
             {
-                Packet packet = new Packet(bytes);
-                int packetID = packet.ReadInt();
-                string ipAddress = Socket.Client.RemoteEndPoint.ToString().Split(':')[0];
-                PacketHandlerDictionary[packetID](ipAddress, packet);
+                try
+                {
+                    Packet packet = new Packet(bytes);
+                    int packetID = packet.ReadInt();
+                    string ipAddress = Socket.Client.RemoteEndPoint.ToString().Split(':')[0];
+                    PacketHandlerDictionary[packetID](ipAddress, packet);
+                }
+                catch (Exception exception)
+                {
+                    Debug.Log("\nError in HandleData of DiscoveryTCPClient...");
+                }
             });
             packetLen = 0;
 
@@ -144,7 +151,7 @@ public abstract class DiscoveryTCPClient
         }
         if (packetLen < 2)
             return true;
-
+        
         return false;
     }
     private bool ExitHandleData(ref int packetLen)

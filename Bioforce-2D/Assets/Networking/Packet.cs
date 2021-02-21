@@ -7,7 +7,7 @@ public enum InternetDiscoveryClientPackets
 {
     firstAskForServers,
     askForServerChanges,
-    addServer, //TODO: over 9000 addServer when creating server
+    addServer, 
     deletedServer,
     modifiedServer,
     joinServerNamed
@@ -15,7 +15,7 @@ public enum InternetDiscoveryClientPackets
 public enum InternetDiscoveryServerPackets
 {
     welcome,
-    serverData, //Same as added
+    serverData,
     serverDeleted,
     serverModified,
     cantJoinServerDeleted,
@@ -47,7 +47,8 @@ public enum ServerPackets
     playerRespawned,
     tookDamage,
     serverIsFull,
-    armPositionRotation
+    armPositionRotation,
+    playerPausedGame
 }
 
 /// <summary>Sent from client to server.</summary>
@@ -61,7 +62,8 @@ public enum ClientPackets
     playerDied,
     playerRespawned,
     tookDamage,
-    armPositionRotation
+    armPositionRotation,
+    pausedGame
 }
 
 public class Packet : IDisposable

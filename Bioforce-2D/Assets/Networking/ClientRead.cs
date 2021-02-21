@@ -58,10 +58,13 @@ public class ClientRead : MonoBehaviour
         int G = packet.ReadInt();
         int B = packet.ReadInt();
         Color color = new Color((float)R / (float)255, (float)G / (float)255, (float)B / (float)255);
+        bool paused = packet.ReadBool();
 
         GameManager.Instance.SpawnPlayer(iD, username, position, isFacingRight, isDead, justJoined, maxHealth, currentHealth, color);
         GameManager.PlayerDictionary[iD].SetPlayerMovementStats(runSpeed, sprintSpeed);
         ScoreboardManager.Instance.AddEntry(iD, username, kills, deaths, score);
+
+        GameManager.PlayerDictionary[iD].SetPlayerPaused(paused);
     }
     public static void PlayerMovementStats(Packet packet)
     {
@@ -164,6 +167,20 @@ public class ClientRead : MonoBehaviour
         catch (Exception exception)
         {
             Debug.Log($"Player's: {iD} ArmPositionRotation caused an error.\n{exception}");
+        }
+    }
+
+    internal static void PlayerPausedGame(Packet packet)
+    {
+        int iD = packet.ReadInt();
+        bool paused = packet.ReadBool();
+        try
+        {
+            GameManager.PlayerDictionary[iD].SetPlayerPaused(paused);
+        }
+        catch (Exception exception)
+        {
+            Debug.Log($"Player's: {iD} PlayerPausedGame caused an error.\n{exception}");
         }
     }
 }

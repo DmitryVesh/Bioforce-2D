@@ -82,6 +82,9 @@ namespace GameServer
             {
                 Console.WriteLine($"\tError closing Server: {ServerName}...\n{exception}");
             }
+
+            if (MainServerComms.EstablishedConnection)
+                Environment.Exit(1);
         }
         public static void SendUDPPacket(IPEndPoint clientIPEndPoint, Packet packet)
         {
@@ -117,6 +120,7 @@ namespace GameServer
             PacketHandlerDictionary.Add((int)ClientPackets.playerRespawned, ServerRead.PlayerRespawnedRead);
             PacketHandlerDictionary.Add((int)ClientPackets.tookDamage, ServerRead.TookDamageRead);
             PacketHandlerDictionary.Add((int)ClientPackets.armPositionRotation, ServerRead.ArmPositionRotation);
+            PacketHandlerDictionary.Add((int)ClientPackets.pausedGame, ServerRead.PlayerPausedGame);
 
             Console.WriteLine("\tInitialised server packets.");
         }
@@ -153,7 +157,6 @@ namespace GameServer
             TCPListener.BeginAcceptTcpClient(new AsyncCallback(TCPConnectAsyncCallback), null);
         }
         
-        
 
         private static void UDPConnectAsyncCallback(IAsyncResult asyncResult)
         {
@@ -187,7 +190,6 @@ namespace GameServer
             }
             catch (Exception exception)
             {
-                //TODO: maybe Disconnect client, error caused when 2 or more clients disconnect at same time.
                 Console.WriteLine($"\tError, in UDP data:\n{exception}");
             }
         }

@@ -45,7 +45,11 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
 
         PlayerManager.OnPlayerDeath += DieAnimation;
         PlayerManager.OnPlayerRespawn += RespawnAnimation;
+        PlayerManager.OnPlayerPaused += PlayerPaused;
     }
+
+    
+
     protected virtual void FixedUpdate()
     {
         SpeedXNonLocal = WalkingPlayer.GetSpeedX();
@@ -74,7 +78,10 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     {
         Anim.SetTrigger("Respawn");
     }
-
+    private void PlayerPaused(bool paused)
+    {
+        Anim.SetBool("Paused", paused);
+    }
 
     protected virtual void LateUpdate()
     {
@@ -98,6 +105,7 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     {
         PlayerManager.OnPlayerDeath -= DieAnimation;
         PlayerManager.OnPlayerRespawn -= RespawnAnimation;
+        PlayerManager.OnPlayerPaused -= PlayerPaused;
     }
 
     

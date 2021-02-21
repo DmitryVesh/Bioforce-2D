@@ -27,7 +27,7 @@ public class Client : MonoBehaviour
     private static Dictionary<int, PacketHandler> PacketHandlerDictionary;
     public bool Connected { get; set; } = false;
 
-    [SerializeField] private float TimerTimeOutTime = 15;
+    private float TimerTimeOutTime = 10;
     private bool TimerRunning { get; set; } = false;
     private float Timer { get; set; }
     
@@ -67,7 +67,7 @@ public class Client : MonoBehaviour
     }
     private IEnumerator ConnectTCP(string ip)
     {
-        yield return new WaitForSeconds(1); //Delays connection to server, as problems when query it too fast
+        yield return new WaitForSeconds(3); //Delays connection to server, as problems when query it too fast
         tCP.Connect(ip);
     }
     public void Disconnect()
@@ -348,10 +348,8 @@ public class Client : MonoBehaviour
     }
     private void OnApplicationPause(bool pause)
     {
-        if (pause && Connected)
-        {
-            //TODO: add handler when paused in game
-        }
+        if (Connected)
+            ClientSend.PausedGame(pause);
     }
 
     private void InitClientData()
@@ -370,6 +368,7 @@ public class Client : MonoBehaviour
         PacketHandlerDictionary.Add((int)ServerPackets.tookDamage, ClientRead.TookDamage);
         PacketHandlerDictionary.Add((int)ServerPackets.serverIsFull, ClientRead.ServerIsFull);
         PacketHandlerDictionary.Add((int)ServerPackets.armPositionRotation, ClientRead.ArmPositionRotation);
+        PacketHandlerDictionary.Add((int)ServerPackets.playerPausedGame, ClientRead.PlayerPausedGame);
     }
        
 }

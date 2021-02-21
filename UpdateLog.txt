@@ -9,15 +9,19 @@ Main goals is to;
 	1 Make a main menu screen, and add a volume settings menu, pause menu
 	1 Assign each player a color, and change the color of name on kill field to corresponding player color
 	1 Fix bug when a player is killed multiple times at once, (probably have to set a field which states when can call that you can die)
-	0 Add server updates, how many players playing on the server
+	1 Add communication between the MainServer and GameServers
+	1 Add server updates, how many players playing on the server
+	1 Add server destruction, when a server is idle with no players gets deleted
+	1 When a player exits the game (without killing the app) "Deactivate the player", and if exited for too long kick player
+	1 Fix bug where player spawned in, and is in 1 position only, however after respawn changes position, 
+		so must be problem with getting the other player's position, in UpdateMain of server
+		Occured due to sending via UDP, so packets sometimes were blocked for some reason...	
+	1 Fix muzzelflash anim being stuck in wrong frame.
+	1 Make all inputs passed through valid chars, instead of invalid chars	
 
 Future tasks;	
 		
-	version 0.5.7.3
-		Make all inputs passed through valid chars, instead of invalid chars
-		Fix muzzelflash anim being stuck in wrong frame.
-		Fix bug where player spawned in, and is in 1 position only, however after respawn changes position, 
-			so must be problem with getting the other player's position, in UpdateMain of server
+	version 0.5.7.3	
 		Make servers be able to sort by Name, Players, Map, etc...
 		Lookahead at where the user is pointing
 		Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard
