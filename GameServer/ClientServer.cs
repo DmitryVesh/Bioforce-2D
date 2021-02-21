@@ -58,11 +58,18 @@ namespace GameServer
             }
             public void Disconnect()
             {
-                Socket.Close();
-                Socket = null;
-                Stream = null;
-                ReceiveBuffer = null;
-                ReceivePacket = null;
+                try
+                {
+                    Socket.Close();
+                    Socket = null;
+                    Stream = null;
+                    ReceiveBuffer = null;
+                    ReceivePacket = null;
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine($"\n\tError in {Server.ServerName} client: {ID}, error in Disconnect...{exception}");
+                }
             }
 
             private void StreamBeginRead()
