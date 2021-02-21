@@ -642,6 +642,11 @@ PrefabInstance:
       propertyPath: m_LookAt
       value: 
       objectReference: {fileID: 7847370238992379355}
+    - target: {fileID: 3544536141716630502, guid: e79d4f5886fc92d449b693ac38d3b89b,
+        type: 3}
+      propertyPath: m_ComponentOwner
+      value: 
+      objectReference: {fileID: 1032412737202246357}
     - target: {fileID: 5971285485232926341, guid: e79d4f5886fc92d449b693ac38d3b89b,
         type: 3}
       propertyPath: m_Name
@@ -658,6 +663,12 @@ GameObject:
 --- !u!4 &6451151220147399164 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3186732566511837750, guid: e79d4f5886fc92d449b693ac38d3b89b,
+    type: 3}
+  m_PrefabInstance: {fileID: 8484389964605148106}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1032412737202246357 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8929870955869280543, guid: e79d4f5886fc92d449b693ac38d3b89b,
     type: 3}
   m_PrefabInstance: {fileID: 8484389964605148106}
   m_PrefabAsset: {fileID: 0}

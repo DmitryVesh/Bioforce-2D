@@ -141,7 +141,7 @@ public abstract class DiscoveryTCPClient
                 }
                 catch (Exception exception)
                 {
-                    Debug.Log("\nError in HandleData of DiscoveryTCPClient...");
+                    Debug.Log($"\nError in HandleData of DiscoveryTCPClient...\n{exception}");
                 }
             });
             packetLen = 0;
