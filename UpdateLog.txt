@@ -1,4 +1,59 @@
 ===============================================================================================================================
+Version 0.5.7.3
+---------------
+
+Summary
+-------
+Main goals is to;
+	1 Fix being able to take damage whilst down 
+	1 prevent crashing and stopping receiving packets from client to server when 2 or more clients disconnect simultaneosly.
+		just tested this out, and it doesn't occur anymore... probably the exception handling/player movement updates changed
+		causing it to not be an issue anymore!
+	1 Make servers are able to be sorted by Name, Players, Map, etc...
+		simply update the ListOfIndexesToCompare
+	1 Make so a player joining to full server is sent a message
+	1 Add particle effects when hit player
+	1 Add splatters when a player gets hit/dies onto the environment
+	1 Lookahead at where the user is pointing
+	0 Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard	
+	0 Make Main Menu background move right to left and left to right
+	0 Add trail effects when a player sprints, so can clearly see player sprinting, also maybe zoom camera out a little bit...
+
+Future tasks;	
+		
+	version 0.5.7.4
+		add health pickups
+		add adrenaline pickup
+		make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+	version 0.5.7.5
+		Add invincibility frames, after being hit/respawning
+	version 0.5.8.1
+		add breathing camera movement when player is idle, going up and down.
+		using cinemachine add impulses, fast small camera movements in specific directions, for:
+			Player Getting shot
+			Player shooting
+			Player jumping
+			Player running
+	version 0.5.8.2
+		Make the scoreboard reuse scoreboard entries, instead of destroying them, when a player disconnects.
+		
+		
+	
+	
+	Add chat into game
+	Add ping field to Player Score entries in scoreboard
+	Add gamepad support for pc & mac
+	Make server sided, currently very client sided
+
+	make the ThreadManager to work on multi-threading
+	
+	imrpove killFeedUI, make entries disappear by decreasing opacity, and popping them back up smoothly instead of vertical layout group which
+		pops them and moves other entries up instantly.
+	improve UI, adding pop up animations to the UI elements instead of just appearing instantly.
+	improve UI, adding black borders to UI Panels like TimeOutPanel.
+	fix player move validation, when respawned, should ignore any changes that occured lately.
+
+===============================================================================================================================
 Version 0.5.7.2
 ---------------
 

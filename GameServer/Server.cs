@@ -141,7 +141,7 @@ namespace GameServer
                     return;
                 }
             }
-            for (int count = 0; count < MaxNumPlayers + 1; count++)
+            for (int count = 1; count < MaxNumPlayers + 1; count++)
             {
                 if (NotConnectedClients[count].tCP.Socket == null)
                 {

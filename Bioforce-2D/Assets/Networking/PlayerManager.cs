@@ -15,7 +15,7 @@ public class PlayerManager : MonoBehaviour
     public Color PlayerColor { get; private set; }
 
     public Vector2 RespawnPosition { get; set; }
-    private GameObject PlayerModelObject { get; set; }
+    public GameObject PlayerModelObject { get; private set; }
     [SerializeField] private TextMeshProUGUI UsernameText;
 
     // Delegate and event used to notify when movement stats are read from server

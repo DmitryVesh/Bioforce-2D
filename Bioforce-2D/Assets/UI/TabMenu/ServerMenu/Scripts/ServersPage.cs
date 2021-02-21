@@ -20,6 +20,14 @@ public class ServersPage : UIItemListingManager
     
 
     private Queue<(string, int, int, string, int)> ServersToAdd = new Queue<(string, int, int, string, int)>();
+
+    internal void SortServerEntriesBy(ServersSortBy selectedSort, bool ascending)
+    {
+        SortByChanged = true;
+        List<(int, bool)> indexesToCompare = new List<(int, bool)>() { ((int)selectedSort, ascending) };
+        SetIndexesToCompareInMergeSort(indexesToCompare);
+    }
+
     public void EnqueEntry(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping) =>
         ServersToAdd.Enqueue((serverName, currentPlayerCount, maxPlayerCount, mapName, ping));
     internal void LostConnectionToMainServer()

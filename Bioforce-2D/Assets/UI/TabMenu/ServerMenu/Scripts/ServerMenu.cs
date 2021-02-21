@@ -20,10 +20,8 @@ public class ServerMenu : MonoBehaviour
     [SerializeField] private GameObject KeyServerFields;
 
     //Server pages & Manual Entries
-    private ServersPage SelectedServersPage { get; set; } = null;
+    public ServersPage SelectedServersPage { get; private set; } = null;
     private Dictionary<GameObject, ServersPage> ServerPagesDict { get; set; }
-
-    
 
     private ServersPage InternetServersPage { get; set; }
     private ServersPage LANServersPage { get; set; }
@@ -236,6 +234,8 @@ public class ServerMenu : MonoBehaviour
         ManualEntryObject = ServerPageHolder.transform.GetChild(2).gameObject;        
 
         LANServerScanner = gameObject.GetComponent<LANServerScanner>();
+
+        SelectedServersPage = InternetServersPage;
     }
 
     

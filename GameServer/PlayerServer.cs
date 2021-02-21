@@ -145,12 +145,14 @@ namespace GameServer
             int disconnectAfterTimeMs = 30000;
             PausedTimer = new Timer(disconnectAfterTimeMs);
             PausedTimer.Elapsed += PausedTimer_Elapsed;
+            PausedTimer.Start();
         }
 
         private void PausedTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (Paused)
                 Server.ClientDictionary[ID].Disconnect();
+            PausedTimer.Stop();
             PausedTimer.Dispose();
         }
     }

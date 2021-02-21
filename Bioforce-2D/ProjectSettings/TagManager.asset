@@ -65,6 +65,9 @@ TagManager:
   - name: Enemy
     uniqueID: 1405739067
     locked: 0
+  - name: Splatter
+    uniqueID: 3906237763
+    locked: 0
   - name: Player
     uniqueID: 4044317899
     locked: 0

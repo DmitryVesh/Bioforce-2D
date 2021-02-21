@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
 using System.Threading;
+using System.Timers;
 
 namespace GameServer
 {
@@ -192,26 +193,12 @@ namespace GameServer
             {
                 packet.Write((int)ServerPackets.serverIsFull);
                 packet.WriteLength();
-                Server.NotConnectedClients[notConnectedClient].tCP.SendPacket(packet);   
+                Server.NotConnectedClients[notConnectedClient].tCP.SendPacket(packet);
+                Console.WriteLine($"\n\tGameServer: {Server.ServerName} is full and sent a server is full packet");
             }
-            //TODO: test the need to wait like 5 seconds before disconnecting
-            ThreadStart threadStart = new ThreadStart(() => DisconnectAfterTime(notConnectedClient, 5000));
-            Thread newThread = new Thread(threadStart);
-            newThread.Start();
-
-            bool added = false;
-            for (int threadCount = 0; threadCount < DelayedThreads.Count; threadCount++)
-            {
-                Thread existingThread = DelayedThreads[threadCount];
-                if (existingThread.ThreadState == ThreadState.Stopped)
-                {
-                    DelayedThreads[threadCount] = newThread;
-                    added = true;
-                }
-            }
-            if (!added)
-                DelayedThreads.Add(newThread);
         }
+
+
         private static void DisconnectAfterTime(int notConnectedClient, int ms)
         {
             Thread.Sleep(ms);

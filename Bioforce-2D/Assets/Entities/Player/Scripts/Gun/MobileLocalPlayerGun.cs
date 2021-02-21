@@ -12,8 +12,8 @@ public class MobileLocalPlayerGun : LocalPlayerGun
     private bool AlreadyTouchedJoystick { get; set; }
     private float TimeCanFireAfterFirstTouch { get; set; }
     
-    private float LastX { get; set; }
-    private float LastY { get; set; }
+    public float LastX { get; set; }
+    public float LastY { get; set; }
     
 
     protected override void Awake()

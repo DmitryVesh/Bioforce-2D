@@ -82,6 +82,14 @@ MonoBehaviour:
   FacingRight: 1
   PlayerBodySprite: {fileID: 7847370238992379348}
   PlayerArmsSprite: {fileID: 2298301300277298035}
+  PlayerHitParticleSystem: {fileID: 5699433724371637409}
+  SplatterPrefab: {fileID: 2689029294326577204, guid: 4c583973c47e782448301c0d390ee53e,
+    type: 3}
+  SplatterSprites:
+  - {fileID: -8379500666254281049, guid: b95b107362984f34e8f4a3d4823cbd97, type: 3}
+  - {fileID: 3776552351419399078, guid: b95b107362984f34e8f4a3d4823cbd97, type: 3}
+  - {fileID: 8491009819667440847, guid: b95b107362984f34e8f4a3d4823cbd97, type: 3}
+  - {fileID: 5188043738036765523, guid: b95b107362984f34e8f4a3d4823cbd97, type: 3}
 --- !u!114 &3727253228089246339
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -95,6 +103,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CinemachineCamera: {fileID: 8369745376462033058}
+  Follow: {fileID: 9197498262357729496}
 --- !u!114 &1533597402597742654
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -207,12 +216,12 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Follow
       value: 
-      objectReference: {fileID: 7847370238992379355}
+      objectReference: {fileID: 9197498262357729496}
     - target: {fileID: 3544536141716630502, guid: e79d4f5886fc92d449b693ac38d3b89b,
         type: 3}
       propertyPath: m_LookAt
       value: 
-      objectReference: {fileID: 7847370238992379355}
+      objectReference: {fileID: 9197498262357729496}
     - target: {fileID: 5971285485232926341, guid: e79d4f5886fc92d449b693ac38d3b89b,
         type: 3}
       propertyPath: m_Name
@@ -474,6 +483,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 286639045735284032}
     m_Modifications:
+    - target: {fileID: 947694065097509191, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 947694065097509191, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2190302947158787140, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
         type: 3}
       propertyPath: m_RootOrder
@@ -680,3 +699,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc0ccc65539aaac40994e3c6a52d3361, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!198 &5699433724371637409 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 4439007226685127998, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+    type: 3}
+  m_PrefabInstance: {fileID: 8251422772928506271}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &9197498262357729496 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 947694065097509191, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+    type: 3}
+  m_PrefabInstance: {fileID: 8251422772928506271}
+  m_PrefabAsset: {fileID: 0}
