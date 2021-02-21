@@ -29,8 +29,10 @@ public class PlayerCameraController : MonoBehaviour
         PlayerManager = GameManager.PlayerDictionary[Client.Instance.ClientID];
         PlayerManager.OnPlayerRespawn += ResetCamera;
 
-        MobileLocalPlayerGun = GetComponent<MobileLocalPlayerGun>();
-        OnMobile = MobileLocalPlayerGun != null;
+        //MobileLocalPlayerGun = GetComponent<MobileLocalPlayerGun>();
+        //OnMobile = MobileLocalPlayerGun != null;
+        OnMobile = false;
+
         if (!OnMobile)
         {
             Follow = PlayerManager.PlayerModelObject.transform;
