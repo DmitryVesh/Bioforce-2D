@@ -75,11 +75,11 @@ public class KillFeedUI : UIEntryManager
     
     private void TurnOffBorder(GameObject entry)
     {
-        entry.transform.GetChild(1).gameObject.SetActive(false);
+        entry.transform.GetChild(0).gameObject.SetActive(false);
     }
     private void TurnOnRedBorder(GameObject entry)
     {
-        entry.transform.GetChild(1).gameObject.SetActive(true);
+        entry.transform.GetChild(0).gameObject.SetActive(true);
     }
     private void TurnOnRedFilling(GameObject entry)
     {

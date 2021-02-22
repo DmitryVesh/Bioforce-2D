@@ -186,15 +186,20 @@ public class Client : MonoBehaviour
                 byte[] bytes = ReceivePacket.ReadBytes(packetLen);
                 ThreadManager.ExecuteOnMainThread(() =>
                 {
+                    int packetID = -1;
                     try
                     {
                         Packet packet = new Packet(bytes);
-                        int packetID = packet.ReadInt();
+                        packetID = packet.ReadInt();
                         PacketHandlerDictionary[packetID](packet);
+                    }
+                    catch (KeyNotFoundException exception)
+                    {
+                        Debug.Log($"Error in Handle data of TCP Packet {packetID} ...\n{exception}");
                     }
                     catch (Exception exception)
                     {
-                        Debug.Log($"Error in Handle data of TCP Packet...\n{exception}");
+                        Debug.Log($"Error in Handle data of not know TCP Packet...\n{exception}");
                     }
                 });
                 packetLen = 0;

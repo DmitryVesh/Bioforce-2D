@@ -125,9 +125,7 @@ namespace GameServer
                         return true;
                 }
                 if (packetLen < 2)
-                {
                     return true;
-                }
 
                 return false;
             }
@@ -137,9 +135,7 @@ namespace GameServer
                 {
                     packetLen = ReceivePacket.ReadInt();
                     if (packetLen < 1)
-                    {
                         return true;
-                    }
                 }
                 return false;
             }
@@ -190,9 +186,7 @@ namespace GameServer
             foreach (ClientServer client in Server.ClientDictionary.Values)
             {
                 if (client.Player != null)
-                {
                     ServerSend.SpawnPlayer(client.ID, Player, true);
-                }
             }
 
             //Spawning rest of players for the connected user

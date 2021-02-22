@@ -95,6 +95,7 @@ namespace GameServer
                 }
             }
             Console.WriteLine($"\t\tEnding MainServerComms server: {Port}");
+            Environment.Exit(1);
         }
         
         public class TCP
