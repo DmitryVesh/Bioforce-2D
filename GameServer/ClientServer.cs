@@ -206,7 +206,6 @@ namespace GameServer
         }
         public void Disconnect()
         {
-            //TODO: crashes when 2 players disconnect simultaneously, or stops receiving packets from players
             PlayerColor.GiveBackRandomColor(Player.PlayerColor);
             Console.WriteLine($"\tPlayer: {ID} has disconnected. {tCP.Socket.Client.RemoteEndPoint}");
             ServerSend.DisconnectPlayer(ID);

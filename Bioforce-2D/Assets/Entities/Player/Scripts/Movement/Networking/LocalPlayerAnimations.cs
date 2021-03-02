@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using System;
-
+﻿
 public class LocalPlayerAnimations : NonLocalPlayerAnimations
 {
     private IWalkingLocalPlayer LocalPlayerMoveInterface { get; set; } = null;

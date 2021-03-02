@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
 
-//TODO: make so Client.TCP Inherits from lesser version of this one
 public abstract class DiscoveryTCPClient
 {
     public TcpClient Socket { get; private set; }

@@ -1,5 +1,4 @@
-﻿using Shared;
-using System;
+﻿using System;
 using System.Numerics;
 using System.Timers;
 
@@ -25,7 +24,6 @@ namespace GameServer
         private Vector2 LastPosition { get; set; }
         public float RunSpeed { get; set; } = 0;
         public float SprintSpeed { get; set; } = 0;
-        private int MovePlayerSent { get; set; } = 0;
 
         public bool IsDead { get; private set; } = false;
 

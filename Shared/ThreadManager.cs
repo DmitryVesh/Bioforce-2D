@@ -5,26 +5,26 @@ namespace Shared
 {
     public class ThreadManager
     {
-        private static readonly List<Action> executeOnMainThread = new List<Action>();
-        private static readonly List<Action> executeCopiedOnMainThread = new List<Action>();
-        private static bool actionToExecuteOnMainThread = false;
+        private static readonly List<Action> ActionsToExecute = new List<Action>();
+        private static readonly List<Action> CopiedActionsToExecute = new List<Action>();
+        private static bool HasActionToExecute { get; set; } = false;
 
         static void Main() { }
 
         /// <summary>Sets an action to be executed on the main thread.</summary>
-        /// <param name="_action">The action to be executed on the main thread.</param>
-        public static void ExecuteOnMainThread(Action _action)
+        /// <param name="action">The action to be executed on the main thread.</param>
+        public static void ExecuteOnMainThread(Action action)
         {
-            if (_action == null)
+            if (action == null)
             {
                 Console.WriteLine("No action to execute on main thread!");
                 return;
             }
 
-            lock (executeOnMainThread)
+            lock (ActionsToExecute)
             {
-                executeOnMainThread.Add(_action);
-                actionToExecuteOnMainThread = true;
+                ActionsToExecute.Add(action);
+                HasActionToExecute = true;
             }
         }
 
@@ -41,23 +41,19 @@ namespace Shared
         /// <summary>Executes all code meant to run on the main thread. NOTE: Call this ONLY from the main thread.</summary>
         public static void UpdateMain()
         {
-            if (actionToExecuteOnMainThread)
+            if (HasActionToExecute)
             {
-                executeCopiedOnMainThread.Clear();
-                lock (executeOnMainThread)
+                CopiedActionsToExecute.Clear();
+                lock (ActionsToExecute)
                 {
-                    executeCopiedOnMainThread.AddRange(executeOnMainThread);
-                    executeOnMainThread.Clear();
-                    actionToExecuteOnMainThread = false;
+                    CopiedActionsToExecute.AddRange(ActionsToExecute);
+                    ActionsToExecute.Clear();
+                    HasActionToExecute = false;
                 }
 
-                for (int i = 0; i < executeCopiedOnMainThread.Count; i++)
-                {
-                    executeCopiedOnMainThread[i]();
-                }
+                for (int i = 0; i < CopiedActionsToExecute.Count; i++)
+                    CopiedActionsToExecute[i]();
             }
-        }
-        
+        }   
     }
-
 }

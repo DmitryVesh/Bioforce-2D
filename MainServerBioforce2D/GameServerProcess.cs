@@ -28,6 +28,5 @@ namespace MainServerBioforce2D
         public int ServerPort { get; private set; }
         public GameServerArgs(string serverName, int serverPort) =>
             (ServerName, ServerPort) = (serverName, serverPort);
-    }
-    
+    } 
 }

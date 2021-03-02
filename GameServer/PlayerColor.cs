@@ -47,9 +47,5 @@ namespace GameServer
 
         private static int RandomColorVal(Random random) =>
             random.Next(0, 256);
-
-        
-
-
     }
 }

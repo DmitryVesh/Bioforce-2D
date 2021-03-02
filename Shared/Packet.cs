@@ -81,77 +81,65 @@ namespace Shared
 
     public class Packet : IDisposable
     {
-        private List<byte> buffer;
-        private byte[] readableBuffer;
-        private int readPos;
+        private List<byte> ByteBuffer { get; set; }
+        private byte[] readableBuffer { get; set; }
+        private int CurrentReadPosition;
 
         /// <summary>Creates a new empty packet (without an ID).</summary>
         public Packet()
         {
-            buffer = new List<byte>(); // Intitialize buffer
-            readPos = 0; // Set readPos to 0
+            ByteBuffer = new List<byte>(); // Intitialize buffer
+            CurrentReadPosition = 0; // Set readPos to 0
         }
 
         /// <summary>Creates a new packet with a given ID. Used for sending.</summary>
-        /// <param name="_id">The packet ID.</param>
-        public Packet(int _id)
+        /// <param name="packetID">The packet ID.</param>
+        public Packet(int packetID)
         {
-            buffer = new List<byte>(); // Intitialize buffer
-            readPos = 0; // Set readPos to 0
+            ByteBuffer = new List<byte>(); // Intitialize buffer
+            CurrentReadPosition = 0; // Set readPos to 0
 
-            Write(_id); // Write packet id to the buffer
+            Write(packetID); // Write packet id to the buffer
         }
 
         /// <summary>Creates a packet from which data can be read. Used for receiving.</summary>
-        /// <param name="_data">The bytes to add to the packet.</param>
-        public Packet(byte[] _data)
+        /// <param name="bytes">The bytes to add to the packet.</param>
+        public Packet(byte[] bytes)
         {
-            buffer = new List<byte>(); // Intitialize buffer
-            readPos = 0; // Set readPos to 0
+            ByteBuffer = new List<byte>(); // Intitialize buffer
+            CurrentReadPosition = 0; // Set readPos to 0
 
-            SetBytes(_data);
+            SetBytes(bytes);
         }
 
         #region Functions
         /// <summary>Sets the packet's content and prepares it to be read.</summary>
-        /// <param name="_data">The bytes to add to the packet.</param>
-        public void SetBytes(byte[] _data)
+        /// <param name="SetBytes">The bytes to add to the packet.</param>
+        public void SetBytes(byte[] SetBytes)
         {
-            Write(_data);
-            readableBuffer = buffer.ToArray();
+            Write(SetBytes);
+            readableBuffer = ByteBuffer.ToArray();
         }
 
         /// <summary>Inserts the length of the packet's content at the start of the buffer.</summary>
-        public void WriteLength()
-        {
-            buffer.InsertRange(0, BitConverter.GetBytes(buffer.Count)); // Insert the byte length of the packet at the very beginning
-        }
+        public void WriteLength() =>
+            ByteBuffer.InsertRange(0, BitConverter.GetBytes(ByteBuffer.Count)); // Insert the byte length of the packet at the very beginning
 
-        /// <summary>Inserts the given int at the start of the buffer.</summary>
-        /// <param name="_value">The int to insert.</param>
-        public void InsertInt(int _value)
-        {
-            buffer.InsertRange(0, BitConverter.GetBytes(_value)); // Insert the int at the start of the buffer
-        }
 
         /// <summary>Gets the packet's content in array form.</summary>
         public byte[] ToArray()
         {
-            readableBuffer = buffer.ToArray();
+            readableBuffer = ByteBuffer.ToArray();
             return readableBuffer;
         }
 
         /// <summary>Gets the length of the packet's content.</summary>
-        public int Length()
-        {
-            return buffer.Count; // Return the length of buffer
-        }
+        public int Length() =>
+            ByteBuffer.Count; // Return the length of buffer
 
         /// <summary>Gets the length of the unread data contained in the packet.</summary>
-        public int UnreadLength()
-        {
-            return Length() - readPos; // Return the remaining length (unread)
-        }
+        public int UnreadLength() =>
+            Length() - CurrentReadPosition; // Return the remaining length (unread)
 
         /// <summary>Resets the packet instance to allow it to be reused.</summary>
         /// <param name="_shouldReset">Whether or not to reset the packet.</param>
@@ -159,14 +147,12 @@ namespace Shared
         {
             if (_shouldReset)
             {
-                buffer.Clear(); // Clear buffer
+                ByteBuffer.Clear(); // Clear buffer
                 readableBuffer = null;
-                readPos = 0; // Reset readPos
+                CurrentReadPosition = 0; // Reset readPos
             }
             else
-            {
-                readPos -= 4; // "Unread" the last read int
-            }
+                CurrentReadPosition -= 4; // "Unread" the last read int
         }
         #endregion
 
@@ -175,50 +161,50 @@ namespace Shared
         /// <param name="_value">The byte to add.</param>
         public void Write(byte _value)
         {
-            buffer.Add(_value);
+            ByteBuffer.Add(_value);
         }
         /// <summary>Adds an array of bytes to the packet.</summary>
         /// <param name="_value">The byte array to add.</param>
         public void Write(byte[] _value)
         {
-            buffer.AddRange(_value);
+            ByteBuffer.AddRange(_value);
         }
         /// <summary>Adds a short to the packet.</summary>
         /// <param name="_value">The short to add.</param>
         public void Write(short _value)
         {
-            buffer.AddRange(BitConverter.GetBytes(_value));
+            ByteBuffer.AddRange(BitConverter.GetBytes(_value));
         }
         /// <summary>Adds an int to the packet.</summary>
         /// <param name="_value">The int to add.</param>
         public void Write(int _value)
         {
-            buffer.AddRange(BitConverter.GetBytes(_value));
+            ByteBuffer.AddRange(BitConverter.GetBytes(_value));
         }
         /// <summary>Adds a long to the packet.</summary>
         /// <param name="_value">The long to add.</param>
         public void Write(long _value)
         {
-            buffer.AddRange(BitConverter.GetBytes(_value));
+            ByteBuffer.AddRange(BitConverter.GetBytes(_value));
         }
         /// <summary>Adds a float to the packet.</summary>
         /// <param name="_value">The float to add.</param>
         public void Write(float _value)
         {
-            buffer.AddRange(BitConverter.GetBytes(_value));
+            ByteBuffer.AddRange(BitConverter.GetBytes(_value));
         }
         /// <summary>Adds a bool to the packet.</summary>
         /// <param name="_value">The bool to add.</param>
         public void Write(bool _value)
         {
-            buffer.AddRange(BitConverter.GetBytes(_value));
+            ByteBuffer.AddRange(BitConverter.GetBytes(_value));
         }
         /// <summary>Adds a string to the packet.</summary>
         /// <param name="_value">The string to add.</param>
         public void Write(string _value)
         {
             Write(_value.Length); // Add the length of the string to the packet
-            buffer.AddRange(Encoding.ASCII.GetBytes(_value)); // Add the string itself
+            ByteBuffer.AddRange(Encoding.ASCII.GetBytes(_value)); // Add the string itself
         }
         /// <summary>Adds a Vector3 to the packet.</summary>
         /// <param name="_value">The Vector3 to add.</param>
@@ -251,14 +237,14 @@ namespace Shared
         /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
         public byte ReadByte(bool _moveReadPos = true)
         {
-            if (buffer.Count > readPos)
+            if (ByteBuffer.Count > CurrentReadPosition)
             {
                 // If there are unread bytes
-                byte _value = readableBuffer[readPos]; // Get the byte at readPos' position
+                byte _value = readableBuffer[CurrentReadPosition]; // Get the byte at readPos' position
                 if (_moveReadPos)
                 {
                     // If _moveReadPos is true
-                    readPos += 1; // Increase readPos by 1
+                    CurrentReadPosition += 1; // Increase readPos by 1
                 }
                 return _value; // Return the byte
             }
@@ -273,14 +259,14 @@ namespace Shared
         /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
         public byte[] ReadBytes(int _length, bool _moveReadPos = true)
         {
-            if (buffer.Count > readPos)
+            if (ByteBuffer.Count > CurrentReadPosition)
             {
                 // If there are unread bytes
-                byte[] _value = buffer.GetRange(readPos, _length).ToArray(); // Get the bytes at readPos' position with a range of _length
+                byte[] _value = ByteBuffer.GetRange(CurrentReadPosition, _length).ToArray(); // Get the bytes at readPos' position with a range of _length
                 if (_moveReadPos)
                 {
                     // If _moveReadPos is true
-                    readPos += _length; // Increase readPos by _length
+                    CurrentReadPosition += _length; // Increase readPos by _length
                 }
                 return _value; // Return the bytes
             }
@@ -294,14 +280,14 @@ namespace Shared
         /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
         public short ReadShort(bool _moveReadPos = true)
         {
-            if (buffer.Count > readPos)
+            if (ByteBuffer.Count > CurrentReadPosition)
             {
                 // If there are unread bytes
-                short _value = BitConverter.ToInt16(readableBuffer, readPos); // Convert the bytes to a short
+                short _value = BitConverter.ToInt16(readableBuffer, CurrentReadPosition); // Convert the bytes to a short
                 if (_moveReadPos)
                 {
                     // If _moveReadPos is true and there are unread bytes
-                    readPos += 2; // Increase readPos by 2
+                    CurrentReadPosition += 2; // Increase readPos by 2
                 }
                 return _value; // Return the short
             }
@@ -315,14 +301,14 @@ namespace Shared
         /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
         public int ReadInt(bool _moveReadPos = true)
         {
-            if (buffer.Count > readPos)
+            if (ByteBuffer.Count > CurrentReadPosition)
             {
                 // If there are unread bytes
-                int _value = BitConverter.ToInt32(readableBuffer, readPos); // Convert the bytes to an int
+                int _value = BitConverter.ToInt32(readableBuffer, CurrentReadPosition); // Convert the bytes to an int
                 if (_moveReadPos)
                 {
                     // If _moveReadPos is true
-                    readPos += 4; // Increase readPos by 4
+                    CurrentReadPosition += 4; // Increase readPos by 4
                 }
                 return _value; // Return the int
             }
@@ -336,14 +322,14 @@ namespace Shared
         /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
         public long ReadLong(bool _moveReadPos = true)
         {
-            if (buffer.Count > readPos)
+            if (ByteBuffer.Count > CurrentReadPosition)
             {
                 // If there are unread bytes
-                long _value = BitConverter.ToInt64(readableBuffer, readPos); // Convert the bytes to a long
+                long _value = BitConverter.ToInt64(readableBuffer, CurrentReadPosition); // Convert the bytes to a long
                 if (_moveReadPos)
                 {
                     // If _moveReadPos is true
-                    readPos += 8; // Increase readPos by 8
+                    CurrentReadPosition += 8; // Increase readPos by 8
                 }
                 return _value; // Return the long
             }
@@ -357,14 +343,14 @@ namespace Shared
         /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
         public float ReadFloat(bool _moveReadPos = true)
         {
-            if (buffer.Count > readPos)
+            if (ByteBuffer.Count > CurrentReadPosition)
             {
                 // If there are unread bytes
-                float _value = BitConverter.ToSingle(readableBuffer, readPos); // Convert the bytes to a float
+                float _value = BitConverter.ToSingle(readableBuffer, CurrentReadPosition); // Convert the bytes to a float
                 if (_moveReadPos)
                 {
                     // If _moveReadPos is true
-                    readPos += 4; // Increase readPos by 4
+                    CurrentReadPosition += 4; // Increase readPos by 4
                 }
                 return _value; // Return the float
             }
@@ -378,14 +364,14 @@ namespace Shared
         /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
         public bool ReadBool(bool _moveReadPos = true)
         {
-            if (buffer.Count > readPos)
+            if (ByteBuffer.Count > CurrentReadPosition)
             {
                 // If there are unread bytes
-                bool _value = BitConverter.ToBoolean(readableBuffer, readPos); // Convert the bytes to a bool
+                bool _value = BitConverter.ToBoolean(readableBuffer, CurrentReadPosition); // Convert the bytes to a bool
                 if (_moveReadPos)
                 {
                     // If _moveReadPos is true
-                    readPos += 1; // Increase readPos by 1
+                    CurrentReadPosition += 1; // Increase readPos by 1
                 }
                 return _value; // Return the bool
             }
@@ -402,11 +388,11 @@ namespace Shared
             try
             {
                 int _length = ReadInt(); // Get the length of the string
-                string _value = Encoding.ASCII.GetString(readableBuffer, readPos, _length); // Convert the bytes to a string
+                string _value = Encoding.ASCII.GetString(readableBuffer, CurrentReadPosition, _length); // Convert the bytes to a string
                 if (_moveReadPos && _value.Length > 0)
                 {
                     // If _moveReadPos is true string is not empty
-                    readPos += _length; // Increase readPos by the length of the string
+                    CurrentReadPosition += _length; // Increase readPos by the length of the string
                 }
                 return _value; // Return the string
             }
@@ -460,20 +446,20 @@ namespace Shared
         }
         #endregion
 
-        private bool disposed = false;
+        private bool Disposed { get; set; } = false;
 
-        protected virtual void Dispose(bool _disposing)
+        protected virtual void Dispose(bool toDispose)
         {
-            if (!disposed)
+            if (!Disposed)
             {
-                if (_disposing)
+                if (toDispose)
                 {
-                    buffer = null;
+                    ByteBuffer = null;
                     readableBuffer = null;
-                    readPos = 0;
+                    CurrentReadPosition = 0;
                 }
 
-                disposed = true;
+                Disposed = true;
             }
         }
 

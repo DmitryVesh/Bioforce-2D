@@ -1,124 +1,126 @@
-﻿
-
-using Shared;
+﻿using Shared;
 using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
 using System.Numerics;
 using System.Threading;
-using System.Timers;
 
 namespace GameServer
 {
     class ServerSend
     {
-        static List<Thread> DelayedThreads = new List<Thread>();
-
         public static void Welcome(int recipientClient, string message, string mapName)
         {
-            Packet packet = new Packet((int)ServerPackets.welcome);
-
-            packet.Write(message);
-            packet.Write(recipientClient);
-            packet.Write(mapName);
-            SendTCPPacket(recipientClient, packet);
+            using (Packet packet = new Packet((int)ServerPackets.welcome))
+            {
+                packet.Write(message);
+                packet.Write(recipientClient);
+                packet.Write(mapName);
+                SendTCPPacket(recipientClient, packet);
+            }
         }
         public static void UDPTest(int recipientClient)
         {
-            Packet packet = new Packet((int)ServerPackets.udpTest);
-            packet.Write("Testing UDP");
-            SendUDPPacket(recipientClient, packet);
+            using (Packet packet = new Packet((int)ServerPackets.udpTest))
+            {
+                packet.Write("Testing UDP");
+                SendUDPPacket(recipientClient, packet);
+            }
         }
         public static void DisconnectPlayer(int disconnectedPlayer)
         {
-            Packet packet = new Packet((int)ServerPackets.playerDisconnect);
-            packet.Write(disconnectedPlayer);
-            SendTCPPacketToAllButIncluded(disconnectedPlayer, packet); // Packet has to arrive, so sending via TCP to make sure
+            using (Packet packet = new Packet((int)ServerPackets.playerDisconnect))
+            {
+                packet.Write(disconnectedPlayer);
+                SendTCPPacketToAllButIncluded(disconnectedPlayer, packet); // Packet has to arrive, so sending via TCP to make sure
+            }
         }
 
 
         public static void SpawnPlayer(int recipientClient, PlayerServer player, bool justJoined)
         {
-            Packet packet = new Packet((int)ServerPackets.spawnPlayer);
-            packet.Write(player.ID);
-            packet.Write(player.Username);
-            packet.Write(player.Position);
-            packet.Write(player.IsFacingRight);
+            using (Packet packet = new Packet((int)ServerPackets.spawnPlayer))
+            {
+                packet.Write(player.ID);
+                packet.Write(player.Username);
+                packet.Write(player.Position);
+                packet.Write(player.IsFacingRight);
 
-            packet.Write(player.RunSpeed);
-            packet.Write(player.SprintSpeed);
+                packet.Write(player.RunSpeed);
+                packet.Write(player.SprintSpeed);
 
-            packet.Write(player.IsDead);
-            packet.Write(justJoined);
+                packet.Write(player.IsDead);
+                packet.Write(justJoined);
 
-            packet.Write(player.Kills);
-            packet.Write(player.Deaths);
-            packet.Write(player.Score);
+                packet.Write(player.Kills);
+                packet.Write(player.Deaths);
+                packet.Write(player.Score);
 
-            packet.Write(player.MaxHealth);
-            packet.Write(player.CurrentHealth);
+                packet.Write(player.MaxHealth);
+                packet.Write(player.CurrentHealth);
 
-            packet.Write(player.PlayerColor.R);
-            packet.Write(player.PlayerColor.G);
-            packet.Write(player.PlayerColor.B);
+                packet.Write(player.PlayerColor.R);
+                packet.Write(player.PlayerColor.G);
+                packet.Write(player.PlayerColor.B);
 
-            packet.Write(player.Paused);
+                packet.Write(player.Paused);
 
-            SendTCPPacket(recipientClient, packet);
-        }
-        public static void PlayerPosition(int playerID, Vector2 position)
-        {
-            Packet packet = new Packet((int)ServerPackets.playerPosition);
-            packet.Write(playerID);
-            packet.Write(position);
-
-            SendTCPPacketToAll(packet);
+                SendTCPPacket(recipientClient, packet);
+            }
         }
         public static void PlayerPositionButLocal(int playerID, Vector2 position)
         {
-            Packet packet = new Packet((int)ServerPackets.playerPosition);
-            packet.Write(playerID);
-            packet.Write(position);
+            using (Packet packet = new Packet((int)ServerPackets.playerPosition))
+            {
+                packet.Write(playerID);
+                packet.Write(position);
 
-            SendTCPPacketToAllButIncluded(playerID, packet);
+                SendTCPPacketToAllButIncluded(playerID, packet);
+            }
         }
         public static void PlayerRotationAndVelocity(int playerID, bool isFacingRight, Vector2 velocity, Quaternion rotation)
         {
-            Packet packet = new Packet((int)ServerPackets.playerRotationAndVelocity);
-            packet.Write(playerID);
-            packet.Write(isFacingRight);
-            packet.Write(velocity);
-            packet.Write(rotation);
+            using (Packet packet = new Packet((int)ServerPackets.playerRotationAndVelocity))
+            {
+                packet.Write(playerID);
+                packet.Write(isFacingRight);
+                packet.Write(velocity);
+                packet.Write(rotation);
 
-            SendTCPPacketToAllButIncluded(playerID, packet);
+                SendTCPPacketToAllButIncluded(playerID, packet);
+            }
         }
         public static void PlayerMovementStats(int playerID, float runSpeed, float sprintSpeed)
         {
-            Packet packet = new Packet((int)ServerPackets.playerMovementStats);
-            packet.Write(playerID);
-            packet.Write(runSpeed);
-            packet.Write(sprintSpeed);
+            using (Packet packet = new Packet((int)ServerPackets.playerMovementStats))
+            {
+                packet.Write(playerID);
+                packet.Write(runSpeed);
+                packet.Write(sprintSpeed);
 
-            SendTCPPacketToAll(packet);
+                SendTCPPacketToAll(packet);
+            }
         }
         public static void ShotBullet(int playerID, Vector2 position, Quaternion rotation)
         {
-            Packet packet = new Packet((int)ServerPackets.bulleShot);
-            packet.Write(playerID);
-            packet.Write(position);
-            packet.Write(rotation);
+            using (Packet packet = new Packet((int)ServerPackets.bulleShot))
+            {
 
-            SendTCPPacketToAllButIncluded(playerID, packet);
+                packet.Write(playerID);
+                packet.Write(position);
+                packet.Write(rotation);
+
+                SendTCPPacketToAllButIncluded(playerID, packet);
+            }
         }
         public static void PlayerDied(int playerKilledID, int bulletOwnerID, int typeOfDeath)
         {
-            Packet packet = new Packet((int)ServerPackets.playerDied);
-            packet.Write(playerKilledID);
-            packet.Write(bulletOwnerID);
-            packet.Write(typeOfDeath);
+            using (Packet packet = new Packet((int)ServerPackets.playerDied))
+            {
+                packet.Write(playerKilledID);
+                packet.Write(bulletOwnerID);
+                packet.Write(typeOfDeath);
 
-            SendTCPPacketToAllButIncluded(playerKilledID, packet);
+                SendTCPPacketToAllButIncluded(playerKilledID, packet);
+            }
         }
         public static void PlayerRespawned(int playerID, Vector2 respawnPoint)
         {
@@ -132,12 +134,14 @@ namespace GameServer
         }
         internal static void TookDamage(int clientID, int damage, int currentHealth)
         {
-            Packet packet = new Packet((int)ServerPackets.tookDamage);
-            packet.Write(clientID);
-            packet.Write(damage);
-            packet.Write(currentHealth);
+            using (Packet packet = new Packet((int)ServerPackets.tookDamage))
+            {
+                packet.Write(clientID);
+                packet.Write(damage);
+                packet.Write(currentHealth);
 
-            SendTCPPacketToAllButIncluded(clientID, packet);
+                SendTCPPacketToAllButIncluded(clientID, packet);
+            }
         }
         internal static void ArmPositionRotation(int playerID, Vector2 position, Quaternion rotation)
         {

@@ -2,11 +2,9 @@
 using Shared;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 namespace MainServer
 {
@@ -24,8 +22,7 @@ namespace MainServer
             ServerName = serverName;
             Port = port;
 
-            //TODO: Listen to traffic comming from 127.0.0.1 on Port
-
+            //Listen to traffic comming from 127.0.0.1 on Port
             InitialSocketListener = new TcpListener(IPAddress.Loopback, port);
             InitialSocketListener.Start();
             TCPBeginReceiveGameServer();

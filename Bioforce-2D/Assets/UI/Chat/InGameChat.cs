@@ -1,15 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class InGameChat : UIEntryManager
 {
     public static InGameChat Instance { get; private set; }
 
-    public void AddInGameChatEntry(string text)
-    {
+    public void AddInGameChatEntry(string text) =>
         AddEntry(text, null, null);
-    }
 
     protected override void Awake()
     {
@@ -37,10 +33,8 @@ public class InGameChat : UIEntryManager
             message = "is in game";
         AddInGameChatEntry($"Player {iD} \"{username}\" {message}");
     }
-    private void PlayerDisconnectedMessage(int iD, string username)
-    {
+    private void PlayerDisconnectedMessage(int iD, string username) =>
         AddInGameChatEntry($"Player {iD} \"{username}\" left");
-    }
 
     private void OnDestroy()
     {

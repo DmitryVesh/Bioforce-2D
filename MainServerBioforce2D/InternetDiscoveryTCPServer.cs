@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using MainServer;
@@ -26,11 +23,12 @@ namespace MainServerBioforce2D
         public static Dictionary<string, GameServerProcess> GameServerDict { get; set; } = new Dictionary<string, GameServerProcess>();
 
         private static Queue<int> PortQueue = new Queue<int>(PortsAvailable);
+        private static int NumServers { get; set; } = 100;
         private static List<int> PortsAvailable
         {
             get
             {
-                int minPort = 28030, maxPort = 28129;
+                int minPort = 28030, maxPort = minPort + NumServers - 1;
                 List<int> ports = new List<int>();
                 for (int port = minPort; port < maxPort; port++)
                     ports.Add(port);
@@ -78,7 +76,7 @@ namespace MainServerBioforce2D
             if (PortQueue.Count != 0)
             {
                 int gamePort = PortQueue.Dequeue();
-                return (gamePort, gamePort + 100);
+                return (gamePort, gamePort + NumServers);
             }
             else
                 return (-1, -1);
