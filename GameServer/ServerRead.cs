@@ -40,10 +40,10 @@ namespace GameServer
                 Vector2 position = packet.ReadVector2();
                 Vector2 velocity = packet.ReadVector2();
                 Quaternion rotation = packet.ReadQuaternion();
-                ServerSend.PlayerPositionButLocal(clientID, position);
-                ServerSend.PlayerRotationAndVelocity(clientID, isFacingRight, velocity, rotation);
+                //ServerSend.PlayerPositionButLocal(clientID, position);
+                //ServerSend.PlayerRotationAndVelocity(clientID, isFacingRight, velocity, rotation);
                 //Sometimes System.NullReferenceException when a player disconnects
-                //Server.ClientDictionary[clientID].Player.PlayerMoves(isFacingRight, position, velocity, rotation);
+                Server.ClientDictionary[clientID].Player.PlayerMoves(isFacingRight, position, velocity, rotation);
             }
             catch (Exception exception)
             {

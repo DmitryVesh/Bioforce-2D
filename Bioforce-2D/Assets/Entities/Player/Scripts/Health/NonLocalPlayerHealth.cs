@@ -59,9 +59,12 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
     public void Respawn()
     {
         ResetHealth();
-        CantGetHit = false;
+        Invoke("SetCantGetHitFalse", PlayerManager.RespawnTime);
         GameManager.Instance.PlayerRespawned(OwnerClientID);
     }
+    private void SetCantGetHitFalse() =>
+        CantGetHit = false;
+
     public void FallDie()
     {
         GameManager.Instance.PlayerDied(OwnerClientID, OwnerClientID, TypeOfDeath.Fall);

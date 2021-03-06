@@ -12,9 +12,7 @@ namespace GameServer
             foreach (ClientServer client in Server.ClientDictionary.Values)
             {
                 if (client.Player != null)
-                {
                     client.Player.Update();
-                }
             }
         }
     }

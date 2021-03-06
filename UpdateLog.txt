@@ -15,9 +15,12 @@ Main goals is to;
 	1 Add particle effects when hit player
 	1 Add splatters when a player gets hit/dies onto the environment
 	1 Lookahead at where the user is pointing
-	0 Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard	
-	0 Make Main Menu background move right to left and left to right
-	0 Add trail effects when a player sprints, so can clearly see player sprinting, also maybe zoom camera out a little bit...
+	1 Make Main Menu background move right to left and left to right
+	1 Add total num ever connected ips to MainServer
+	1 Fix never ending transition when player tries to create a server, with no connection to MainServer (use ServerMenu states)
+		NoMoreServersAvailable client side packet handler!
+	1 Fix spawning in characters at 0,0 and interpolating into actual position, better to spawn in at current player position!
+	1 Fix taking damage when player is down
 
 Future tasks;	
 		
@@ -27,19 +30,21 @@ Future tasks;
 		make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
 	version 0.5.7.5
 		Add invincibility frames, after being hit/respawning
-	version 0.5.8.1
+		Add trail effects when a player sprints, so can clearly see player sprinting, also maybe zoom camera out a little bit...
+		Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard
+	version 0.5.7.6
 		add breathing camera movement when player is idle, going up and down.
 		using cinemachine add impulses, fast small camera movements in specific directions, for:
 			Player Getting shot
 			Player shooting
 			Player jumping
 			Player running
-	version 0.5.8.2
+	version 0.5.7.7
 		Make the scoreboard reuse scoreboard entries, instead of destroying them, when a player disconnects.
-		
-		
-	
-	
+		Allow players to choose their own colour
+	version 0.5.7.8
+		Add tutorial level into game
+
 	Add chat into game
 	Add ping field to Player Score entries in scoreboard
 	Add gamepad support for pc & mac

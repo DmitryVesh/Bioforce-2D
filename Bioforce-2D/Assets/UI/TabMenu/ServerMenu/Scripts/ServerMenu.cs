@@ -102,7 +102,11 @@ public class ServerMenu : MonoBehaviour
 
     internal static void ReadNoMoreServersAvailable(string ip, Packet packet)
     {
-        throw new NotImplementedException();
+        Instance.ServerConnectionErrorText.text =
+            "No more Servers can be Created..." +
+            "\nJoin Existing Servers" +
+            "\nPress Continue to proceed";
+        Instance.ServerConnectionErrorPanel.SetActive(true);
     }
     internal static void ReadCantJoinServerDeleted(string ip, Packet packet)
     {

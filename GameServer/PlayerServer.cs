@@ -63,7 +63,6 @@ namespace GameServer
             Position = position;
             Velocity = velocity;
             Rotation = rotation;
-            MovePlayer();
         }
         public void SetPlayerMovementStats(float runSpeed, float sprintSpeed)
         {
@@ -72,7 +71,7 @@ namespace GameServer
         }
         public void Update()
         {
-            //MovePlayer();
+            MovePlayer();
         }
 
         private void MovePlayer()

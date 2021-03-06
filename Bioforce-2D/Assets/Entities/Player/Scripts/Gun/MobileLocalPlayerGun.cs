@@ -11,7 +11,6 @@ public class MobileLocalPlayerGun : LocalPlayerGun
     
     public float LastX { get; set; }
     public float LastY { get; set; }
-    
 
     protected override void Awake()
     {
@@ -59,6 +58,7 @@ public class MobileLocalPlayerGun : LocalPlayerGun
         }
 
         Aim(LastX, LastY);
+        LastAimVector = new Vector2(LastX, LastY);
     }
 
     protected override bool IsPlayerTryingToShoot()

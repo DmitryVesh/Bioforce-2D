@@ -4,6 +4,8 @@ using System.Net;
 using System.Net.Sockets;
 using MainServer;
 using Shared;
+using DmitryNamespace;
+using System.IO;
 
 namespace MainServerBioforce2D
 {
@@ -22,24 +24,25 @@ namespace MainServerBioforce2D
         public static List<Server> ServersAvailable { get; set; } = new List<Server>();
         public static Dictionary<string, GameServerProcess> GameServerDict { get; set; } = new Dictionary<string, GameServerProcess>();
 
-        private static Queue<int> PortQueue = new Queue<int>(PortsAvailable);
+        private static Queue<int> PortQueue { get; set; }
         private static int NumServers { get; set; } = 100;
-        private static List<int> PortsAvailable
+        private static BinaryTree<string> IPsConnected = new BinaryTree<string>(true);
+
+        private static List<int> PortsAvailable()
         {
-            get
-            {
-                int minPort = 28030, maxPort = minPort + NumServers - 1;
-                List<int> ports = new List<int>();
-                for (int port = minPort; port < maxPort; port++)
-                    ports.Add(port);
-                return ports;
-            }
+            int minPort = 28030, maxPort = minPort + NumServers - 1;
+            List<int> ports = new List<int>();
+            for (int port = minPort; port < maxPort; port++)
+                ports.Add(port);
+            return ports;
         }
 
         public static void StartServer(int port)
         {
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CloseServer);
             PortNum = port;
+
+            PortQueue = new Queue<int>(PortsAvailable());
 
             Console.WriteLine("\nTrying to start the MainServer...");
             if (TCPBroadCastTcpListener == null)
@@ -70,6 +73,11 @@ namespace MainServerBioforce2D
 
             foreach (GameServerProcess gameServer in GameServerDict.Values)
                 gameServer.Kill();
+
+            using (StreamWriter sw = new StreamWriter("IPs", false))
+            {
+                sw.WriteLine(IPsConnected.NumNodes);
+            }
         }
         internal static (int, int) GetAvailablePort()
         {
@@ -82,10 +90,8 @@ namespace MainServerBioforce2D
                 return (-1, -1);
         }
 
-        private static void TCPBeginReceiveDiscoveryClients()
-        {
+        private static void TCPBeginReceiveDiscoveryClients() =>
             TCPBroadCastTcpListener.BeginAcceptTcpClient(new AsyncCallback(TCPConnectAsyncCallback), null);
-        }
         private static void TCPConnectAsyncCallback(IAsyncResult asyncResult)
         {
             TcpClient client = TCPBroadCastTcpListener.EndAcceptTcpClient(asyncResult);
@@ -95,6 +101,9 @@ namespace MainServerBioforce2D
             int discoveryClientCount = SearchForDictSpace(ref ClientDictionary);
             ClientDictionary[discoveryClientCount].Connect(client);
             InternetDiscoveryTCPServerSend.SendWelcome(discoveryClientCount);
+            string ip = client.Client.RemoteEndPoint.ToString().Split(':')[0].ToString();
+            if (!IPsConnected.Contains(ip))
+                IPsConnected.Add(ip);
             Console.WriteLine($"Connected and sent welcome to new DiscoveryTCPClient: {client.Client.RemoteEndPoint}");
         }
 
@@ -141,6 +150,8 @@ namespace MainServerBioforce2D
                 $"\n-------------------------------------------" +
                 $"\nGameServer: {serverName} exited..." +
                 $"\n-------------------------------------------");
+
+
 
             lock (ServersAvailable)
             {

@@ -75,7 +75,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CinemachineCamera: {fileID: 2837513207859176783}
-  Follow: {fileID: 9197498262357729496}
+  AimFollow: {fileID: 9197498262357729496}
+  MaxX: 3
+  MaxY: 2
 --- !u!114 &1533597402597742654
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -636,12 +638,12 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Follow
       value: 
-      objectReference: {fileID: 7847370238992379355}
+      objectReference: {fileID: 9197498262357729496}
     - target: {fileID: 3544536141716630502, guid: e79d4f5886fc92d449b693ac38d3b89b,
         type: 3}
       propertyPath: m_LookAt
       value: 
-      objectReference: {fileID: 7847370238992379355}
+      objectReference: {fileID: 0}
     - target: {fileID: 3544536141716630502, guid: e79d4f5886fc92d449b693ac38d3b89b,
         type: 3}
       propertyPath: m_ComponentOwner

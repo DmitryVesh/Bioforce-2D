@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class LocalPlayerGun : NonLocalPlayerGun
+public class LocalPlayerGun : NonLocalPlayerGun, ILocalPlayerGun
 {
     [SerializeField] private Transform FirePointTransform; //Set in inspector    
 
@@ -9,6 +9,10 @@ public class LocalPlayerGun : NonLocalPlayerGun
     private bool FacingRight { get; set; } = true;
     private float RotateExtra { get; set; }
     private float TurnedPositionOffset { get; set; } = 0.137f;
+    protected Vector2 LastAimVector { get; set; }
+
+    public Vector2 GetAimingVector() =>
+        LastAimVector;
 
     public void SetLookDir(bool facingRight)
     {
@@ -52,10 +56,12 @@ public class LocalPlayerGun : NonLocalPlayerGun
 
     protected virtual void AimWherePointing()
     {
-        Vector3 difference = MainCamera.ScreenToWorldPoint(Input.mousePosition) - ArmsTransform.position;
-        difference.Normalize();
+        Vector2 difference = MainCamera.ScreenToWorldPoint(Input.mousePosition) - ArmsTransform.position;
+
+        difference.Normalize();        
 
         Aim(difference.x, difference.y);
+        LastAimVector = difference;
     }
 
     protected void Aim(float x, float y)
@@ -94,6 +100,4 @@ public class LocalPlayerGun : NonLocalPlayerGun
         ClientSend.ShotBullet(FirePointTransform.position, FirePointTransform.rotation);
         
     }
-
-    
 }

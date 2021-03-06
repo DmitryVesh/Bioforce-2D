@@ -79,7 +79,6 @@ namespace MainServerBioforce2D
             string mapName = packet.ReadString();
             int currentNumPlayers = packet.ReadInt();
             int ping = packet.ReadInt();
-            //string ip = InternetDiscoveryTCPServer.ClientDictionary[client].TCPClient.Client.RemoteEndPoint.ToString().Split(':')[0];
 
             if (InternetDiscoveryTCPServer.GameServerDict.ContainsKey(serverName))
             {
@@ -87,17 +86,22 @@ namespace MainServerBioforce2D
                 InternetDiscoveryTCPServerSend.SendJoinServer(client, port);
                 return;
             }
-
-            Server server = new Server(serverName, maxNumPlayers, mapName, currentNumPlayers, ping);
-            InternetDiscoveryTCPServer.ServersAvailable.Add(server);
+            
             Console.WriteLine($"Read AddServer from client:{client} at ip {InternetDiscoveryTCPServer.ClientDictionary[client].TCPClient.Client.RemoteEndPoint}");
 
             (int gameServerPort, int gameMainPort) = InternetDiscoveryTCPServer.GetAvailablePort();
             if (gameServerPort == -1) //No more servers available
             {
+                Console.WriteLine(
+                    $"\n==========================" +
+                    $"\nNo more servers available!" +
+                    $"\n==========================\n");
                 InternetDiscoveryTCPServerSend.SendNoMoreServersAvailable(client);
                 return;
             }
+
+            Server server = new Server(serverName, maxNumPlayers, mapName, currentNumPlayers, ping);
+            InternetDiscoveryTCPServer.ServersAvailable.Add(server);
 
             GameServerProcess gameServerProcess = new GameServerProcess(serverName, gameServerPort);
             gameServerProcess.StartInfo = new ProcessStartInfo
