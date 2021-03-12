@@ -3,6 +3,7 @@ using System.Threading;
 using Shared;
 using GameServer;
 using System.Linq;
+using System.IO;
 
 namespace MainServerBioforce2D
 {
@@ -16,6 +17,8 @@ namespace MainServerBioforce2D
 
         static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
             if (args.Length == 0 || args[0] == "MainServer")
             {
                 InternetDiscoveryTCPServer.StartServer(Port);
@@ -28,6 +31,38 @@ namespace MainServerBioforce2D
                 args = args.Skip(1).ToArray();
                 ServerProgram.StartServerProgram(args);
             }
+        }
+
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs args)
+        {
+            Exception exc = (Exception)args.ExceptionObject;
+            DateTime now = DateTime.Now;
+            string logMessage =
+                $"\n\n" +
+                $"\nUnhandled Exception ---" +
+                $"\n===========================================================" +
+                $"\n{now}" +
+                $"\n" +
+                $"\nMessage ---" +
+                $"\n{exc.Message}" +
+                $"\n--- End Message" +
+                $"\n" +
+                $"\nSource ---" +
+                $"\n{exc.Source}" +
+                $"\n--- End Source" +
+                $"\n" +
+                $"\nStackTrace ---" +
+                $"\n{exc.StackTrace}" +
+                $"\n--- End StackTrace" +
+                $"\n" +
+                $"\nTargetSite ---" +
+                $"\n{exc.TargetSite}" +
+                $"\n--- End TargetSite" +
+                $"\n--- End Unhandled Exception: {now}" +
+                $"\n===========================================================";
+
+            using (StreamWriter sw = new StreamWriter("excLog.txt", true)) 
+                sw.Write(logMessage);            
         }
 
         private static void MainThread()

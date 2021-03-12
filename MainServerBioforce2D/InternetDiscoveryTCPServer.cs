@@ -6,6 +6,7 @@ using MainServer;
 using Shared;
 using DmitryNamespace;
 using System.IO;
+using System.Diagnostics;
 
 namespace MainServerBioforce2D
 {
@@ -26,6 +27,7 @@ namespace MainServerBioforce2D
 
         private static Queue<int> PortQueue { get; set; }
         private static int NumServers { get; set; } = 100;
+        
         private static BinaryTree<string> IPsConnected = new BinaryTree<string>(true);
 
         private static List<int> PortsAvailable()
@@ -35,6 +37,35 @@ namespace MainServerBioforce2D
             for (int port = minPort; port < maxPort; port++)
                 ports.Add(port);
             return ports;
+        }
+
+        public static int MakeGameServer(string serverName, int maxNumPlayers, string mapName, int currentNumPlayers, int ping, int timeOut)
+        {
+            (int gameServerPort, int gameMainPort) = GetAvailablePort();
+            if (gameServerPort == -1) //No more servers available
+            {
+                return gameServerPort;
+            }
+
+            Server server = new Server(serverName, maxNumPlayers, mapName, currentNumPlayers, ping);
+            ServersAvailable.Add(server);
+
+            GameServerProcess gameServerProcess = new GameServerProcess(serverName, gameServerPort);
+            gameServerProcess.StartInfo = new ProcessStartInfo
+            {
+                FileName = "MainServer",
+                ArgumentList = { "GameServer", serverName, maxNumPlayers.ToString(), mapName, gameServerPort.ToString(), gameMainPort.ToString(), timeOut.ToString() }
+            };
+            gameServerProcess.Start();
+            gameServerProcess.EnableRaisingEvents = true;
+            gameServerProcess.OnGameServerExited += OnGameServerExited;
+
+            GameServerDict.Add(serverName, gameServerProcess);
+
+            GameServerComms gameServerConnection = new GameServerComms(serverName, gameMainPort);
+            GameServerComms.GameServerConnection.Add(serverName, gameServerConnection);
+            
+            return gameServerPort;
         }
 
         public static void StartServer(int port)
@@ -61,6 +92,8 @@ namespace MainServerBioforce2D
                     Console.WriteLine($"Error in StartServer of MainServer:\n{exception}");
                 }
             }
+
+            MakeGameServer(serverName: "Welcome", maxNumPlayers: 20, mapName: "Level 1", currentNumPlayers: 0, ping: 0, timeOut: -1);
         }
         public static void CloseServer(object sender, EventArgs e)
         {
@@ -74,12 +107,10 @@ namespace MainServerBioforce2D
             foreach (GameServerProcess gameServer in GameServerDict.Values)
                 gameServer.Kill();
 
-            using (StreamWriter sw = new StreamWriter("IPs", false))
-            {
-                sw.WriteLine(IPsConnected.NumNodes);
-            }
+            
+            
         }
-        internal static (int, int) GetAvailablePort()
+        private static (int, int) GetAvailablePort()
         {
             if (PortQueue.Count != 0)
             {
@@ -102,9 +133,27 @@ namespace MainServerBioforce2D
             ClientDictionary[discoveryClientCount].Connect(client);
             InternetDiscoveryTCPServerSend.SendWelcome(discoveryClientCount);
             string ip = client.Client.RemoteEndPoint.ToString().Split(':')[0].ToString();
-            if (!IPsConnected.Contains(ip))
-                IPsConnected.Add(ip);
+
+            
             Console.WriteLine($"Connected and sent welcome to new DiscoveryTCPClient: {client.Client.RemoteEndPoint}");
+
+            try
+            {
+                if (IPsConnected.NumNodes == 0)
+                    IPsConnected.Add(ip);
+
+                if (!IPsConnected.Contains(ip))
+                    IPsConnected.Add(ip);
+
+                using (StreamWriter sw = new StreamWriter("IPs.txt", false))
+                {
+                    sw.WriteLine(IPsConnected.NumNodes);
+                }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         private static int SearchForDictSpace(ref Dictionary<int, InternetDiscoveryTCPClientOnServer> dict)

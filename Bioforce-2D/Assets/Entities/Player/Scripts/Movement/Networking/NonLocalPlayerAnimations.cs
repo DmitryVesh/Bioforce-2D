@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
 {
@@ -17,7 +18,11 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     [SerializeField] private SpriteRenderer PlayerBodySprite;
     [SerializeField] private SpriteRenderer PlayerArmsSprite;
 
-    [SerializeField] private ParticleSystem PlayerHitParticleSystem;
+    [SerializeField] private GameObject PlayerHitParticle;
+    private ParticleSystem[] PlayerHitParticleSystems = new ParticleSystem[NumMaxParticleSystems];
+    private Transform[] PlayerHitParticleTF = new Transform[NumMaxParticleSystems];
+    const int NumMaxParticleSystems = 10;
+    private int CurrentParticleIndex = 0;
 
     [SerializeField] private GameObject SplatterPrefab;
     [SerializeField] private Sprite[] SplatterSprites;
@@ -25,7 +30,7 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     private GameObject[] Splatters = new GameObject[NumMaxSplatters];
     private SpriteRenderer[] SplattersRenderers = new SpriteRenderer[NumMaxSplatters];
     const int NumMaxSplatters = 25;
-    int CurrentSplatterIndex;
+    private int CurrentSplatterIndex = 0;
 
     static int CurrentSplatterOrderInLayerIndex = -32768;
 
@@ -40,24 +45,42 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
         PlayerBodySprite.color = playerColor;
         PlayerArmsSprite.color = playerColor;
 
-        ParticleSystem.MainModule main = PlayerHitParticleSystem.main;
+        ParticleSystem mainParticleSystem = PlayerHitParticle.GetComponent<ParticleSystem>();
+        ParticleSystem.MainModule main = mainParticleSystem.main;
         main.startColor = new ParticleSystem.MinMaxGradient(playerColor);
+        GenerateParticleSystems();
+        
         SplatterSpriteRenderer.color = playerColor;
-
         GenerateSplatters();
+    }
+
+    private void GenerateParticleSystems()
+    {
+        Transform particleHolder = new GameObject($"ParticleHolder: {OwnerClientID}").transform;
+        particleHolder.position = Vector3.zero;
+
+        for (int particleCount = 0; particleCount < NumMaxParticleSystems; particleCount++)
+        {
+            GameObject particleSystem = Instantiate(PlayerHitParticle, particleHolder);
+            PlayerHitParticleTF[particleCount] = particleSystem.transform;
+            PlayerHitParticleSystems[particleCount] = particleSystem.GetComponent<ParticleSystem>();
+        }
     }
 
     private void GenerateSplatters()
     {
         CurrentSplatterIndex = 0;
         int maxSplatterSprites = SplatterSprites.Length;
+        Transform splatterHolder = new GameObject($"SplatterHolder: {OwnerClientID}").transform;
+        splatterHolder.position = Vector3.zero;
+
         for (int splatterCount = 0; splatterCount < NumMaxSplatters; splatterCount++)
         {
-            GameObject splatter = Instantiate(SplatterPrefab);
+            GameObject splatter = Instantiate(SplatterPrefab, splatterHolder);
             SpriteRenderer spriteRenderer = splatter.GetComponent<SpriteRenderer>();
 
-            splatter.GetComponent<SpriteRenderer>().sprite = SplatterSprites[Random.Range(0, maxSplatterSprites)];
-            splatter.transform.localScale = new Vector2(Random.Range(1f, 3f), Random.Range(1f, 3f));
+            splatter.GetComponent<SpriteRenderer>().sprite = SplatterSprites[UnityEngine.Random.Range(0, maxSplatterSprites)];
+            splatter.transform.localScale = new Vector2(UnityEngine.Random.Range(1f, 3f), UnityEngine.Random.Range(1f, 3f));
 
             splatter.SetActive(false);
             Splatters[splatterCount] = splatter;
@@ -98,8 +121,16 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
         CurrentSplatterIndex = (CurrentSplatterIndex + 1) % NumMaxSplatters;
     }
 
-    private void PlayHitParticleEffect(int damage, int currentHealth) =>
-        PlayerHitParticleSystem.Play();
+    private void PlayHitParticleEffect(int damage, int currentHealth)
+    {
+        Transform transform = PlayerHitParticleTF[CurrentParticleIndex];
+        transform.position = PlayerModelObject.transform.position;
+
+        ParticleSystem particle = PlayerHitParticleSystems[CurrentParticleIndex];
+        particle.Play();
+
+        CurrentParticleIndex = (CurrentSplatterIndex + 1) % NumMaxParticleSystems;
+    }
 
     protected virtual void FixedUpdate()
     {

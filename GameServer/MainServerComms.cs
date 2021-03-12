@@ -18,11 +18,13 @@ namespace GameServer
         public static bool EstablishedConnection { get; set; } = false;
         public static int Port { get; private set; }
         public static string ServerName { get; set; }
+        private static int TimeOut { get; set; }
 
-        public static void Connect(int port, string serverName)
+        public static void Connect(int port, string serverName, int timeOut)
         {
             Port = port;
             ServerName = serverName;
+            TimeOut = timeOut;
 
             Console.WriteLine($"\n\t\tMainServerComms trying to connect:{Port}");
             InitIncomingPacketHandler();
@@ -75,7 +77,7 @@ namespace GameServer
                     else
                         numTimesServerIsEmpty = 0;
 
-                    if (numTimesServerIsEmpty >= 30)
+                    if (TimeOut != -1 && numTimesServerIsEmpty >= TimeOut)
                     {
                         Console.WriteLine("\n\t\t------------------------------------------------------------" +
                             $"\n\t\tGameServer {ServerName} is shutting down due to no players present..." +

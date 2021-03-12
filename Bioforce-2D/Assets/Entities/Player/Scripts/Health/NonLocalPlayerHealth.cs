@@ -13,6 +13,9 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
     private PlayerManager PlayerManager { get; set; }
     private bool CantGetHit { get; set; }
 
+    public bool CanTakeDamage() =>
+        !CantGetHit;
+
     public float GetMaxHealth() =>
         MaxHealth;
     public float GetCurrentHealth() =>
@@ -83,5 +86,5 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
         yield return new WaitForSeconds(PlayerManager.DeadTime);
         Respawn();
     }
-    
+
 }

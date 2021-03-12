@@ -9,4 +9,6 @@ public interface IHealth
 
     float GetMaxHealth();
     float GetCurrentHealth();
+
+    bool CanTakeDamage();
 }

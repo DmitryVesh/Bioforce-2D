@@ -1079,6 +1079,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Settings - Menu Button
       objectReference: {fileID: 0}
+    - target: {fileID: 5496167699219401216, guid: 73575fc90ec10ae45a8adb6fa02e1eb8,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5496167699219401218, guid: 73575fc90ec10ae45a8adb6fa02e1eb8,
         type: 3}
       propertyPath: OnClickEvent.m_PersistentCalls.m_Calls.Array.size
@@ -2313,7 +2318,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5858864ec9c76c4494f7d1258f8eda6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TestingTouchInEditor: 0
+  TestingTouchInEditor: 1
   LocalPlayerPrefab: {fileID: 5321615058723665281, guid: 46915cd5231142d4d922fed68d8abf79,
     type: 3}
   PlayerPrefab: {fileID: 598685846401911508, guid: ab14d8c5b57b353488ff9af910ecd732,
@@ -5570,7 +5575,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  AppearInMobile: 0
+  AppearInMobile: 1
 --- !u!1 &1090586290
 GameObject:
   m_ObjectHideFlags: 0
@@ -6164,6 +6169,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Tab - Manual
+      objectReference: {fileID: 0}
+    - target: {fileID: 8166814078560540369, guid: d8d0c84db32dd1f4da4ca218168110dd,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8166814079389225342, guid: d8d0c84db32dd1f4da4ca218168110dd,
         type: 3}
@@ -10745,6 +10755,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Quit - Menu Button
       objectReference: {fileID: 0}
+    - target: {fileID: 5496167699219401216, guid: 73575fc90ec10ae45a8adb6fa02e1eb8,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5496167699219401218, guid: 73575fc90ec10ae45a8adb6fa02e1eb8,
         type: 3}
       propertyPath: AppearInMobile
@@ -12000,6 +12015,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mutliplayer - Menu Button
+      objectReference: {fileID: 0}
+    - target: {fileID: 5496167699219401216, guid: 73575fc90ec10ae45a8adb6fa02e1eb8,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5496167699219401218, guid: 73575fc90ec10ae45a8adb6fa02e1eb8,
         type: 3}

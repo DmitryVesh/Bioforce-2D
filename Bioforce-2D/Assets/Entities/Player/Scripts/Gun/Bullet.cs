@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameServer;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,7 +17,7 @@ public class Bullet : MonoBehaviour
     private bool Available = false;
 
     private Animator Animator { get; set; }
-    private CapsuleCollider2D Hitbox { get; set; }
+    public CapsuleCollider2D Hitbox { get; private set; }
     private SpriteRenderer Sprite { get; set; }
     private Color BulletColor { get; set; }
 
@@ -29,10 +30,8 @@ public class Bullet : MonoBehaviour
         BulletColor = playerColor;
     }
 
-    public void SetOwnerClientID(int iD)
-    {
+    public void SetOwner(int iD) =>
         OwnerClientID = iD;
-    }
     public void Shoot(Vector2 position, Quaternion rotation)
     {
         transform.position = position;

@@ -21,7 +21,7 @@ namespace GameServer
         public Quaternion Rotation { get; private set; }
         public bool IsFacingRight { get; private set; }
 
-        private Vector2 LastPosition { get; set; }
+        private Vector2 LastPositionValidation { get; set; }
         public float RunSpeed { get; set; } = 0;
         public float SprintSpeed { get; set; } = 0;
 
@@ -31,6 +31,8 @@ namespace GameServer
 
         public bool Paused { get; private set; }
         public Timer PausedTimer { get; private set; }
+        public TimeSpan PacketTimeOut { get; set; } = DateTime.Now.TimeOfDay + new TimeSpan(0, 1, 0);
+        public TimeSpan PacketPause { get; set; } = DateTime.Now.TimeOfDay + new TimeSpan(0, 0, 20);
 
         public PlayerServer(int iD, string username, Vector2 position, PlayerColor playerColor)
         {
@@ -38,7 +40,7 @@ namespace GameServer
             Username = username;
             Position = position;
             IsFacingRight = true;
-            LastPosition = position;
+            LastPositionValidation = position;
             CurrentHealth = MaxHealth;
             PlayerColor = playerColor;
         }
@@ -71,6 +73,20 @@ namespace GameServer
         }
         public void Update()
         {
+            TimeSpan now = DateTime.Now.TimeOfDay;
+            TimeSpan zero = new TimeSpan(0, 0, 0);
+
+            if (PacketPause - now < zero)
+            {
+                bool paused = true;
+                Server.ClientDictionary[ID].Player.SetPaused(paused);
+                ServerSend.PlayerPausedGame(ID, paused);
+            }
+            if (PacketTimeOut - now < zero)
+            {
+                Server.ClientDictionary[ID].Disconnect();
+                Paused = false;
+            }
             MovePlayer();
         }
 
@@ -108,7 +124,7 @@ namespace GameServer
 
             Vector2 validPosition = new Vector2(0, 0);
             //Validating X
-            float xLast = LastPosition.X;
+            float xLast = LastPositionValidation.X;
             float xMaxTravelledRight = xLast + SprintSpeed + 0.5f;
             float xMaxTravelledLeft = xLast - SprintSpeed - 0.5f;
             Console.WriteLine($"\txLast: {xLast}\nxMaxTravelledLeft: {xMaxTravelledLeft}\nxMaxTravelledRight: {xMaxTravelledRight} ");
@@ -131,15 +147,24 @@ namespace GameServer
             //TODO: Validate Y
             validPosition.Y = Position.Y;
 
-            LastPosition = validPosition;
+            LastPositionValidation = validPosition;
 
             return valid;
+        }
+
+        internal void LastPacketReceived(TimeSpan timeOfDay)
+        {
+            PacketTimeOut = timeOfDay + new TimeSpan(0, 0, 25);
+            PacketPause = timeOfDay + new TimeSpan(0, 0, 5);
         }
 
         internal void SetPaused(bool paused)
         {
             Paused = paused;
-            int disconnectAfterTimeMs = 30000;
+            if (!Paused)
+                return;
+
+            int disconnectAfterTimeMs = 20_000;
             PausedTimer = new Timer(disconnectAfterTimeMs);
             PausedTimer.Elapsed += PausedTimer_Elapsed;
             PausedTimer.Start();
@@ -148,7 +173,11 @@ namespace GameServer
         private void PausedTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (Paused)
+            {
+                Console.WriteLine($"PausedTimer for Player: {ID} has elapsed, and they are still paused...");
                 Server.ClientDictionary[ID].Disconnect();
+                Paused = false;
+            }
             PausedTimer.Stop();
             PausedTimer.Dispose();
         }

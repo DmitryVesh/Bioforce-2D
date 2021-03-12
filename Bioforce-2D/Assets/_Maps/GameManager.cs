@@ -126,6 +126,7 @@ public class GameManager : MonoBehaviour
         IGun playerGun = player.GetComponentInChildren<IGun>();
         playerGun?.SetOwnerClientID(iD);
         playerGun?.SetColor(playerColor);
+        playerGun?.SetOwnerCollider(player.GetComponentInChildren<CapsuleCollider2D>());
 
         if (!isFacingRight)
             playerAnimations.FlipSprite();
@@ -151,7 +152,7 @@ public class GameManager : MonoBehaviour
         }
         catch (KeyNotFoundException exception)
         {
-            Debug.LogWarning($"Player has been probing LAN connection\n{exception}");
+            Debug.Log($"Error in Disconnecting Player: {disconnectedPlayer}...\n{exception}");
         }
     }
     public void DisconnectAllPlayers()

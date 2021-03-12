@@ -7,4 +7,5 @@ public interface IGun
     void Disable(TypeOfDeath typeOfDeath);
     void Enable();
     void SetColor(Color playerColor);
+    void SetOwnerCollider(Collider2D ownCollider);
 }

@@ -54,7 +54,8 @@ MonoBehaviour:
   FacingRight: 1
   PlayerBodySprite: {fileID: 7847370238992379348}
   PlayerArmsSprite: {fileID: 2298301300277298035}
-  PlayerHitParticleSystem: {fileID: 5699433724371637409}
+  PlayerHitParticle: {fileID: 6421890002363139958, guid: 8c43f0adcb74e764381f6918a3c31595,
+    type: 3}
   SplatterPrefab: {fileID: 2689029294326577204, guid: 4c583973c47e782448301c0d390ee53e,
     type: 3}
   SplatterSprites:
@@ -560,12 +561,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc0ccc65539aaac40994e3c6a52d3361, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!198 &5699433724371637409 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 4439007226685127998, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
-    type: 3}
-  m_PrefabInstance: {fileID: 8251422772928506271}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &9197498262357729496 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 947694065097509191, guid: 73ac35a2afb20154c8e39c9292eb9d5d,

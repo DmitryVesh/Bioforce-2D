@@ -17,6 +17,7 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
     private Quaternion ArmRotation{ get; set; }
 
     public Color PlayerColor { get; set; }
+    public Collider2D OwnCollider { get; private set; }
 
     public virtual void ShootBullet(Vector2 position, Quaternion rotation) //Has to be public to satisfy interface
     {
@@ -30,13 +31,16 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
         }
 
         bullet.Shoot(position, rotation);
+        Physics2D.IgnoreCollision(bullet.Hitbox, OwnCollider, true);
 
         MuzzelFlash.PlayFlash();
     }
-    public void SetOwnerClientID(int iD)
-    {
+
+    public void SetOwnerClientID(int iD) =>
         OwnerClientID = iD;
-    }
+    public void SetOwnerCollider(Collider2D ownCollider) =>
+        OwnCollider = ownCollider;
+
     private void SetArmPositionRotation(Vector2 position, Quaternion rotation)
     {
         //Need to call in late update so anims don't override the position x...
@@ -80,7 +84,7 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
         GameObject bulletGameObject = Instantiate(BulletPrefab, Vector3.zero, Quaternion.identity);
         SetToPlayerColor(bulletGameObject);
         Bullet bulletScript = bulletGameObject.GetComponent<Bullet>();
-        bulletScript.SetOwnerClientID(OwnerClientID);
+        bulletScript.SetOwner(OwnerClientID);
         
         BulletList.Add(bulletScript);
         return bulletScript;
@@ -116,6 +120,4 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
         PlayerManager.OnPlayerDeath -= Disable;
         PlayerManager.OnPlayerRespawn -= Enable;
     }
-
-    
 }

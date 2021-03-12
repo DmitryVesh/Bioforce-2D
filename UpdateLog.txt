@@ -1,4 +1,59 @@
 ===============================================================================================================================
+Version 0.5.7.4
+---------------
+
+Summary
+-------
+Main goals is to;
+	1 Make particle systems stay in place where the play was hit
+	1 Make all MainServer & GameServer exceptions that crash the process be logged in a txt file excLog.txt
+	1 Fix random server breakdowns 
+		1 TCPServer System.Collections.Generic.Dictionary
+		1 Cannot access a disposed object System.Net.Socket.Socket at GameServer.ClientServer.Disconnect
+		1 Null reference at GameServer.ClientServer.Disconnect
+	1 Fix bullets hitting own other player when they are running in opposite direction to shooting
+	1 Make 1 server always be present, with no timeout called Welcome
+
+	1 Make so the player name/server name can not have swear words in them.
+	0 Make client sided timeout when haven't received data from the GameServer in x amount of time
+	0 Add health pickups
+	0 Add adrenaline pickup
+	0 Make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+
+Future tasks;	
+		
+	version 0.5.7.5
+		Add invincibility frames, after being hit/respawning
+		Add trail effects when a player sprints, so can clearly see player sprinting, also maybe zoom camera out a little bit...
+		Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard
+	version 0.5.7.6
+		add breathing camera movement when player is idle, going up and down.
+		using cinemachine add impulses, fast small camera movements in specific directions, for:
+			Player Getting shot
+			Player shooting
+			Player jumping
+			Player running
+		Make so when the player is down the collisions are not occuring when shot
+	version 0.5.7.7
+		Make the scoreboard reuse scoreboard entries, instead of destroying them, when a player disconnects.
+		Allow players to choose their own colour
+	version 0.5.7.8
+		Add tutorial level into game
+
+	Add chat into game
+	Add ping field to Player Score entries in scoreboard
+	Add gamepad support for pc & mac
+	Make server sided, currently very client sided
+
+	make the ThreadManager to work on multi-threading
+	
+	imrpove killFeedUI, make entries disappear by decreasing opacity, and popping them back up smoothly instead of vertical layout group which
+		pops them and moves other entries up instantly.
+	improve UI, adding pop up animations to the UI elements instead of just appearing instantly.
+	improve UI, adding black borders to UI Panels like TimeOutPanel.
+	fix player move validation, when respawned, should ignore any changes that occured lately.
+
+===============================================================================================================================
 Version 0.5.7.3
 ---------------
 

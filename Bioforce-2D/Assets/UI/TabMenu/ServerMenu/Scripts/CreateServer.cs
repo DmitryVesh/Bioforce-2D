@@ -9,14 +9,6 @@ public class CreateServer : MonoBehaviour
 {
     //Server name
     [SerializeField] TMP_InputField ServerNameInputField;
-    //TODO: Add swear words and invalid server names for server creation
-    private List<string> InvalidServerNameStrings
-        = new List<string>() { "shit", "fuck", "bitch" };
-
-    private char[] ValidChars = new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-                                             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-                                             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                                             ' ', '\''};
 
     //Map selection
     [SerializeField] TMP_Dropdown MapDropdown;
@@ -57,10 +49,9 @@ public class CreateServer : MonoBehaviour
     public void OnServerNameChanged()
     {
         ServerNameSelected = ServerNameInputField.text;
-        ServerNameSelected = ServerNameSelected.Replace("  ", null);
-        RemoveInvalidCharsInString(ref ServerNameSelected);
+        TextInputValidator.RemoveInvalidCharsInString(ref ServerNameSelected);
         ServerNameInputField.text = ServerNameSelected;
-        StartServerButton.Interactable = IsServerNameValid(ServerNameSelected);
+        StartServerButton.Interactable = TextInputValidator.IsTextLengthValid(ServerNameSelected);
     }
 
     public void OnMapDropdownChanged()
@@ -149,36 +140,7 @@ public class CreateServer : MonoBehaviour
     }
 
 
-    private void RemoveInvalidCharsInString(ref string text)
-    {
-        List<int> indexesRemove = new List<int>();
-
-        for (int count = 0; count < text.Length; count++)
-        {
-            bool valid = false;
-            foreach (char validChar in ValidChars)
-            {
-                if (text[count] == validChar)
-                {
-                    valid = true;
-                    break;
-                }
-            }
-
-            if (!valid)
-                indexesRemove.Add(count);
-        }
-
-        int decrimentIndexer = 0;
-        foreach (int index in indexesRemove)
-        {
-            text = text.Remove(index - decrimentIndexer);
-            decrimentIndexer++;
-        }
-    }
-
-    private bool IsServerNameValid(string serverName) =>
-        serverName.Length >= 4 && !InvalidServerNameStrings.Any(serverName.ToLower().Contains);
+    
     private void SetMapDropdownOptions()
     {
         MapDropdown.ClearOptions();

@@ -163,7 +163,7 @@ public class ServerMenu : MonoBehaviour
         ServerMenuPanel.SetActive(false);
         //TODO: Deal when the player count is full, e.g. 10/10 players
         if (SelectedManualEntry) //TODO: Make so Discovery tcp client is made to check out the ip address
-            throw new NotImplementedException();
+            ServerConnectionTimeOut();
         else
         {
             //Send packet to MainServer that you want to join a specific server

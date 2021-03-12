@@ -26,6 +26,7 @@ namespace GameServer
         {
             public TcpClient Socket { get; private set; }
             private int ID { get; }
+
             private byte[] ReceiveBuffer;
             private NetworkStream Stream;
             private Packet ReceivePacket;
@@ -52,8 +53,8 @@ namespace GameServer
                 }
                 catch (Exception exception)
                 {
-                    //Disconnect();
-                    Console.WriteLine($"\n\tError, occured when sending TCP data from client {ID}\nError{exception}");
+                    Console.WriteLine($"\n\tError, occured when sending TCP data to client {ID}\nError{exception}");
+                    Server.ClientDictionary[ID].Disconnect();
                 }
             }
             public void Disconnect()
@@ -68,7 +69,7 @@ namespace GameServer
                 }
                 catch (Exception exception)
                 {
-                    Console.WriteLine($"\n\tError in {Server.ServerName} client: {ID}, error in Disconnect...{exception}");
+                    Console.WriteLine($"\n\tError in {Server.ServerName} client: {ID}, error in TCP Disconnect...\n{exception}");
                 }
             }
 
@@ -115,8 +116,20 @@ namespace GameServer
                     {
                         using (Packet packet = new Packet(bytes))
                         {
-                            int packetId = packet.ReadInt();
-                            Server.PacketHandlerDictionary[packetId](ID, packet);
+                            try
+                            {
+                                int packetId = packet.ReadInt();
+                                Server.PacketHandlerDictionary[packetId](ID, packet);
+                                Server.ClientDictionary[ID].Player.LastPacketReceived(DateTime.Now.TimeOfDay);
+                            }
+                            catch (Exception exception)
+                            {
+                                Console.WriteLine($"\n\tError in TCP HandlePacket of GameServer Client: {ID}...\n{exception}");
+                                //Server.ClientDictionary[ID].Disconnect();
+                                //Instead of disconnecting straight away, make sure packets are being received from this player,
+                                //  If still receiving packets, then don't disconnect
+                                //  Else, disconnect player
+                            }
                         }
                     });
                     packetLen = 0;
@@ -167,9 +180,19 @@ namespace GameServer
 
                 ThreadManager.ExecuteOnMainThread(() =>
                 {
-                    Packet newPacket = new Packet(data);
-                    int packetID = newPacket.ReadInt();
-                    Server.PacketHandlerDictionary[packetID](ID, newPacket);
+                    try
+                    {
+                        using (Packet newPacket = new Packet(data))
+                        {
+                            int packetID = newPacket.ReadInt();
+                            Server.PacketHandlerDictionary[packetID](ID, newPacket);
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        Console.WriteLine($"\n\tError in UDP HandlePacket of GameServer Client: {ID}...{exception}");
+                        Server.ClientDictionary[ID].Disconnect();
+                    }
                 });
             }
             public void Disconnect()
@@ -206,14 +229,28 @@ namespace GameServer
         }
         public void Disconnect()
         {
-            PlayerColor.GiveBackRandomColor(Player.PlayerColor);
-            Console.WriteLine($"\tPlayer: {ID} has disconnected. {tCP.Socket.Client.RemoteEndPoint}");
-            ServerSend.DisconnectPlayer(ID);
-            
-            tCP.Disconnect();
-            uDP.Disconnect();
+            try
+            {
+                if (Player is null)
+                {
+                    Console.WriteLine($"\n\tTrying to Disconnect Player: {ID}, when they are already null...");
+                    tCP.Disconnect();
+                    uDP.Disconnect();
+                    return;
+                }
 
-            Player = null;
+                Console.WriteLine($"\tPlayer: {ID} has disconnected. {tCP.Socket.Client.RemoteEndPoint}");
+
+                PlayerColor.GiveBackRandomColor(Player.PlayerColor);
+                ServerSend.DisconnectPlayer(ID);
+                tCP.Disconnect();
+                uDP.Disconnect();
+                Player = null;
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"\n\tError in GameServer Disconnecting Player: {ID}...\n{exception}");
+            }
         }
     }
 }

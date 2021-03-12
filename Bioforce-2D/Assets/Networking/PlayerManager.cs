@@ -8,10 +8,6 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] public int ID;
     [SerializeField] private string Username;
 
-    public int Kills { get; private set; }
-    public int Deaths { get; private set; }
-    public int Score { get; private set; }
-
     public Color PlayerColor { get; private set; }
 
     public Vector2 RespawnPosition { get; set; }

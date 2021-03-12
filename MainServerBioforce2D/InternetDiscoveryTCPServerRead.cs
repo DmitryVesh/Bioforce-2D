@@ -89,8 +89,8 @@ namespace MainServerBioforce2D
             
             Console.WriteLine($"Read AddServer from client:{client} at ip {InternetDiscoveryTCPServer.ClientDictionary[client].TCPClient.Client.RemoteEndPoint}");
 
-            (int gameServerPort, int gameMainPort) = InternetDiscoveryTCPServer.GetAvailablePort();
-            if (gameServerPort == -1) //No more servers available
+            int gameServerPort = InternetDiscoveryTCPServer.MakeGameServer(serverName, maxNumPlayers, mapName, currentNumPlayers, ping, timeOut: 30);
+            if (gameServerPort == -1)
             {
                 Console.WriteLine(
                     $"\n==========================" +
@@ -99,25 +99,6 @@ namespace MainServerBioforce2D
                 InternetDiscoveryTCPServerSend.SendNoMoreServersAvailable(client);
                 return;
             }
-
-            Server server = new Server(serverName, maxNumPlayers, mapName, currentNumPlayers, ping);
-            InternetDiscoveryTCPServer.ServersAvailable.Add(server);
-
-            GameServerProcess gameServerProcess = new GameServerProcess(serverName, gameServerPort);
-            gameServerProcess.StartInfo = new ProcessStartInfo
-            {
-                FileName = "MainServer",
-                ArgumentList = { "GameServer", serverName, maxNumPlayers.ToString(), mapName, gameServerPort.ToString(), gameMainPort.ToString() }
-            };
-            gameServerProcess.Start();
-            gameServerProcess.EnableRaisingEvents = true;
-            gameServerProcess.OnGameServerExited += InternetDiscoveryTCPServer.OnGameServerExited;
-
-            InternetDiscoveryTCPServer.GameServerDict.Add(serverName, gameServerProcess);
-
-            GameServerComms gameServerConnection = new GameServerComms(serverName, gameMainPort);
-            GameServerComms.GameServerConnection.Add(serverName, gameServerConnection);
-
             InternetDiscoveryTCPServerSend.SendJoinServer(client, gameServerPort);
         }
         internal static void ReadDeleteServer(int client, Packet packet)

@@ -66,7 +66,8 @@ MonoBehaviour:
   FacingRight: 1
   PlayerBodySprite: {fileID: 1733593939604397235}
   PlayerArmsSprite: {fileID: 7713742556804674068}
-  PlayerHitParticleSystem: {fileID: 4319506067474261446}
+  PlayerHitParticle: {fileID: 6421890002363139958, guid: 8c43f0adcb74e764381f6918a3c31595,
+    type: 3}
   SplatterPrefab: {fileID: 2689029294326577204, guid: 4c583973c47e782448301c0d390ee53e,
     type: 3}
   SplatterSprites:
@@ -253,6 +254,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &3966645358245549415
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -293,6 +295,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Color.a
       value: 0.78431374
+      objectReference: {fileID: 0}
+    - target: {fileID: 947694065097509191, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2059156668309886192, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
         type: 3}
@@ -519,12 +526,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc0ccc65539aaac40994e3c6a52d3361, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!198 &4319506067474261446 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 4439007226685127998, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
-    type: 3}
-  m_PrefabInstance: {fileID: 462589195740240120}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4574617095284228478
 PrefabInstance:
   m_ObjectHideFlags: 0

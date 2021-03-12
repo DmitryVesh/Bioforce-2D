@@ -16,14 +16,16 @@ namespace GameServer
 
         public static void StartServerProgram(string[] args)
         {
-            (string serverName, int maxNumPlayers, string mapName, int portGame, int portMainServer) = (args[0], int.Parse(args[1]), args[2], int.Parse(args[3]), int.Parse(args[4]));
+            (string serverName, int maxNumPlayers, string mapName, int portGame, int portMainServer, int timeOut) 
+                = (args[0], int.Parse(args[1]), args[2], int.Parse(args[3]), int.Parse(args[4]), int.Parse(args[5]));
+
             Thread mainThread = new Thread(new ThreadStart(MainThread));
             mainThread.Start();
             PortGame = portGame;
 
             try
             {
-                MainServerComms.Connect(portMainServer, serverName);
+                MainServerComms.Connect(portMainServer, serverName, timeOut);
                 Server.StartServer(serverName, maxNumPlayers, mapName, portGame);
             }
             catch (Exception exception)

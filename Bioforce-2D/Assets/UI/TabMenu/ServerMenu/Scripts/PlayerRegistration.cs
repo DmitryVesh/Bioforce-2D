@@ -11,11 +11,6 @@ public class PlayerRegistration : MonoBehaviour
     public bool IsUsernameValid { get; set; }
 
     [SerializeField] private TextMeshProUGUI PlayerModelUsernameText;
-    private char[] InvalidChars = new char[] { 'q', 'z', 'Z', ']', '[', '\'', '\"', '@', '+', 'J', ';', '(', ')', '\\', '/', '#', '*', '%', '$', '£', '!', '^', '&', '=', '~', '?', '<', '>', '|' };
-    private char[] ValidChars = new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-                                             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-                                             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                                             ' ', '\''};
 
     private TMP_InputField UsernameInputField { get; set; }
     private MenuButton OKMenuButton { get; set; }
@@ -40,10 +35,10 @@ public class PlayerRegistration : MonoBehaviour
     public void OnUsernameInputFieldChanged() //Called by inputField on change event
     {
         string inputField = UsernameInputField.text;
-        RemoveInvalidCharsInString(ref inputField);
+        TextInputValidator.RemoveInvalidCharsInString(ref inputField);
         UsernameInputField.text = inputField;
 
-        IsUsernameValid = IsInputFieldValid(inputField);
+        IsUsernameValid = TextInputValidator.IsTextLengthValid(inputField);
 
         PlayerModelUsernameText.text = inputField;
         OKMenuButton.Interactable = IsUsernameValid;
@@ -84,39 +79,5 @@ public class PlayerRegistration : MonoBehaviour
         OKMenuButton = transform.GetChild(1).GetComponent<MenuButton>();
 
         PlayerModelUsernameText.text = "";
-    }
-
-    private bool IsInputFieldValid(string inputField)
-    {
-        if (inputField == null || inputField == "" || inputField.Length < 3 || inputField.Contains("  "))
-            return false;
-        return true;
-    }
-    private void RemoveInvalidCharsInString(ref string String)
-    {
-        List<int> indexesRemove = new List<int>();
-
-        for (int count = 0; count < String.Length; count++)
-        {
-            bool valid = false;
-            foreach (char validChar in ValidChars)
-            {
-                if (String[count] == validChar)
-                {
-                    valid = true;
-                    break;
-                }
-            }
-
-            if (!valid)
-                indexesRemove.Add(count);
-        }
-
-        int decrimentIndexer = 0;
-        foreach (int index in indexesRemove)
-        {
-            String = String.Remove(index - decrimentIndexer);
-            decrimentIndexer++;
-        }
     }
 }
