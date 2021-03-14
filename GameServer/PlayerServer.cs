@@ -30,7 +30,6 @@ namespace GameServer
         public PlayerColor PlayerColor { get; private set; }
 
         public bool Paused { get; private set; }
-        public Timer PausedTimer { get; private set; }
         public TimeSpan PacketTimeOut { get; set; } = DateTime.Now.TimeOfDay + new TimeSpan(0, 1, 0);
         public TimeSpan PacketPause { get; set; } = DateTime.Now.TimeOfDay + new TimeSpan(0, 0, 20);
 
@@ -71,21 +70,30 @@ namespace GameServer
             RunSpeed = runSpeed;
             SprintSpeed = sprintSpeed;
         }
+
+        internal void LastPacketReceived(TimeSpan timeOfDay)
+        {
+            PacketTimeOut = timeOfDay + new TimeSpan(0, 0, 10);
+            PacketPause = timeOfDay + new TimeSpan(0, 0, 2);
+        }
+
         public void Update()
         {
+            
             TimeSpan now = DateTime.Now.TimeOfDay;
             TimeSpan zero = new TimeSpan(0, 0, 0);
 
             if (PacketPause - now < zero)
             {
                 bool paused = true;
-                Server.ClientDictionary[ID].Player.SetPaused(paused);
                 ServerSend.PlayerPausedGame(ID, paused);
             }
             if (PacketTimeOut - now < zero)
             {
                 Server.ClientDictionary[ID].Disconnect();
                 Paused = false;
+                Console.WriteLine($"\n\tPlayer: {ID} has been kicked, due to GameServer not having received packets in a while...");
+                return;
             }
             MovePlayer();
         }
@@ -150,36 +158,6 @@ namespace GameServer
             LastPositionValidation = validPosition;
 
             return valid;
-        }
-
-        internal void LastPacketReceived(TimeSpan timeOfDay)
-        {
-            PacketTimeOut = timeOfDay + new TimeSpan(0, 0, 25);
-            PacketPause = timeOfDay + new TimeSpan(0, 0, 5);
-        }
-
-        internal void SetPaused(bool paused)
-        {
-            Paused = paused;
-            if (!Paused)
-                return;
-
-            int disconnectAfterTimeMs = 20_000;
-            PausedTimer = new Timer(disconnectAfterTimeMs);
-            PausedTimer.Elapsed += PausedTimer_Elapsed;
-            PausedTimer.Start();
-        }
-
-        private void PausedTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            if (Paused)
-            {
-                Console.WriteLine($"PausedTimer for Player: {ID} has elapsed, and they are still paused...");
-                Server.ClientDictionary[ID].Disconnect();
-                Paused = false;
-            }
-            PausedTimer.Stop();
-            PausedTimer.Dispose();
         }
     }
 }

@@ -61,7 +61,8 @@ namespace Shared
         tookDamage,
         serverIsFull,
         armPositionRotation,
-        playerPausedGame
+        playerPausedGame,
+        stillConnected
     }
 
     /// <summary>Sent from client to server.</summary>
@@ -76,7 +77,8 @@ namespace Shared
         playerRespawned,
         tookDamage,
         armPositionRotation,
-        pausedGame
+        pausedGame,
+        stillConnected
     }
 
     public class Packet : IDisposable

@@ -88,6 +88,7 @@ namespace GameServer
                 SendTCPPacketToAllButIncluded(playerID, packet);
             }
         }
+
         public static void PlayerMovementStats(int playerID, float runSpeed, float sprintSpeed)
         {
             using (Packet packet = new Packet((int)ServerPackets.playerMovementStats))
@@ -153,7 +154,7 @@ namespace GameServer
 
                 SendTCPPacketToAllButIncluded(playerID, packet);
             }
-        }
+        }        
 
         internal static void PlayerPausedGame(int clientID, bool paused)
         {
@@ -165,6 +166,14 @@ namespace GameServer
                 SendTCPPacketToAllButIncluded(clientID, packet);
             }
         }
+        internal static void PlayerConnectedAckn(int clientID)
+        {
+            using (Packet packet = new Packet((int)ServerPackets.stillConnected))
+            {
+                SendTCPPacket(clientID, packet);
+            }
+        }
+
 
         private static void SendTCPPacket(int recipientClient, Packet packet)
         {

@@ -60,6 +60,7 @@
     <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\ServersPage.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Health\LocalPlayerHealth.cs" />
     <Compile Include="Assets\UI\TabMenu\Scripts\TabGroup.cs" />
+    <Compile Include="Assets\Entities\Items\Scripts\PickUpItem.cs" />
     <Compile Include="Assets\UI\PauseMenu\Scripts\Menu.cs" />
     <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\ServerEntry.cs" />
     <Compile Include="Assets\_Maps\FallBoundry\Scripts\FallBoundry.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="Assets\UI\MobileKeyboardManager\MobileKeyboardManager.cs" />
     <Compile Include="Assets\Networking\PlayerManager.cs" />
     <Compile Include="Assets\Joystick Pack\Scripts\Base\Joystick.cs" />
+    <Compile Include="Assets\Entities\Items\Scripts\BandagePickup.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\UI\Bar.cs" />
     <Compile Include="Assets\Entities\Effects\DamageNums\Scripts\DamageNumManager.cs" />
     <Compile Include="Assets\UI\Scoreboard\Scripts\ScoreboardManager.cs" />
@@ -80,6 +82,7 @@
     <Compile Include="Assets\Entities\Player\Scripts\UI\StatsBar.cs" />
     <Compile Include="Assets\UI\Main Menu\Buttons\Scripts\MenuButton.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Movement\Networking\NonLocalPlayerAnimations.cs" />
+    <Compile Include="Assets\UI\TextInputValidator.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Gun\IGun.cs" />
     <Compile Include="Assets\Networking\GameServer\ClientServer.cs" />
     <Compile Include="Assets\_Maps\RespawnPoints\RespawnPoint.cs" />
@@ -96,6 +99,7 @@
     <Compile Include="Assets\Audio\Scripts\AudioTrack.cs" />
     <Compile Include="Assets\UI\IgnoreParentRotation.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Camera\DetachFromParent.cs" />
+    <Compile Include="Assets\Entities\Player\Scripts\Gun\ILocalPlayerGun.cs" />
     <Compile Include="Assets\UI\KillFeed\KillFeedUI.cs" />
     <Compile Include="Assets\Networking\Client.cs" />
     <Compile Include="Assets\UI\Main Menu\Buttons\Scripts\MenuButtonManager.cs" />
@@ -122,6 +126,7 @@
     <Compile Include="Assets\Networking\GameServer\DiscoveryTCPClientServer.cs" />
     <Compile Include="Assets\_Maps\MainManager.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Gun\MuzzelFlash.cs" />
+    <Compile Include="Assets\Entities\Items\Scripts\PickupItemsManager.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Gun\LocalPlayerGun.cs" />
     <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\ManualServerEntry.cs" />
     <Compile Include="Assets\Networking\ThreadManager.cs" />
@@ -132,24 +137,27 @@
     <Compile Include="Assets\Entities\Player\Scripts\Movement\Networking\LocalPlayerAnimations.cs" />
     <Compile Include="Assets\Networking\DiscoveryTCPClient.cs" />
     <Compile Include="Assets\Networking\GameServer\ServerProgram.cs" />
+    <Compile Include="Assets\Entities\Items\Scripts\MedkitPickup.cs" />
     <Compile Include="Assets\Entities\Walking\InheritedScripts\IWalking.cs" />
     <Compile Include="Assets\Networking\GameServer\Server.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Gun\NonLocalPlayerGun.cs" />
     <Compile Include="Assets\Networking\GameServer\DiscoveryServer.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Gun\Bullet.cs" />
     <Compile Include="Assets\Networking\LANDiscoveryClient.cs" />
+    <Compile Include="Assets\UI\Main Menu\MoveBackground.cs" />
     <Compile Include="Assets\UI\IUIItemListing.cs" />
     <Compile Include="Assets\Networking\GameServer\GameLogic.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Movement\Networking\LocalPlayerMovement.cs" />
+    <Compile Include="Assets\Entities\Items\Scripts\HealthPickup.cs" />
     <Compile Include="Assets\Networking\LANServerScanner.cs" />
     <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\TabGroupPages.cs" />
     <Compile Include="Assets\UI\Main Menu\Buttons\Scripts\MainMenuButton.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Health\TypeOfDeath.cs" />
+    <Compile Include="Assets\UI\PauseMenu\Scripts\SpinningBallsLoading.cs" />
     <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\PlayerRegistration.cs" />
     <Compile Include="Assets\UI\PauseMenu\Scripts\PauseManager.cs" />
-    <Compile Include="Assets\UI\Main Menu\MoveBackground.cs" />
-    <Compile Include="Assets\Entities\Player\Scripts\Gun\ILocalPlayerGun.cs" />
-    <Compile Include="Assets\UI\TextInputValidator.cs" />
+    <Compile Include="Assets\Networking\Host\HostStateManager.cs" />
+    <Compile Include="Assets\Networking\Host\HostClient.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />

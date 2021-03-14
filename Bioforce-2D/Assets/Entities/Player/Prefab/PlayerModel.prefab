@@ -274,6 +274,10 @@ MonoBehaviour:
   WasHit: {fileID: 8300000, guid: 94fa3b922edabb0429eec3511399ac6c, type: 3}
   DieBullet: {fileID: 8300000, guid: 4e9e3e1e7d17f474b95f14b92694435a, type: 3}
   DieFall: {fileID: 8300000, guid: a1cde94858136374fb8924b2867c8439, type: 3}
+  PickupBandage:
+  - {fileID: 8300000, guid: ebaae5c18cd5ccc48af3ffa7e4cd49ea, type: 3}
+  PickupMedkit:
+  - {fileID: 8300000, guid: 9862f60787a965d4990af86714c83ad1, type: 3}
 --- !u!82 &1981908882278247658
 AudioSource:
   m_ObjectHideFlags: 0

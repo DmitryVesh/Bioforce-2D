@@ -17,13 +17,13 @@ public class GameManager : MonoBehaviour
 
     public delegate void PlayerDisconnected (int iD, string username);
     public event PlayerDisconnected OnPlayerDisconnected;
-    private bool ShouldLoadMainMenu { get; set; }
 
     public bool IsMobileSupported { get; private set; }
     public bool InGame { get; set; }
 
     public delegate void OnPause(bool pause);
     public event OnPause OnPauseEvent;
+    public event OnPause OnLostConnectionEvent;
     public bool Paused { get; private set; } = false;
 
     public static void ConfyMouse() =>
@@ -35,6 +35,10 @@ public class GameManager : MonoBehaviour
     {
         Paused = pause;
         OnPauseEvent?.Invoke(pause);
+    }
+    public void InvokeLostConnectionEvent(bool lostConnection)
+    {
+        OnLostConnectionEvent?.Invoke(lostConnection);
     }
 
     private void Awake()
@@ -66,22 +70,6 @@ public class GameManager : MonoBehaviour
         if (!IsMobileSupported && Input.GetButtonDown("Pause"))
             return true;
         return false;
-    }
-
-    private void FixedUpdate()
-    {
-        if (ShouldLoadMainMenu)
-        {
-            foreach (PlayerManager player in PlayerDictionary.Values)
-            {
-                ScoreboardManager.Instance.DeleteEntry(player.ID);
-                player.Disconnect();
-            }
-            PlayerDictionary.Clear();
-
-            SceneManager.LoadScene("Main Menu");
-            ShouldLoadMainMenu = false;
-        }
     }
 
     public void SpawnPlayer(int iD, string username, Vector3 position, bool isFacingRight, bool isDead, bool justJoined, int maxHealth, int currentHealth, Color playerColor)
@@ -155,12 +143,21 @@ public class GameManager : MonoBehaviour
             Debug.Log($"Error in Disconnecting Player: {disconnectedPlayer}...\n{exception}");
         }
     }
-    public void DisconnectAllPlayers()
+    public void DisconnectLoadMainMenu()
     {
-        Debug.Log($"All players are being disconnected.");
-        //Return to MainMenu
-        ShouldLoadMainMenu = true;
-        InGame = false;
+        ThreadManager.ExecuteOnMainThread(() =>
+        {
+            Debug.Log($"All players are being disconnected.");
+            foreach (PlayerManager player in PlayerDictionary.Values)
+            {
+                ScoreboardManager.Instance.DeleteEntry(player.ID);
+                player.Disconnect();
+            }
+            PlayerDictionary.Clear();
+
+            SceneManager.LoadScene("Main Menu");
+        });
+        
     }
     public void PlayerDied(int playerKilledDiedID, int bulletOwnerID, TypeOfDeath typeOfDeath)
     {

@@ -36,7 +36,6 @@ namespace GameServer
             try
             {
                 bool isFacingRight = packet.ReadBool();
-                //TODO: Change position to be vector2
                 Vector2 position = packet.ReadVector2();
                 Vector2 velocity = packet.ReadVector2();
                 //Sometimes System.NullReferenceException when a player disconnects

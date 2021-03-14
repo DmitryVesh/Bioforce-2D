@@ -58,7 +58,14 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         handle.anchoredPosition = Vector2.zero;
 
         GameManager.Instance.OnPauseEvent += OnGamePaused;
+        GameManager.Instance.OnLostConnectionEvent += OnGamePaused;
     }
+    private void OnDestroy()
+    {
+        GameManager.Instance.OnPauseEvent -= OnGamePaused;
+        GameManager.Instance.OnLostConnectionEvent -= OnGamePaused;
+    }
+
     private void OnGamePaused(bool pause)
     {
         CanAim = !pause;
@@ -146,11 +153,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         handle.anchoredPosition = Vector2.zero;
     }
 
-    private void OnDestroy()
-    {
-        GameManager.Instance.OnPauseEvent -= OnGamePaused;
-    }
-
+    
     protected Vector2 ScreenPointToAnchoredPosition(Vector2 screenPosition)
     {
         Vector2 localPoint = Vector2.zero;

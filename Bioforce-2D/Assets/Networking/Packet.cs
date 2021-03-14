@@ -48,7 +48,9 @@ public enum ServerPackets
     tookDamage,
     serverIsFull,
     armPositionRotation,
-    playerPausedGame
+    playerPausedGame,
+    stillConnected,
+    shouldHost
 }
 
 /// <summary>Sent from client to server.</summary>
@@ -63,7 +65,8 @@ public enum ClientPackets
     playerRespawned,
     tookDamage,
     armPositionRotation,
-    pausedGame
+    pausedGame,
+    stillConnnected
 }
 
 public class Packet : IDisposable

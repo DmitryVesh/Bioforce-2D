@@ -126,12 +126,13 @@ namespace GameServer
             }
         }
 
+        
+
         internal static void PlayerPausedGame(int clientID, Packet packet)
         {
             try
             {
                 bool paused = packet.ReadBool();
-                Server.ClientDictionary[clientID].Player.SetPaused(paused);
 
                 ServerSend.PlayerPausedGame(clientID, paused);
 
@@ -139,6 +140,19 @@ namespace GameServer
             catch (Exception exception)
             {
                 Console.WriteLine($"\tError, trying to read PausedGame, from player: {clientID}\n{exception}");
+            }
+        }
+
+        internal static void PlayerStillConnected(int clientID, Packet packet)
+        {
+            try
+            {
+                Server.ClientDictionary[clientID].Player.LastPacketReceived(DateTime.Now.TimeOfDay);
+                ServerSend.PlayerConnectedAckn(clientID);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"\tError, trying to read PlayerStillConnected, from player: {clientID}\n{exception}");
             }
         }
 

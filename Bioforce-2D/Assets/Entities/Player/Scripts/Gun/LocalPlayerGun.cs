@@ -34,6 +34,12 @@ public class LocalPlayerGun : NonLocalPlayerGun, ILocalPlayerGun
     {
         base.Start();
         GameManager.Instance.OnPauseEvent += SetCanShootAndAim;
+        GameManager.Instance.OnLostConnectionEvent += SetCanShootAndAim;
+    }
+    private void OnDestroy()
+    {
+        GameManager.Instance.OnPauseEvent -= SetCanShootAndAim;
+        GameManager.Instance.OnLostConnectionEvent -= SetCanShootAndAim;
     }
 
     protected virtual bool IsPlayerTryingToShoot()

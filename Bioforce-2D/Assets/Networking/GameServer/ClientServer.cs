@@ -206,7 +206,6 @@ namespace GameServer
         }
         private void Disconnect()
         {
-            //TODO: crashes when 2 players disconnect simultaneously, or stops receiving packets from players
             Debug.Log($"Player: {ID} has disconnected. {tCP.Socket.Client.RemoteEndPoint}");
             ServerSend.DisconnectPlayer(ID);
             

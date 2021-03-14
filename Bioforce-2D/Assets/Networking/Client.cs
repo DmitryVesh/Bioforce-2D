@@ -18,7 +18,7 @@ public class Client : MonoBehaviour
     public const string InternetMainServerIP = "18.130.250.31";
     //public const string InternetMainServerIP = "127.0.0.1";
 
-    public int ClientID = 0;
+    public int ClientID { get; set; } = 0;
     public TCP tCP { get; set; }
     public UDP uDP { get; set; }
 
@@ -29,7 +29,11 @@ public class Client : MonoBehaviour
     private float TimerTimeOutTime = 10;
     private bool TimerRunning { get; set; } = false;
     private float Timer { get; set; }
-    
+
+    private TimeSpan PacketTimeOut { get; set; } 
+    private TimeSpan PacketPause { get; set; }
+    private TimeSpan TimeSpanZero { get; set; } = new TimeSpan(0, 0, 0);
+    private bool LastLostConnection { get; set; }
 
     public static bool IsIPAddressValid(string text)
     {
@@ -82,13 +86,11 @@ public class Client : MonoBehaviour
             {
                 Debug.Log($"Error, tried to close TCP and UDP sockets:\n{exception}");
             }
-            ServerMenu.Disconnected();
             Connected = false;
 
             Debug.Log($"You, client: {ClientID} have been disconnected.");
 
-            GameManager.Instance.DisconnectAllPlayers();
-
+            GameManager.Instance.DisconnectLoadMainMenu();
         }
     }
     public void SuccessfullyConnected(int assignedID)
@@ -96,6 +98,7 @@ public class Client : MonoBehaviour
         Connected = true;
         ResetTimeOutTimer(false);
         ClientID = assignedID;
+        PlayerConnectedAckn(DateTime.Now.TimeOfDay);
     }
 
     public class TCP
@@ -156,7 +159,7 @@ public class Client : MonoBehaviour
                 int byteLen = Stream.EndRead(asyncResult);
                 if (byteLen <= 0)
                 {
-                    Instance.Disconnect();
+                    Disconnect();
                     return;
                 }
 
@@ -236,6 +239,7 @@ public class Client : MonoBehaviour
             
         }
     }
+
     public class UDP
     {
         public UdpClient Socket;
@@ -326,6 +330,28 @@ public class Client : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        if (Connected)
+        {
+            ClientSend.PlayerConnectedPacket();
+
+            TimeSpan now = DateTime.Now.TimeOfDay;
+
+            if (PacketTimeOut - now < TimeSpanZero)
+            {
+                //TODO: add message when disconnected because of a time out
+                Debug.LogError("Lost connection with MainServer");
+                Disconnect();
+                return;
+            }
+
+            bool lostConnection = PacketPause - now < TimeSpanZero;
+            if (LastLostConnection != lostConnection)
+            {
+                GameManager.Instance.InvokeLostConnectionEvent(lostConnection);
+                LastLostConnection = lostConnection;
+            }
+        }
+
         if (TimerRunning)
             Timer += Time.fixedDeltaTime;
         else
@@ -337,7 +363,13 @@ public class Client : MonoBehaviour
             ConnectionTimedOut();
         }
     }
-    
+
+    public void PlayerConnectedAckn(TimeSpan timeOfDay)
+    {
+        PacketTimeOut = timeOfDay + new TimeSpan(0, 0, 10);
+        PacketPause = timeOfDay + new TimeSpan(0, 0, 2);
+    }
+
     private void ResetTimeOutTimer(bool runTimer = true)
     {
         TimerRunning = runTimer;
@@ -380,6 +412,8 @@ public class Client : MonoBehaviour
         PacketHandlerDictionary.Add((int)ServerPackets.serverIsFull, ClientRead.ServerIsFull);
         PacketHandlerDictionary.Add((int)ServerPackets.armPositionRotation, ClientRead.ArmPositionRotation);
         PacketHandlerDictionary.Add((int)ServerPackets.playerPausedGame, ClientRead.PlayerPausedGame);
+        PacketHandlerDictionary.Add((int)ServerPackets.stillConnected, ClientRead.PlayerStillConnected);
+        PacketHandlerDictionary.Add((int)ServerPackets.shouldHost, ClientRead.SetHostClient);
     }
        
 }

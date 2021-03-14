@@ -147,11 +147,6 @@ public class ServerMenu : MonoBehaviour
         Instance.ServerConnectionErrorPanel.SetActive(true);
         Instance.ServerMenuPanel.SetActive(false);
     }
-    public static void Disconnected()
-    {
-        if (Instance != null)
-            Instance.ServerMenuPanel.SetActive(true);
-    }
 
     public void OnServerConnectionErrorPanelContinuePressed()
     {
@@ -161,7 +156,6 @@ public class ServerMenu : MonoBehaviour
     public void OnConnectButtonPressed()
     {        
         ServerMenuPanel.SetActive(false);
-        //TODO: Deal when the player count is full, e.g. 10/10 players
         if (SelectedManualEntry) //TODO: Make so Discovery tcp client is made to check out the ip address
             ServerConnectionTimeOut();
         else

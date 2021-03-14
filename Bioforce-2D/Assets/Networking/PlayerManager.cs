@@ -11,6 +11,7 @@ public class PlayerManager : MonoBehaviour
     public Color PlayerColor { get; private set; }
 
     public Vector2 RespawnPosition { get; set; }
+
     public GameObject PlayerModelObject { get; private set; }
     [SerializeField] private TextMeshProUGUI UsernameText;
 
@@ -31,20 +32,29 @@ public class PlayerManager : MonoBehaviour
     public delegate void PlayerTookDamage(int damage, int currentHealth);
     public event PlayerTookDamage OnPlayerTookDamage;
 
-    public delegate void Vector2andQuaternion(Vector2 position, Quaternion rotation);
-    public event Vector2andQuaternion OnPlayerShot;
+    public delegate void PositionAndRotation(Vector2 position, Quaternion rotation);
+    public event PositionAndRotation OnPlayerShot;
     
     public event NoParams OnPlayerJumped;
 
-    public delegate void PlayerPosition(Vector2 position);
-    public event PlayerPosition OnPlayerPosition;
-    public delegate void PlayerRotation(Quaternion rotation);
-    public event PlayerRotation OnPlayerRotation;
+    public delegate void Position(Vector2 position);
+    public event Position OnPlayerPosition;
+    public delegate void Rotation(Quaternion rotation);
+    public event Rotation OnPlayerRotation;
 
-    public event Vector2andQuaternion OnArmPositionRotation;
+    public event PositionAndRotation OnArmPositionRotation;
 
     public delegate void Bool(bool boolean);
     public event Bool OnPlayerPaused;
+
+    public delegate void Int(int integer);
+    public event Int OnPlayerPickupBandage;
+    public event Int OnPlayerPickupMedkit;
+
+    internal void BandagePickup(int restoreHealth) =>
+        OnPlayerPickupBandage?.Invoke(restoreHealth);
+    internal void MedkitPickup(int restoreHealth) =>
+        OnPlayerPickupMedkit?.Invoke(restoreHealth);
 
     public string GetUsername() =>
         Username;
@@ -87,12 +97,9 @@ public class PlayerManager : MonoBehaviour
         OnPlayerPosition?.Invoke(position); 
     public void SetRotation(Quaternion rotation) =>
         OnPlayerRotation?.Invoke(rotation); 
-
         
-    
     public void Disconnect() =>
         Destroy(gameObject);
-
 
     public void CallOnBulletShotEvent(Vector2 position, Quaternion rotation) =>
         OnPlayerShot?.Invoke(position, rotation);
@@ -109,7 +116,6 @@ public class PlayerManager : MonoBehaviour
         PlayerColor = playerColor;
         UsernameText.color = PlayerColor;
     }
-
     private void SetUsername(string username) =>
         UsernameText.text = username;
 
@@ -118,10 +124,9 @@ public class PlayerManager : MonoBehaviour
         DamageNumManager.Instance.Create(PlayerModelObject.transform.position, damage, PhysicsHelper.RandomBool());
         OnPlayerTookDamage?.Invoke(damage, currentHealth);
     }
-
     internal void SetArmPositionRotation(Vector2 position, Quaternion rotation) =>
         OnArmPositionRotation?.Invoke(position, rotation);
-
     internal void SetPlayerPaused(bool paused) =>
         OnPlayerPaused?.Invoke(paused);
+
 }

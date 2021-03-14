@@ -15,18 +15,24 @@ Main goals is to;
 	1 Make 1 server always be present, with no timeout called Welcome
 
 	1 Make so the player name/server name can not have swear words in them.
-	0 Make client sided timeout when haven't received data from the GameServer in x amount of time
+	1 Make client sided timeout when haven't received data from the GameServer in x amount of time
+	1 Make so when the Welcome/persistent server crashes, make a new 1
+
 	0 Add health pickups
+
 	0 Add adrenaline pickup
 	0 Make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+	0 Remove any references to Ping Server values
+	0 Remove Manual Server Entry
 
 Future tasks;	
 		
-	version 0.5.7.5
+	version 0.6.1
+		Delete all GameServer Code in Unity project
 		Add invincibility frames, after being hit/respawning
 		Add trail effects when a player sprints, so can clearly see player sprinting, also maybe zoom camera out a little bit...
 		Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard
-	version 0.5.7.6
+	version 0.6.2
 		add breathing camera movement when player is idle, going up and down.
 		using cinemachine add impulses, fast small camera movements in specific directions, for:
 			Player Getting shot
@@ -34,10 +40,10 @@ Future tasks;
 			Player jumping
 			Player running
 		Make so when the player is down the collisions are not occuring when shot
-	version 0.5.7.7
+	version 0.6.3
 		Make the scoreboard reuse scoreboard entries, instead of destroying them, when a player disconnects.
 		Allow players to choose their own colour
-	version 0.5.7.8
+	version 0.6.4
 		Add tutorial level into game
 
 	Add chat into game

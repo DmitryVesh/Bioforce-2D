@@ -182,4 +182,15 @@ public class ClientRead : MonoBehaviour
             Debug.Log($"Player's: {iD} PlayerPausedGame caused an error.\n{exception}");
         }
     }
+
+    internal static void PlayerStillConnected(Packet packet)
+    {
+        Client.Instance.PlayerConnectedAckn(DateTime.Now.TimeOfDay);
+    }
+
+    internal static void SetHostClient(Packet packet)
+    {
+        bool shouldHost = packet.ReadBool();
+        HostClient.Instance.Host(shouldHost);
+    }
 }

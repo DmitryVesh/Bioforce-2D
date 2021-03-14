@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ClientSend : MonoBehaviour
@@ -75,7 +73,6 @@ public class ClientSend : MonoBehaviour
             SendTCPPacket(packet);
         }        
     }
-
     public static void TookDamage(int damage, int currentHealth)
     {
         Packet packet = new Packet((int)ClientPackets.tookDamage);
@@ -84,12 +81,20 @@ public class ClientSend : MonoBehaviour
 
         SendTCPPacket(packet);
     }
+
     internal static void PausedGame(bool paused)
     {
         using (Packet packet = new Packet((int)ClientPackets.pausedGame))
         {
             packet.Write(paused);
 
+            SendTCPPacket(packet);
+        }
+    }
+    internal static void PlayerConnectedPacket()
+    {
+        using (Packet packet = new Packet((int)ClientPackets.stillConnnected))
+        {
             SendTCPPacket(packet);
         }
     }

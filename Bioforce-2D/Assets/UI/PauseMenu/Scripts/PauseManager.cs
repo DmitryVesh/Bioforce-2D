@@ -9,6 +9,7 @@ public class PauseManager : MonoBehaviour
     public static PauseManager Instance { get; set; }
     public bool Paused { get; set; }
 
+
     [SerializeField] private TextMeshProUGUI TitleText;
 
     [SerializeField] private Menu MenuPause;
@@ -22,18 +23,31 @@ public class PauseManager : MonoBehaviour
     private bool ClickedOdd { get; set; }
     [SerializeField] private GameObject MobileSettingsButton;
 
-    internal static void SetActive(bool active)
+    [SerializeField] private GameObject LostConnectionPanel;
+    [SerializeField] private GameObject NormalPausePanel;
+
+    internal void SetNormalPauseActive(bool active)
     {
-        Instance.Paused = active;
-        Instance.Panel.SetActive(active);
+        Paused = active;
+        Panel.SetActive(active);
+
+        NormalPausePanel.SetActive(active);
+        LostConnectionPanel.SetActive(false);
+
         if (GameManager.Instance.IsMobileSupported)
-            Instance.MobileSettingsButton.SetActive(!active);
+            MobileSettingsButton.SetActive(!active);
 
         if (active)
         {
-            Instance.DeactivateAllMenus();
-            Instance.ActivateMenu(Instance.MenuPause);
-        }
+            DeactivateAllMenus();
+            ActivateMenu(Instance.MenuPause);
+        }        
+    }
+    internal void SetLostonnectionPause(bool lostConnection)
+    {
+        Panel.SetActive(Paused || lostConnection);
+        NormalPausePanel.SetActive(Paused && !lostConnection);
+        LostConnectionPanel.SetActive(lostConnection);
     }
     public void OnMobileSettings()
     {
@@ -85,13 +99,19 @@ public class PauseManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        SetActive(false);
+        SetNormalPauseActive(false);
         MobileSettingsButton.SetActive(GameManager.Instance.IsMobileSupported);
 
     }
     private void Start()
     {
-        GameManager.Instance.OnPauseEvent += SetActive;
+        GameManager.Instance.OnPauseEvent += SetNormalPauseActive;
+        GameManager.Instance.OnLostConnectionEvent += SetLostonnectionPause;
+    }
+    private void OnDestroy()
+    {
+        GameManager.Instance.OnPauseEvent -= SetNormalPauseActive;
+        GameManager.Instance.OnLostConnectionEvent -= SetLostonnectionPause;
     }
 
 }

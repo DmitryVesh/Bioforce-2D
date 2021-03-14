@@ -43,24 +43,6 @@ public class PlayerRegistration : MonoBehaviour
         PlayerModelUsernameText.text = inputField;
         OKMenuButton.Interactable = IsUsernameValid;
     }
-    //TODO: Test on android, on my iOS device when click on inputField, it auto opens a keyboard for me...
-    //So might be useless.
-    /*
-    public void OnUsernameInputFieldSelect()
-    {
-        if (MobileUsernameInputKeyboard != null)
-        {
-            MobileUsernameInputKeyboard.active = true;
-        }
-    }
-    public void OnUsernameInputFieldDeselect()
-    {
-        if (MobileUsernameInputKeyboard != null)
-        {
-            MobileUsernameInputKeyboard.active = false;
-        }
-    }
-    */
     public void SavePlayerUsername() =>
         PlayerPrefs.SetString("Username", UsernameInputField.text);
     public void HideUserRegistration() =>

@@ -80,7 +80,26 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
         PlayerManager = GameManager.PlayerDictionary[OwnerClientID];
         PlayerManager.OnPlayerTookDamage += TookDamage;
         PlayerManager.OnPlayerRespawn += ResetHealth;
+
+        PlayerManager.OnPlayerPickupMedkit += PickupHealth;
+        PlayerManager.OnPlayerPickupBandage += PickupHealth;
     }
+    private void OnDestroy()
+    {
+        PlayerManager.OnPlayerTookDamage -= TookDamage;
+        PlayerManager.OnPlayerRespawn -= ResetHealth;
+
+        PlayerManager.OnPlayerPickupMedkit -= PickupHealth;
+        PlayerManager.OnPlayerPickupBandage -= PickupHealth;
+    }
+
+    private void PickupHealth(int restoreHealth)
+    {
+        CurrentHealth += restoreHealth;
+        if (CurrentHealth > MaxHealth)
+            CurrentHealth = MaxHealth;
+    }
+
     private IEnumerator WaitBeforeRespawning()
     {
         yield return new WaitForSeconds(PlayerManager.DeadTime);

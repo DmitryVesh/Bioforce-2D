@@ -14,6 +14,7 @@ namespace GameServer
         private static int DataBufferSize { get; set; } = 4096;
 
         public PlayerServer Player { get; private set; }
+        private bool Disconnected { get; set; } = false;
 
         public ClientServer(int iD)
         {
@@ -120,7 +121,6 @@ namespace GameServer
                             {
                                 int packetId = packet.ReadInt();
                                 Server.PacketHandlerDictionary[packetId](ID, packet);
-                                Server.ClientDictionary[ID].Player.LastPacketReceived(DateTime.Now.TimeOfDay);
                             }
                             catch (Exception exception)
                             {
@@ -246,6 +246,8 @@ namespace GameServer
                 tCP.Disconnect();
                 uDP.Disconnect();
                 Player = null;
+
+                Disconnected = true;
             }
             catch (Exception exception)
             {
@@ -253,4 +255,5 @@ namespace GameServer
             }
         }
     }
+
 }
