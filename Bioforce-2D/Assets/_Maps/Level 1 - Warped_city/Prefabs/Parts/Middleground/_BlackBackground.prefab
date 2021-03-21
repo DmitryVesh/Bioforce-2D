@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7377198176522092919}
   - component: {fileID: 7730870900953599370}
   - component: {fileID: -5244291130746553288}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: _BlackBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -38,7 +38,7 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
     // SpeedX which is found in moving in X direction Data
     // runSpeed used to know when to switch from normal running animation to sprinting animation
     private bool Jumped { get; set; } = false; // Used to identify when player has jumped, for LocalPlayerAnimations
-    
+
     public float GetMaxStamina() =>
         MaxStamina;
     public float GetCurrentStamina() =>
@@ -130,10 +130,10 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
         if (JumpPressed) { fJumpPressedRemember = FJumpPressedRememberTime; } //Reseting jump remember timer when player tries to jump
         if (GetJumpInputReleased()) // When a player releases the Jump key
         {
-            Vector2 velocity = rb.velocity;
+            Vector2 velocity = RigidBody.velocity;
             if (velocity.y > 0) // If player is still going up
             { 
-                rb.velocity = new Vector2(velocity.x, velocity.y * FCutJumpHeight); // Decreases the y axis up velocity, so player stops moving up faster
+                RigidBody.velocity = new Vector2(velocity.x, velocity.y * FCutJumpHeight); // Decreases the y axis up velocity, so player stops moving up faster
             }
         }
 
@@ -151,11 +151,11 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
             currentNumJumps--; // Decriment jumps available
         }
 
-        Physics2D.IgnoreLayerCollision(gameObject.layer, PlatformLayer, rb.velocity.y > 0.0f || GetVerticalInput() < -0.5);
+        Physics2D.IgnoreLayerCollision(gameObject.layer, PlatformLayer, RigidBody.velocity.y > 0.0f || GetVerticalInput() < -0.5);
     }
     private void PlayerJump()
     {
-        rb.velocity = new Vector2(rb.velocity.x, JumpForce);
+        RigidBody.velocity = new Vector2(RigidBody.velocity.x, JumpForce);
         Jumped = true;
         PlayerManager.CallOnPlayerJumpedEvent();
     }
@@ -164,9 +164,9 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
     {
         base.FixedUpdate();
 
-        Vector2 velocity = new Vector2(SpeedX, rb.velocity.y);
+        Vector2 velocity = new Vector2(SpeedX, RigidBody.velocity.y);
         if (CanMove)
-            rb.velocity = velocity; // Applying movement in x direction, SpeedX calculated in Update, calculated in Update in order to increase responsiveness, applied in FixedUpdate to keep physics interaction reliable
+            RigidBody.velocity = velocity; // Applying movement in x direction, SpeedX calculated in Update, calculated in Update in order to increase responsiveness, applied in FixedUpdate to keep physics interaction reliable
         SendMovesToServer(velocity);
     }
 
@@ -178,13 +178,13 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
     protected override void UnFreezeMotion()
     {
         CanMove = true;
-        rb.bodyType = RigidbodyType2D.Dynamic;
+        RigidBody.bodyType = RigidbodyType2D.Dynamic;
     }
     private void SetRespawnPointLocation()
     {
         ModelObject.transform.position = RespawnPoint.GetRandomSpawnPoint(ModelObject.transform.position);
         PlayerManager.RespawnPosition = ModelObject.transform.position;
-        rb.velocity.Set(0, 0);
+        RigidBody.velocity.Set(0, 0);
     }
     protected override void PlayerCanMoveAndCanBeHit()
     {

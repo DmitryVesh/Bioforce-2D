@@ -33,7 +33,17 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
         PlayerManager.OnPlayerPosition += PlayerPosition;
         PlayerManager.OnPlayerRotation += PlayerRotation;
 
+        GameManager.Instance.OnLostConnectionEvent += PlayerCantMoveWhenPaused;
+
         PlayerCanMoveAndCanBeHit();
+    }
+
+    private void PlayerCantMoveWhenPaused(bool pause)
+    {
+        if (pause)
+            FreezeMotion();
+        else
+            UnFreezeMotion();
     }
 
     private void PlayerPosition(Vector2 position)
@@ -65,6 +75,7 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
     private void PlayerCantMoveAndCantBeHit(TypeOfDeath typeOfDeath)
     {
         Hitbox.enabled = false;
+        RigidBody.simulated = false;
         FreezeMotion();
     }
     protected virtual void PlayerCanMoveAndCanBeHit()
@@ -76,6 +87,7 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
         yield return new WaitForSeconds(PlayerManager.RespawnTime);
         UnFreezeMotion();
         Hitbox.enabled = true;
+        RigidBody.simulated = true;
     }
     
     private void OnDestroy()

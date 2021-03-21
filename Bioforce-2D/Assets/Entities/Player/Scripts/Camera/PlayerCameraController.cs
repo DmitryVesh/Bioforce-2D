@@ -19,6 +19,10 @@ public class PlayerCameraController : MonoBehaviour
     [SerializeField] private float MaxX = 3f;
     [SerializeField] private float MaxY = 2f;
 
+    [SerializeField] protected CinemachineImpulseSource ShootImpulse;
+    [SerializeField] protected CinemachineImpulseSource HitImpulse;
+    [SerializeField] protected CinemachineImpulseSource JumpImpulse;
+
     private void Awake()
     {
         CameraConfiner = CinemachineCamera.GetComponent<CinemachineConfiner>();
@@ -32,12 +36,26 @@ public class PlayerCameraController : MonoBehaviour
         PlayerManager = GameManager.PlayerDictionary[Client.Instance.ClientID];
         PlayerManager.OnPlayerRespawn += ResetCamera;
 
+        PlayerManager.OnPlayerShot += GenerateShootImpulse;
+        PlayerManager.OnPlayerJumped += GenerateJumpedImpulse;
+        PlayerManager.OnPlayerTookDamage += GenerateHitImpulse;
+
         PlayerGun = GetComponent<ILocalPlayerGun>();
         OnMobile = PlayerGun != null;
         PlayerTransform = PlayerManager.PlayerModelObject.transform;
 
         AimFollow.parent = null; //Detach object
     }
+
+    private void GenerateHitImpulse(int damage, int currentHealth) =>
+        HitImpulse.GenerateImpulse();
+
+    private void GenerateJumpedImpulse() =>
+        JumpImpulse.GenerateImpulse();
+
+    private void GenerateShootImpulse(Vector2 position, Quaternion rotation) =>
+        ShootImpulse.GenerateImpulse();
+
     private void Update()
     {
         Vector2 aimingVector = PlayerGun.GetAimingVector();

@@ -8,6 +8,8 @@ public class AudioTrack
     public float Volume;
 
     public bool Loop;
-    public bool Fade;
-    public float FadeTime;
+    public bool FadeIn;
+    public bool FadeOut;
+    public float FadeInTime;
+    public float FadeOutTime;
 }

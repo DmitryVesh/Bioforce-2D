@@ -1,5 +1,5 @@
 ===============================================================================================================================
-Version 0.5.7.4
+Version 1.0.0
 ---------------
 
 Summary
@@ -18,21 +18,28 @@ Main goals is to;
 	1 Make client sided timeout when haven't received data from the GameServer in x amount of time
 	1 Make so when the Welcome/persistent server crashes, make a new 1
 
-	0 Add health pickups
+	1 Add temporary hit screen
+	1 Add permanent health damage screen
+	1 Add camera shake when getting hit
+	1 Add camera shake when shooting
+	1 Add camera shake when jumping
 
-	0 Add adrenaline pickup
-	0 Make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
-	0 Remove any references to Ping Server values
-	0 Remove Manual Server Entry
-
+	1 Add different music - White Bat Audio
+	1 Make About Screen giving credit to asset makers like Music - White Bat Audio
+	1 Add particle effects to bullets hitting collider
 Future tasks;	
-		
-	version 0.6.1
+	version 1.0.1
+		Add health pickups
+		Add adrenaline pickup
+		Make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+		Remove any references to Ping Server values
+		Remove Manual Server Entry
+	version 1.0.2
 		Delete all GameServer Code in Unity project
 		Add invincibility frames, after being hit/respawning
 		Add trail effects when a player sprints, so can clearly see player sprinting, also maybe zoom camera out a little bit...
 		Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard
-	version 0.6.2
+	version 1.0.3
 		add breathing camera movement when player is idle, going up and down.
 		using cinemachine add impulses, fast small camera movements in specific directions, for:
 			Player Getting shot
@@ -40,10 +47,11 @@ Future tasks;
 			Player jumping
 			Player running
 		Make so when the player is down the collisions are not occuring when shot
-	version 0.6.3
+		Add heartbeat sound effects when low on health, increases with volume as player gets more damaged, similar to permanent damage overlay Alpha var
+	version 1.0.4
 		Make the scoreboard reuse scoreboard entries, instead of destroying them, when a player disconnects.
 		Allow players to choose their own colour
-	version 0.6.4
+	version 1.0.5
 		Add tutorial level into game
 
 	Add chat into game

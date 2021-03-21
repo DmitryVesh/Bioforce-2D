@@ -23,7 +23,8 @@ public class PickupItemsManager : HostStateManager
     private Queue<PickupItem> PickupsAvailable { get; set; } = new Queue<PickupItem>();
     private Dictionary<int, PickupItem> PickupsDictionary { get; set; } = new Dictionary<int, PickupItem>();
     private int NumPickupsExistedCount { get; set; } = 0;
-    [SerializeField] Queue<Transform> SpawnLocations; //TODO: 9000 Decide if want a Queue or random system...
+    [SerializeField] List<Transform> SpawnLocations;
+
 
     private void Awake()
     {

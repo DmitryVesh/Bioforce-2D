@@ -13,7 +13,7 @@ public abstract class EntityWalking : MonoBehaviour, IWalking
 
     // References to other scripts
     protected GameObject ModelObject { get; set; } // The gameObject that holds the components of the entity
-    protected Rigidbody2D rb { get; set; } // Used to add force in x and y directions, corresponding to input
+    protected Rigidbody2D RigidBody { get; set; } // Used to add force in x and y directions, corresponding to input
     protected CapsuleCollider2D Hitbox { get; set; } // Used to determine if player is grounded
 
     // Variables used for Animations
@@ -35,7 +35,7 @@ public abstract class EntityWalking : MonoBehaviour, IWalking
     protected virtual void Awake()
     {
         ModelObject = transform.GetChild(0).gameObject;
-        rb = ModelObject.GetComponent<Rigidbody2D>();
+        RigidBody = ModelObject.GetComponent<Rigidbody2D>();
         Hitbox = ModelObject.GetComponent<CapsuleCollider2D>();
     }
     private void Start()
@@ -87,13 +87,13 @@ public abstract class EntityWalking : MonoBehaviour, IWalking
     protected void FreezeMotion()
     {
         CanMove = false;
-        rb.velocity.Set(0, 0);
-        rb.bodyType = RigidbodyType2D.Static;
+        RigidBody.velocity.Set(0, 0);
+        RigidBody.bodyType = RigidbodyType2D.Static;
     }
     protected virtual void UnFreezeMotion()
     {
         CanMove = true;
-        rb.bodyType = RigidbodyType2D.Kinematic;
+        RigidBody.bodyType = RigidbodyType2D.Kinematic;
     }
 
     public void LerpPosition()

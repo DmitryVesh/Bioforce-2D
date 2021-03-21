@@ -104,6 +104,5 @@ public class LocalPlayerGun : NonLocalPlayerGun, ILocalPlayerGun
         PlayerManager.CallOnBulletShotEvent(FirePointTransform.position, FirePointTransform.rotation);
         //base.ShootBullet(FirePointTransform.position, FirePointTransform.rotation);
         ClientSend.ShotBullet(FirePointTransform.position, FirePointTransform.rotation);
-        
     }
 }

@@ -15,7 +15,8 @@ public class ClientRead : MonoBehaviour
         Debug.Log($"Message from server:\n{message}");
         Client.Instance.SuccessfullyConnected(id);
         Client.Instance.uDP.Connect(((IPEndPoint)Client.Instance.tCP.Socket.Client.LocalEndPoint).Port);
-        SceneManager.LoadScene(mapName);
+
+        GameManager.Instance.SwitchScene(mapName);
 
         ClientSend.WelcomePacketReply();
 

@@ -20,6 +20,8 @@ public class Bullet : MonoBehaviour
     public CapsuleCollider2D Hitbox { get; private set; }
     private SpriteRenderer Sprite { get; set; }
     private Color BulletColor { get; set; }
+    private ParticleSystem ParticleSystem { get; set; }
+
 
     public bool IsAvailable()
     {
@@ -53,7 +55,9 @@ public class Bullet : MonoBehaviour
         Animator = GetComponent<Animator>();
         Hitbox = GetComponent<CapsuleCollider2D>();
         Sprite = GetComponent<SpriteRenderer>();
+        ParticleSystem = GetComponent<ParticleSystem>();
         gameObject.SetActive(false);
+        
 
     }
     private void FixedUpdate()
@@ -96,6 +100,7 @@ public class Bullet : MonoBehaviour
         Hitbox.enabled = false;
         CurrentTimeToLive = impactEffectTime;
         rb.bodyType = RigidbodyType2D.Static;
+        ParticleSystem.Play();
     }
     private void ResetBullet()
     {

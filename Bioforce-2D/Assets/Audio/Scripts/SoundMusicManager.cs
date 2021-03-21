@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -10,12 +11,24 @@ public class SoundMusicManager : MonoBehaviour
     private Transform AudioListenerTF { get; set; }
 
     private AudioSource MusicAudioSource { get; set; }
-    [SerializeField] private AudioTrack StartingMusic = null;
 
+    [SerializeField] private AudioTrack[] MainMenuMusic = null;
+    [SerializeField] private AudioTrack[] Level1Music = null;
+    private string MainMenu = "Main Menu";
+    private string Level1 = "Level 1";
+
+    private Dictionary<string, AudioTrack[]> ScenesMusic = new Dictionary<string, AudioTrack[]>();
+    
+    private Action OnMusicEndAction { get; set; }
+
+    private int[] CurrentSceneTracksOrder { get; set; }
+    private int CurrentSceneTracksOrderIndex { get; set; }
+    private string CurrentScene { get; set; }
     private AudioTrack CurrentAudioTrack { get; set; }
     private bool KeepFadingIn { get; set; }
     private bool KeepFadingOut { get; set; }
     private bool KeepLooping { get; set; }
+    
 
     [SerializeField] private AudioClip[] ButtonPressedSFXs;
     [SerializeField] private AudioClip[] ButtonSelectedSFXs;
@@ -60,8 +73,19 @@ public class SoundMusicManager : MonoBehaviour
 
         MusicAudioSource = GetComponent<AudioSource>();
         AudioListenerTF = Camera.main.transform;
+        
+        InitiliseScenesMusic();
+    }
 
-    } 
+    private void InitiliseScenesMusic()
+    {
+        AddSceneMusic(MainMenu, MainMenuMusic);
+        AddSceneMusic(Level1, Level1Music);
+    }
+    private void AddSceneMusic(string sceneName, AudioTrack[] music) 
+    {
+        ScenesMusic.Add(sceneName, music);
+    }
     
     private void SetMixerStored(string param, ref AudioMixerGroup mixer, float defaultVal)
     {
@@ -73,9 +97,48 @@ public class SoundMusicManager : MonoBehaviour
     {
         SetMixerStored("Master", ref MasterMixer, 0.8f);
         SetMixerStored("Music", ref MusicMixer, 1);
-        SetMixerStored("Sound Effects", ref SFXMixer, 1);
-        PlayClip(StartingMusic);
+        SetMixerStored("Sound Effects", ref SFXMixer, 1);      
+
+        GameManager.Instance.OnLoadSceneEvent += PlaySceneMusic;
+        OnMusicEndAction += PlayCurrentSceneMusic;
+
+        //Start in Main Menu so play Main Menu Music
+        PlaySceneMusic(MainMenu);
     }
+
+    private void PlaySceneMusic(string sceneName)
+    {
+        CurrentScene = sceneName;
+        AudioTrack[] music = ScenesMusic[CurrentScene];
+
+        int numTracks = music.Length;
+        
+        CurrentSceneTracksOrder = new int[numTracks];
+        for (int i = 0; i < numTracks; i++)
+            CurrentSceneTracksOrder[i] = -1;
+
+        CurrentSceneTracksOrderIndex = 0;
+        for (int trackOrderCount = 0; trackOrderCount < numTracks; trackOrderCount++)
+        {
+            int trackNum = UnityEngine.Random.Range(0, numTracks);
+            if (CurrentSceneTracksOrder.Contains(trackNum))
+            {
+                trackOrderCount--;
+                continue;
+            }
+
+            CurrentSceneTracksOrder[trackOrderCount] = trackNum;
+        }
+
+        PlayCurrentSceneMusic();
+    }
+
+    private void PlayCurrentSceneMusic()
+    {
+        ChangeMusic(ScenesMusic[CurrentScene][CurrentSceneTracksOrder[CurrentSceneTracksOrderIndex]]);
+        CurrentSceneTracksOrderIndex = (CurrentSceneTracksOrderIndex + 1) % ScenesMusic[CurrentScene].Length;
+    }
+
     private void FixedUpdate()
     {
         if (AudioListenerTF == null)
@@ -83,8 +146,10 @@ public class SoundMusicManager : MonoBehaviour
         transform.position = AudioListenerTF.position;
     }
 
-    private void ChangeMusic(AudioTrack audioTrack) =>
+    private void ChangeMusic(AudioTrack audioTrack) 
+    {
         StartCoroutine(ActuallyChangeMusic(audioTrack));
+    }
     
     private IEnumerator ActuallyChangeMusic(AudioTrack audioTrack)
     {
@@ -102,7 +167,7 @@ public class SoundMusicManager : MonoBehaviour
 
         MusicAudioSource.volume = 0;
         float maxVolume = CurrentAudioTrack.Volume;
-        float fadeSpeed = 1 / CurrentAudioTrack.FadeTime * Time.fixedDeltaTime;
+        float fadeSpeed = 1 / CurrentAudioTrack.FadeInTime * Time.fixedDeltaTime;
 
         while(MusicAudioSource.volume < maxVolume && KeepFadingIn)
         {
@@ -113,10 +178,16 @@ public class SoundMusicManager : MonoBehaviour
     }
     private IEnumerator FadeOut()
     {
+        if (CurrentAudioTrack is null || !CurrentAudioTrack.FadeOut)
+        {
+            KeepFadingOut = false;
+            yield break;
+        }
+
         KeepFadingIn = false;
         KeepFadingOut = true;
-
-        float fadeSpeed = 1 / CurrentAudioTrack.FadeTime * Time.fixedDeltaTime;
+        
+        float fadeSpeed = 1 / CurrentAudioTrack.FadeOutTime * Time.fixedDeltaTime;
 
         while (MusicAudioSource.volume > 0 && KeepFadingOut)
         {
@@ -139,10 +210,20 @@ public class SoundMusicManager : MonoBehaviour
         MusicAudioSource.volume = audioTrack.Volume;
         MusicAudioSource.Play();
         CurrentAudioTrack = audioTrack;
-        if (audioTrack.Fade && !dontFadeOverride)
+
+        StartCoroutine(CallOnMusicEndFinishSuccessful(audioTrack));
+        if (audioTrack.FadeIn && !dontFadeOverride)
             StartCoroutine(FadeIn());
         if (audioTrack.Loop)
             StartCoroutine(Loop(audioTrack));
         
+    }
+    private IEnumerator CallOnMusicEndFinishSuccessful(AudioTrack track)
+    {
+        yield return new WaitForSecondsRealtime(track.AudioClip.length);
+        if (MusicAudioSource.clip == track.AudioClip)
+        {
+            OnMusicEndAction?.Invoke();
+        }
     }
 }

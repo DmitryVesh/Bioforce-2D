@@ -62,7 +62,8 @@ namespace Shared
         serverIsFull,
         armPositionRotation,
         playerPausedGame,
-        stillConnected
+        stillConnected,
+        shouldHost
     }
 
     /// <summary>Sent from client to server.</summary>

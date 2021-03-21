@@ -15,8 +15,8 @@ public class Client : MonoBehaviour
     public const int PortNumLANDiscover = 28021;
     
     public static int PortNumGame { get; private set; }
-    public const string InternetMainServerIP = "18.130.250.31";
-    //public const string InternetMainServerIP = "127.0.0.1";
+    public const string MainServerIP = "18.134.197.3";
+    //public const string MainServerIP = "127.0.0.1";
 
     public int ClientID { get; set; } = 0;
     public TCP tCP { get; set; }

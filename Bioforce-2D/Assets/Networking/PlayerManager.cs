@@ -7,6 +7,7 @@ public class PlayerManager : MonoBehaviour
 {
     [SerializeField] public int ID;
     [SerializeField] private string Username;
+    public int MaxHealth { get; private set; }
 
     public Color PlayerColor { get; private set; }
 
@@ -82,9 +83,9 @@ public class PlayerManager : MonoBehaviour
     public void CallOnPlayerJumpedEvent() =>
         OnPlayerJumped?.Invoke();
 
-    public void Initialise(int iD, string username, Color playerColor) 
+    public void Initialise(int iD, string username, Color playerColor, int maxHealth) 
     {
-        (ID, Username) = (iD, username);
+        (ID, Username, MaxHealth) = (iD, username, maxHealth);
         SetUsername(playerColor);
     }
 

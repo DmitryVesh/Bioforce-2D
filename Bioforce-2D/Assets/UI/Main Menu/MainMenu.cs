@@ -22,6 +22,7 @@ public class MainMenu : MonoBehaviour
 
     private GameObject MainMenuPanel { get; set; }
     [SerializeField] private Menu SettingsMenu;
+    [SerializeField] private Menu AboutMenu;
 
     //Specific Button Click events - the MenuButton subscribes to these events via the Inspector
     public void MultiplayerButtonClicked()
@@ -45,6 +46,11 @@ public class MainMenu : MonoBehaviour
     public void QuitButtonClicked()
     {
         Application.Quit();
+    }
+    public void AboutButtonClicked()
+    {
+        HideMainMenu();
+        AboutMenu.Activate();
     }
 
     public void BackToMainMenu() =>

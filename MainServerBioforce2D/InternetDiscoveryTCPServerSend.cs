@@ -93,7 +93,7 @@ namespace MainServerBioforce2D
         {
             using (Packet packet = new Packet((int)InternetDiscoveryServerPackets.joinServer))
             {
-                packet.Write(InternetDiscoveryTCPServer.MyIP);
+                packet.Write(InternetDiscoveryTCPServer.MainServerIP);
                 packet.Write(serverPort);
 
                 SendPacket(client, packet);

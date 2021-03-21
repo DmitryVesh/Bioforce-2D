@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3232100769334712010}
   - component: {fileID: 959291525516618645}
   - component: {fileID: 2156411441818834309}
+  - component: {fileID: 5866950213179179686}
   m_Layer: 0
   m_Name: Sprite
   m_TagString: Untagged
@@ -99,6 +100,24 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.26373053
+--- !u!114 &5866950213179179686
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6206984314977086887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7a8a30195a61234894f70ae818845af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PickupType: 0
+  PickupEffect: {fileID: 949972960886682320}
+  ItemCollider: {fileID: 2156411441818834309}
+  SpriteRenderer: {fileID: 959291525516618645}
+  RestoreMin: 10
+  RestoreMax: 15
 --- !u!1 &9118951853227299491
 GameObject:
   m_ObjectHideFlags: 0
@@ -108,7 +127,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2863032304930687337}
-  - component: {fileID: 6849137829753474008}
   - component: {fileID: 949972960886682320}
   - component: {fileID: 6372268236638987117}
   m_Layer: 0
@@ -133,24 +151,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6849137829753474008
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9118951853227299491}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a7a8a30195a61234894f70ae818845af, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PickupType: 0
-  PickupEffect: {fileID: 949972960886682320}
-  ItemCollider: {fileID: 2156411441818834309}
-  SpriteRenderer: {fileID: 959291525516618645}
-  RestoreMin: 10
-  RestoreMax: 15
 --- !u!198 &949972960886682320
 ParticleSystem:
   m_ObjectHideFlags: 0

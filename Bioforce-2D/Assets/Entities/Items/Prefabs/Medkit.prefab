@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 32016936747748589}
   - component: {fileID: 5865437306991879070}
   - component: {fileID: 7464975364380904026}
+  - component: {fileID: 8501789606577820586}
   m_Layer: 0
   m_Name: Sprite
   m_TagString: Untagged
@@ -99,6 +100,24 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 1.1419567, y: 0.726152}
   m_Direction: 1
+--- !u!114 &8501789606577820586
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3904055802231601803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a99bd38cb8203b145a49aafd5fa278f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PickupType: 1
+  PickupEffect: {fileID: 5724300672670958398}
+  ItemCollider: {fileID: 7464975364380904026}
+  SpriteRenderer: {fileID: 5865437306991879070}
+  RestoreMin: 20
+  RestoreMax: 35
 --- !u!1 &4382899744523264845
 GameObject:
   m_ObjectHideFlags: 0
@@ -108,7 +127,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7342484549305759879}
-  - component: {fileID: 5868093775962964574}
   - component: {fileID: 5724300672670958398}
   - component: {fileID: 1887270266596905603}
   m_Layer: 0
@@ -133,24 +151,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5868093775962964574
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4382899744523264845}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a99bd38cb8203b145a49aafd5fa278f3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PickupType: 1
-  PickupEffect: {fileID: 5724300672670958398}
-  ItemCollider: {fileID: 7464975364380904026}
-  SpriteRenderer: {fileID: 5865437306991879070}
-  RestoreMin: 20
-  RestoreMax: 35
 --- !u!198 &5724300672670958398
 ParticleSystem:
   m_ObjectHideFlags: 0

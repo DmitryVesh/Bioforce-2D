@@ -12,8 +12,8 @@ namespace MainServerBioforce2D
 {
     class InternetDiscoveryTCPServer
     {
-        public const string MyIP = "18.130.250.31";
-        //public const string MyIP = "127.0.0.1";
+        public const string MainServerIP = "18.134.197.3";
+        //public const string MainServerIP = "127.0.0.1";
 
         private static TcpListener TCPBroadCastTcpListener { get; set; }
 

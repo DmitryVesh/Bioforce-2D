@@ -15,10 +15,6 @@ public static class PhysicsHelper
 
     internal static bool RandomBool()
     {
-        int randomNum = Random.Range(0, 2);
-        if (randomNum == 0)
-            return false;
-        else
-            return true;
+        return Random.Range(0, 2) == 0;
     }
 }

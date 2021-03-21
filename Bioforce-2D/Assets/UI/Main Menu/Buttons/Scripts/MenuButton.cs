@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 [RequireComponent(typeof(Animator))]
 public class MenuButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
 {
-    public bool Interactable { get; set; } = true;
+    public bool Interactable = true;
     private bool LastInteractibility { get; set; }
 
     [SerializeField] private UnityEvent OnClickEvent;

@@ -83,7 +83,7 @@ public class ServerMenu : MonoBehaviour
         string mapName = packet.ReadString();
         int ping = packet.ReadInt(); //TODO: look into how to calculate ping
 
-        if (serverIP == Client.InternetMainServerIP)
+        if (serverIP == Client.MainServerIP)
         {
             Instance.AddInternetServerToPage(serverName, currentPlayerCount, maxPlayerCount, mapName, ping);
         }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -25,6 +26,9 @@ public class GameManager : MonoBehaviour
     public event OnPause OnPauseEvent;
     public event OnPause OnLostConnectionEvent;
     public bool Paused { get; private set; } = false;
+
+    public delegate void LoadScene(string sceneName);
+    public event LoadScene OnLoadSceneEvent;
 
     public static void ConfyMouse() =>
         Cursor.lockState = CursorLockMode.Confined;
@@ -97,7 +101,7 @@ public class GameManager : MonoBehaviour
         player = Instantiate(prefab, position, Quaternion.identity);
 
         PlayerManager playerManager = player.GetComponent<PlayerManager>();
-        playerManager.Initialise(iD, username, playerColor);
+        playerManager.Initialise(iD, username, playerColor, maxHealth);
         PlayerDictionary.Add(iD, playerManager);
 
         NonLocalPlayerHealth healthManager = player.GetComponentInChildren<NonLocalPlayerHealth>();
@@ -155,10 +159,17 @@ public class GameManager : MonoBehaviour
             }
             PlayerDictionary.Clear();
 
-            SceneManager.LoadScene("Main Menu");
+            SwitchScene("Main Menu");
         });
         
     }
+
+    public void SwitchScene(string sceneName)
+    {
+        OnLoadSceneEvent?.Invoke(sceneName);
+        SceneManager.LoadScene(sceneName);
+    }
+
     public void PlayerDied(int playerKilledDiedID, int bulletOwnerID, TypeOfDeath typeOfDeath)
     {
         ClientSend.PlayerDied(bulletOwnerID, typeOfDeath);
