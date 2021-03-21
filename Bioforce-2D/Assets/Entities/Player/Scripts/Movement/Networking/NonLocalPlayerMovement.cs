@@ -96,5 +96,7 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
         PlayerManager.OnPlayerSpeedXChanged -= ChangedSpeedX;
         PlayerManager.OnPlayerDeath -= PlayerCantMoveAndCantBeHit;
         PlayerManager.OnPlayerRespawn -= PlayerCanMoveAndCanBeHit;
+
+        GameManager.Instance.OnLostConnectionEvent -= PlayerCantMoveWhenPaused;
     }
 }
