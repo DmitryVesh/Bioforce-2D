@@ -347,8 +347,8 @@ public class Client : MonoBehaviour
             bool lostConnection = PacketPause - now < TimeSpanZero;
             if (LastLostConnection != lostConnection)
             {
-                GameManager.Instance.InvokeLostConnectionEvent(lostConnection);
                 LastLostConnection = lostConnection;
+                GameManager.Instance.InvokeLostConnectionEvent(lostConnection);
             }
         }
 

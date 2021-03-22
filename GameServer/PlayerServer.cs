@@ -30,6 +30,7 @@ namespace GameServer
         public PlayerColor PlayerColor { get; private set; }
 
         public bool Paused { get; private set; }
+        private bool LastPaused { get; set; }
         public TimeSpan PacketTimeOut { get; set; } = DateTime.Now.TimeOfDay + new TimeSpan(0, 1, 0);
         public TimeSpan PacketPause { get; set; } = DateTime.Now.TimeOfDay + new TimeSpan(0, 0, 20);
 
@@ -85,15 +86,24 @@ namespace GameServer
 
             if (PacketPause - now < zero)
             {
-                bool paused = true;
-                ServerSend.PlayerPausedGame(ID, paused);
+                if (Paused) //Shouldn't send that the player is paused more than once
+                    return;
+
+                Paused = true;
+                ServerSend.PlayerPausedGame(ID, Paused);
+                return;
             }
             if (PacketTimeOut - now < zero)
             {
                 Server.ClientDictionary[ID].Disconnect();
-                Paused = false;
                 Console.WriteLine($"\n\tPlayer: {ID} has been kicked, due to GameServer not having received packets in a while...");
                 return;
+            }
+
+            if (Paused)
+            {
+                Paused = false;
+                ServerSend.PlayerPausedGame(ID, Paused);
             }
             MovePlayer();
         }
