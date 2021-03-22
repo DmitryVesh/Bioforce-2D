@@ -1,4 +1,55 @@
 ===============================================================================================================================
+Version 1.0.1
+---------------
+
+Summary
+-------
+Main goals is to;
+	0 Add more particle effects when bullet being shot out of gun
+	0 Add screen shake and hit marker when you hit a player
+	0 Add pitch changes to player sounds, to make them feel more unique
+
+	0 Add health pickups
+	0 Add adrenaline pickup
+	0 Make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+	0 Remove any references to Ping Server values
+	0 Remove Manual Server Entry
+
+Future tasks;			
+	version 1.0.2
+		Delete all GameServer Code in Unity project
+		Add invincibility frames, after being hit/respawning
+		Add trail effects when a player sprints, so can clearly see player sprinting, also maybe zoom camera out a little bit...
+		Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard
+	version 1.0.3
+		add breathing camera movement when player is idle, going up and down.
+		using cinemachine add impulses, fast small camera movements in specific directions, for:
+			Player Getting shot
+			Player shooting
+			Player jumping
+			Player running
+		Make so when the player is down the collisions are not occuring when shot
+		Add heartbeat sound effects when low on health, increases with volume as player gets more damaged, similar to permanent damage overlay Alpha var
+	version 1.0.4
+		Make the scoreboard reuse scoreboard entries, instead of destroying them, when a player disconnects.
+		Allow players to choose their own colour
+	version 1.0.5
+		Add tutorial level into game
+
+	Add chat into game
+	Add ping field to Player Score entries in scoreboard
+	Add gamepad support for pc & mac
+	Make server sided, currently very client sided
+
+	make the ThreadManager to work on multi-threading
+	
+	imrpove killFeedUI, make entries disappear by decreasing opacity, and popping them back up smoothly instead of vertical layout group which
+		pops them and moves other entries up instantly.
+	improve UI, adding pop up animations to the UI elements instead of just appearing instantly.
+	improve UI, adding black borders to UI Panels like TimeOutPanel.
+	fix player move validation, when respawned, should ignore any changes that occured lately.
+
+===============================================================================================================================
 Version 1.0.0
 ---------------
 

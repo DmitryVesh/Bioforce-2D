@@ -83,8 +83,14 @@ namespace GameServer
             
             TimeSpan now = DateTime.Now.TimeOfDay;
             TimeSpan zero = new TimeSpan(0, 0, 0);
-
-            if (PacketPause - now < zero)
+            
+            if (PacketTimeOut - now < zero)
+            {
+                Server.ClientDictionary[ID].Disconnect();
+                Console.WriteLine($"\n\tPlayer: {ID} has been kicked, due to GameServer not having received packets in a while...");
+                return;
+            }
+            else if (PacketPause - now < zero)
             {
                 if (Paused) //Shouldn't send that the player is paused more than once
                     return;
@@ -93,12 +99,7 @@ namespace GameServer
                 ServerSend.PlayerPausedGame(ID, Paused);
                 return;
             }
-            if (PacketTimeOut - now < zero)
-            {
-                Server.ClientDictionary[ID].Disconnect();
-                Console.WriteLine($"\n\tPlayer: {ID} has been kicked, due to GameServer not having received packets in a while...");
-                return;
-            }
+            
 
             if (Paused)
             {
