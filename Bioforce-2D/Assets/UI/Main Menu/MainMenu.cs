@@ -61,6 +61,9 @@ public class MainMenu : MonoBehaviour
 
     public void SetButtonSelected(MenuButton menuButton)
     {
+        if (!MenuButtons.Contains(menuButton))
+            return;
+
         CurrentSelectedButtonIndex = MenuButtons.IndexOf(menuButton);
         if (CurrentSelectedButtonIndex == LastSelectedButtonIndex)
             return;

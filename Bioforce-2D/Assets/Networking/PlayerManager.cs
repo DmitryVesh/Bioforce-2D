@@ -46,11 +46,20 @@ public class PlayerManager : MonoBehaviour
     public event PositionAndRotation OnArmPositionRotation;
 
     public delegate void Bool(bool boolean);
+
     public event Bool OnPlayerPaused;
 
     public delegate void Int(int integer);
     public event Int OnPlayerPickupBandage;
     public event Int OnPlayerPickupMedkit;
+
+    public event NoParams OnPlayersBulletHitCollider;
+
+    public event NoParams OnLocalPlayerHitAnother;
+
+
+    public void PlayersBulletHitCollider() =>
+        OnPlayersBulletHitCollider?.Invoke();
 
     internal void BandagePickup(int restoreHealth) =>
         OnPlayerPickupBandage?.Invoke(restoreHealth);
@@ -125,6 +134,10 @@ public class PlayerManager : MonoBehaviour
         DamageNumManager.Instance.Create(PlayerModelObject.transform.position, damage, PhysicsHelper.RandomBool());
         OnPlayerTookDamage?.Invoke(damage, currentHealth);
     }
+
+    public void CallLocalPlayerHitAnother() =>
+        OnLocalPlayerHitAnother?.Invoke();
+
     internal void SetArmPositionRotation(Vector2 position, Quaternion rotation) =>
         OnArmPositionRotation?.Invoke(position, rotation);
     internal void SetPlayerPaused(bool paused) =>

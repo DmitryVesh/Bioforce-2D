@@ -12,7 +12,6 @@ public class PlayerCameraController : MonoBehaviour
     private PlayerManager PlayerManager { get; set; }
 
     ILocalPlayerGun PlayerGun { get; set; }
-    private bool OnMobile { get; set; }
     private Transform PlayerTransform { get; set; }
 
     [SerializeField] private Transform AimFollow;
@@ -37,24 +36,30 @@ public class PlayerCameraController : MonoBehaviour
         PlayerManager.OnPlayerRespawn += ResetCamera;
 
         PlayerManager.OnPlayerShot += GenerateShootImpulse;
-        PlayerManager.OnPlayerJumped += GenerateJumpedImpulse;
+        PlayerManager.OnPlayerJumped += GenerateJumpImpulse;
         PlayerManager.OnPlayerTookDamage += GenerateHitImpulse;
+        PlayerManager.OnLocalPlayerHitAnother += GenerateLocalPlayerHitOtherPlayerImpulse;
 
         PlayerGun = GetComponent<ILocalPlayerGun>();
-        OnMobile = PlayerGun != null;
         PlayerTransform = PlayerManager.PlayerModelObject.transform;
 
         AimFollow.parent = null; //Detach object
     }
 
-    private void GenerateHitImpulse(int damage, int currentHealth) =>
-        HitImpulse.GenerateImpulse();
-
-    private void GenerateJumpedImpulse() =>
-        JumpImpulse.GenerateImpulse();
+    private void ResetCamera() =>
+        CameraTransposer.OnTargetObjectWarped(CameraVirtual.Follow, RespawnPoint.Instance.LastRespawnPoint - RespawnPoint.Instance.LastDiePosition);
 
     private void GenerateShootImpulse(Vector2 position, Quaternion rotation) =>
         ShootImpulse.GenerateImpulse();
+
+    private void GenerateJumpImpulse() =>
+        JumpImpulse.GenerateImpulse();
+
+    private void GenerateHitImpulse(int damage, int currentHealth) =>
+        HitImpulse.GenerateImpulse();
+
+    public void GenerateLocalPlayerHitOtherPlayerImpulse() =>
+        HitImpulse.GenerateImpulse();
 
     private void Update()
     {
@@ -63,14 +68,17 @@ public class PlayerCameraController : MonoBehaviour
             PlayerTransform.position.y + (aimingVector.y * MaxY));
     }
 
-    private void ResetCamera()
-    {
-        CameraTransposer.OnTargetObjectWarped(CameraVirtual.Follow, RespawnPoint.Instance.LastRespawnPoint - RespawnPoint.Instance.LastDiePosition);
-    }
+    
 
     private void OnDestroy()
     {
         PlayerManager.OnPlayerRespawn -= ResetCamera;
+
+        PlayerManager.OnPlayerShot -= GenerateShootImpulse;
+        PlayerManager.OnPlayerJumped -= GenerateJumpImpulse;
+        PlayerManager.OnPlayerTookDamage -= GenerateHitImpulse;
+        PlayerManager.OnLocalPlayerHitAnother -= GenerateLocalPlayerHitOtherPlayerImpulse;
+
         Destroy(CinemachineCamera);
     }
 }

@@ -73,6 +73,8 @@ public abstract class DiscoveryTCPClient
         else if (timedOut)
             OnTimedOutAction?.Invoke();
     }
+    public bool IsConnected() =>
+        Socket.Connected;
 
     private void ConnectCallback(IAsyncResult asyncResult)
     {

@@ -42,7 +42,7 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
             Die(bulletOwnerID);
 
         PlayerManager.TookDamage(damage, CurrentHealth - damage);
-        ClientSend.TookDamage(damage, CurrentHealth);
+        ClientSend.TookDamage(damage, CurrentHealth, bulletOwnerID);
     }
 
     public void SetOwnerClientID(int iD) =>

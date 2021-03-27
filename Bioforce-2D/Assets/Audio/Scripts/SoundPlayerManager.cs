@@ -8,7 +8,8 @@ public class SoundPlayerManager : MonoBehaviour
     private AudioSource AudioSource { get; set; }
     private PlayerManager PlayerManager { get; set; }
 
-    [SerializeField] private AudioClip[] Shoot = null;
+    [SerializeField] private AudioClip[] Shoot;
+    [SerializeField] private AudioClip[] BulletHit;
     [SerializeField] private AudioClip[] Jump;
     [SerializeField] private AudioClip[] Footsteps;
 
@@ -16,8 +17,14 @@ public class SoundPlayerManager : MonoBehaviour
     [SerializeField] private AudioClip DieBullet;
     [SerializeField] private AudioClip DieFall;
 
-    [SerializeField] private AudioClip[] PickupBandage;
-    [SerializeField] private AudioClip[] PickupMedkit;
+    [SerializeField] private AudioClip PickupBandage;
+    [SerializeField] private AudioClip PickupMedkit;
+
+    [SerializeField] private AudioClip HitMarker;
+
+    [SerializeField] private AudioClip[] SkullLaughing;
+
+    const float NormalPitch = 1f;
 
     private void Awake()
     {
@@ -32,7 +39,20 @@ public class SoundPlayerManager : MonoBehaviour
 
         PlayerManager.OnPlayerPickupMedkit += PlayMedkitSound;
         PlayerManager.OnPlayerPickupBandage += PlayBandageSound;
+
+        PlayerManager.OnPlayersBulletHitCollider += BulletHitCollider;
+
+        PlayerManager.OnLocalPlayerHitAnother += HitMarkerSound;
+
+        PlayerManager.OnPlayerDeath += PlaySkullLaughing;
     }
+
+    private void PlaySkullLaughing(TypeOfDeath typeOfDeath)
+    {
+        if (typeOfDeath.Equals(TypeOfDeath.Bullet))
+            Play(SkullLaughing);
+    }
+
     private void OnDestroy()
     {
         PlayerManager.OnPlayerShot -= PlayShootSound;
@@ -43,8 +63,20 @@ public class SoundPlayerManager : MonoBehaviour
 
         PlayerManager.OnPlayerPickupMedkit -= PlayMedkitSound;
         PlayerManager.OnPlayerPickupBandage -= PlayBandageSound;
+
+        PlayerManager.OnPlayersBulletHitCollider -= BulletHitCollider;
+
+        PlayerManager.OnLocalPlayerHitAnother -= HitMarkerSound;
     }
 
+    
+
+    //Called by Bullet Class
+    public void BulletHitCollider() =>
+        Play(BulletHit);
+
+    private void HitMarkerSound() =>
+        Play(HitMarker);
     private void PlayMedkitSound(int integer) =>
         Play(PickupMedkit);
     private void PlayBandageSound(int integer) =>
@@ -66,9 +98,15 @@ public class SoundPlayerManager : MonoBehaviour
             Play(DieFall);
     }
 
-    private void Play(AudioClip audioClip) =>
+    private void Play(AudioClip audioClip)
+    {
+        AudioSource.pitch = NormalPitch;
         AudioSource.PlayOneShot(audioClip);
-    private void Play(AudioClip[] audioClips) =>
+    }
+    private void Play(AudioClip[] audioClips)
+    {
         Play(SoundMusicManager.GetRandomAudioClip(audioClips));
+        AudioSource.pitch = UnityEngine.Random.Range(0.85f, 1.15f);
+    }
     
 }

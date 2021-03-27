@@ -101,6 +101,7 @@
     <Compile Include="Assets\UI\IgnoreParentRotation.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Camera\DetachFromParent.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Gun\ILocalPlayerGun.cs" />
+    <Compile Include="Assets\UI\Screen Overlays\Scripts\PermanentDamageOverlay.cs" />
     <Compile Include="Assets\UI\KillFeed\KillFeedUI.cs" />
     <Compile Include="Assets\Networking\Client.cs" />
     <Compile Include="Assets\UI\Main Menu\Buttons\Scripts\MenuButtonManager.cs" />
@@ -131,6 +132,7 @@
     <Compile Include="Assets\Entities\Player\Scripts\Gun\LocalPlayerGun.cs" />
     <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\ManualServerEntry.cs" />
     <Compile Include="Assets\Networking\ThreadManager.cs" />
+    <Compile Include="Assets\UI\Screen Overlays\Scripts\Overlay.cs" />
     <Compile Include="Assets\Audio\Scripts\SoundMusicManager.cs" />
     <Compile Include="Assets\UI\UIEntryManager.cs" />
     <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\ServerMenu.cs" />
@@ -155,11 +157,12 @@
     <Compile Include="Assets\UI\Main Menu\Buttons\Scripts\MainMenuButton.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Health\TypeOfDeath.cs" />
     <Compile Include="Assets\UI\PauseMenu\Scripts\SpinningBallsLoading.cs" />
+    <Compile Include="Assets\UI\Screen Overlays\Scripts\HitOverlay.cs" />
     <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\PlayerRegistration.cs" />
     <Compile Include="Assets\UI\PauseMenu\Scripts\PauseManager.cs" />
-    <Compile Include="Assets\UI\Screen Overlays\Scripts\Overlay.cs" />
-    <Compile Include="Assets\UI\Screen Overlays\Scripts\HitOverlay.cs" />
-    <Compile Include="Assets\UI\Screen Overlays\Scripts\PermanentDamageOverlay.cs" />
+    <Compile Include="Assets\Publishing Assets\Monetization\UnityMonetization.cs" />
+    <Compile Include="Assets\Publishing Assets\PrivacyPolicyTermsConditionsMenu.cs" />
+    <Compile Include="Assets\Entities\Effects\Particle Systems\LinkedParticleSystemManager.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />
@@ -850,8 +853,21 @@
     <Reference Include="Unity.SysrootPackage.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.SysrootPackage.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.Advertisements">
+      <HintPath>Library\ScriptAssemblies\UnityEngine.Advertisements.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Monetization">
+      <HintPath>Library\ScriptAssemblies\UnityEngine.Monetization.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Advertisements.Editor">
+      <HintPath>Library\ScriptAssemblies\UnityEngine.Advertisements.Editor.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
+      <Project>{59E58DFD-1AD3-FB10-100B-A8C8991258D8}</Project>
+      <Name>Assembly-CSharp-firstpass</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

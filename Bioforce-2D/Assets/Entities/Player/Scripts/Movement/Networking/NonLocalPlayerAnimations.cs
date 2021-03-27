@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 
 public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
@@ -18,12 +19,6 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     [SerializeField] private SpriteRenderer PlayerBodySprite;
     [SerializeField] private SpriteRenderer PlayerArmsSprite;
 
-    [SerializeField] private GameObject PlayerHitParticle;
-    private ParticleSystem[] PlayerHitParticleSystems = new ParticleSystem[NumMaxParticleSystems];
-    private Transform[] PlayerHitParticleTF = new Transform[NumMaxParticleSystems];
-    const int NumMaxParticleSystems = 10;
-    private int CurrentParticleIndex = 0;
-
     [SerializeField] private GameObject SplatterPrefab;
     [SerializeField] private Sprite[] SplatterSprites;
     private SpriteRenderer SplatterSpriteRenderer { get; set; }
@@ -33,6 +28,12 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     private int CurrentSplatterIndex = 0;
 
     static int CurrentSplatterOrderInLayerIndex = -32768;
+
+    [SerializeField] private LinkedParticleSystemManager PlayerHitParticles;
+    [SerializeField] private LinkedParticleSystemManager PlayerMuzzelFlashParticles;
+
+    [SerializeField] private GameObject HitMarker;
+    [SerializeField] private float DisplayHitMarkerTime = 0.25f;
 
     //TODO: add Jumped sent animations so can play sound effect on non local players
 
@@ -45,26 +46,11 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
         PlayerBodySprite.color = playerColor;
         PlayerArmsSprite.color = playerColor;
 
-        ParticleSystem mainParticleSystem = PlayerHitParticle.GetComponent<ParticleSystem>();
-        ParticleSystem.MainModule main = mainParticleSystem.main;
-        main.startColor = new ParticleSystem.MinMaxGradient(playerColor);
-        GenerateParticleSystems();
+        PlayerHitParticles.Initilise(playerColor, OwnerClientID);
+        PlayerMuzzelFlashParticles.Initilise(playerColor, OwnerClientID);
         
         SplatterSpriteRenderer.color = playerColor;
         GenerateSplatters();
-    }
-
-    private void GenerateParticleSystems()
-    {
-        Transform particleHolder = new GameObject($"ParticleHolder: {OwnerClientID}").transform;
-        particleHolder.position = Vector3.zero;
-
-        for (int particleCount = 0; particleCount < NumMaxParticleSystems; particleCount++)
-        {
-            GameObject particleSystem = Instantiate(PlayerHitParticle, particleHolder);
-            PlayerHitParticleTF[particleCount] = particleSystem.transform;
-            PlayerHitParticleSystems[particleCount] = particleSystem.GetComponent<ParticleSystem>();
-        }
     }
 
     private void GenerateSplatters()
@@ -104,8 +90,30 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
         PlayerManager.OnPlayerDeath += DieAnimation;
         PlayerManager.OnPlayerRespawn += RespawnAnimation;
         PlayerManager.OnPlayerPaused += PlayerPaused;
-        PlayerManager.OnPlayerTookDamage += PlayHitParticleEffect;
+        
         PlayerManager.OnPlayerTookDamage += LeaveSplatter;
+        PlayerManager.OnPlayerTookDamage += PlayHitParticleEffect;
+        PlayerManager.OnPlayerShot += PlayMuzzelFlashParticleEffect;
+
+        HitMarker.SetActive(false);
+        PlayerManager.OnPlayerTookDamage += ShowHitMarker;
+    }
+
+    private void ShowHitMarker(int damage, int currentHealth) =>
+        StartCoroutine(DisplayHitMarker());
+    private IEnumerator DisplayHitMarker()
+    {
+        HitMarker.SetActive(true);
+        yield return new WaitForSeconds(DisplayHitMarkerTime);
+        HitMarker.SetActive(false);
+    }
+
+    private void PlayMuzzelFlashParticleEffect(Vector2 position, Quaternion rotation) =>
+        PlayerMuzzelFlashParticles.PlayAffect(position, rotation);
+    private void PlayHitParticleEffect(int damage, int currentHealth) 
+    {
+        Transform tf = PlayerModelObject.transform;
+        PlayerHitParticles.PlayAffect(tf.position, tf.rotation);
     }
 
     private void LeaveSplatter(int damage, int currentHealth)
@@ -121,16 +129,7 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
         CurrentSplatterIndex = (CurrentSplatterIndex + 1) % NumMaxSplatters;
     }
 
-    private void PlayHitParticleEffect(int damage, int currentHealth)
-    {
-        Transform transform = PlayerHitParticleTF[CurrentParticleIndex];
-        transform.position = PlayerModelObject.transform.position;
-
-        ParticleSystem particle = PlayerHitParticleSystems[CurrentParticleIndex];
-        particle.Play();
-
-        CurrentParticleIndex = (CurrentSplatterIndex + 1) % NumMaxParticleSystems;
-    }
+    
 
     protected virtual void FixedUpdate()
     {
@@ -190,6 +189,8 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
         PlayerManager.OnPlayerPaused -= PlayerPaused;
         PlayerManager.OnPlayerTookDamage -= PlayHitParticleEffect;
         PlayerManager.OnPlayerTookDamage -= LeaveSplatter;
+        PlayerManager.OnPlayerShot -= PlayMuzzelFlashParticleEffect;
+        PlayerManager.OnPlayerTookDamage -= ShowHitMarker;
     }
 
     

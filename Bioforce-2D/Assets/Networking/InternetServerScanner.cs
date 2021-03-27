@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections;
+using System.Timers;
 using UnityEngine;
 
 public class InternetServerScanner : MonoBehaviour
 {
     public static InternetServerScanner Instance { get; set; }
     private InternetDiscoveryClient MainServerSocket { get; set; }
-    private bool ReAskTimerIsOn { get; set; }
-    private const float ReAskTimerMax = 5f;
-    private float ReAskTimerCurrent { get; set; }
+
+    private const double ReAskTimerMax = 5000d;
+    private TimeSpan TwoSecondsTimeSpan { get; } = TimeSpan.FromSeconds(2d);
+    private TimeSpan LastTimeAskedForServers { get; set; }
+    private Timer AutoReAskTimer { get; set; }
 
     public static void ContactMainServerForServers(int port)
     {
@@ -24,6 +27,10 @@ public class InternetServerScanner : MonoBehaviour
         StartMainServerSocket(port);
 
         //4.
+        Instance.AutoReAskTimer = new Timer(ReAskTimerMax);
+        Instance.AutoReAskTimer.Elapsed += AutoReAskTimer_Elapsed;
+        Instance.AutoReAskTimer.Start();
+
         Instance.ResetReAskTimer(true);
     }
     public bool ContactMainServerToAddOwnServer(string serverName, int maxNumPlayers, string mapName, int port)
@@ -91,12 +98,31 @@ public class InternetServerScanner : MonoBehaviour
         }
         //Now wait for 
     }
+    public void UserAskForServerChanges()
+    {
+        //if there is no connection between MainServer and client
+        //Get into contact with the MainServer
+        if (MainServerSocket is null || !MainServerSocket.IsConnected())
+        {
+            ContactMainServerForServers(Client.PortNumInternetDiscover);
+            return;
+        }
+
+        //if last time asked was greater than 2 seconds ago
+        //then ask again
+        TimeSpan now = DateTime.Now.TimeOfDay;
+        if (now - LastTimeAskedForServers > TwoSecondsTimeSpan)
+        {
+            LastTimeAskedForServers = now;
+            SendAskForServerChangesPacket();
+        }
+    }
     private void SendAskForServerChangesPacket()
     {
         using (Packet packet = new Packet())
         {
             packet.Write((int)InternetDiscoveryClientPackets.askForServerChanges);
-            MainServerSocket.SendPacket(packet);
+            MainServerSocket?.SendPacket(packet);
         }
     }
     internal static void SendJoinServerPacket(int port, string serverName)
@@ -115,7 +141,15 @@ public class InternetServerScanner : MonoBehaviour
             Debug.Log($"Error SendJoinServerPacket to server: {serverName}...\n{exception}");
         }
     }
-
+    private static void AutoReAskTimer_Elapsed(object sender, ElapsedEventArgs e) =>
+        Instance.UserAskForServerChanges();
+    private void ResetReAskTimer(bool shouldRun)
+    {
+        if (shouldRun)
+            AutoReAskTimer?.Start();
+        else
+            AutoReAskTimer?.Stop();
+    }
 
     //5.3
     private void OnMainServerSocketDisconnected()
@@ -130,11 +164,6 @@ public class InternetServerScanner : MonoBehaviour
         MainServerSocket = null;
         ServerMenu.TimedOutMainServer();
     }
-    private void ResetReAskTimer(bool shouldRun)
-    {
-        ReAskTimerIsOn = shouldRun;
-        ReAskTimerCurrent = ReAskTimerMax;
-    }
 
     private void Awake()
     {
@@ -146,19 +175,6 @@ public class InternetServerScanner : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    private void FixedUpdate()
-    {
-        if (!ReAskTimerIsOn)
-            return;
-
-        //4.
-        ReAskTimerCurrent -= Time.fixedDeltaTime;
-        if (ReAskTimerCurrent < 0)
-        {
-            ResetReAskTimer(true);
-            SendAskForServerChangesPacket();
-        }
-    }
 
     private void OnDestroy()
     {
@@ -168,6 +184,4 @@ public class InternetServerScanner : MonoBehaviour
         MainServerSocket = null;
         ResetReAskTimer(false);
     }
-
-    
 }

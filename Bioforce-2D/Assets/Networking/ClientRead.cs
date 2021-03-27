@@ -146,8 +146,11 @@ public class ClientRead : MonoBehaviour
         int iD = packet.ReadInt();
         int damage = packet.ReadInt();
         int currentHealth = packet.ReadInt();
+        int bulletOwner = packet.ReadInt();
 
         GameManager.PlayerDictionary[iD].TookDamage(damage, currentHealth);
+        if (Client.Instance.ClientID == bulletOwner)
+            GameManager.PlayerDictionary[bulletOwner].CallLocalPlayerHitAnother();
     }
 
     internal static void ServerIsFull(Packet packet)

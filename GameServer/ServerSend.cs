@@ -133,13 +133,14 @@ namespace GameServer
                 SendTCPPacketToAllButIncluded(playerID, packet);
             }            
         }
-        internal static void TookDamage(int clientID, int damage, int currentHealth)
+        internal static void TookDamage(int clientID, int damage, int currentHealth, int bulletOwner)
         {
             using (Packet packet = new Packet((int)ServerPackets.tookDamage))
             {
                 packet.Write(clientID);
                 packet.Write(damage);
                 packet.Write(currentHealth);
+                packet.Write(bulletOwner);
 
                 SendTCPPacketToAllButIncluded(clientID, packet);
             }
@@ -154,7 +155,9 @@ namespace GameServer
 
                 SendTCPPacketToAllButIncluded(playerID, packet);
             }
-        }        
+        }
+
+        
 
         internal static void PlayerPausedGame(int clientID, bool paused)
         {

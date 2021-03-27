@@ -5,17 +5,23 @@ public class ClientSend : MonoBehaviour
 {
     public static void WelcomePacketReply()
     {
-        Packet packet = new Packet((int)ClientPackets.welcomeReceived);
-        packet.Write(Client.Instance.ClientID);
-        packet.Write(PlayerRegistration.GetUsername());
-        SendTCPPacket(packet);
+        using (Packet packet = new Packet((int)ClientPackets.welcomeReceived))
+        {
+            packet.Write(Client.Instance.ClientID);
+            packet.Write(PlayerRegistration.GetUsername());
+
+            SendTCPPacket(packet);
+        }        
     }
     public static void UDPTestPacketReply()
     {
-        Packet packet = new Packet((int)ClientPackets.udpTestReceived);
-        packet.Write(Client.Instance.ClientID);
-        packet.Write("Received UDP Test Packet");
-        SendUDPPacket(packet);
+        using (Packet packet = new Packet((int)ClientPackets.udpTestReceived))
+        {
+            packet.Write(Client.Instance.ClientID);
+            packet.Write("Received UDP Test Packet");
+
+            SendUDPPacket(packet);
+        }        
     }
 
     public static void PlayerMovement(bool isFacingRight, Vector2 position, Vector2 velocity, Quaternion rotation)
@@ -32,10 +38,13 @@ public class ClientSend : MonoBehaviour
     }
     public static void PlayerMovementStats(float runSpeed, float sprintSpeed)
     {
-        Packet packet = new Packet((int)ClientPackets.playerMovementStats);
-        packet.Write(runSpeed);
-        packet.Write(sprintSpeed);
-        SendTCPPacket(packet); // Only sending once, so want to make sure it gets there
+        using (Packet packet = new Packet((int)ClientPackets.playerMovementStats))
+        {
+            packet.Write(runSpeed);
+            packet.Write(sprintSpeed);
+
+            SendTCPPacket(packet); // Only sending once, so want to make sure it gets there
+        }        
     }
 
     internal static void ArmPositionAndRotation(Vector2 localPosition, Quaternion localRotation)
@@ -44,25 +53,30 @@ public class ClientSend : MonoBehaviour
         {
             packet.Write(localPosition);
             packet.Write(localRotation);
+
             SendTCPPacket(packet);
         }
     }
 
     public static void ShotBullet(Vector2 position, Quaternion rotation)
     {
-        Packet packet = new Packet((int)ClientPackets.bulletShot);
-        packet.Write(position);
-        packet.Write(rotation);
+        using (Packet packet = new Packet((int)ClientPackets.bulletShot))
+        {
+            packet.Write(position);
+            packet.Write(rotation);
 
-        SendTCPPacket(packet);
+            SendTCPPacket(packet);
+        }
     }
     public static void PlayerDied(int bulletOwnerID, TypeOfDeath typeOfDeath)
     {
-        Packet packet = new Packet((int)ClientPackets.playerDied);
-        packet.Write(bulletOwnerID);
-        packet.Write((int)typeOfDeath);
+        using (Packet packet = new Packet((int)ClientPackets.playerDied))
+        {
+            packet.Write(bulletOwnerID);
+            packet.Write((int)typeOfDeath);
 
-        SendTCPPacket(packet);
+            SendTCPPacket(packet);
+        }       
     }
     public static void PlayerRespawned(Vector2 respawnPosition)
     {
@@ -73,13 +87,16 @@ public class ClientSend : MonoBehaviour
             SendTCPPacket(packet);
         }        
     }
-    public static void TookDamage(int damage, int currentHealth)
+    public static void TookDamage(int damage, int currentHealth, int bulletOwner)
     {
-        Packet packet = new Packet((int)ClientPackets.tookDamage);
-        packet.Write(damage);
-        packet.Write(currentHealth);
+        using (Packet packet = new Packet((int)ClientPackets.tookDamage))
+        {
+            packet.Write(damage);
+            packet.Write(currentHealth);
+            packet.Write(bulletOwner);
 
-        SendTCPPacket(packet);
+            SendTCPPacket(packet);
+        }        
     }
 
     internal static void PausedGame(bool paused)

@@ -113,16 +113,21 @@ namespace GameServer
 
         public static void TookDamageRead(int clientID, Packet packet)
         {
+            int currentHealth = 0, damage = 0, bulletOwner = -1;
             try
             {
-                int damage = packet.ReadInt();
-                int currentHealth = packet.ReadInt();
-                Server.ClientDictionary[clientID].Player.CurrentHealth = currentHealth;
-                ServerSend.TookDamage(clientID, damage, currentHealth);
+                damage = packet.ReadInt();
+                currentHealth = packet.ReadInt();
+                bulletOwner = packet.ReadInt();
             }
             catch (Exception exception)
             {
                 Console.WriteLine($"\tError, trying to read player took damage, from player: {clientID}\n{exception}");
+            }
+            finally
+            {
+                Server.ClientDictionary[clientID].Player.CurrentHealth = currentHealth;
+                ServerSend.TookDamage(clientID, damage, currentHealth, bulletOwner);
             }
         }
 

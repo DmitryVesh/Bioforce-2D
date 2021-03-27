@@ -5,15 +5,34 @@ Version 1.0.1
 Summary
 -------
 Main goals is to;
-	0 Add more particle effects when bullet being shot out of gun
-	0 Add screen shake and hit marker when you hit a player
-	0 Add pitch changes to player sounds, to make them feel more unique
+	1 Add refresh button to Internet servers list, instead of automatically updating
 
+	1 Improve sound quality of shooting
+	1 Improve spark effects
+	1 Add more particle effects when bullet being shot out of gun
+	1 Add sound when bullet hits a collider
+	1 Add screen shake and hit marker when you hit a player
+
+	1 Fix GenerateLocalPlayerHitPlayerImpulse not being called!!
+	1 Add skull sprite when a player is killed
+	1 Add pitch changes to player sounds, to make them feel more unique
+
+	1 Hide health bar & stamina bars, (already have the Damage overlay indicating how damaged player is)
+		Need to figure out something for the stamina bar replacement
+	1 Move local player health bar onto the player, similar to other player's health bars
+	1 Remove stamina bar, will always have infinite stamina
+	1 Add skull laughing sound effect
+
+	0 Add a minimap
+	
 	0 Add health pickups
 	0 Add adrenaline pickup
 	0 Make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
 	0 Remove any references to Ping Server values
 	0 Remove Manual Server Entry
+
+	0 Integrate ads
+	0 Make dead time, so when died, wait like 10 seconds & show banner ads
 
 Future tasks;			
 	version 1.0.2

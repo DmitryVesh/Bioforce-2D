@@ -57,7 +57,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1792
   MaxStamina: 5
-  RateStaminaLoss: 1
+  RateStaminaLoss: 0
   RateStaminaRegen: 0.5
   PlatformLayerName: Platform
   JumpForce: 10
@@ -82,8 +82,6 @@ MonoBehaviour:
   FacingRight: 1
   PlayerBodySprite: {fileID: 7847370238992379348}
   PlayerArmsSprite: {fileID: 2298301300277298035}
-  PlayerHitParticle: {fileID: 6421890002363139958, guid: 8c43f0adcb74e764381f6918a3c31595,
-    type: 3}
   SplatterPrefab: {fileID: 2689029294326577204, guid: 4c583973c47e782448301c0d390ee53e,
     type: 3}
   SplatterSprites:
@@ -91,6 +89,16 @@ MonoBehaviour:
   - {fileID: 3776552351419399078, guid: b95b107362984f34e8f4a3d4823cbd97, type: 3}
   - {fileID: 8491009819667440847, guid: b95b107362984f34e8f4a3d4823cbd97, type: 3}
   - {fileID: 5188043738036765523, guid: b95b107362984f34e8f4a3d4823cbd97, type: 3}
+  PlayerHitParticles:
+    ParticleGameObject: {fileID: 6421890002363139958, guid: 8c43f0adcb74e764381f6918a3c31595,
+      type: 3}
+    NumMaxParticleSystems: 5
+  PlayerMuzzelFlashParticles:
+    ParticleGameObject: {fileID: 6421890002363139958, guid: 568dcccd583ef864293c01f02d137a39,
+      type: 3}
+    NumMaxParticleSystems: 5
+  HitMarker: {fileID: 3842690952241875696}
+  DisplayHitMarkerTime: 0.4
 --- !u!114 &3727253228089246339
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -665,6 +673,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 286639045735284032}
     m_Modifications:
+    - target: {fileID: 2144256880820316425, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2144256880820316425, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2144256880820316425, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2190302947158787140, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
         type: 3}
       propertyPath: m_RootOrder
@@ -868,15 +891,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc0ccc65539aaac40994e3c6a52d3361, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &9060565342501309971 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1098712728827684748, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+    type: 3}
+  m_PrefabInstance: {fileID: 8251422772928506271}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &9197498262357729496 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 947694065097509191, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
     type: 3}
   m_PrefabInstance: {fileID: 8251422772928506271}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &9060565342501309971 stripped
+--- !u!1 &3842690952241875696 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 1098712728827684748, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+  m_CorrespondingSourceObject: {fileID: 5174928736180822895, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
     type: 3}
   m_PrefabInstance: {fileID: 8251422772928506271}
   m_PrefabAsset: {fileID: 0}

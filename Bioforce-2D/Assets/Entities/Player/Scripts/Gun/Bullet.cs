@@ -101,6 +101,8 @@ public class Bullet : MonoBehaviour
         CurrentTimeToLive = impactEffectTime;
         rb.bodyType = RigidbodyType2D.Static;
         ParticleSystem.Play();
+
+        GameManager.PlayerDictionary[OwnerClientID].PlayersBulletHitCollider();
     }
     private void ResetBullet()
     {
