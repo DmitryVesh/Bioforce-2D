@@ -35,6 +35,8 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     [SerializeField] private GameObject HitMarker;
     [SerializeField] private float DisplayHitMarkerTime = 0.25f;
 
+    [SerializeField] private SpriteRenderer MinimapPlayerIcon;
+
     //TODO: add Jumped sent animations so can play sound effect on non local players
 
     public void SetOwnerClientID(int iD)
@@ -50,6 +52,9 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
         PlayerMuzzelFlashParticles.Initilise(playerColor, OwnerClientID);
         
         SplatterSpriteRenderer.color = playerColor;
+
+        MinimapPlayerIcon.color = playerColor;
+
         GenerateSplatters();
     }
 

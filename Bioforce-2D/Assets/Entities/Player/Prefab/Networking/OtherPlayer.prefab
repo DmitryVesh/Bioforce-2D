@@ -83,6 +83,7 @@ MonoBehaviour:
     NumMaxParticleSystems: 5
   HitMarker: {fileID: 4736230074330856343}
   DisplayHitMarkerTime: 0.2
+  MinimapPlayerIcon: {fileID: 7711383102858222094}
 --- !u!114 &2811104684193076455
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -141,6 +142,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Color.a
       value: 0.78431374
+      objectReference: {fileID: 0}
+    - target: {fileID: 2022831040620180700, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2022831040620180700, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2022831040620180700, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2059156668309886192, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
         type: 3}
@@ -247,6 +263,16 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: ea4fb03c1d7885a489373f10f0da0edf, type: 2}
+    - target: {fileID: 3134470533494490725, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134470533494490725, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4723899791567761022, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
         type: 3}
       propertyPath: m_RootOrder
@@ -375,6 +401,12 @@ MonoBehaviour:
 --- !u!1 &4736230074330856343 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5174928736180822895, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+    type: 3}
+  m_PrefabInstance: {fileID: 462589195740240120}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &7711383102858222094 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 7885561602539750134, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
     type: 3}
   m_PrefabInstance: {fileID: 462589195740240120}
   m_PrefabAsset: {fileID: 0}

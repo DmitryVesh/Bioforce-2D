@@ -163,6 +163,8 @@
     <Compile Include="Assets\Publishing Assets\Monetization\UnityMonetization.cs" />
     <Compile Include="Assets\Publishing Assets\PrivacyPolicyTermsConditionsMenu.cs" />
     <Compile Include="Assets\Entities\Effects\Particle Systems\LinkedParticleSystemManager.cs" />
+    <Compile Include="Assets\_Maps\Minimap\Minimap.cs" />
+    <Compile Include="Assets\_Maps\Minimap\MinimapIcon.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />
