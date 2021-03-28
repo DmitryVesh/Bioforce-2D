@@ -65,7 +65,6 @@
     <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\ServerEntry.cs" />
     <Compile Include="Assets\_Maps\FallBoundry\Scripts\FallBoundry.cs" />
     <Compile Include="Assets\UI\UIItemListingManager.cs" />
-    <Compile Include="Assets\Networking\GameServer\ServerRead.cs" />
     <Compile Include="Assets\UI\Main Menu\MainMenu.cs" />
     <Compile Include="Assets\Audio\Scripts\SoundPlayerManager.cs" />
     <Compile Include="Assets\Networking\PlayerManager.cs" />
@@ -84,12 +83,10 @@
     <Compile Include="Assets\Entities\Player\Scripts\Movement\Networking\NonLocalPlayerAnimations.cs" />
     <Compile Include="Assets\UI\TextInputValidator.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Gun\IGun.cs" />
-    <Compile Include="Assets\Networking\GameServer\ClientServer.cs" />
     <Compile Include="Assets\_Maps\RespawnPoints\RespawnPoint.cs" />
     <Compile Include="Assets\Networking\InternetDiscoveryClient.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Movement\Networking\IWalkingLocalPlayer.cs" />
     <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\TabGroupServerSort.cs" />
-    <Compile Include="Assets\Networking\GameServer\PlayerServer.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Movement\Networking\IWalkingPlayer.cs" />
     <Compile Include="Assets\Networking\ClientSend.cs" />
     <Compile Include="Assets\UI\Chat\InGameChat.cs" />
@@ -105,7 +102,6 @@
     <Compile Include="Assets\UI\KillFeed\KillFeedUI.cs" />
     <Compile Include="Assets\Networking\Client.cs" />
     <Compile Include="Assets\UI\Main Menu\Buttons\Scripts\MenuButtonManager.cs" />
-    <Compile Include="Assets\Networking\GameServer\ServerSend.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Movement\Networking\MobileLocalPlayerMovement.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\UI\HealthBar.cs" />
     <Compile Include="Assets\Networking\Packet.cs" />
@@ -125,7 +121,6 @@
     <Compile Include="Assets\Entities\Walking\InheritedScripts\IHealth.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Health\NonLocalPlayerHealth.cs" />
     <Compile Include="Assets\UI\MobileJoystick.cs" />
-    <Compile Include="Assets\Networking\GameServer\DiscoveryTCPClientServer.cs" />
     <Compile Include="Assets\_Maps\MainManager.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Gun\MuzzelFlash.cs" />
     <Compile Include="Assets\Entities\Items\Scripts\PickupItemsManager.cs" />
@@ -139,17 +134,13 @@
     <Compile Include="Assets\Entities\Player\Scripts\Camera\PlayerCameraController.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Movement\Networking\LocalPlayerAnimations.cs" />
     <Compile Include="Assets\Networking\DiscoveryTCPClient.cs" />
-    <Compile Include="Assets\Networking\GameServer\ServerProgram.cs" />
     <Compile Include="Assets\Entities\Items\Scripts\MedkitPickup.cs" />
     <Compile Include="Assets\Entities\Walking\InheritedScripts\IWalking.cs" />
-    <Compile Include="Assets\Networking\GameServer\Server.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Gun\NonLocalPlayerGun.cs" />
-    <Compile Include="Assets\Networking\GameServer\DiscoveryServer.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Gun\Bullet.cs" />
     <Compile Include="Assets\Networking\LANDiscoveryClient.cs" />
     <Compile Include="Assets\UI\Main Menu\MoveBackground.cs" />
     <Compile Include="Assets\UI\IUIItemListing.cs" />
-    <Compile Include="Assets\Networking\GameServer\GameLogic.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Movement\Networking\LocalPlayerMovement.cs" />
     <Compile Include="Assets\Entities\Items\Scripts\HealthPickup.cs" />
     <Compile Include="Assets\Networking\LANServerScanner.cs" />
@@ -165,6 +156,7 @@
     <Compile Include="Assets\Entities\Effects\Particle Systems\LinkedParticleSystemManager.cs" />
     <Compile Include="Assets\_Maps\Minimap\Minimap.cs" />
     <Compile Include="Assets\_Maps\Minimap\MinimapIcon.cs" />
+    <Compile Include="Assets\Publishing Assets\VersionCompatibility.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />

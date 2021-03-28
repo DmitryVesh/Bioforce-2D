@@ -123,6 +123,9 @@ MonoBehaviour:
   DamageMin: 5
   DamageMax: 15
   TimeToLive: 0.35
+  TimeBeforeShrinking: 0.2
+  TimeToShrink: 0.15
+  ShrinkTo: {x: 0.75, y: 0.75, z: 0.75}
 --- !u!50 &239321189594306111
 Rigidbody2D:
   serializedVersion: 4

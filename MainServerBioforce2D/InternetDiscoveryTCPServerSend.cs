@@ -7,10 +7,10 @@ namespace MainServerBioforce2D
     {
         public static void SendWelcome(int client)
         {
-            using (Packet packet = new Packet())
+            using (Packet packet = new Packet((int)InternetDiscoveryServerPackets.welcome))
             {
-                packet.Write((int)InternetDiscoveryServerPackets.welcome);
                 packet.Write($"Welcome to the MainServer client: {client}!");
+                packet.Write(InternetDiscoveryTCPServer.GameVersionLatest);
 
                 SendPacket(client, packet);
             }
@@ -23,9 +23,8 @@ namespace MainServerBioforce2D
 
             try
             {
-                using (Packet packet = new Packet())
+                using (Packet packet = new Packet((int)InternetDiscoveryServerPackets.serverData))
                 {
-                    packet.Write((int)InternetDiscoveryServerPackets.serverData);
                     packet.Write(server.ServerName);
                     packet.Write(server.CurrentNumPlayers);
                     packet.Write(server.MaxNumPlayers);
@@ -44,9 +43,8 @@ namespace MainServerBioforce2D
 
         public static void SendServerDeleted(int client, Server server)
         {
-            using (Packet packet = new Packet())
+            using (Packet packet = new Packet((int)InternetDiscoveryServerPackets.serverDeleted))
             {
-                packet.Write((int)InternetDiscoveryServerPackets.serverDeleted);
                 packet.Write(server.ServerName);
                 SendPacket(client, packet);
             }
@@ -55,9 +53,8 @@ namespace MainServerBioforce2D
 
         public static void SendModifedServer(int client, Server server)
         {
-            using (Packet packet = new Packet())
+            using (Packet packet = new Packet((int)InternetDiscoveryServerPackets.serverModified))
             {
-                packet.Write((int)InternetDiscoveryServerPackets.serverModified);
                 packet.Write(server.ServerName);
                 packet.Write(server.CurrentNumPlayers);
                 packet.Write(server.MaxNumPlayers);

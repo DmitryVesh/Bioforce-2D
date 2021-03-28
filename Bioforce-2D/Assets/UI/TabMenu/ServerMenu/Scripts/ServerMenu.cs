@@ -1,5 +1,4 @@
-﻿using GameServer;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using TMPro;
@@ -40,8 +39,17 @@ public class ServerMenu : MonoBehaviour
     internal static void ReadWelcomePacket(string ip, Packet packet)
     {
         string message = packet.ReadString();
-        Debug.Log($"Connection with MainServer established.\nMessage from MainServer: {message}");
-        
+        string gameVersionLatest = packet.ReadString();
+        Debug.Log($"Connection with MainServer established.\nMessage from MainServer: {message}" +
+            $"\nLatest GameVersion: {gameVersionLatest}");
+
+        if (!VersionCompatibility.Instance.DoGameVersionsMatch(gameVersionLatest))
+        {
+            VersionCompatibility.Instance.DisplayPanel();
+            InternetServerScanner.Instance.Disconnect();
+            return;
+        }
+
         if (Instance.AskingForServers)
             InternetServerScanner.SendFirstAskForServersPacket();
         Instance.InternetServersPage.RegainedConnectionToMainServer();

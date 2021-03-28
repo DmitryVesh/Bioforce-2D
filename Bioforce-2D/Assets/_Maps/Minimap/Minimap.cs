@@ -18,8 +18,8 @@ public class Minimap : MonoBehaviour
     private List<MinimapIcon> Icons { get; set; } = new List<MinimapIcon>();
     [SerializeField] private RectTransform MinimapRectTF;
     private Rect MinimapRect { get; set; }
-    private Vector2 MinimapCorner { get; set; }
-    private Vector2 MinimapScale { get; set; }
+    //private Vector2 MinimapCorner { get; set; }
+    //private Vector2 MinimapScale { get; set; }
     private int MultiplierX { get; set; }
     private int MultiplierY { get; set; }
 
@@ -50,14 +50,13 @@ public class Minimap : MonoBehaviour
             Destroy(gameObject);
         }
 
-        MinimapRect = MinimapRectTF.rect;
-
-        MinimapScale = MinimapRectTF.localScale;
+        MinimapRect = MinimapRectTF.rect;        
 
         Vector3[] minimapCorners = new Vector3[4];
         MinimapRectTF.GetWorldCorners(minimapCorners);
 
-        MinimapCorner = minimapCorners[(int)CornderIndex];
+        //MinimapCorner = minimapCorners[(int)CornderIndex];
+        //MinimapScale = MinimapRectTF.localScale;
 
         MakeXAndYMultipliers();
     }

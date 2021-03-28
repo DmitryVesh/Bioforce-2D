@@ -29,7 +29,7 @@ public class TabGroup : MonoBehaviour
 
     protected virtual void Start()
     {
-        TabButtons = GetComponentsInChildren<TabButton>(true).ToList();
+        TabButtons = GetComponentsInChildren<TabButton>(false).ToList();
         foreach (TabButton button in TabButtons)
         {
             button.SetParentTabGroup(this);

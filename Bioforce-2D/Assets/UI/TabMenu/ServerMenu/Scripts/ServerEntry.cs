@@ -33,7 +33,7 @@ public class ServerEntry : MonoBehaviour, IUIItemListing, IPointerEnterHandler, 
         ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.serverName).GetComponent<TextMeshProUGUI>());
         ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.playerCount).GetComponent<TextMeshProUGUI>());
         ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.mapName).GetComponent<TextMeshProUGUI>());
-        ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.ping).GetComponent<TextMeshProUGUI>());
+        //ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.ping).GetComponent<TextMeshProUGUI>());
 
         TextBackground = GetComponent<Image>();
 
@@ -44,7 +44,7 @@ public class ServerEntry : MonoBehaviour, IUIItemListing, IPointerEnterHandler, 
         ArrayListTexts[(int)ServerEntryArrayListIndexes.serverName].text = serverName;
         ArrayListTexts[(int)ServerEntryArrayListIndexes.playerCount].text = $"{currentPlayerCount}/{maxPlayerCount}";
         ArrayListTexts[(int)ServerEntryArrayListIndexes.mapName].text = mapName;
-        ArrayListTexts[(int)ServerEntryArrayListIndexes.ping].text = ping.ToString();
+        //ArrayListTexts[(int)ServerEntryArrayListIndexes.ping].text = ping.ToString();
 
         SetArrayList(new ArrayList() { serverName, currentPlayerCount, mapName, ping });
     }

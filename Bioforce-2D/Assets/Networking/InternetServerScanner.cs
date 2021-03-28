@@ -25,13 +25,6 @@ public class InternetServerScanner : MonoBehaviour
         //                                      5.3 lost connection to MainServer
         ServerMenu.Instance.AskingForServers = true;
         StartMainServerSocket(port);
-
-        //4.
-        Instance.AutoReAskTimer = new Timer(ReAskTimerMax);
-        Instance.AutoReAskTimer.Elapsed += AutoReAskTimer_Elapsed;
-        Instance.AutoReAskTimer.Start();
-
-        Instance.ResetReAskTimer(true);
     }
     public bool ContactMainServerToAddOwnServer(string serverName, int maxNumPlayers, string mapName, int port)
     {
@@ -69,6 +62,13 @@ public class InternetServerScanner : MonoBehaviour
         }
     }
 
+    public void Disconnect()
+    {
+        if (MainServerSocket != null)
+            MainServerSocket.Disconnect(false, false);
+        MainServerSocket = null;
+    }
+
     //Sending Packets
     internal static void SendFirstAskForServersPacket()
     {
@@ -79,6 +79,12 @@ public class InternetServerScanner : MonoBehaviour
             Instance.MainServerSocket.SendPacket(packet);
         }
         Debug.Log("Sent FirstAskForServers Packet to MainServer");
+
+        //4.
+        Instance.AutoReAskTimer = new Timer(ReAskTimerMax);
+        Instance.AutoReAskTimer.Elapsed += AutoReAskTimer_Elapsed;
+
+        Instance.ResetReAskTimer(true);
     }
     
     internal IEnumerator SendAddServerPacket(string serverName, int maxNumPlayers, string mapName)
@@ -179,9 +185,8 @@ public class InternetServerScanner : MonoBehaviour
     private void OnDestroy()
     {
         //5.2
-        if (MainServerSocket != null)
-            MainServerSocket.Disconnect(false, false);
-        MainServerSocket = null;
+        Disconnect();
         ResetReAskTimer(false);
     }
+
 }

@@ -3,7 +3,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using GameServer;
+using System;
 
 public class CreateServer : MonoBehaviour
 {
@@ -112,10 +112,11 @@ public class CreateServer : MonoBehaviour
         bool successStart;
         if (!InternetServerSelected)
         {
-            int port = 28025; //TODO: Make so not hardcoded, maybe player assigns their own?
-            successStart = ServerProgram.StartServerProgram(ServerNameSelected, MaxPlayerSelected, MapSelected, port);
-            Instantiate(ServerGameObject);
-            Client.Instance.ConnectToServer("127.0.0.1", port);
+            throw new NotImplementedException();
+            //int port = 28025; //TODO: Make so not hardcoded, maybe player assigns their own?
+            //successStart = ServerProgram.StartServerProgram(ServerNameSelected, MaxPlayerSelected, MapSelected, port);
+            //Instantiate(ServerGameObject);
+            //Client.Instance.ConnectToServer("127.0.0.1", port);
         }
         else 
         {

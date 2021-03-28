@@ -19,7 +19,11 @@ public class MinimapIcon : MonoBehaviour
     private void OnDestroy()
     {
         Minimap.Unsubscribe(this);
+
         if (!(Icon is null))
-            Destroy(Icon.gameObject);
+            Destroy(Icon);
+        //if (!(Icon.gameObject is null))
+        //    Destroy(Icon.gameObject);
+
     }
 }

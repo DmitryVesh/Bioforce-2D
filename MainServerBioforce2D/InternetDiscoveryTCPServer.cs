@@ -15,6 +15,8 @@ namespace MainServerBioforce2D
         public const string MainServerIP = "18.134.197.3";
         //public const string MainServerIP = "127.0.0.1";
 
+        public const string GameVersionLatest = "1.0.1";
+
         private static TcpListener TCPBroadCastTcpListener { get; set; }
 
         private static int PortNum { get; set; }

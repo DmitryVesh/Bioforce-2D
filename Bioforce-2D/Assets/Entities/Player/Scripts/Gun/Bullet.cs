@@ -1,6 +1,4 @@
-﻿using GameServer;
-using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,6 +19,12 @@ public class Bullet : MonoBehaviour
     private SpriteRenderer Sprite { get; set; }
     private Color BulletColor { get; set; }
     private ParticleSystem ParticleSystem { get; set; }
+
+    [SerializeField] private float TimeBeforeShrinking = 0.3f;
+    [SerializeField] private float TimeToShrink = 0.7f;
+
+    [SerializeField] private Vector3 ShrinkTo = new Vector3(0.3f, 0.3f, 0.3f);
+    private Vector3 OriginalScale { get; set; }
 
 
     public bool IsAvailable()
@@ -57,19 +61,29 @@ public class Bullet : MonoBehaviour
         Sprite = GetComponent<SpriteRenderer>();
         ParticleSystem = GetComponent<ParticleSystem>();
         gameObject.SetActive(false);
-        
 
+        OriginalScale = transform.localScale;
     }
     private void FixedUpdate()
     {
         if (!Available)
         {
+            DecreaseSizeOverTime();
+
             CurrentTimeToLive -= Time.fixedDeltaTime;
             if (CurrentTimeToLive < 0)
                 ResetBullet();
         }
     }
 
+    private void DecreaseSizeOverTime()
+    {
+        float CurrentLiveTime = TimeToLive - CurrentTimeToLive;
+        if (CurrentLiveTime > TimeBeforeShrinking)
+            return;
+
+        transform.localScale = Vector3.Lerp(transform.localScale, ShrinkTo, CurrentLiveTime / TimeToShrink);
+    }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -83,7 +97,8 @@ public class Bullet : MonoBehaviour
             //So only hurts local player, so other people's bullets only hurt you,
             if (ownClient && !ownBullet)
             {
-                int damage = UnityEngine.Random.Range(DamageMin, DamageMax + 1);
+                float damageRatio = transform.localScale.magnitude / OriginalScale.magnitude;
+                int damage = (int)((float)Random.Range(DamageMin, DamageMax + 1) * damageRatio);
                 health.TakeDamage(damage, OwnerClientID);
             }
             else if (ownBullet)
@@ -108,5 +123,6 @@ public class Bullet : MonoBehaviour
     {
         gameObject.SetActive(false);
         Available = true;
+        transform.localScale = OriginalScale;
     }
 }

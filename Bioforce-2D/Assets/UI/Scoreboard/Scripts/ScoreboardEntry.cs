@@ -20,7 +20,7 @@ public class ScoreboardEntry : MonoBehaviour, IUIItemListing
     private ArrayList ItemList { get; set; }
 
     //TODO: Add pings to the scoreboard entry of players.
-    private TextMeshProUGUI PingText { get; set; }    
+    //private TextMeshProUGUI PingText { get; set; }    
 
     public void Init(int iD, int score, string username, int kills, int deaths)
     {
@@ -30,7 +30,7 @@ public class ScoreboardEntry : MonoBehaviour, IUIItemListing
         ArrayListTexts.Add(transform.GetChild((int)ScoreboardEntryArrayListIndexes.kills).GetComponent<TextMeshProUGUI>());
         ArrayListTexts.Add(transform.GetChild((int)ScoreboardEntryArrayListIndexes.deaths).GetComponent<TextMeshProUGUI>());
 
-        PingText = transform.GetChild(4).GetComponent<TextMeshProUGUI>();
+        //PingText = transform.GetChild(4).GetComponent<TextMeshProUGUI>();
         SetText(score, username, kills, deaths);
 
         Color color = GameManager.PlayerDictionary[iD].PlayerColor;
