@@ -100,6 +100,9 @@ MonoBehaviour:
   HitMarker: {fileID: 3842690952241875696}
   DisplayHitMarkerTime: 0.4
   MinimapPlayerIcon: {fileID: 2801587477364284785}
+  FootstepParticles: {fileID: 5596285460121286306}
+  SprintingParticlesAdd: 15
+  ImpactOnFlootParticles: {fileID: 6921770375379748362}
 --- !u!114 &3727253228089246339
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -165,6 +168,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxHealth: 50
   CurrentHealth: 0
+  HealthWhenHeartBeatShouldPlayMin: 30
+  HealthWhenHeartBeatShouldPlayMax: 10
 --- !u!114 &1797031027889607205
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -674,6 +679,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 286639045735284032}
     m_Modifications:
+    - target: {fileID: 2022831040620180700, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2022831040620180700, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2022831040620180700, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2144256880820316425, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
         type: 3}
       propertyPath: m_Color.b
@@ -774,6 +794,16 @@ PrefabInstance:
       propertyPath: ShootImpulseSource
       value: 
       objectReference: {fileID: 1797031027889607205}
+    - target: {fileID: 3134470533494490725, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3134470533494490725, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7510654303130867598, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
         type: 3}
       propertyPath: m_PresetInfoIsWorld
@@ -895,6 +925,18 @@ MonoBehaviour:
 --- !u!1 &9060565342501309971 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1098712728827684748, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+    type: 3}
+  m_PrefabInstance: {fileID: 8251422772928506271}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &6921770375379748362 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 1336971165434769301, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+    type: 3}
+  m_PrefabInstance: {fileID: 8251422772928506271}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &5596285460121286306 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 4551748008333451069, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
     type: 3}
   m_PrefabInstance: {fileID: 8251422772928506271}
   m_PrefabAsset: {fileID: 0}

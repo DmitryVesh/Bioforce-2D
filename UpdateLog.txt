@@ -36,24 +36,22 @@ Main goals is to;
 	1 Remove Manual Server Entry
 	1 Delete all GameServer Code in Unity project
 
-	0 Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard
-
-	0 Add health pickups
-	0 Add adrenaline pickup
-
-	0 Integrate ads
-	0 Make dead time, so when died, wait like 10 seconds & show banner ads
-
+	1 Add trail effects when a player is moving, and increase when sprinting
+	1 Add heartbeat sound effects when low on health, increases with volume as player gets more damaged, similar to permanent damage overlay Alpha var
+	
 Future tasks;			
 	version 1.0.2
+		0 Decrease the music volume / deafen the music as player's heart beat increases in bpm
+		0 Allow players to choose their own colour
+		0 Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard
+
+		0 Add health pickups
+		0 Add adrenaline pickup
+
+		0 Integrate ads
+		0 Make dead time, so when died, wait like 10 seconds & show banner ads
 		Add invincibility frames, after being hit/respawning
-		Add trail effects when a player sprints, so can clearly see player sprinting, also maybe zoom camera out a little bit...
 	version 1.0.3
-		add breathing camera movement when player is idle, going up and down
-		Add heartbeat sound effects when low on health, increases with volume as player gets more damaged, similar to permanent damage overlay Alpha var
-	version 1.0.4
-		Allow players to choose their own colour
-	version 1.0.5
 		Add tutorial level into game
 
 	Add chat into game

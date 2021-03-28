@@ -27,7 +27,6 @@ public class ScoreboardManager : UIItemListingManager
     }
     internal void DeleteEntry(int disconnectedPlayer)
     {
-        //TODO: instead of destroying gameObject, should setActive(false), and re-use it later
         try
         {
             Destroy(PlayersItemLists[disconnectedPlayer].GetGameObject());

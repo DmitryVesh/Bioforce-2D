@@ -164,7 +164,7 @@ public class ServerMenu : MonoBehaviour
     public void OnConnectButtonPressed()
     {        
         ServerMenuPanel.SetActive(false);
-        if (SelectedManualEntry) //TODO: Make so Discovery tcp client is made to check out the ip address
+        if (SelectedManualEntry)
             ServerConnectionTimeOut();
         else
         {

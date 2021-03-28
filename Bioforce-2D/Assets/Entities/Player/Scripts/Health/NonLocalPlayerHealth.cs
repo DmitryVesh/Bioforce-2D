@@ -5,13 +5,13 @@ using UnityEngine;
 public class NonLocalPlayerHealth : MonoBehaviour, IHealth
 {
     [SerializeField] private int MaxHealth = 0;
-    [SerializeField] private int CurrentHealth = 0;
+    [SerializeField] protected int CurrentHealth = 0;
 
     //Set to default of -1, which will mean that the object will take damage from any bullet
     public int OwnerClientID { get; private set; } = -1;
 
-    private PlayerManager PlayerManager { get; set; }
-    private bool CantGetHit { get; set; }
+    protected PlayerManager PlayerManager { get; set; }
+    protected bool CantGetHit { get; set; }
 
     public bool CanTakeDamage() =>
         !CantGetHit;
@@ -30,20 +30,9 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
 
     public void TookDamage(int damage, int currentHealth)
     {
-        //TODO: display hit effect
         CurrentHealth = currentHealth;
     }
-    public void TakeDamage(int damage, int bulletOwnerID)
-    {
-        if (CantGetHit)
-            return;
-
-        if (CurrentHealth - damage <= 0 && !CantGetHit)
-            Die(bulletOwnerID);
-
-        PlayerManager.TookDamage(damage, CurrentHealth - damage);
-        ClientSend.TookDamage(damage, CurrentHealth, bulletOwnerID);
-    }
+    public virtual void TakeDamage(int damage, int bulletOwnerID) { }
 
     public void SetOwnerClientID(int iD) =>
         OwnerClientID = iD;

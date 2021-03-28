@@ -37,6 +37,23 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
 
     [SerializeField] private MinimapIcon MinimapPlayerIcon;
 
+    [SerializeField] private ParticleSystem FootstepParticles;
+    private ParticleSystem.EmissionModule FootstepEmission;
+    private ParticleSystem.MinMaxCurve EmissionNormal;
+    private ParticleSystem.MinMaxCurve EmissionSprint;
+    [SerializeField] private float SprintingParticlesAdd = 15f;
+    private ParticleSystem.MinMaxCurve EmissionEmpty;
+    enum MovingState
+    {
+        notMoving,
+        moving,
+        sprinting
+    }
+    private MovingState CurrentMovingState { get; set; }
+
+    [SerializeField] private ParticleSystem ImpactOnFlootParticles;
+    private bool LastGrounded { get; set; } = true;
+
     //TODO: add Jumped sent animations so can play sound effect on non local players
 
     public void SetOwnerClientID(int iD)
@@ -87,6 +104,13 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
         WalkingPlayer = GetComponent<IWalkingPlayer>();
 
         SplatterSpriteRenderer = SplatterPrefab.GetComponent<SpriteRenderer>();
+
+        FootstepEmission = FootstepParticles.emission;
+        EmissionNormal = FootstepEmission.rateOverTime;
+        EmissionSprint = new ParticleSystem.MinMaxCurve(EmissionNormal.constant + SprintingParticlesAdd);
+        EmissionEmpty = new ParticleSystem.MinMaxCurve(0f);
+
+        FootstepEmission.rateOverTime = EmissionEmpty;
     }
     private void Start()
     {
@@ -149,12 +173,55 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
         if (speedX < 0) //Moving left
             speedX = -speedX; // Adjusting the horizontal speed to a positive value if moving to left
 
-        Anim.SetBool("Moving", speedX != 0);
-        Anim.SetBool("Sprinting", speedX > WalkingPlayer.GetRunSpeed());
+        bool moving = speedX != 0;
+        Anim.SetBool("Moving", moving);
+
+        bool sprinting = speedX > WalkingPlayer.GetRunSpeed();
+        Anim.SetBool("Sprinting", sprinting);
+        
+        HandleFootstepParticles(moving, sprinting);
     }
+
+    private void HandleFootstepParticles(bool moving, bool sprinting)
+    {
+        MovingState newMovingState;
+        bool grounded = WalkingPlayer.GetGrounded();
+        if (sprinting && grounded)
+            newMovingState = MovingState.sprinting;
+        else if (moving && grounded)
+            newMovingState = MovingState.moving;
+        else
+            newMovingState = MovingState.notMoving;
+
+        if (newMovingState == CurrentMovingState)
+            return;
+
+        CurrentMovingState = newMovingState;
+        switch (CurrentMovingState)
+        {
+            case MovingState.notMoving:
+                FootstepEmission.rateOverTime = EmissionEmpty;
+                break;
+            case MovingState.moving:
+                FootstepEmission.rateOverTime = EmissionNormal;
+                break;
+            case MovingState.sprinting:
+                FootstepEmission.rateOverTime = EmissionSprint;
+                break;
+        }
+    }
+
     public virtual void YAxisAnimations()
     {
-        Anim.SetBool("Grounded", WalkingPlayer.GetGrounded());
+        bool grounded = WalkingPlayer.GetGrounded();
+        Anim.SetBool("Grounded", grounded);
+
+        if (grounded == LastGrounded)
+            return;
+
+        LastGrounded = grounded;
+        if (LastGrounded)
+            ImpactOnFlootParticles.Play();
     }
     public virtual void DieAnimation(TypeOfDeath typeOfDeath)
     {

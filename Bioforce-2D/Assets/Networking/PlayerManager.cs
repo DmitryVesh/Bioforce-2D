@@ -57,6 +57,11 @@ public class PlayerManager : MonoBehaviour
 
     public event NoParams OnLocalPlayerHitAnother;
 
+    public delegate void TripleInt(int integer1, int integer2, int integer3);
+    public event TripleInt OnHeartBeatShouldPlay;
+
+    internal void OnHeartBeatShouldPlayEvent(int newHealth, int healthWhenHeartBeatShouldPlayMin, int healthWhenHeartBeatShouldPlayMax) =>
+        OnHeartBeatShouldPlay?.Invoke(newHealth, healthWhenHeartBeatShouldPlayMin, healthWhenHeartBeatShouldPlayMax);
 
     public void PlayersBulletHitCollider() =>
         OnPlayersBulletHitCollider?.Invoke();

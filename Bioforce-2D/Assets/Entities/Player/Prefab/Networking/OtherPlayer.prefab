@@ -84,6 +84,9 @@ MonoBehaviour:
   HitMarker: {fileID: 4736230074330856343}
   DisplayHitMarkerTime: 0.2
   MinimapPlayerIcon: {fileID: 5911185414982741014}
+  FootstepParticles: {fileID: 4125434554662602693}
+  SprintingParticlesAdd: 15
+  ImpactOnFlootParticles: {fileID: 1506052052720695149}
 --- !u!114 &2811104684193076455
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -263,6 +266,16 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: ea4fb03c1d7885a489373f10f0da0edf, type: 2}
+    - target: {fileID: 2468677318017382592, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: looping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2468677318017382592, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+        type: 3}
+      propertyPath: lengthInSec
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 3134470533494490725, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -398,6 +411,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc0ccc65539aaac40994e3c6a52d3361, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!198 &1506052052720695149 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 1336971165434769301, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+    type: 3}
+  m_PrefabInstance: {fileID: 462589195740240120}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &4125434554662602693 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 4551748008333451069, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+    type: 3}
+  m_PrefabInstance: {fileID: 462589195740240120}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &4736230074330856343 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5174928736180822895, guid: 73ac35a2afb20154c8e39c9292eb9d5d,

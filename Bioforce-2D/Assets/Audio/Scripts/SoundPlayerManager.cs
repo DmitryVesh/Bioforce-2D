@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class SoundPlayerManager : MonoBehaviour
 {
-    private AudioSource AudioSource { get; set; }
+    [SerializeField] private AudioSource AudioSource;
     private PlayerManager PlayerManager { get; set; }
 
     [SerializeField] private AudioClip[] Shoot;
@@ -23,6 +22,14 @@ public class SoundPlayerManager : MonoBehaviour
     [SerializeField] private AudioClip HitMarker;
 
     [SerializeField] private AudioClip[] SkullLaughing;
+
+    [SerializeField] private AudioSource HeartBeatAudioSource; //Must have its own to adjust tempo, pitch and volume
+    [SerializeField] private float MinHeartBeatVolume = 0.5f;
+    [SerializeField] private float MaxHeartBeatVolume = 1f;
+    [SerializeField] private AudioMixerGroup HeartbeatMixer;
+    [SerializeField] private float MinHeartBeatTempo = 1f;
+    [SerializeField] private float MaxHeartBeatTempo = 1.75f;
+    private bool PlayingHeartbeat;
 
     const float NormalPitch = 1f;
 
@@ -45,6 +52,43 @@ public class SoundPlayerManager : MonoBehaviour
         PlayerManager.OnLocalPlayerHitAnother += HitMarkerSound;
 
         PlayerManager.OnPlayerDeath += PlaySkullLaughing;
+
+        PlayerManager.OnHeartBeatShouldPlay += PlayHeartBeat;
+        PlayerManager.OnPlayerDeath += StopHeartBeat;
+    }
+
+    private void PlayHeartBeat(int health, int healthMinToPlayHeartBeat, int healthMaxToPlayHeartBeat)
+    {
+        HeartBeatAudioSource.volume = LinearInterpolate(health, healthMinToPlayHeartBeat, healthMaxToPlayHeartBeat, MinHeartBeatVolume, MaxHeartBeatVolume);
+
+        //TODO: Turn down the music volume as well to amplify effect
+        float tempo = LinearInterpolate(health, healthMinToPlayHeartBeat, healthMaxToPlayHeartBeat, MinHeartBeatTempo, MaxHeartBeatTempo);
+        HeartBeatAudioSource.pitch = tempo;
+        HeartbeatMixer.audioMixer.SetFloat("Heartbeat Pitch", 1f / tempo);
+
+        if (!PlayingHeartbeat)
+        {
+            HeartBeatAudioSource.Play();
+            PlayingHeartbeat = true;
+        }
+    }
+    private void StopHeartBeat(TypeOfDeath typeOfDeath)
+    {
+        if (PlayingHeartbeat)
+        {
+            HeartBeatAudioSource.Stop();
+            PlayingHeartbeat = false;
+        }
+    }
+
+    private static float LinearInterpolate(int health, int healthMinToPlayHeartBeat, int healthMaxToPlayHeartBeat, float minVal, float maxVal)
+    {
+        int diffRanges = healthMaxToPlayHeartBeat - healthMinToPlayHeartBeat;
+        int diffCurrent = health - healthMinToPlayHeartBeat;
+
+        float diffVals = maxVal - minVal;
+
+        return ((float)diffCurrent / (float)diffRanges) * diffVals + minVal;
     }
 
     private void PlaySkullLaughing(TypeOfDeath typeOfDeath)
