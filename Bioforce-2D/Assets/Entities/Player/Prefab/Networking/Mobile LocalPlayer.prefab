@@ -86,7 +86,7 @@ MonoBehaviour:
     NumMaxParticleSystems: 5
   HitMarker: {fileID: 3842690952241875696}
   DisplayHitMarkerTime: 0.4
-  MinimapPlayerIcon: {fileID: 2300729404947393385}
+  MinimapPlayerIcon: {fileID: 2801587477364284785}
 --- !u!114 &3727253228089246339
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -799,12 +799,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 8251422772928506271}
   m_PrefabAsset: {fileID: 0}
---- !u!212 &2300729404947393385 stripped
-SpriteRenderer:
-  m_CorrespondingSourceObject: {fileID: 7885561602539750134, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+--- !u!114 &2801587477364284785 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6080930132917482734, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
     type: 3}
   m_PrefabInstance: {fileID: 8251422772928506271}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 570da206f0dbdd1489997c518f857d5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &8484389964605148106
 PrefabInstance:
   m_ObjectHideFlags: 0

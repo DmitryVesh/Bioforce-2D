@@ -1,14 +1,25 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MinimapIcon : MonoBehaviour
 {
-    [SerializeField] private Sprite IconWithinRange;
-    [SerializeField] private Sprite IconOutOfRange;
+    [SerializeField] public Image Icon;
+
+    [SerializeField] public Sprite IconWithinRange;
+    [SerializeField] public Sprite IconOutOfRange;
+    
+    [SerializeField] public bool ShouldClamp;
+    public Color Color { get; set; }
 
     private void Start()
     {
-        Minimap.SubscribeIcon(this);
+        Minimap.SubscribeIcon(this, Color);
+    }
+
+    private void OnDestroy()
+    {
+        Minimap.Unsubscribe(this);
+        if (!(Icon is null))
+            Destroy(Icon.gameObject);
     }
 }

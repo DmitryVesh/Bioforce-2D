@@ -23,13 +23,17 @@ Main goals is to;
 	1 Remove stamina bar, will always have infinite stamina
 	1 Add skull laughing sound effect
 
-	0 Add a minimap
+	1 Add a minimap
 	
-	0 Add health pickups
-	0 Add adrenaline pickup
-	0 Make a movement cooldown if a player fully exhausted the stamina bar, decrease run speed, don't allow to try and sprint
+	0 Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard
+
+	0 Hide Public/Private game optionss
 	0 Remove any references to Ping Server values
 	0 Remove Manual Server Entry
+	0 Remove references to LAN Servers
+
+	0 Add health pickups
+	0 Add adrenaline pickup
 
 	0 Integrate ads
 	0 Make dead time, so when died, wait like 10 seconds & show banner ads
@@ -39,7 +43,6 @@ Future tasks;
 		Delete all GameServer Code in Unity project
 		Add invincibility frames, after being hit/respawning
 		Add trail effects when a player sprints, so can clearly see player sprinting, also maybe zoom camera out a little bit...
-		Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard
 	version 1.0.3
 		add breathing camera movement when player is idle, going up and down.
 		using cinemachine add impulses, fast small camera movements in specific directions, for:
