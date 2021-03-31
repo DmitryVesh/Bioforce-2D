@@ -11,9 +11,13 @@ namespace GameServer
         public static string ServerName { get; private set; }
         public static int MaxNumPlayers { get; private set; }
         public static string MapName { get; private set; }
-        public static int PortNum { get; private set; }        
+
+        public static int PortNum { get; private set; }
+
+        
 
         public static Dictionary<int, ClientServer> ClientDictionary = new Dictionary<int, ClientServer>();
+
         public static Dictionary<int, ClientServer> NotConnectedClients = new Dictionary<int, ClientServer>();
 
         private static TcpListener TCPListener { get; set; }
@@ -22,6 +26,14 @@ namespace GameServer
         public delegate void PacketHandler(int clientID, Packet packet);
         public static Dictionary<int, PacketHandler> PacketHandlerDictionary;
 
+
+        internal static List<int> GetAllPlayerColors()
+        {
+            List<int> PlayerColors = new List<int>();
+            foreach (ClientServer client in ClientDictionary.Values)
+                PlayerColors.Add(client.Player.PlayerColor);
+            return PlayerColors;
+        }
         public static int GetCurrentNumPlayers()
         {
             int playerCount = 0;
@@ -60,7 +72,7 @@ namespace GameServer
                     $"\n\t\tMax Players:  {MaxNumPlayers}" +
                     $"\n\t\tPort number:  {PortNum}");
                 
-                PlayerColor.GetRandomColor();
+                //PlayerColor.GetRandomColor();
             }
             catch (Exception exception)
             {
@@ -120,6 +132,8 @@ namespace GameServer
             PacketHandlerDictionary.Add((int)ClientPackets.armPositionRotation, ServerRead.ArmPositionRotation);
             PacketHandlerDictionary.Add((int)ClientPackets.pausedGame, ServerRead.PlayerPausedGame);
             PacketHandlerDictionary.Add((int)ClientPackets.stillConnected, ServerRead.PlayerStillConnected);
+            PacketHandlerDictionary.Add((int)ClientPackets.colorToFreeAndTake, ServerRead.ColorToFreeAndToTake);
+            PacketHandlerDictionary.Add((int)ClientPackets.readyToJoin, ServerRead.ReadyToJoin);
 
             Console.WriteLine("\tInitialised server packets.");
         }

@@ -16,9 +16,9 @@ public class ClientRead : MonoBehaviour
         Client.Instance.SuccessfullyConnected(id);
         Client.Instance.uDP.Connect(((IPEndPoint)Client.Instance.tCP.Socket.Client.LocalEndPoint).Port);
 
-        GameManager.Instance.SwitchScene(mapName);
-
         ClientSend.WelcomePacketReply();
+
+        GameManager.Instance.SwitchScene(mapName);
 
         GameManager.Instance.InGame = true;
     }
@@ -27,6 +27,47 @@ public class ClientRead : MonoBehaviour
         Debug.Log($"Received packet via UDP: {packet.ReadString()}");
         ClientSend.UDPTestPacketReply();
     }
+
+    internal static void AskingForPlayerDetails(Packet packet)
+    {
+        int numPlayers = packet.ReadInt();
+
+        List<int> playerColors = new List<int>();
+
+        for (int playerCount = 0; playerCount < numPlayers; playerCount++)
+            playerColors.Add(packet.ReadInt());
+
+        PlayerChooseColor.Instance.SetActivate(true);
+        PlayerChooseColor.Instance.SetTakenColors(playerColors);
+        PlayerChooseColor.Instance.SetDefaultColor();
+
+    }
+
+    internal static void FreeColor(Packet packet)
+    {
+        int colorToFree = packet.ReadInt();
+
+        PlayerChooseColor.Instance.FreeColor(colorToFree);
+    }
+    internal static void TakeColor(Packet packet)
+    {
+        int colorToTake = packet.ReadInt();
+
+        PlayerChooseColor.Instance.TakeColor(colorToTake);
+    }
+    internal static void TriedTakingTakenColor(Packet packet)
+    {
+        int numColors = packet.ReadInt();
+
+        List<int> colors = new List<int>();
+
+        for (int playerCount = 0; playerCount < numColors; playerCount++)
+            colors.Add(packet.ReadInt());
+
+        PlayerChooseColor.Instance.SetTakenColors(colors);
+        PlayerChooseColor.Instance.SetDefaultColor();
+    }
+
     public static void PlayerDisconnect(Packet packet)
     {
         int disconnectedPlayer = packet.ReadInt();
@@ -54,13 +95,11 @@ public class ClientRead : MonoBehaviour
         int maxHealth = packet.ReadInt();
         int currentHealth = packet.ReadInt();
 
-        int R = packet.ReadInt();
-        int G = packet.ReadInt();
-        int B = packet.ReadInt();
-        Color color = new Color((float)R / (float)255, (float)G / (float)255, (float)B / (float)255);
+        int playerColor = packet.ReadInt();
+        
         bool paused = packet.ReadBool();
 
-        GameManager.Instance.SpawnPlayer(iD, username, position, isFacingRight, isDead, justJoined, maxHealth, currentHealth, color);
+        GameManager.Instance.SpawnPlayer(iD, username, position, isFacingRight, isDead, justJoined, maxHealth, currentHealth, playerColor);
         GameManager.PlayerDictionary[iD].SetPlayerMovementStats(runSpeed, sprintSpeed);
         ScoreboardManager.Instance.AddEntry(iD, username, kills, deaths, score);
 
@@ -197,4 +236,6 @@ public class ClientRead : MonoBehaviour
         bool shouldHost = packet.ReadBool();
         HostClient.Instance.Host(shouldHost);
     }
+
+    
 }

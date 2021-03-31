@@ -63,7 +63,11 @@ namespace Shared
         armPositionRotation,
         playerPausedGame,
         stillConnected,
-        shouldHost
+        shouldHost,
+        askPlayerDetails,
+        freeColor,
+        takeColor,
+        triedTakingTakenColor
     }
 
     /// <summary>Sent from client to server.</summary>
@@ -79,7 +83,9 @@ namespace Shared
         tookDamage,
         armPositionRotation,
         pausedGame,
-        stillConnected
+        stillConnected,
+        colorToFreeAndTake,
+        readyToJoin
     }
 
     public class Packet : IDisposable

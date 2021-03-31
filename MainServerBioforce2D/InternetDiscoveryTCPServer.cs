@@ -70,7 +70,7 @@ namespace MainServerBioforce2D
             return gameServerPort;
         }
         private static void MakePersistentServer() =>
-            MakeGameServer(serverName: "Welcome", maxNumPlayers: 20, mapName: "Level 1", currentNumPlayers: 0, ping: 0, timeOut: -1);
+            MakeGameServer(serverName: "Welcome", maxNumPlayers: 16, mapName: "Level 1", currentNumPlayers: 0, ping: 0, timeOut: -1);
 
         public static void StartServer(int port)
         {

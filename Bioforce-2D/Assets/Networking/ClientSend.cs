@@ -24,6 +24,26 @@ public class ClientSend : MonoBehaviour
         }        
     }
 
+    internal static void ColorToFreeAndToTaken(int colorToFree, int colorToTake)
+    {
+        using (Packet packet = new Packet((int)ClientPackets.colorToFreeAndTake))
+        {
+            packet.Write(colorToFree);
+            packet.Write(colorToTake);
+
+            SendTCPPacket(packet);
+        }
+    }
+    internal static void PlayerReadyToJoin(int chosenColorIndex)
+    {
+        using (Packet packet = new Packet((int)ClientPackets.readyToJoin))
+        {
+            packet.Write(chosenColorIndex);
+
+            SendTCPPacket(packet);
+        }
+    }
+
     public static void PlayerMovement(bool isFacingRight, Vector2 position, Vector2 velocity, Quaternion rotation)
     {
         using (Packet packet = new Packet((int)ClientPackets.playerMovement))
@@ -36,6 +56,8 @@ public class ClientSend : MonoBehaviour
             SendTCPPacket(packet);
         }        
     }
+
+
     public static void PlayerMovementStats(float runSpeed, float sprintSpeed)
     {
         using (Packet packet = new Packet((int)ClientPackets.playerMovementStats))
@@ -46,6 +68,8 @@ public class ClientSend : MonoBehaviour
             SendTCPPacket(packet); // Only sending once, so want to make sure it gets there
         }        
     }
+
+    
 
     internal static void ArmPositionAndRotation(Vector2 localPosition, Quaternion localRotation)
     {
@@ -110,7 +134,7 @@ public class ClientSend : MonoBehaviour
     }
     internal static void PlayerConnectedPacket()
     {
-        using (Packet packet = new Packet((int)ClientPackets.stillConnnected))
+        using (Packet packet = new Packet((int)ClientPackets.stillConnected))
         {
             SendTCPPacket(packet);
         }

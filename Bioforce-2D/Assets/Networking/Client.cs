@@ -413,6 +413,10 @@ public class Client : MonoBehaviour
         PacketHandlerDictionary.Add((int)ServerPackets.playerPausedGame, ClientRead.PlayerPausedGame);
         PacketHandlerDictionary.Add((int)ServerPackets.stillConnected, ClientRead.PlayerStillConnected);
         PacketHandlerDictionary.Add((int)ServerPackets.shouldHost, ClientRead.SetHostClient);
+        PacketHandlerDictionary.Add((int)ServerPackets.askPlayerDetails, ClientRead.AskingForPlayerDetails);
+        PacketHandlerDictionary.Add((int)ServerPackets.freeColor, ClientRead.FreeColor);
+        PacketHandlerDictionary.Add((int)ServerPackets.takeColor, ClientRead.TakeColor);
+        PacketHandlerDictionary.Add((int)ServerPackets.triedTakingTakenColor, ClientRead.TriedTakingTakenColor);
     }
        
 }

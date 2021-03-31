@@ -50,7 +50,11 @@ public enum ServerPackets
     armPositionRotation,
     playerPausedGame,
     stillConnected,
-    shouldHost
+    shouldHost,
+    askPlayerDetails,
+    freeColor,
+    takeColor,
+    triedTakingTakenColor
 }
 
 /// <summary>Sent from client to server.</summary>
@@ -66,7 +70,9 @@ public enum ClientPackets
     tookDamage,
     armPositionRotation,
     pausedGame,
-    stillConnnected
+    stillConnected,
+    colorToFreeAndTake,
+    readyToJoin
 }
 
 public class Packet : IDisposable

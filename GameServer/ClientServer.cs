@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
@@ -155,6 +156,8 @@ namespace GameServer
             
             
         }
+
+
         public class UDPServer
         {
             public IPEndPoint ipEndPoint;
@@ -200,10 +203,14 @@ namespace GameServer
                 ipEndPoint = null;
             }
         }
-        
-        public void SendIntoGame(string username)
+
+        internal void SetPlayer(string username)
         {
-            Player = new PlayerServer(ID, username, new Vector2(0, 0), PlayerColor.GetRandomColor());
+            Player = new PlayerServer(ID, username);
+        }
+        public void SendIntoGame(int playerColor)
+        {
+            Player.SetPlayerData(Vector2.Zero, playerColor);
 
             //Spawning the player who just joined, for all connected users
             foreach (ClientServer client in Server.ClientDictionary.Values)
@@ -211,7 +218,10 @@ namespace GameServer
                 if (client.Player != null)
                     ServerSend.SpawnPlayer(client.ID, Player, true);
             }
+        }
 
+        public void SpawnOtherPlayersToConnectedUser()
+        {
             //Spawning rest of players for the connected user
             foreach (ClientServer client in Server.ClientDictionary.Values)
             {
@@ -224,9 +234,8 @@ namespace GameServer
                     }
                 }
             }
-
-            
         }
+
         public void Disconnect()
         {
             try
@@ -241,7 +250,7 @@ namespace GameServer
 
                 Console.WriteLine($"\tPlayer: {ID} has disconnected. {tCP.Socket.Client.RemoteEndPoint}");
 
-                PlayerColor.GiveBackRandomColor(Player.PlayerColor);
+                PlayerColor.FreeColor(Player.PlayerColor, ID);
                 ServerSend.DisconnectPlayer(ID);
                 tCP.Disconnect();
                 uDP.Disconnect();

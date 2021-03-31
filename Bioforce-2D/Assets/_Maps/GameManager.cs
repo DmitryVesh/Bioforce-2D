@@ -17,6 +17,8 @@ public class GameManager : MonoBehaviour
     public event PlayerConnected OnPlayerConnected;
 
     public delegate void PlayerDisconnected (int iD, string username);
+
+    
     public event PlayerDisconnected OnPlayerDisconnected;
 
     public bool IsMobileSupported { get; private set; }
@@ -29,6 +31,14 @@ public class GameManager : MonoBehaviour
 
     public delegate void LoadScene(string sceneName);
     public event LoadScene OnLoadSceneEvent;
+
+    //public Action<Color, int> OnPlayerChosenColor;
+
+    internal void PlayerChoseColor(Color chosenColor, int chosenColorIndex)
+    {
+        ClientSend.PlayerReadyToJoin(chosenColorIndex);
+    }
+
 
     public static void ConfyMouse() =>
         Cursor.lockState = CursorLockMode.Confined;
@@ -76,12 +86,13 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    public void SpawnPlayer(int iD, string username, Vector3 position, bool isFacingRight, bool isDead, bool justJoined, int maxHealth, int currentHealth, Color playerColor)
+    public void SpawnPlayer(int iD, string username, Vector3 position, bool isFacingRight, bool isDead, bool justJoined, int maxHealth, int currentHealth, int playerColorIndex)
     {
         GameObject player;
         GameObject prefab;
 
         bool localClient = iD == Client.Instance.ClientID;
+        Color playerColor = PlayerChooseColor.Instance.GetColorFromIndex(playerColorIndex);
 
         if (localClient)
         {
@@ -125,7 +136,6 @@ public class GameManager : MonoBehaviour
 
         StartCoroutine(playerManager.IsPlayerDeadUponSpawning(isDead));
 
-        
 
         OnPlayerConnected?.Invoke(iD, username, justJoined);
     }

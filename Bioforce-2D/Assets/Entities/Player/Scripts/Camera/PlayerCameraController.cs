@@ -59,7 +59,7 @@ public class PlayerCameraController : MonoBehaviour
         HitImpulse.GenerateImpulse();
 
     public void GenerateLocalPlayerHitOtherPlayerImpulse() =>
-        HitImpulse.GenerateImpulse();
+        ShootImpulse.GenerateImpulse();
 
     private void Update()
     {

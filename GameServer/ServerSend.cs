@@ -1,5 +1,7 @@
 ﻿using Shared;
 using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Numerics;
 using System.Threading;
 
@@ -14,17 +16,63 @@ namespace GameServer
                 packet.Write(message);
                 packet.Write(recipientClient);
                 packet.Write(mapName);
+
                 SendTCPPacket(recipientClient, packet);
             }
         }
+
         public static void UDPTest(int recipientClient)
         {
             using (Packet packet = new Packet((int)ServerPackets.udpTest))
             {
                 packet.Write("Testing UDP");
+
                 SendUDPPacket(recipientClient, packet);
             }
         }
+
+        internal static void AskPlayerDetails(int clientID, List<int> PlayerColors)
+        {
+            using (Packet packet = new Packet((int)ServerPackets.askPlayerDetails))
+            {
+                int numberOfPlayers = PlayerColors.Count;
+                for (int playerCount = 0; playerCount < numberOfPlayers; playerCount++)
+                    packet.Write(PlayerColors[playerCount]);
+
+                SendTCPPacket(clientID, packet);
+            }
+        }
+
+        internal static void ColorIsAvailable(int colorToFree, int clientID)
+        {
+            using (Packet packet = new Packet((int)ServerPackets.freeColor))
+            {
+                packet.Write(colorToFree);
+
+                SendTCPPacketToAllButIncluded(clientID, packet);
+            }
+        }
+        internal static void ColorIsTaken(int colorToTake, int clientID)
+        {
+            using (Packet packet = new Packet((int)ServerPackets.takeColor))
+            {
+                packet.Write(colorToTake);
+
+                SendTCPPacketToAllButIncluded(clientID, packet);
+            }
+        }
+        internal static void PlayerTriedTakingAlreadyTakenColor(int clientID, List<int> availablePlayerColors)
+        {
+            using (Packet packet = new Packet((int)ServerPackets.triedTakingTakenColor))
+            {
+                int numColors = availablePlayerColors.Count;
+                for (int colorCount = 0; colorCount < numColors; colorCount++)
+                    packet.Write(availablePlayerColors[colorCount]);
+
+                SendTCPPacket(clientID, packet);
+            }
+        }
+
         public static void DisconnectPlayer(int disconnectedPlayer)
         {
             using (Packet packet = new Packet((int)ServerPackets.playerDisconnect))
@@ -57,9 +105,7 @@ namespace GameServer
                 packet.Write(player.MaxHealth);
                 packet.Write(player.CurrentHealth);
 
-                packet.Write(player.PlayerColor.R);
-                packet.Write(player.PlayerColor.G);
-                packet.Write(player.PlayerColor.B);
+                packet.Write(player.PlayerColor);
 
                 packet.Write(player.Paused);
 
@@ -188,7 +234,6 @@ namespace GameServer
             packet.WriteLength();
             for (int count = 1; count < Server.MaxNumPlayers + 1; count++)
             {
-                //TODO: maybe check if the client is null or something to fix the simultaneous exit crash
                 Server.ClientDictionary[count].tCP.SendPacket(packet);
             }
         }

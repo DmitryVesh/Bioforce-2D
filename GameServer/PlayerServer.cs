@@ -27,21 +27,25 @@ namespace GameServer
 
         public bool IsDead { get; private set; } = false;
 
-        public PlayerColor PlayerColor { get; private set; }
+        public int PlayerColor { get; private set; } //Represents the index of the color in the color palette
 
         public bool Paused { get; private set; }
         private bool LastPaused { get; set; }
         public TimeSpan PacketTimeOut { get; set; } = DateTime.Now.TimeOfDay + new TimeSpan(0, 1, 0);
         public TimeSpan PacketPause { get; set; } = DateTime.Now.TimeOfDay + new TimeSpan(0, 0, 20);
 
-        public PlayerServer(int iD, string username, Vector2 position, PlayerColor playerColor)
+        public PlayerServer(int iD, string username)
         {
             ID = iD;
-            Username = username;
+            Username = username;            
+            IsFacingRight = true;            
+            CurrentHealth = MaxHealth;            
+        }
+        public void SetPlayerData(Vector2 position, int playerColor)
+        {
             Position = position;
-            IsFacingRight = true;
             LastPositionValidation = position;
-            CurrentHealth = MaxHealth;
+
             PlayerColor = playerColor;
         }
         public void Died()

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Numerics;
 using Shared;
+using System.Collections.Generic;
 
 namespace GameServer
 {
@@ -14,8 +16,9 @@ namespace GameServer
             Console.WriteLine($"\t{Server.ClientDictionary[clientID].tCP.Socket.Client.RemoteEndPoint} connected as player: {clientID}");
             if (clientID == checkClientID)
             {
-                Server.ClientDictionary[clientID].SendIntoGame(username);
-                Console.WriteLine($"\tPlayer: {clientID} was sent into game.");
+                ServerSend.AskPlayerDetails(clientID, Server.GetAllPlayerColors());
+                Server.ClientDictionary[clientID].SetPlayer(username);
+                Server.ClientDictionary[clientID].SpawnOtherPlayersToConnectedUser();
                 return;
             }
             Console.WriteLine($"\tError, player {username} is connected as wrong player number");
@@ -32,6 +35,36 @@ namespace GameServer
             }
             Console.WriteLine($"\tError, player {clientID} is connected as wrong player number {checkClientID}");
         }
+
+        internal static void ColorToFreeAndToTake(int clientID, Packet packet)
+        {
+            try
+            {
+                int colorToFree = packet.ReadInt();
+                int colorToTake = packet.ReadInt();
+
+                PlayerColor.FreeColor(colorToFree, clientID);
+                PlayerColor.TakeColor(colorToTake, clientID);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"\tError, trying to read ColorToFreeAndToTAke, from player: {clientID}...\n{exception}");
+            }
+        }
+        internal static void ReadyToJoin(int clientID, Packet packet)
+        {
+            try
+            {
+                int colorIndex = packet.ReadInt();
+                Server.ClientDictionary[clientID].SendIntoGame(colorIndex);
+                Console.WriteLine($"\tPlayer: {clientID} was sent into game.");
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"\tError, trying to read ReadyToJoin, from player: {clientID}...\n{exception}");
+            }
+        }
+
         public static void PlayerMovementRead(int clientID, Packet packet)
         {
             try
@@ -131,7 +164,6 @@ namespace GameServer
             }
         }
 
-        
 
         internal static void PlayerPausedGame(int clientID, Packet packet)
         {
@@ -167,7 +199,7 @@ namespace GameServer
             {
                 Vector2 position = packet.ReadVector2();
                 Quaternion rotation = packet.ReadQuaternion();
-                //TODO: make so all packets from player are sent in Update, apart from bullet
+                //TODO: make so all packets from player are sent in Update
                 //Server.ClientDictionary[clientID].player.SetArmPositionRotation(position, rotation);
                 ServerSend.ArmPositionRotation(clientID, position, rotation);
             }
