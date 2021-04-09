@@ -194,7 +194,7 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
 
     private void SendMovesToServer(Vector2 velocity)
     {
-        ClientSend.PlayerMovement(!(ModelObject.transform.rotation.y == -1), ModelObject.transform.position, velocity, ModelObject.transform.rotation);
+        ClientSend.PlayerMovement(ModelObject.transform.position, velocity);
     }
 
 }

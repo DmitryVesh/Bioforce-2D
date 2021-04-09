@@ -11,7 +11,7 @@ public class Bullet : MonoBehaviour
     private float CurrentTimeToLive;
     //[SerializeField] private GameObject impactEffect;
     private Rigidbody2D rb;
-    private int OwnerClientID = -1;
+    private byte OwnerClientID = 255;
     private bool Available = false;
 
     private Animator Animator { get; set; }
@@ -36,7 +36,7 @@ public class Bullet : MonoBehaviour
         BulletColor = playerColor;
     }
 
-    public void SetOwner(int iD) =>
+    public void SetOwner(byte iD) =>
         OwnerClientID = iD;
     public void Shoot(Vector2 position, Quaternion rotation)
     {

@@ -18,7 +18,6 @@ public class PlayerChooseColor : MonoBehaviour
     private int ChosenColorIndex { get; set; }
 
     [SerializeField] private PlayerColor[] PlayerColors;
-    const int NumColors = 16;
 
     internal Color GetColorFromIndex(int playerColorIndex) =>
         PlayerColors[playerColorIndex].Color;
@@ -31,44 +30,65 @@ public class PlayerChooseColor : MonoBehaviour
     {
         Panel.SetActive(active);
     }
+    
     public void ActivatedColor(Color color)
     {
         int colorToFree = -1, colorToTake = -1;
-        for (int colorCount = 0; colorCount < NumColors; colorCount++)
+        for (int colorCount = 0; colorCount < PlayerColors.Length; colorCount++)
         {
             PlayerColor playerColor = PlayerColors[colorCount];
             Color currentColor = playerColor.Color;
-
-            if (currentColor == ChosenColor)
+            
+            if (currentColor == color)
+                colorToTake = colorCount;
+            else if (currentColor == ChosenColor)
             {
                 colorToFree = colorCount;
                 playerColor.SetIsFree(true);
             }
-            else if (currentColor == color)
-                colorToTake = colorCount;
         }
 
         ChosenColor = color;
         ChosenColorIndex = colorToTake;
         ExamplePlayerModelBody.color = ChosenColor;
         ExamplePlayerModelArms.color = ChosenColor;
-        //Send message to server that this color is to be taken!
+
+        if (ChosenColorIndex != -1)
+        {
+            PlayerColors[ChosenColorIndex].SetIsFree(false);
+        }
+        if (colorToFree != -1)
+        {
+            PlayerColors[colorToFree].SetIsFree(true);
+        }
         ClientSend.ColorToFreeAndToTaken(colorToFree, colorToTake);
     }
     
-    internal void SetTakenColors(List<int> playerColors)
+    internal void SetTakenColors(List<int> takenColors)
     {
-        foreach (PlayerColor playerColor in PlayerColors)
-            playerColor.SetIsFree(true);
-
-        foreach (int color in playerColors)
-            PlayerColors[color].SetIsFree(false);
+        for (int colorCount = 0; colorCount < PlayerColors.Length; colorCount++)
+        {
+            PlayerColor playerColor = PlayerColors[colorCount];
+            if (takenColors.Contains(colorCount))
+            {
+                Debug.Log($"SetTakenColor: {colorCount}");
+                playerColor.SetIsFree(false);
+            }
+            else
+                playerColor.SetIsFree(true);
+        }
     }
-   
-    internal void FreeColor(int colorToFree) =>
+
+    internal void FreeColor(int colorToFree)
+    {
+        Debug.Log($"Color: {colorToFree} is freed");
         PlayerColors[colorToFree].SetIsFree(true);
-    internal void TakeColor(int colorToTake) =>
+    }
+    internal void TakeColor(int colorToTake)
+    {
+        Debug.Log($"Color: {colorToTake} is taken");
         PlayerColors[colorToTake].SetIsFree(false);
+    }
     
     internal void SetDefaultColor()
     {

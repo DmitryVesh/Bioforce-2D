@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
-    [SerializeField] public int ID;
+    [SerializeField] public byte ID;
     [SerializeField] private string Username;
     public int MaxHealth { get; private set; }
 
@@ -97,7 +97,7 @@ public class PlayerManager : MonoBehaviour
     public void CallOnPlayerJumpedEvent() =>
         OnPlayerJumped?.Invoke();
 
-    public void Initialise(int iD, string username, Color playerColor, int maxHealth) 
+    public void Initialise(byte iD, string username, Color playerColor, int maxHealth) 
     {
         (ID, Username, MaxHealth) = (iD, username, maxHealth);
         SetUsername(playerColor);

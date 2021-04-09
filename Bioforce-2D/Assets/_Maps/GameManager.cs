@@ -6,17 +6,17 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; set; }
-    public static Dictionary<int, PlayerManager> PlayerDictionary { get; set; }
+    public static Dictionary<byte, PlayerManager> PlayerDictionary { get; set; }
 
     [SerializeField] private bool TestingTouchInEditor = false;
     [SerializeField] private GameObject LocalPlayerPrefab;
     [SerializeField] private GameObject PlayerPrefab;
     [SerializeField] private GameObject MobileLocalPlayerPrefab;
 
-    public delegate void PlayerConnected (int iD, string username, bool justJoined);
+    public delegate void PlayerConnected (byte iD, string username, bool justJoined);
     public event PlayerConnected OnPlayerConnected;
 
-    public delegate void PlayerDisconnected (int iD, string username);
+    public delegate void PlayerDisconnected (byte iD, string username);
 
     
     public event PlayerDisconnected OnPlayerDisconnected;
@@ -66,7 +66,7 @@ public class GameManager : MonoBehaviour
             Debug.Log($"GameManager instance already exists, destroying {gameObject.name}");
             Destroy(gameObject);
         }
-        PlayerDictionary = new Dictionary<int, PlayerManager>();
+        PlayerDictionary = new Dictionary<byte, PlayerManager>();
         ConfyMouse();
         IsMobileSupported = CheckIfOnMobile();
 
@@ -86,12 +86,13 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    public void SpawnPlayer(int iD, string username, Vector3 position, bool isFacingRight, bool isDead, bool justJoined, int maxHealth, int currentHealth, int playerColorIndex)
+    public void SpawnPlayer(byte iD, string username, Vector3 position, bool isFacingRight, bool isDead, bool justJoined, int maxHealth, int currentHealth, int playerColorIndex)
     {
         GameObject player;
         GameObject prefab;
 
         bool localClient = iD == Client.Instance.ClientID;
+        Debug.Log(playerColorIndex);
         Color playerColor = PlayerChooseColor.Instance.GetColorFromIndex(playerColorIndex);
 
         if (localClient)
@@ -139,7 +140,7 @@ public class GameManager : MonoBehaviour
 
         OnPlayerConnected?.Invoke(iD, username, justJoined);
     }
-    public void DisconnectPlayer(int disconnectedPlayer)
+    public void DisconnectPlayer(byte disconnectedPlayer)
     {
         try 
         {
@@ -180,13 +181,13 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(sceneName);
     }
 
-    public void PlayerDied(int playerKilledDiedID, int bulletOwnerID, TypeOfDeath typeOfDeath)
+    public void PlayerDied(byte playerKilledDiedID, byte bulletOwnerID, TypeOfDeath typeOfDeath)
     {
         ClientSend.PlayerDied(bulletOwnerID, typeOfDeath);
         PlayerDictionary[playerKilledDiedID].PlayerDied(typeOfDeath);
         KillFeedUI.Instance.AddKillFeedEntry(playerKilledDiedID, bulletOwnerID);
     }
-    public void PlayerRespawned(int iD)
+    public void PlayerRespawned(byte iD)
     {
         PlayerDictionary[iD].PlayerRespawned();
         ClientSend.PlayerRespawned(PlayerDictionary[iD].RespawnPosition);

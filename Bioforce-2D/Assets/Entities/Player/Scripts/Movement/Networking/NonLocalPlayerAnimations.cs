@@ -8,7 +8,7 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     protected Animator Anim { get; set; } = null;
     protected IWalkingPlayer WalkingPlayer { get; set; } = null;
 
-    private int OwnerClientID { get; set; } = -1;
+    private byte OwnerClientID { get; set; } = 255;
     PlayerManager PlayerManager { get; set; } = null;
 
 
@@ -56,7 +56,7 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
 
     //TODO: add Jumped sent animations so can play sound effect on non local players
 
-    public void SetOwnerClientID(int iD)
+    public void SetOwnerClientID(byte iD)
     {
         OwnerClientID = iD;
     }

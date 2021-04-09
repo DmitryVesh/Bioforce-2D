@@ -121,7 +121,7 @@ public class CreateServer : MonoBehaviour
         else 
         {
             ServerMenu.Instance.HideServerMenu();
-            successStart = InternetServerScanner.Instance.ContactMainServerToAddOwnServer(ServerNameSelected, MaxPlayerSelected, MapSelected, Client.PortNumInternetDiscover);
+            successStart = InternetServerScanner.Instance.ContactMainServerToAddOwnServer(ServerNameSelected, MaxPlayerSelected, MapSelected, Client.PortNumInternetToConnectTo);
             //Waiting for response packet from MainServer
         }
         //TODO: Implement the Public/Private servers

@@ -5,7 +5,7 @@ public class ClientSend : MonoBehaviour
 {
     public static void WelcomePacketReply()
     {
-        using (Packet packet = new Packet((int)ClientPackets.welcomeReceived))
+        using (Packet packet = new Packet((byte)ClientPackets.welcomeReceived))
         {
             packet.Write(Client.Instance.ClientID);
             packet.Write(PlayerRegistration.GetUsername());
@@ -15,7 +15,7 @@ public class ClientSend : MonoBehaviour
     }
     public static void UDPTestPacketReply()
     {
-        using (Packet packet = new Packet((int)ClientPackets.udpTestReceived))
+        using (Packet packet = new Packet((byte)ClientPackets.udpTestReceived))
         {
             packet.Write(Client.Instance.ClientID);
             packet.Write("Received UDP Test Packet");
@@ -26,7 +26,7 @@ public class ClientSend : MonoBehaviour
 
     internal static void ColorToFreeAndToTaken(int colorToFree, int colorToTake)
     {
-        using (Packet packet = new Packet((int)ClientPackets.colorToFreeAndTake))
+        using (Packet packet = new Packet((byte)ClientPackets.colorToFreeAndTake))
         {
             packet.Write(colorToFree);
             packet.Write(colorToTake);
@@ -36,7 +36,7 @@ public class ClientSend : MonoBehaviour
     }
     internal static void PlayerReadyToJoin(int chosenColorIndex)
     {
-        using (Packet packet = new Packet((int)ClientPackets.readyToJoin))
+        using (Packet packet = new Packet((byte)ClientPackets.readyToJoin))
         {
             packet.Write(chosenColorIndex);
 
@@ -44,23 +44,20 @@ public class ClientSend : MonoBehaviour
         }
     }
 
-    public static void PlayerMovement(bool isFacingRight, Vector2 position, Vector2 velocity, Quaternion rotation)
+    public static void PlayerMovement(Vector2 position, Vector2 velocity)
     {
-        using (Packet packet = new Packet((int)ClientPackets.playerMovement))
+        using (Packet packet = new Packet((byte)ClientPackets.playerMovement))
         {
-            packet.Write(isFacingRight);
             packet.Write(position);
             packet.Write(velocity);
-            packet.Write(rotation);
 
             SendTCPPacket(packet);
         }        
     }
 
-
     public static void PlayerMovementStats(float runSpeed, float sprintSpeed)
     {
-        using (Packet packet = new Packet((int)ClientPackets.playerMovementStats))
+        using (Packet packet = new Packet((byte)ClientPackets.playerMovementStats))
         {
             packet.Write(runSpeed);
             packet.Write(sprintSpeed);
@@ -73,7 +70,7 @@ public class ClientSend : MonoBehaviour
 
     internal static void ArmPositionAndRotation(Vector2 localPosition, Quaternion localRotation)
     {
-        using (Packet packet = new Packet((int)ClientPackets.armPositionRotation))
+        using (Packet packet = new Packet((byte)ClientPackets.armPositionRotation))
         {
             packet.Write(localPosition);
             packet.Write(localRotation);
@@ -84,7 +81,7 @@ public class ClientSend : MonoBehaviour
 
     public static void ShotBullet(Vector2 position, Quaternion rotation)
     {
-        using (Packet packet = new Packet((int)ClientPackets.bulletShot))
+        using (Packet packet = new Packet((byte)ClientPackets.bulletShot))
         {
             packet.Write(position);
             packet.Write(rotation);
@@ -92,28 +89,28 @@ public class ClientSend : MonoBehaviour
             SendTCPPacket(packet);
         }
     }
-    public static void PlayerDied(int bulletOwnerID, TypeOfDeath typeOfDeath)
+    public static void PlayerDied(byte bulletOwnerID, TypeOfDeath typeOfDeath)
     {
-        using (Packet packet = new Packet((int)ClientPackets.playerDied))
+        using (Packet packet = new Packet((byte)ClientPackets.playerDied))
         {
             packet.Write(bulletOwnerID);
-            packet.Write((int)typeOfDeath);
+            packet.Write((byte)typeOfDeath);
 
             SendTCPPacket(packet);
         }       
     }
     public static void PlayerRespawned(Vector2 respawnPosition)
     {
-        using (Packet packet = new Packet((int)ClientPackets.playerRespawned))
+        using (Packet packet = new Packet((byte)ClientPackets.playerRespawned))
         {
             packet.Write(respawnPosition);
 
             SendTCPPacket(packet);
         }        
     }
-    public static void TookDamage(int damage, int currentHealth, int bulletOwner)
+    public static void TookDamage(int damage, int currentHealth, short bulletOwner)
     {
-        using (Packet packet = new Packet((int)ClientPackets.tookDamage))
+        using (Packet packet = new Packet((byte)ClientPackets.tookDamage))
         {
             packet.Write(damage);
             packet.Write(currentHealth);
@@ -125,21 +122,29 @@ public class ClientSend : MonoBehaviour
 
     internal static void PausedGame(bool paused)
     {
-        using (Packet packet = new Packet((int)ClientPackets.pausedGame))
+        using (Packet packet = new Packet((byte)ClientPackets.pausedGame))
         {
             packet.Write(paused);
-
             SendTCPPacket(packet);
         }
     }
     internal static void PlayerConnectedPacket()
     {
-        using (Packet packet = new Packet((int)ClientPackets.stillConnected))
+        using (Packet packet = new Packet((byte)ClientPackets.stillConnected))
         {
             SendTCPPacket(packet);
         }
     }
 
+    internal static void LocalPlayerPickedUpItem(int pickupID)
+    {
+        using (Packet packet = new Packet((byte)ClientPackets.pickedUpItem))
+        {
+            packet.Write(pickupID);
+
+            SendTCPPacket(packet);
+        }
+    }
 
     private static void SendTCPPacket(Packet packet)
     {

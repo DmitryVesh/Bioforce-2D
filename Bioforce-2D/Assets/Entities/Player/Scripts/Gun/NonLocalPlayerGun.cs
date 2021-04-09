@@ -6,7 +6,7 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
     [SerializeField] protected GameObject BulletPrefab;
     protected List<Bullet> BulletList;
 
-    private int OwnerClientID = -1;
+    private byte OwnerClientID = 255;
     protected bool CanShootAndAim = true;
     protected PlayerManager PlayerManager { get; set; } = null;
     
@@ -36,7 +36,7 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
         MuzzelFlash.PlayFlash();
     }
 
-    public void SetOwnerClientID(int iD) =>
+    public void SetOwnerClientID(byte iD) =>
         OwnerClientID = iD;
     public void SetOwnerCollider(Collider2D ownCollider) =>
         OwnCollider = ownCollider;

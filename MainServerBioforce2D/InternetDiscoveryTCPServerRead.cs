@@ -8,7 +8,7 @@ namespace MainServerBioforce2D
 {
     class InternetDiscoveryTCPServerRead
     {
-        internal static void ReadFirstAskForServers(int client, Packet packet)
+        internal static void ReadFirstAskForServers(byte client, Packet packet)
         {
             //Send existing servers saved on server to client
             foreach (Server server in InternetDiscoveryTCPServer.ServersAvailable)
@@ -16,7 +16,7 @@ namespace MainServerBioforce2D
             InternetDiscoveryTCPServer.ClientDictionary[client].ServersAlreadyGiven = new List<Server>(InternetDiscoveryTCPServer.ServersAvailable);
             Console.WriteLine($"Read FirstAskForServers from client:{client}");
         }
-        internal static void ReadAskForServerChanges(int client, Packet packet)
+        internal static void ReadAskForServerChanges(byte client, Packet packet)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace MainServerBioforce2D
             }
 
         }
-        internal static void ReadAddServer(int client, Packet packet)
+        internal static void ReadAddServer(byte client, Packet packet)
         {
             string serverName = packet.ReadString();            
             int maxNumPlayers = packet.ReadInt();
@@ -101,14 +101,14 @@ namespace MainServerBioforce2D
             }
             InternetDiscoveryTCPServerSend.SendJoinServer(client, gameServerPort);
         }
-        internal static void ReadDeleteServer(int client, Packet packet)
+        internal static void ReadDeleteServer(byte client, Packet packet)
         {
             string serverName = packet.ReadString();            
 
             InternetDiscoveryTCPServer.GameServerDict[serverName].Kill();
             Console.WriteLine($"Read DeleteServer from client:{client}");
         }
-        internal static void ReadJoinServerNamed(int client, Packet packet)
+        internal static void ReadJoinServerNamed(byte client, Packet packet)
         {
             string serverName = packet.ReadString();
             GameServerProcess gameServer;
@@ -123,7 +123,7 @@ namespace MainServerBioforce2D
             InternetDiscoveryTCPServerSend.SendJoinServer(client, serverPort);
         }
 
-        internal static void ReadModifyServer(int client, Packet packet)
+        internal static void ReadModifyServer(byte client, Packet packet)
         {
             string serverName = packet.ReadString();
             int maxNumPlayers = packet.ReadInt();

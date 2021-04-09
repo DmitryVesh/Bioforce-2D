@@ -8,7 +8,7 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
     [SerializeField] protected int CurrentHealth = 0;
 
     //Set to default of -1, which will mean that the object will take damage from any bullet
-    public int OwnerClientID { get; private set; } = -1;
+    public byte OwnerClientID { get; private set; } = 255;
 
     protected PlayerManager PlayerManager { get; set; }
     protected bool CantGetHit { get; set; }
@@ -32,15 +32,15 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
     {
         CurrentHealth = currentHealth;
     }
-    public virtual void TakeDamage(int damage, int bulletOwnerID) { }
+    public virtual void TakeDamage(int damage, byte bulletOwnerID) { }
 
-    public void SetOwnerClientID(int iD) =>
+    public void SetOwnerClientID(byte iD) =>
         OwnerClientID = iD;
 
-    public int GetOwnerClientID() => 
+    public byte GetOwnerClientID() => 
         OwnerClientID;
 
-    public void Die(int bulletOwnerID)
+    public void Die(byte bulletOwnerID)
     {
         CantGetHit = true;
         GameManager.Instance.PlayerDied(OwnerClientID, bulletOwnerID, TypeOfDeath.Bullet);

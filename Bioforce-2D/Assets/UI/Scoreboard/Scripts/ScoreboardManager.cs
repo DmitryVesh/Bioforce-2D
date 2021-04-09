@@ -16,7 +16,7 @@ public class ScoreboardManager : UIItemListingManager
     private bool ScoreboardActive { get; set; }
     private bool ClickedOdd { get; set; }
 
-    public void AddEntry(int iD, string username, int kills, int deaths, int score)
+    public void AddEntry(byte iD, string username, int kills, int deaths, int score)
     {
         GameObject entryToAdd = Instantiate(ItemListingPrefab, ScoreboardPanel.transform);
         ScoreboardEntry scoreboardEntry = entryToAdd.GetComponent<ScoreboardEntry>();
@@ -25,7 +25,7 @@ public class ScoreboardManager : UIItemListingManager
         PlayersItemLists.Add(iD, scoreboardEntry);
         ScoreboardChanged = true;
     }
-    internal void DeleteEntry(int disconnectedPlayer)
+    internal void DeleteEntry(byte disconnectedPlayer)
     {
         try
         {
@@ -34,13 +34,13 @@ public class ScoreboardManager : UIItemListingManager
         }
         catch (KeyNotFoundException) {}
     }
-    public void AddKill(int bulletOwnerID)
+    public void AddKill(byte bulletOwnerID)
     {
         PlayersItemLists[bulletOwnerID].AddToItemIndex((int)ScoreboardEntryArrayListIndexes.kills, 1);
         PlayersItemLists[bulletOwnerID].AddToItemIndex((int)ScoreboardEntryArrayListIndexes.score, 3);
         ScoreboardChanged = true;
     }
-    public void AddDeath(int ownerClientID)
+    public void AddDeath(byte ownerClientID)
     {
         PlayersItemLists[ownerClientID].AddToItemIndex((int)ScoreboardEntryArrayListIndexes.deaths, 1);
         ScoreboardChanged = true;

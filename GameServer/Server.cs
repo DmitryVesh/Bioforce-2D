@@ -31,7 +31,12 @@ namespace GameServer
         {
             List<int> PlayerColors = new List<int>();
             foreach (ClientServer client in ClientDictionary.Values)
-                PlayerColors.Add(client.Player.PlayerColor);
+            {
+                if ((!(client.Player is null)) && client.Player.PlayerColor != -1)
+                {
+                    PlayerColors.Add(client.Player.PlayerColor);
+                }
+            }
             return PlayerColors;
         }
         public static int GetCurrentNumPlayers()

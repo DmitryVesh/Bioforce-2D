@@ -12,17 +12,28 @@ public class Client : MonoBehaviour
 
     public const int PortNumInternetDiscover = 28020;
     public const int PortNumLANDiscover = 28021;
-    
+
+    public const int PortNumInternetDiscoverTesting = 28420;
+
+    public static int PortNumInternetToConnectTo 
+    { 
+        get
+        {
+            return Instance.IsTesting ? PortNumInternetDiscoverTesting : PortNumInternetDiscover;
+        } 
+    }
+    [SerializeField] private bool IsTesting = false;
+
     public static int PortNumGame { get; private set; }
     public const string MainServerIP = "18.134.197.3";
     //public const string MainServerIP = "127.0.0.1";
 
-    public int ClientID { get; set; } = 0;
+    public byte ClientID { get; set; } = 0;
     public TCP tCP { get; set; }
     public UDP uDP { get; set; }
 
     private delegate void PacketHandler(Packet packet);
-    private static Dictionary<int, PacketHandler> PacketHandlerDictionary;
+    private static Dictionary<byte, PacketHandler> PacketHandlerDictionary;
     public bool Connected { get; set; } = false;
 
     private float TimerTimeOutTime = 10;
@@ -92,7 +103,7 @@ public class Client : MonoBehaviour
             GameManager.Instance.DisconnectLoadMainMenu();
         }
     }
-    public void SuccessfullyConnected(int assignedID)
+    public void SuccessfullyConnected(byte assignedID)
     {
         Connected = true;
         ResetTimeOutTimer(false);
@@ -187,12 +198,14 @@ public class Client : MonoBehaviour
                 byte[] bytes = ReceivePacket.ReadBytes(packetLen);
                 ThreadManager.ExecuteOnMainThread(() =>
                 {
-                    int packetID = -1;
+                    byte packetID = 255;
                     try
                     {
-                        Packet packet = new Packet(bytes);
-                        packetID = packet.ReadInt();
-                        PacketHandlerDictionary[packetID](packet);
+                        using (Packet packet = new Packet(bytes))
+                        {
+                            packetID = packet.ReadByte();
+                            PacketHandlerDictionary[packetID](packet);
+                        }
                     }
                     catch (KeyNotFoundException exception)
                     {
@@ -200,7 +213,7 @@ public class Client : MonoBehaviour
                     }
                     catch (Exception exception)
                     {
-                        Debug.Log($"Error in Handle data of not know TCP Packet...\n{exception}");
+                        Debug.LogWarning($"Error in Handle data of not know TCP Packet...\n{exception}");
                     }
                 });
                 packetLen = 0;
@@ -215,7 +228,7 @@ public class Client : MonoBehaviour
         }
         private bool ExitHandleData(ref int packetLen)
         {
-            if (ReceivePacket.UnreadLength() >= 4)
+            if (ReceivePacket.UnreadLength() >= 4) //TODO: Might cause problems when switching the packetLen from int -> short or whatever: if byte, >= 1, ushort >= 2
             {
                 packetLen = ReceivePacket.ReadInt();
                 if (packetLen < 1)
@@ -261,7 +274,8 @@ public class Client : MonoBehaviour
         {
             try
             {
-                packet.InsertInt(Instance.ClientID);
+                //packet.InsertInt(Instance.ClientID);
+                packet.InsertByte(Instance.ClientID);
                 if (Socket != null)
                     Socket.BeginSend(packet.ToArray(), packet.Length(), null, null);
             }
@@ -294,15 +308,19 @@ public class Client : MonoBehaviour
         }
         private void HandleData(byte[] data)
         {
-            Packet packetInit = new Packet(data);
-            int packetLen = packetInit.ReadInt();
-            data = packetInit.ReadBytes(packetLen);
+            using (Packet packetInit = new Packet(data))
+            {
+                int packetLen = packetInit.ReadInt();
+                data = packetInit.ReadBytes(packetLen);
+            }
 
             ThreadManager.ExecuteOnMainThread(() =>
             {
-                Packet packet = new Packet(data);
-                int packetID = packet.ReadInt();
-                PacketHandlerDictionary[packetID](packet);
+                using (Packet packet = new Packet(data))
+                {
+                    byte packetID = packet.ReadByte();
+                    PacketHandlerDictionary[packetID](packet);
+                }
             });
         }
         private void SocketBeginReceive()
@@ -396,27 +414,28 @@ public class Client : MonoBehaviour
 
     private void InitClientData()
     {
-        PacketHandlerDictionary = new Dictionary<int, PacketHandler>();
-        PacketHandlerDictionary.Add((int)ServerPackets.welcome, ClientRead.WelcomeRead);
-        PacketHandlerDictionary.Add((int)ServerPackets.udpTest, ClientRead.UDPTestRead);
-        PacketHandlerDictionary.Add((int)ServerPackets.spawnPlayer, ClientRead.SpawnPlayer);
-        PacketHandlerDictionary.Add((int)ServerPackets.playerPosition, ClientRead.PlayerPosition);
-        PacketHandlerDictionary.Add((int)ServerPackets.playerRotationAndVelocity, ClientRead.PlayerRotationAndVelocity);
-        PacketHandlerDictionary.Add((int)ServerPackets.playerMovementStats, ClientRead.PlayerMovementStats);
-        PacketHandlerDictionary.Add((int)ServerPackets.playerDisconnect, ClientRead.PlayerDisconnect);
-        PacketHandlerDictionary.Add((int)ServerPackets.bulleShot, ClientRead.BulletShot);
-        PacketHandlerDictionary.Add((int)ServerPackets.playerDied, ClientRead.PlayerDied);
-        PacketHandlerDictionary.Add((int)ServerPackets.playerRespawned, ClientRead.PlayerRespawned);
-        PacketHandlerDictionary.Add((int)ServerPackets.tookDamage, ClientRead.TookDamage);
-        PacketHandlerDictionary.Add((int)ServerPackets.serverIsFull, ClientRead.ServerIsFull);
-        PacketHandlerDictionary.Add((int)ServerPackets.armPositionRotation, ClientRead.ArmPositionRotation);
-        PacketHandlerDictionary.Add((int)ServerPackets.playerPausedGame, ClientRead.PlayerPausedGame);
-        PacketHandlerDictionary.Add((int)ServerPackets.stillConnected, ClientRead.PlayerStillConnected);
-        PacketHandlerDictionary.Add((int)ServerPackets.shouldHost, ClientRead.SetHostClient);
-        PacketHandlerDictionary.Add((int)ServerPackets.askPlayerDetails, ClientRead.AskingForPlayerDetails);
-        PacketHandlerDictionary.Add((int)ServerPackets.freeColor, ClientRead.FreeColor);
-        PacketHandlerDictionary.Add((int)ServerPackets.takeColor, ClientRead.TakeColor);
-        PacketHandlerDictionary.Add((int)ServerPackets.triedTakingTakenColor, ClientRead.TriedTakingTakenColor);
+        PacketHandlerDictionary = new Dictionary<byte, PacketHandler>();
+        PacketHandlerDictionary.Add((byte)ServerPackets.welcome, ClientRead.WelcomeRead);
+        PacketHandlerDictionary.Add((byte)ServerPackets.udpTest, ClientRead.UDPTestRead);
+        PacketHandlerDictionary.Add((byte)ServerPackets.spawnPlayer, ClientRead.SpawnPlayer);
+        PacketHandlerDictionary.Add((byte)ServerPackets.playerPosition, ClientRead.PlayerPosition);
+        //PacketHandlerDictionary.Add((int)ServerPackets.playerRotationAndVelocity, ClientRead.PlayerRotationAndVelocity);
+        PacketHandlerDictionary.Add((byte)ServerPackets.playerMovementStats, ClientRead.PlayerMovementStats);
+        PacketHandlerDictionary.Add((byte)ServerPackets.playerDisconnect, ClientRead.PlayerDisconnect);
+        PacketHandlerDictionary.Add((byte)ServerPackets.bulleShot, ClientRead.BulletShot);
+        PacketHandlerDictionary.Add((byte)ServerPackets.playerDied, ClientRead.PlayerDied);
+        PacketHandlerDictionary.Add((byte)ServerPackets.playerRespawned, ClientRead.PlayerRespawned);
+        PacketHandlerDictionary.Add((byte)ServerPackets.tookDamage, ClientRead.TookDamage);
+        PacketHandlerDictionary.Add((byte)ServerPackets.serverIsFull, ClientRead.ServerIsFull);
+        PacketHandlerDictionary.Add((byte)ServerPackets.armPositionRotation, ClientRead.ArmPositionRotation);
+        PacketHandlerDictionary.Add((byte)ServerPackets.playerPausedGame, ClientRead.PlayerPausedGame);
+        PacketHandlerDictionary.Add((byte)ServerPackets.stillConnected, ClientRead.PlayerStillConnected);
+        PacketHandlerDictionary.Add((byte)ServerPackets.askPlayerDetails, ClientRead.AskingForPlayerDetails);
+        PacketHandlerDictionary.Add((byte)ServerPackets.freeColor, ClientRead.FreeColor);
+        PacketHandlerDictionary.Add((byte)ServerPackets.takeColor, ClientRead.TakeColor);
+        PacketHandlerDictionary.Add((byte)ServerPackets.triedTakingTakenColor, ClientRead.TriedTakingTakenColor);
+        PacketHandlerDictionary.Add((byte)ServerPackets.generatedPickup, ClientRead.GeneratedPickupItem);
+        PacketHandlerDictionary.Add((byte)ServerPackets.playerPickedUpItem, ClientRead.PlayerPickedUpItem);
     }
        
 }

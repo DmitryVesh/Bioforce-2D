@@ -4,7 +4,7 @@ using UnityEngine;
 public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
 {
     protected float SpeedX { get; set; } // Used to store the input in x direction, as well as in PlayerAnimations
-    protected int OwnerClientID { get; set; } = -1;
+    protected byte OwnerClientID { get; set; } = 255;
     protected PlayerManager PlayerManager { get; set; } = null;
 
     public float GetRunSpeed()
@@ -16,7 +16,7 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
         return SpeedX;
     }
 
-    public void SetOwnerClientID(int iD)
+    public void SetOwnerClientID(byte iD)
     {
         OwnerClientID = iD;
     }

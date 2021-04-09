@@ -16,7 +16,7 @@ public abstract class DiscoveryTCPClient
     public Action OnTimedOutAction { get; set; }
 
     protected delegate void PacketHandler(string ip, Packet packet);
-    protected Dictionary<int, PacketHandler> PacketHandlerDictionary { get; set; } = new Dictionary<int, PacketHandler>();
+    protected Dictionary<byte, PacketHandler> PacketHandlerDictionary { get; set; } = new Dictionary<byte, PacketHandler>();
 
     public DiscoveryTCPClient()
     {
@@ -134,7 +134,7 @@ public abstract class DiscoveryTCPClient
                 try
                 {
                     Packet packet = new Packet(bytes);
-                    int packetID = packet.ReadInt();
+                    byte packetID = packet.ReadByte();
                     string ipAddress = Socket.Client.RemoteEndPoint.ToString().Split(':')[0];
                     PacketHandlerDictionary[packetID](ipAddress, packet);
                 }

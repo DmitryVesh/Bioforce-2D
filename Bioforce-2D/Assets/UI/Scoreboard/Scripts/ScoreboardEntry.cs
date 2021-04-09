@@ -22,7 +22,7 @@ public class ScoreboardEntry : MonoBehaviour, IUIItemListing
     //TODO: Add pings to the scoreboard entry of players.
     //private TextMeshProUGUI PingText { get; set; }    
 
-    public void Init(int iD, int score, string username, int kills, int deaths)
+    public void Init(byte iD, int score, string username, int kills, int deaths)
     {
         ArrayListTexts = new List<TextMeshProUGUI>();
         ArrayListTexts.Add(transform.GetChild((int)ScoreboardEntryArrayListIndexes.score).GetComponent<TextMeshProUGUI>());

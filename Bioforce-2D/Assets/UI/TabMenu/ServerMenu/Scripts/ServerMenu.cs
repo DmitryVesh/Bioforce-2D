@@ -169,7 +169,7 @@ public class ServerMenu : MonoBehaviour
         else
         {
             //Send packet to MainServer that you want to join a specific server
-            InternetServerScanner.SendJoinServerPacket(Client.PortNumInternetDiscover, ServerEntryConnectTo.ServerName);
+            InternetServerScanner.SendJoinServerPacket(Client.PortNumInternetToConnectTo, ServerEntryConnectTo.ServerName);
         }
             
     }
@@ -258,7 +258,7 @@ public class ServerMenu : MonoBehaviour
         if (SelectedServersPage == LANServersPage)
             StartCoroutine(LANServerScanner.GetLANServerAddressUDPBroadcast(Client.PortNumLANDiscover));
         else
-            InternetServerScanner.ContactMainServerForServers(Client.PortNumInternetDiscover);
+            InternetServerScanner.ContactMainServerForServers(Client.PortNumInternetToConnectTo);
 
     }
     private void AddLANServerToPage(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping) =>

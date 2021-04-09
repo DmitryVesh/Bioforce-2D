@@ -8,7 +8,7 @@ public class LocalPlayerHealth : NonLocalPlayerHealth
     [SerializeField] private int HealthWhenHeartBeatShouldPlayMin;
     [SerializeField] private int HealthWhenHeartBeatShouldPlayMax;
 
-    public override void TakeDamage(int damage, int bulletOwnerID)
+    public override void TakeDamage(int damage, byte bulletOwnerID)
     {
         if (CantGetHit)
             return;

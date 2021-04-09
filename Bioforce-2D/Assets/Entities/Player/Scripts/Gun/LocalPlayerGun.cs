@@ -11,6 +11,9 @@ public class LocalPlayerGun : NonLocalPlayerGun, ILocalPlayerGun
     private float TurnedPositionOffset { get; set; } = 0.137f;
     protected Vector2 LastAimVector { get; set; }
 
+    private Vector2 LastPosition { get; set; }
+    private Quaternion LastRotation { get; set; }
+
     public Vector2 GetAimingVector() =>
         LastAimVector;
 
@@ -57,6 +60,16 @@ public class LocalPlayerGun : NonLocalPlayerGun, ILocalPlayerGun
     {
         if (CanShootAndAim)
             AimWherePointing();
+
+
+        Vector2 currentPosition = ArmsTransform.localPosition;
+        Quaternion currentRotation = ArmsTransform.localRotation;
+        if (LastPosition.Equals(currentPosition) && LastRotation.Equals(currentRotation))
+            return;
+
+        LastPosition = currentPosition;
+        LastRotation = currentRotation;
+        //TODO: 10,001 maybe send instead of Rotation, send the AimVector, is it Vector2?
         ClientSend.ArmPositionAndRotation(ArmsTransform.localPosition, ArmsTransform.localRotation);
     }
 
@@ -103,6 +116,7 @@ public class LocalPlayerGun : NonLocalPlayerGun, ILocalPlayerGun
         Crosshair.Instance.ShotBullet();
         PlayerManager.CallOnBulletShotEvent(FirePointTransform.position, FirePointTransform.rotation);
         //base.ShootBullet(FirePointTransform.position, FirePointTransform.rotation);
+
         ClientSend.ShotBullet(FirePointTransform.position, FirePointTransform.rotation);
     }
 }

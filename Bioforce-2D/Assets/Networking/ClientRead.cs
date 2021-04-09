@@ -10,7 +10,7 @@ public class ClientRead : MonoBehaviour
     {
         //PacketSender.Welcome(count, $"Welcome to the server client {count}");
         string message = packet.ReadString();
-        int id = packet.ReadInt();
+        byte id = packet.ReadByte();
         string mapName = packet.ReadString();
         Debug.Log($"Message from server:\n{message}");
         Client.Instance.SuccessfullyConnected(id);
@@ -30,17 +30,22 @@ public class ClientRead : MonoBehaviour
 
     internal static void AskingForPlayerDetails(Packet packet)
     {
-        int numPlayers = packet.ReadInt();
+        Debug.Log("Have Received AskingForPlayerDetails packet");
+        byte numPlayers = packet.ReadByte();
 
         List<int> playerColors = new List<int>();
 
-        for (int playerCount = 0; playerCount < numPlayers; playerCount++)
+        Debug.Log("Colors that have been taken, when asking for player details");
+        for (byte playerCount = 0; playerCount < numPlayers; playerCount++)
+        {
+            Debug.Log($"Color - {playerCount}");
             playerColors.Add(packet.ReadInt());
+        }
+        Debug.Log("End of colors");
 
         PlayerChooseColor.Instance.SetActivate(true);
         PlayerChooseColor.Instance.SetTakenColors(playerColors);
         PlayerChooseColor.Instance.SetDefaultColor();
-
     }
 
     internal static void FreeColor(Packet packet)
@@ -58,26 +63,25 @@ public class ClientRead : MonoBehaviour
     internal static void TriedTakingTakenColor(Packet packet)
     {
         int numColors = packet.ReadInt();
-
-        List<int> colors = new List<int>();
+        List<int> takenColors = new List<int>(numColors);
 
         for (int playerCount = 0; playerCount < numColors; playerCount++)
-            colors.Add(packet.ReadInt());
+            takenColors.Add(packet.ReadInt());
 
-        PlayerChooseColor.Instance.SetTakenColors(colors);
+        PlayerChooseColor.Instance.SetTakenColors(takenColors);
         PlayerChooseColor.Instance.SetDefaultColor();
     }
 
     public static void PlayerDisconnect(Packet packet)
     {
-        int disconnectedPlayer = packet.ReadInt();
+        byte disconnectedPlayer = packet.ReadByte();
         GameManager.Instance.DisconnectPlayer(disconnectedPlayer);
         ScoreboardManager.Instance.DeleteEntry(disconnectedPlayer);
     }
 
     public static void SpawnPlayer(Packet packet)
     {
-        int iD = packet.ReadInt();
+        byte iD = packet.ReadByte();
         string username = packet.ReadString();
         Vector2 position = packet.ReadVector2();
         bool isFacingRight = packet.ReadBool();
@@ -107,7 +111,7 @@ public class ClientRead : MonoBehaviour
     }
     public static void PlayerMovementStats(Packet packet)
     {
-        int iD = packet.ReadInt();
+        byte iD = packet.ReadByte();
         float runSpeed = packet.ReadFloat();
         float sprintSpeed = packet.ReadFloat();
 
@@ -116,11 +120,14 @@ public class ClientRead : MonoBehaviour
 
     public static void PlayerPosition(Packet packet)
     {
-        int iD = packet.ReadInt();
+        byte iD = packet.ReadByte();
         Vector2 position = packet.ReadVector2();
+        Vector2 velocity = packet.ReadVector2();
+
         // Prevents crash when a UDP packet connects before the TCP spawn player call from server
         try
         {
+            GameManager.PlayerDictionary[iD].SetVelocity(velocity);
             GameManager.PlayerDictionary[iD].SetPosition(position);
         }
         catch (KeyNotFoundException exception)
@@ -130,15 +137,12 @@ public class ClientRead : MonoBehaviour
     }
     public static void PlayerRotationAndVelocity(Packet packet)
     {
-        int iD = packet.ReadInt();
-        bool isFacingRight = packet.ReadBool();
-        Vector2 velocity = packet.ReadVector2();
-        Quaternion rotation = packet.ReadQuaternion();
+        byte iD = packet.ReadByte();
+        
 
         // Prevents crash when a UDP packet connects before the TCP spawn player call from server
         try
         {
-            GameManager.PlayerDictionary[iD].SetVelocity(velocity);
             //GameManager.PlayerDictionary[iD].SetRotation(rotation);
         }
         catch (KeyNotFoundException exception)
@@ -148,7 +152,7 @@ public class ClientRead : MonoBehaviour
     }
     public static void BulletShot(Packet packet)
     {
-        int iD = packet.ReadInt();
+        byte iD = packet.ReadByte();
         Vector2 position = packet.ReadVector2();
         Quaternion rotation = packet.ReadQuaternion();
 
@@ -163,9 +167,9 @@ public class ClientRead : MonoBehaviour
     }
     public static void PlayerDied(Packet packet)
     {
-        int playerKilledID = packet.ReadInt();
-        int bulletOwnerID = packet.ReadInt();
-        TypeOfDeath typeOfDeath = (TypeOfDeath)packet.ReadInt();
+        byte playerKilledID = packet.ReadByte();
+        byte bulletOwnerID = packet.ReadByte();
+        TypeOfDeath typeOfDeath = (TypeOfDeath)packet.ReadByte();
         KillFeedUI.Instance.AddKillFeedEntry(playerKilledID, bulletOwnerID);
         if (playerKilledID != bulletOwnerID)
             ScoreboardManager.Instance.AddKill(bulletOwnerID);
@@ -174,7 +178,7 @@ public class ClientRead : MonoBehaviour
     }
     public static void PlayerRespawned(Packet packet)
     {
-        int iD = packet.ReadInt();
+        byte iD = packet.ReadByte();
         Vector2 respawnPoint = packet.ReadVector2();
         GameManager.PlayerDictionary[iD].PlayerRespawned();
         GameManager.PlayerDictionary[iD].SetRespawnPosition(respawnPoint);
@@ -182,24 +186,24 @@ public class ClientRead : MonoBehaviour
 
     internal static void TookDamage(Packet packet)
     {
-        int iD = packet.ReadInt();
+        byte iD = packet.ReadByte();
         int damage = packet.ReadInt();
         int currentHealth = packet.ReadInt();
-        int bulletOwner = packet.ReadInt();
+        short bulletOwner = packet.ReadShort();
 
         GameManager.PlayerDictionary[iD].TookDamage(damage, currentHealth);
         if (Client.Instance.ClientID == bulletOwner)
-            GameManager.PlayerDictionary[bulletOwner].CallLocalPlayerHitAnother();
+            GameManager.PlayerDictionary[(byte)bulletOwner].CallLocalPlayerHitAnother();
     }
 
-    internal static void ServerIsFull(Packet packet)
+    internal static void ServerIsFull(Packet _)
     {
         ServerMenu.ServerConnectionFull();
     }
 
     internal static void ArmPositionRotation(Packet packet)
     {
-        int iD = packet.ReadInt();
+        byte iD = packet.ReadByte();
         Vector2 position = packet.ReadVector2();
         Quaternion rotation = packet.ReadQuaternion();
         try
@@ -214,7 +218,7 @@ public class ClientRead : MonoBehaviour
 
     internal static void PlayerPausedGame(Packet packet)
     {
-        int iD = packet.ReadInt();
+        byte iD = packet.ReadByte();
         bool paused = packet.ReadBool();
         try
         {
@@ -231,11 +235,35 @@ public class ClientRead : MonoBehaviour
         Client.Instance.PlayerConnectedAckn(DateTime.Now.TimeOfDay);
     }
 
-    internal static void SetHostClient(Packet packet)
+    internal static void GeneratedPickupItem(Packet packet)
     {
-        bool shouldHost = packet.ReadBool();
-        HostClient.Instance.Host(shouldHost);
+        try
+        {
+            PickupType pickupType = (PickupType)packet.ReadInt();
+            int pickupID = packet.ReadInt();
+            Vector2 position = packet.ReadVector2();
+
+            PickupItemsManager.Instance.SpawnGeneratedPickup(pickupType, pickupID, position);
+        }
+        catch (Exception e)
+        {
+            Debug.Log($"Error in reading GeneratedPickupItem...\n{e}");
+        }
+    }
+    internal static void PlayerPickedUpItem(Packet packet)
+    {
+        try
+        {
+            int pickupID = packet.ReadInt();
+            byte clientWhoPickedUp = packet.ReadByte();
+
+            //TODO: deal with another player picking up the item, effects 
+            PickupItemsManager.Instance.OtherPlayerPickedUpItem(pickupID);
+        }
+        catch (Exception e)
+        {
+            Debug.Log($"Error in reading PlayerPickedUpItem...\n{e}");
+        }
     }
 
-    
 }

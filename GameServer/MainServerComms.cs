@@ -14,7 +14,7 @@ namespace GameServer
         public static TCP tCP { get; set; }
 
         private delegate void PacketHandler(Packet packet);
-        private static Dictionary<int, PacketHandler> PacketHandlerDictionary;
+        private static Dictionary<byte, PacketHandler> PacketHandlerDictionary;
         public static bool EstablishedConnection { get; set; } = false;
         public static int Port { get; private set; }
         public static string ServerName { get; set; }
@@ -246,8 +246,8 @@ namespace GameServer
 
         private static void InitIncomingPacketHandler()
         {
-            PacketHandlerDictionary = new Dictionary<int, PacketHandler>();
-            PacketHandlerDictionary.Add((int)MainServerToServer.welcome, MainServerCommsRead.Welcome);
+            PacketHandlerDictionary = new Dictionary<byte, PacketHandler>();
+            PacketHandlerDictionary.Add((byte)MainServerToServer.welcome, MainServerCommsRead.Welcome);
         }
     }
 }

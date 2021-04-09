@@ -8,11 +8,20 @@ Main goals is to;
 	1 Decrease screen shake when hitting another player
 	0 Decrease the music volume / deafen the music as player's heart beat increases in bpm
 
-	0 Allow players to choose their own colour
-	0 Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard
+	1 Allow players to choose their own colour
+	1 Move the server code onto a unity server project, so can run physics simulations and control enemies, pick ups
+	1 Seperate the MainServer and GameServer projects
+	
+	0 Decrease packet sizes sent from player 
+		1 Change packet enums to be byte instead of int
+		1 Change Quaternions to be sent as 3 bytes, instead of 16 bytes
+		0 Change the packetLen to be sent not as int, but as either byte (1 bytePacket len), or as ushort (2 bytePacketLen)
+		0 Change Vector2 to be sent as
 
 	0 Add health pickups
 	0 Add adrenaline pickup
+
+	0 Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard	
 
 	0 Integrate ads
 	0 Make dead time, so when died, wait like 10 seconds & show banner ads

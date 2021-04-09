@@ -11,7 +11,7 @@ public class KillFeedUI : UIEntryManager
     [SerializeField] private Sprite DeathBullet;
     [SerializeField] private Sprite DeathFall;
 
-    public void AddKillFeedEntry(int diedID, int killerID)
+    public void AddKillFeedEntry(byte diedID, byte killerID)
     {
         string killerName = "";
         string diedName = GameManager.PlayerDictionary[diedID].GetUsername();
@@ -36,7 +36,7 @@ public class KillFeedUI : UIEntryManager
         }
         GameObject killFeedEntry = AddEntry(killerName, diedName, deathSprite, imageColor, killerColor, diedColor);
 
-        int clientInstanceID = Client.Instance.ClientID;
+        byte clientInstanceID = Client.Instance.ClientID;
         if (clientInstanceID == diedID)
         {
             TurnOnRedBorder(killFeedEntry);

@@ -24,7 +24,7 @@ public class InGameChat : UIEntryManager
         GameManager.Instance.OnPlayerDisconnected += PlayerDisconnectedMessage;
     }
 
-    private void PlayerConnectedMessage(int iD, string username, bool justJoined)
+    private void PlayerConnectedMessage(byte iD, string username, bool justJoined)
     {
         string message;
         if (justJoined)
@@ -33,7 +33,7 @@ public class InGameChat : UIEntryManager
             message = "is in game";
         AddInGameChatEntry($"Player {iD} \"{username}\" {message}");
     }
-    private void PlayerDisconnectedMessage(int iD, string username) =>
+    private void PlayerDisconnectedMessage(byte iD, string username) =>
         AddInGameChatEntry($"Player {iD} \"{username}\" left");
 
     private void OnDestroy()

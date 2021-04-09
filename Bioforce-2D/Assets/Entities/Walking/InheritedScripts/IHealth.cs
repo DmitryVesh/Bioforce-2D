@@ -1,9 +1,9 @@
 ﻿
 public interface IHealth
 {
-    int GetOwnerClientID();
-    void TakeDamage(int damage, int bulletOwnerID);
-    void Die(int bulletOwnerID);
+    byte GetOwnerClientID();
+    void TakeDamage(int damage, byte bulletOwnerID);
+    void Die(byte bulletOwnerID);
     void Respawn();
     void FallDie();
 

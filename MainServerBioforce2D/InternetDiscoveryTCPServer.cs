@@ -15,15 +15,15 @@ namespace MainServerBioforce2D
         public const string MainServerIP = "18.134.197.3";
         //public const string MainServerIP = "127.0.0.1";
 
-        public const string GameVersionLatest = "1.0.1";
+        public const string GameVersionLatest = "1.0.2";
 
         private static TcpListener TCPBroadCastTcpListener { get; set; }
 
         private static int PortNum { get; set; }
 
-        public delegate void PacketHandler(int client, Packet packet);
-        public static Dictionary<int, PacketHandler> PacketHandlerDictionary { get; set; }
-        public static Dictionary<int, InternetDiscoveryTCPClientOnServer> ClientDictionary = new Dictionary<int, InternetDiscoveryTCPClientOnServer>();
+        public delegate void PacketHandler(byte client, Packet packet);
+        public static Dictionary<byte, PacketHandler> PacketHandlerDictionary { get; set; }
+        public static Dictionary<byte, InternetDiscoveryTCPClientOnServer> ClientDictionary = new Dictionary<byte, InternetDiscoveryTCPClientOnServer>();
         public static List<Server> ServersAvailable { get; set; } = new List<Server>();
         public static Dictionary<string, GameServerProcess> GameServerDict { get; set; } = new Dictionary<string, GameServerProcess>();
 
@@ -34,7 +34,7 @@ namespace MainServerBioforce2D
 
         private static List<int> PortsAvailable()
         {
-            int minPort = 28030, maxPort = minPort + NumServers - 1;
+            int minPort = PortNum + 10, maxPort = minPort + NumServers - 1;
             List<int> ports = new List<int>();
             for (int port = minPort; port < maxPort; port++)
                 ports.Add(port);
@@ -55,7 +55,7 @@ namespace MainServerBioforce2D
             GameServerProcess gameServerProcess = new GameServerProcess(serverName, gameServerPort);
             gameServerProcess.StartInfo = new ProcessStartInfo
             {
-                FileName = "MainServer",
+                FileName = Program.GameServerFileName,
                 ArgumentList = { "GameServer", serverName, maxNumPlayers.ToString(), mapName, gameServerPort.ToString(), gameMainPort.ToString(), timeOut.ToString() }
             };
             gameServerProcess.Start();
@@ -133,7 +133,7 @@ namespace MainServerBioforce2D
             Console.WriteLine($"\nUser {client.Client.RemoteEndPoint} is trying to connect to the discovery server...");
             TCPBeginReceiveDiscoveryClients();
 
-            int discoveryClientCount = SearchForDictSpace(ref ClientDictionary);
+            byte discoveryClientCount = SearchForDictSpace(ref ClientDictionary);
             ClientDictionary[discoveryClientCount].Connect(client);
             InternetDiscoveryTCPServerSend.SendWelcome(discoveryClientCount);
             string ip = client.Client.RemoteEndPoint.ToString().Split(':')[0].ToString();
@@ -160,9 +160,9 @@ namespace MainServerBioforce2D
             }
         }
 
-        private static int SearchForDictSpace(ref Dictionary<int, InternetDiscoveryTCPClientOnServer> dict)
+        private static byte SearchForDictSpace(ref Dictionary<byte, InternetDiscoveryTCPClientOnServer> dict)
         {
-            int discoveryClientCount = 0;
+            byte discoveryClientCount = 0;
             while (true)
             {
                 discoveryClientCount++;
@@ -184,13 +184,13 @@ namespace MainServerBioforce2D
 
         private static void InitPacketHandlerDictionary()
         {
-            PacketHandlerDictionary = new Dictionary<int, PacketHandler>();
-            PacketHandlerDictionary.Add((int)InternetDiscoveryClientPackets.firstAskForServers, InternetDiscoveryTCPServerRead.ReadFirstAskForServers);
-            PacketHandlerDictionary.Add((int)InternetDiscoveryClientPackets.askForServerChanges, InternetDiscoveryTCPServerRead.ReadAskForServerChanges);
-            PacketHandlerDictionary.Add((int)InternetDiscoveryClientPackets.addServer, InternetDiscoveryTCPServerRead.ReadAddServer);
-            PacketHandlerDictionary.Add((int)InternetDiscoveryClientPackets.deletedServer, InternetDiscoveryTCPServerRead.ReadDeleteServer);
-            PacketHandlerDictionary.Add((int)InternetDiscoveryClientPackets.modifiedServer, InternetDiscoveryTCPServerRead.ReadModifyServer);
-            PacketHandlerDictionary.Add((int)InternetDiscoveryClientPackets.joinServerNamed, InternetDiscoveryTCPServerRead.ReadJoinServerNamed);
+            PacketHandlerDictionary = new Dictionary<byte, PacketHandler>();
+            PacketHandlerDictionary.Add((byte)InternetDiscoveryClientPackets.firstAskForServers, InternetDiscoveryTCPServerRead.ReadFirstAskForServers);
+            PacketHandlerDictionary.Add((byte)InternetDiscoveryClientPackets.askForServerChanges, InternetDiscoveryTCPServerRead.ReadAskForServerChanges);
+            PacketHandlerDictionary.Add((byte)InternetDiscoveryClientPackets.addServer, InternetDiscoveryTCPServerRead.ReadAddServer);
+            PacketHandlerDictionary.Add((byte)InternetDiscoveryClientPackets.deletedServer, InternetDiscoveryTCPServerRead.ReadDeleteServer);
+            PacketHandlerDictionary.Add((byte)InternetDiscoveryClientPackets.modifiedServer, InternetDiscoveryTCPServerRead.ReadModifyServer);
+            PacketHandlerDictionary.Add((byte)InternetDiscoveryClientPackets.joinServerNamed, InternetDiscoveryTCPServerRead.ReadJoinServerNamed);
         }
 
         internal static void OnGameServerExited(object sender, GameServerArgs args)

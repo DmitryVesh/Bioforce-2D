@@ -13,7 +13,7 @@ public abstract class PickupItem : MonoBehaviour
     [SerializeField] private Collider2D ItemCollider;
     [SerializeField] private SpriteRenderer SpriteRenderer;
 
-    public Action<int> OnPickup { get; set; }
+    public Action<int, int> OnPickup { get; set; }
     public int PickupID { get; set; }
 
     public void SetActive(bool active)
@@ -21,26 +21,31 @@ public abstract class PickupItem : MonoBehaviour
         ItemCollider.enabled = active;
         SpriteRenderer.enabled = active;
     }
-    public void SetPosition(Transform tf) =>
-        transform.position = tf.position;
     public void PlayEffectsAndHide()
     {
         PickupEffect.Play();
+        //TODO: make an animation e.g. a white circle that collapses into a smaller circle
         SetActive(false);
+        Invoke("DestroyItem", 5f);
+    }
+    private void DestroyItem() //Called by Invoke
+    {
+        Destroy(PickupEffect.gameObject);
+        Destroy(gameObject);
     }
 
     protected virtual void PlayerPickedUp(PlayerManager player)
     {
         PlayEffectsAndHide();
-        OnPickup?.Invoke(PickupID);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         PlayerManager player = collision.GetComponentInParent<PlayerManager>();
-        if (player is null)
+        if (player is null || player.ID != Client.Instance.ClientID) //Must be a local player to pickup the item
             return;
 
-        PlayerPickedUp(player);        
+        PlayerPickedUp(player);
+        OnPickup?.Invoke(PickupID, player.ID);
     }
 }

@@ -16,7 +16,7 @@ namespace GameServer
             Console.WriteLine($"\t{Server.ClientDictionary[clientID].tCP.Socket.Client.RemoteEndPoint} connected as player: {clientID}");
             if (clientID == checkClientID)
             {
-                ServerSend.AskPlayerDetails(clientID, Server.GetAllPlayerColors());
+                ServerSend.AskPlayerDetails(clientID, PlayerColor.UnAvailablePlayerColors());
                 Server.ClientDictionary[clientID].SetPlayer(username);
                 Server.ClientDictionary[clientID].SpawnOtherPlayersToConnectedUser();
                 return;
@@ -45,6 +45,7 @@ namespace GameServer
 
                 PlayerColor.FreeColor(colorToFree, clientID);
                 PlayerColor.TakeColor(colorToTake, clientID);
+                Server.ClientDictionary[clientID].Player.PlayerColor = colorToTake;
             }
             catch (Exception exception)
             {

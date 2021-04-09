@@ -5,7 +5,21 @@ namespace GameServer
 {
     public class PlayerColor
     {
-        public static List<int> AvailablePlayerColors { get; set; } = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }; 
+        public static List<int> AvailablePlayerColors { get; set; } = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+        const int NumColors = 16;
+        public static List<int> UnAvailablePlayerColors()
+        {
+            List<int> UnAvailableColors = new List<int>();
+            for (int colorCount = 0; colorCount < NumColors; colorCount++)
+            {
+                if (AvailablePlayerColors.Contains(colorCount))
+                    continue;
+                UnAvailableColors.Add(colorCount);
+            }
+            return UnAvailableColors;
+        }
+
+
 
         internal static void FreeColor(int colorToFree, int clientID)
         {
@@ -24,7 +38,7 @@ namespace GameServer
             if (!AvailablePlayerColors.Contains(colorToTake))
             {
                 //TODO: Send player, that the color is already taken and to choose any color available
-                ServerSend.PlayerTriedTakingAlreadyTakenColor(clientID, AvailablePlayerColors);
+                ServerSend.PlayerTriedTakingAlreadyTakenColor(clientID, UnAvailablePlayerColors());
                 return;
             }
 

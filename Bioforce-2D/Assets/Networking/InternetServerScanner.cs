@@ -75,7 +75,7 @@ public class InternetServerScanner : MonoBehaviour
         //2.
         using (Packet packet = new Packet())
         {
-            packet.Write((int)InternetDiscoveryClientPackets.firstAskForServers);
+            packet.Write((byte)InternetDiscoveryClientPackets.firstAskForServers);
             Instance.MainServerSocket.SendPacket(packet);
         }
         Debug.Log("Sent FirstAskForServers Packet to MainServer");
@@ -93,7 +93,7 @@ public class InternetServerScanner : MonoBehaviour
         Debug.Log($"Sent Add Server Packet: {serverName}");
         using (Packet packet = new Packet())
         {
-            packet.Write((int)InternetDiscoveryClientPackets.addServer);
+            packet.Write((byte)InternetDiscoveryClientPackets.addServer);
             packet.Write(serverName);
             packet.Write(maxNumPlayers);
             packet.Write(mapName);
@@ -110,7 +110,7 @@ public class InternetServerScanner : MonoBehaviour
         //Get into contact with the MainServer
         if (MainServerSocket is null || !MainServerSocket.IsConnected())
         {
-            ContactMainServerForServers(Client.PortNumInternetDiscover);
+            ContactMainServerForServers(Client.PortNumInternetToConnectTo);
             return;
         }
 
@@ -127,7 +127,7 @@ public class InternetServerScanner : MonoBehaviour
     {
         using (Packet packet = new Packet())
         {
-            packet.Write((int)InternetDiscoveryClientPackets.askForServerChanges);
+            packet.Write((byte)InternetDiscoveryClientPackets.askForServerChanges);
             MainServerSocket?.SendPacket(packet);
         }
     }
@@ -136,7 +136,7 @@ public class InternetServerScanner : MonoBehaviour
         try
         {
             StartMainServerSocket(port);
-            using (Packet packet = new Packet((int)InternetDiscoveryClientPackets.joinServerNamed))
+            using (Packet packet = new Packet((byte)InternetDiscoveryClientPackets.joinServerNamed))
             {
                 packet.Write(serverName);
                 Instance.MainServerSocket.SendPacket(packet);

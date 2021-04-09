@@ -210,6 +210,7 @@ namespace GameServer
         }
         public void SendIntoGame(int playerColor)
         {
+            Player.ReadyToPlay = true;
             Player.SetPlayerData(Vector2.Zero, playerColor);
 
             //Spawning the player who just joined, for all connected users
@@ -225,13 +226,10 @@ namespace GameServer
             //Spawning rest of players for the connected user
             foreach (ClientServer client in Server.ClientDictionary.Values)
             {
-                if (client.Player != null)
+                PlayerServer player = client.Player;
+                if (player != null && client.ID != ID && player.ReadyToPlay) //Player exists, not own player, and is ready to play
                 {
-                    if (client.ID != ID)
-                    {
-                        PlayerServer player = client.Player;
-                        ServerSend.SpawnPlayer(ID, player, false);
-                    }
+                    ServerSend.SpawnPlayer(ID, player, false);
                 }
             }
         }

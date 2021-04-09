@@ -36,6 +36,7 @@ namespace GameServer
             using (Packet packet = new Packet((int)ServerPackets.askPlayerDetails))
             {
                 int numberOfPlayers = PlayerColors.Count;
+                packet.Write(numberOfPlayers);
                 for (int playerCount = 0; playerCount < numberOfPlayers; playerCount++)
                     packet.Write(PlayerColors[playerCount]);
 
@@ -61,13 +62,14 @@ namespace GameServer
                 SendTCPPacketToAllButIncluded(clientID, packet);
             }
         }
-        internal static void PlayerTriedTakingAlreadyTakenColor(int clientID, List<int> availablePlayerColors)
+        internal static void PlayerTriedTakingAlreadyTakenColor(int clientID, List<int> unavailableColors)
         {
             using (Packet packet = new Packet((int)ServerPackets.triedTakingTakenColor))
             {
-                int numColors = availablePlayerColors.Count;
+                int numColors = unavailableColors.Count;
+                packet.Write(numColors);
                 for (int colorCount = 0; colorCount < numColors; colorCount++)
-                    packet.Write(availablePlayerColors[colorCount]);
+                    packet.Write(unavailableColors[colorCount]);
 
                 SendTCPPacket(clientID, packet);
             }

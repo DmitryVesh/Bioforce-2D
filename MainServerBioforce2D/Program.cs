@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using Shared;
-using GameServer;
 using System.Linq;
 using System.IO;
 
@@ -12,24 +11,32 @@ namespace MainServerBioforce2D
         public const int Ticks = 30;
         public const int MillisecondsInTick = 1000 / Ticks;
 
-        const int Port = 28020;
+        const int PortRelease = 28020;
+        const int PortTesting = 28420;
+
+        static int PortInUse;
+
         static bool IsRunning = true;
+
+        public static string GameServerFileName { get; private set; }
 
         static void Main(string[] args)
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            if (args.Length == 0 || args[0] == "MainServer")
+            if (args.Length == 2)
             {
-                InternetDiscoveryTCPServer.StartServer(Port);
+                GameServerFileName = args[0];
+                bool isTestBuild = bool.Parse(args[1]);
+                PortInUse = isTestBuild ? PortTesting : PortRelease;
+                InternetDiscoveryTCPServer.StartServer(PortInUse);
 
                 Thread mainThread = new Thread(new ThreadStart(MainThread));
                 mainThread.Start();
             }
-            else if (args[0] == "GameServer")
+            else
             {
-                args = args.Skip(1).ToArray();
-                ServerProgram.StartServerProgram(args);
+                throw new Exception("Not entered the Proper args... Need to Enter GameServer file name to start in MainServer args...");
             }
         }
 

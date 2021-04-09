@@ -103,7 +103,7 @@ namespace Shared
 
         /// <summary>Creates a new packet with a given ID. Used for sending.</summary>
         /// <param name="packetID">The packet ID.</param>
-        public Packet(int packetID)
+        public Packet(byte packetID)
         {
             ByteBuffer = new List<byte>(); // Intitialize buffer
             CurrentReadPosition = 0; // Set readPos to 0
@@ -232,12 +232,121 @@ namespace Shared
         }
         /// <summary>Adds a Quaternion to the packet.</summary>
         /// <param name="_value">The Quaternion to add.</param>
-        public void Write(Quaternion _value)
+        //public void Write(Quaternion _value)
+        //{
+        //    Write(_value.X);
+        //    Write(_value.Y);
+        //    Write(_value.Z);
+        //    Write(_value.W);
+        //}
+        /// <summary>Adds a Quaternion to the packet.</summary>
+        /// <param name="_value">The Quaternion to add.</param>
+        /// 
+        /// Smallest 3, find the largest absolute of the floats, don't send it, send the smallest 3, 
+        /// and give the index for the largest using 2 bits  [00, 01, 10, 11] 00 = x, 01 = y, 10 = z, 11 = w
+        /// Use formula x^2 + y^2 + z^2 + w^2 = 1
+        /// 
+        /// Also can use less precise floating point value, instead of 4 bytes per component, use 1 byte
+        /// 
+        /// This should decrease the packet size from 16 bytes = 128 bits
+        /// To 2 bit (largest component index) + 3 * 7 bits (smallest 3 components) = 23 bits - will send 3 bytes = 24 bits
+        /// only 18.75% of the original packet
+
+        public void Write(Quaternion value)
         {
-            Write(_value.X);
-            Write(_value.Y);
-            Write(_value.Z);
-            Write(_value.W);
+            float[] components = new float[] { Math.Abs(value.X), Math.Abs(value.Y), Math.Abs(value.Z), Math.Abs(value.W) };
+
+            int largestAbsIndex = GetLargestComponentIndex(components);
+            bool[] largestAbsIndexBin = ConvertIntMax4ToBin2(largestAbsIndex);
+
+            byte[] bytesToSend = new byte[3];
+            byte byteCounter = 0;
+
+            for (int count = 0; count < 4; count++)
+            {
+                if (count == largestAbsIndex)
+                    continue;
+                // Writes the 7 bit representation of the float instead of the 32 bit
+                bytesToSend[byteCounter++] = Get7BitFractionalFrom32BitFloat(components[count]);
+            }
+
+            //Writes the bit indexes of which component not to read fragmented amongst the bits
+            if (largestAbsIndexBin[0])
+                bytesToSend[0] += 128;
+            if (largestAbsIndexBin[1])
+                bytesToSend[1] += 128;
+
+            Write(bytesToSend);
+        }
+
+        private byte Get7BitFractionalFrom32BitFloat(float floating32Bit)
+        {
+            byte BitFraction7 = 0;
+            if (floating32Bit == 0 || floating32Bit < MathF.Pow(2, -6))
+                return BitFraction7;
+
+            for (byte bitCount = 7 - 1; bitCount >= 0; bitCount--)
+            {
+                float newCalc = floating32Bit - MathF.Pow(2, -(bitCount - 6));
+
+                if (newCalc < 0)
+                    continue;
+
+                byte bitValue = (byte)MathF.Pow(2, bitCount);
+                BitFraction7 += bitValue;
+
+                if (newCalc == 0)
+                    break;
+
+                floating32Bit = newCalc;
+            }
+
+            return BitFraction7;
+        }
+        private bool[] ConvertIntMax4ToBin2(int largestIndex)
+        {
+            bool[] bits = new bool[2];
+
+            if (largestIndex > 1)
+                bits[1] = true; //Most significant bit
+            if (largestIndex % 2 != 0)
+                bits[0] = true;
+
+            // Above is a more complex version of this
+            //
+            //switch (largestIndex)
+            //{
+            //    case 0:
+            //        break;
+            //    case 1:
+            //        bits[0] = true;
+            //        break;
+            //    case 2:
+            //        bits[1] = true;
+            //        break;
+            //    case 3:
+            //        bits[0] = true;
+            //        bits[1] = true;
+            //        break;
+            //}
+
+            return bits;
+        }
+        private int GetLargestComponentIndex(float[] components)
+        {
+            float largest = -1;
+            int largestIndex = 0;
+            for (int count = 0; count < components.Length; count++)
+            {
+                float component = components[count];
+                if (component > largest)
+                {
+                    largest = component;
+                    largestIndex = count;
+                }
+            }
+
+            return largestIndex;
         }
         #endregion
 
@@ -441,17 +550,107 @@ namespace Shared
         }
         /// <summary>Reads a Quaternion from the packet.</summary>
         /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
+        //public Quaternion ReadQuaternion(bool _moveReadPos = true)
+        //{
+        //    try
+        //    {
+        //        Quaternion _value = new Quaternion(ReadFloat(_moveReadPos), ReadFloat(_moveReadPos), ReadFloat(_moveReadPos), ReadFloat(_moveReadPos));
+        //        return _value; // Return the Quaternion
+        //    }
+        //    catch
+        //    {
+        //        throw new Exception("Could not read value of type 'Quaternion'!");
+        //    }
+        //}
+
+        /// <summary>Reads a Quaternion from the packet.</summary>
+        /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
+        /// 
+        /// Reads the same as the Smallest 3 Written version
+        /// Reads 3 bytes
+        /// Reads the 2 fragmented bits that will indicate the index of the missing component from the 0th and 1st bytes
+        /// Read the 3 smallest components
+        /// Reconstruct the largest component
         public Quaternion ReadQuaternion(bool _moveReadPos = true)
         {
             try
             {
-                Quaternion _value = new Quaternion(ReadFloat(_moveReadPos), ReadFloat(_moveReadPos), ReadFloat(_moveReadPos), ReadFloat(_moveReadPos));
-                return _value; // Return the Quaternion
+                byte[] components = ReadBytes(3);
+
+                //if (largestAbsIndexBin[0])
+                //    bytesToSend[0] += 128;
+                //if (largestAbsIndexBin[1])
+                //    bytesToSend[1] += 128;
+
+                byte val0 = components[0];
+                bool index0 = val0 - 128 <= 0;
+
+                byte val1 = components[1];
+                bool index1 = val1 - 128 <= 0;
+
+                if (index0)
+                    val0 -= 128;
+                if (index1)
+                    val1 -= 128;
+
+                //[00, 01, 10, 11] 00 = x, 01 = y, 10 = z, 11 = w
+                //
+                // Use formula x^2 + y^2 + z^2 + w^2 = 1
+                // a^2 + b^2 + c^2 + r^2 = 1
+                // r = sqrt(1 - a^2 - b^2 - c^2)
+
+                float x, y, z, w;
+
+                if (index1 && index0) //Reconstruct w
+                    Reconstruct(components, out x, out y, out z, out w);
+                else if (index1 && !index0) //Reconstruct z
+                    Reconstruct(components, out x, out y, out w, out z);
+                else if (!index1 && index0) //Reconstruct y
+                    Reconstruct(components, out x, out z, out w, out y);
+                else //same as -> else if (!index1 && !index1) //Reconstruct x
+                    Reconstruct(components, out y, out z, out w, out x);
+
+                Quaternion value = new Quaternion(x, y, z, w);
+
+                return value; // Return the Quaternion
             }
             catch
             {
                 throw new Exception("Could not read value of type 'Quaternion'!");
             }
+        }
+        private static void Reconstruct(byte[] components, out float a, out float b, out float c, out float r)
+        {
+            a = Read7BitFloat(components[0]);
+            b = Read7BitFloat(components[1]);
+            c = Read7BitFloat(components[2]);
+            //Reconstruct
+            r = MathF.Sqrt(1 - (a * a) - (b * b) - (c * c));
+        }
+        private static float Read7BitFloat(byte bit7Float)
+        {
+            float value = 0;
+            if (bit7Float == 0)
+                return value;
+
+            for (int bitCount = 7 - 1; bitCount >= 0; bitCount--)
+            {
+                byte bitValue = (byte)MathF.Pow(2, bitCount);
+                byte newCalc = (byte)(bit7Float - bitValue);
+
+                if (newCalc < 0)
+                    continue;
+
+                float addValue = MathF.Pow(2, -(bitCount - 6));
+                value += addValue;
+
+                if (newCalc == 0)
+                    break;
+
+                bit7Float = newCalc;
+            }
+
+            return value;
         }
         #endregion
 

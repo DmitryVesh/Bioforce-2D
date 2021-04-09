@@ -27,12 +27,13 @@ namespace GameServer
 
         public bool IsDead { get; private set; } = false;
 
-        public int PlayerColor { get; private set; } //Represents the index of the color in the color palette
+        public int PlayerColor { get; set; } = -1;//Represents the index of the color in the color palette
 
         public bool Paused { get; private set; }
         private bool LastPaused { get; set; }
         public TimeSpan PacketTimeOut { get; set; } = DateTime.Now.TimeOfDay + new TimeSpan(0, 1, 0);
         public TimeSpan PacketPause { get; set; } = DateTime.Now.TimeOfDay + new TimeSpan(0, 0, 20);
+        public bool ReadyToPlay { get; set; }
 
         public PlayerServer(int iD, string username)
         {
@@ -115,6 +116,9 @@ namespace GameServer
 
         private void MovePlayer()
         {
+            if (!ReadyToPlay)
+                return;
+
             ServerSend.PlayerPositionButLocal(ID, Position);
             ServerSend.PlayerRotationAndVelocity(ID, IsFacingRight, Velocity, Rotation);
 

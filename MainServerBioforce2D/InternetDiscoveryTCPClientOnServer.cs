@@ -8,7 +8,7 @@ namespace MainServerBioforce2D
     class InternetDiscoveryTCPClientOnServer
     {
         public TcpClient TCPClient { get; private set; }
-        public int ID { get; private set; }
+        public byte ID { get; private set; }
         public List<Server> ServersAlreadyGiven { get; set; }
 
         private static int DataBufferSize { get; set; } = 4096;
@@ -18,7 +18,7 @@ namespace MainServerBioforce2D
         private NetworkStream Stream;
         private Packet ReceivePacket;
 
-        public InternetDiscoveryTCPClientOnServer(int id) =>
+        public InternetDiscoveryTCPClientOnServer(byte id) =>
             ID = id;
         public void Connect(TcpClient client)
         {
@@ -102,7 +102,7 @@ namespace MainServerBioforce2D
                 {
                     using (Packet packet = new Packet(bytes))
                     {
-                        int packetId = packet.ReadInt();
+                        byte packetId = packet.ReadByte();
                         InternetDiscoveryTCPServer.PacketHandlerDictionary[packetId](ID, packet);
                     }
                 });                

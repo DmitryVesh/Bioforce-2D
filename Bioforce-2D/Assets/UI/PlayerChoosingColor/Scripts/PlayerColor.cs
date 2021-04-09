@@ -21,12 +21,10 @@ public class PlayerColor : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (!IsFree)
+            return;
+
         PlayerChooseColor.Instance.ActivatedColor(ColorChoiceImage.color);
         SetIsFree(false);
-    }
-
-    private void Start()
-    {
-        SetIsFree(true);
     }
 }

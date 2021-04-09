@@ -5,9 +5,9 @@ namespace MainServerBioforce2D
 {
     class InternetDiscoveryTCPServerSend
     {
-        public static void SendWelcome(int client)
+        public static void SendWelcome(byte client)
         {
-            using (Packet packet = new Packet((int)InternetDiscoveryServerPackets.welcome))
+            using (Packet packet = new Packet((byte)InternetDiscoveryServerPackets.welcome))
             {
                 packet.Write($"Welcome to the MainServer client: {client}!");
                 packet.Write(InternetDiscoveryTCPServer.GameVersionLatest);
@@ -16,14 +16,14 @@ namespace MainServerBioforce2D
             }
         }
 
-        public static void SendServerData(int client, Server server)
+        public static void SendServerData(byte client, Server server)
         {
             if (server == null)
                 return;
 
             try
             {
-                using (Packet packet = new Packet((int)InternetDiscoveryServerPackets.serverData))
+                using (Packet packet = new Packet((byte)InternetDiscoveryServerPackets.serverData))
                 {
                     packet.Write(server.ServerName);
                     packet.Write(server.CurrentNumPlayers);
@@ -41,9 +41,9 @@ namespace MainServerBioforce2D
             }
         }
 
-        public static void SendServerDeleted(int client, Server server)
+        public static void SendServerDeleted(byte client, Server server)
         {
-            using (Packet packet = new Packet((int)InternetDiscoveryServerPackets.serverDeleted))
+            using (Packet packet = new Packet((byte)InternetDiscoveryServerPackets.serverDeleted))
             {
                 packet.Write(server.ServerName);
                 SendPacket(client, packet);
@@ -51,9 +51,9 @@ namespace MainServerBioforce2D
             Console.WriteLine($"Sent ServerDeleted of: {server.ServerName} to client:{client}");
         }
 
-        public static void SendModifedServer(int client, Server server)
+        public static void SendModifedServer(byte client, Server server)
         {
-            using (Packet packet = new Packet((int)InternetDiscoveryServerPackets.serverModified))
+            using (Packet packet = new Packet((byte)InternetDiscoveryServerPackets.serverModified))
             {
                 packet.Write(server.ServerName);
                 packet.Write(server.CurrentNumPlayers);
@@ -66,9 +66,9 @@ namespace MainServerBioforce2D
             Console.WriteLine($"Sent ModifiedServer of: {server.ServerName} to client:{client}");
         }
 
-        internal static void SendCantJoinServerDeleted(int client, string serverName)
+        internal static void SendCantJoinServerDeleted(byte client, string serverName)
         {
-            using (Packet packet = new Packet((int)InternetDiscoveryServerPackets.cantJoinServerDeleted))
+            using (Packet packet = new Packet((byte)InternetDiscoveryServerPackets.cantJoinServerDeleted))
             {
                 packet.Write(serverName);
 
@@ -77,18 +77,18 @@ namespace MainServerBioforce2D
             Console.WriteLine($"Sent CantJoinServerDeleted packet server: {serverName} to: {client}");
         }
 
-        internal static void SendNoMoreServersAvailable(int client)
+        internal static void SendNoMoreServersAvailable(byte client)
         {
-            using (Packet packet = new Packet((int)InternetDiscoveryServerPackets.noMoreServersAvailable))
+            using (Packet packet = new Packet((byte)InternetDiscoveryServerPackets.noMoreServersAvailable))
             {
                 SendPacket(client, packet);
             }
             Console.WriteLine($"Sent NoMoreServersAvailable packet to: {client}");
         }
 
-        internal static void SendJoinServer(int client, int serverPort)
+        internal static void SendJoinServer(byte client, int serverPort)
         {
-            using (Packet packet = new Packet((int)InternetDiscoveryServerPackets.joinServer))
+            using (Packet packet = new Packet((byte)InternetDiscoveryServerPackets.joinServer))
             {
                 packet.Write(InternetDiscoveryTCPServer.MainServerIP);
                 packet.Write(serverPort);
@@ -97,7 +97,7 @@ namespace MainServerBioforce2D
             }
         }
 
-        private static void SendPacket(int client, Packet packet) =>
+        private static void SendPacket(byte client, Packet packet) =>
             InternetDiscoveryTCPServer.ClientDictionary[client].SendPacket(packet);
     }
 }

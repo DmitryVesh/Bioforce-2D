@@ -11,7 +11,7 @@ namespace MainServer
     class GameServerComms
     {
         public delegate void PacketHandler(string serverName, Packet packet);
-        public static Dictionary<int, PacketHandler> PacketHandlerDictionary { get; set; }
+        public static Dictionary<byte, PacketHandler> PacketHandlerDictionary { get; set; }
         public static Dictionary<string, GameServerComms> GameServerConnection = new Dictionary<string, GameServerComms>();
         private TcpListener InitialSocketListener { get; set; }
 
@@ -32,10 +32,10 @@ namespace MainServer
 
         private void InitPacketHandlerDictionary()
         {
-            PacketHandlerDictionary = new Dictionary<int, PacketHandler>();
-            PacketHandlerDictionary.Add((int)ServerToMainServer.welcomeReceived, ReadWelcomeReceived);
-            PacketHandlerDictionary.Add((int)ServerToMainServer.serverData, ReadServerData);
-            PacketHandlerDictionary.Add((int)ServerToMainServer.shuttingDown, ReadShuttingDown);
+            PacketHandlerDictionary = new Dictionary<byte, PacketHandler>();
+            PacketHandlerDictionary.Add((byte)ServerToMainServer.welcomeReceived, ReadWelcomeReceived);
+            PacketHandlerDictionary.Add((byte)ServerToMainServer.serverData, ReadServerData);
+            PacketHandlerDictionary.Add((byte)ServerToMainServer.shuttingDown, ReadShuttingDown);
         }
 
         private void TCPBeginReceiveGameServer() =>
@@ -95,7 +95,7 @@ namespace MainServer
 
         private void SendWelcome()
         {
-            using (Packet packet = new Packet((int)MainServerToServer.welcome)) 
+            using (Packet packet = new Packet((byte)MainServerToServer.welcome)) 
             {
                 SendPacket(packet);
             }
@@ -194,7 +194,7 @@ namespace MainServer
                 {
                     using (Packet packet = new Packet(bytes))
                     {
-                        int packetId = packet.ReadInt();
+                        byte packetId = packet.ReadByte();
                         string serverName = packet.ReadString();
                         PacketHandlerDictionary[packetId](serverName, packet);
                     }
