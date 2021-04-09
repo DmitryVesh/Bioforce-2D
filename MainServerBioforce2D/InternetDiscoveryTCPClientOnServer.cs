@@ -89,7 +89,7 @@ namespace MainServerBioforce2D
         }
         private bool HandleData(byte[] data)
         {
-            int packetLen = 0;
+            byte packetLen = 0;
             ReceivePacket.SetBytes(data);
 
             if (ExitHandleData(ref packetLen))
@@ -118,11 +118,11 @@ namespace MainServerBioforce2D
 
             return false;
         }
-        private bool ExitHandleData(ref int packetLen)
+        private bool ExitHandleData(ref byte packetLen)
         {
-            if (ReceivePacket.UnreadLength() >= 4)
+            if (ReceivePacket.UnreadLength() >= sizeof(byte))
             {
-                packetLen = ReceivePacket.ReadInt();
+                packetLen = ReceivePacket.ReadPacketLen();
                 if (packetLen < 1)
                 {
                     return true;

@@ -15,7 +15,7 @@ Main goals is to;
 	0 Decrease packet sizes sent from player 
 		1 Change packet enums to be byte instead of int
 		1 Change Quaternions to be sent as 3 bytes, instead of 16 bytes
-		0 Change the packetLen to be sent not as int, but as either byte (1 bytePacket len), or as ushort (2 bytePacketLen)
+		1 Change the packetLen to be sent not as int, but as either byte (1 bytePacket len), or as ushort (2 bytePacketLen)
 		0 Change Vector2 to be sent as
 
 	0 Add health pickups

@@ -86,7 +86,7 @@ public class MainMenu : MonoBehaviour
     private void Start()
     {
         //Set default selected button
-        MenuButtons[CurrentSelectedButtonIndex].OnPointerEnter(null);
+        //MenuButtons[CurrentSelectedButtonIndex].OnPointerEnter(null);
     }
 
     private void Update()

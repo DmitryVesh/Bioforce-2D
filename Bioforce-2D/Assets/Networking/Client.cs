@@ -187,7 +187,7 @@ public class Client : MonoBehaviour
         }
         private bool HandleData(byte[] data)
         {
-            int packetLen = 0;
+            byte packetLen = 0;
             ReceivePacket.SetBytes(data);
 
             if (ExitHandleData(ref packetLen))
@@ -226,11 +226,11 @@ public class Client : MonoBehaviour
 
             return false;
         }
-        private bool ExitHandleData(ref int packetLen)
+        private bool ExitHandleData(ref byte packetLen)
         {
-            if (ReceivePacket.UnreadLength() >= 4) //TODO: Might cause problems when switching the packetLen from int -> short or whatever: if byte, >= 1, ushort >= 2
+            if (ReceivePacket.UnreadLength() >= sizeof(byte)) //TODO: Might cause problems when switching the packetLen from int -> short or whatever: if byte, >= 1, ushort >= 2
             {
-                packetLen = ReceivePacket.ReadInt();
+                packetLen = ReceivePacket.ReadPacketLen();
                 if (packetLen < 1)
                     return true;
             }
@@ -310,7 +310,7 @@ public class Client : MonoBehaviour
         {
             using (Packet packetInit = new Packet(data))
             {
-                int packetLen = packetInit.ReadInt();
+                byte packetLen = packetInit.ReadPacketLen();
                 data = packetInit.ReadBytes(packetLen);
             }
 

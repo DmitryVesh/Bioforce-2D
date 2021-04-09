@@ -28,7 +28,7 @@ namespace Shared
     public enum InternetDiscoveryServerPackets
     {
         welcome,
-        serverData, //Same as added
+        serverData,
         serverDeleted,
         serverModified,
         cantJoinServerDeleted,
@@ -67,7 +67,9 @@ namespace Shared
         askPlayerDetails,
         freeColor,
         takeColor,
-        triedTakingTakenColor
+        triedTakingTakenColor,
+        generatedPickup,
+        playerPickedUpItem
     }
 
     /// <summary>Sent from client to server.</summary>
@@ -85,70 +87,90 @@ namespace Shared
         pausedGame,
         stillConnected,
         colorToFreeAndTake,
-        readyToJoin
+        readyToJoin,
+        pickedUpItem
     }
 
     public class Packet : IDisposable
     {
-        private List<byte> ByteBuffer { get; set; }
-        private byte[] readableBuffer { get; set; }
-        private int CurrentReadPosition;
+        private List<byte> buffer;
+        private byte[] readableBuffer;
+        private int readPos;
 
         /// <summary>Creates a new empty packet (without an ID).</summary>
         public Packet()
         {
-            ByteBuffer = new List<byte>(); // Intitialize buffer
-            CurrentReadPosition = 0; // Set readPos to 0
+            buffer = new List<byte>(); // Intitialize buffer
+            readPos = 0; // Set readPos to 0
         }
 
         /// <summary>Creates a new packet with a given ID. Used for sending.</summary>
-        /// <param name="packetID">The packet ID.</param>
-        public Packet(byte packetID)
+        /// <param name="_id">The packet ID.</param>
+        public Packet(byte _id)
         {
-            ByteBuffer = new List<byte>(); // Intitialize buffer
-            CurrentReadPosition = 0; // Set readPos to 0
+            buffer = new List<byte>(); // Intitialize buffer
+            readPos = 0; // Set readPos to 0
 
-            Write(packetID); // Write packet id to the buffer
+            Write(_id); // Write packet id to the buffer
         }
 
         /// <summary>Creates a packet from which data can be read. Used for receiving.</summary>
-        /// <param name="bytes">The bytes to add to the packet.</param>
-        public Packet(byte[] bytes)
+        /// <param name="_data">The bytes to add to the packet.</param>
+        public Packet(byte[] _data)
         {
-            ByteBuffer = new List<byte>(); // Intitialize buffer
-            CurrentReadPosition = 0; // Set readPos to 0
+            buffer = new List<byte>(); // Intitialize buffer
+            readPos = 0; // Set readPos to 0
 
-            SetBytes(bytes);
+            SetBytes(_data);
         }
 
         #region Functions
         /// <summary>Sets the packet's content and prepares it to be read.</summary>
-        /// <param name="SetBytes">The bytes to add to the packet.</param>
-        public void SetBytes(byte[] SetBytes)
+        /// <param name="_data">The bytes to add to the packet.</param>
+        public void SetBytes(byte[] _data)
         {
-            Write(SetBytes);
-            readableBuffer = ByteBuffer.ToArray();
+            Write(_data);
+            readableBuffer = buffer.ToArray();
         }
 
         /// <summary>Inserts the length of the packet's content at the start of the buffer.</summary>
-        public void WriteLength() =>
-            ByteBuffer.InsertRange(0, BitConverter.GetBytes(ByteBuffer.Count)); // Insert the byte length of the packet at the very beginning
+        public void WriteLength()
+        {
+            // For packetLens that are bigger than 1B , e.g. ushort = 2B, uint = 4B
+            //buffer.InsertRange(0, BitConverter.GetBytes(buffer.Count)); // Insert the byte length of the packet at the very beginning
 
+            buffer.Insert(0, (byte)buffer.Count); // Insert the byte length of the packet at the very beginning
+        }
+
+        /// <summary>Inserts the given int at the start of the buffer.</summary>
+        /// <param name="_value">The int to insert.</param>
+        public void InsertInt(int _value)
+        {
+            buffer.InsertRange(0, BitConverter.GetBytes(_value)); // Insert the int at the start of the buffer
+        }
+        public void InsertByte(byte _value)
+        {
+            buffer.Insert(0, _value); // Insert the int at the start of the buffer
+        }
 
         /// <summary>Gets the packet's content in array form.</summary>
         public byte[] ToArray()
         {
-            readableBuffer = ByteBuffer.ToArray();
+            readableBuffer = buffer.ToArray();
             return readableBuffer;
         }
 
         /// <summary>Gets the length of the packet's content.</summary>
-        public int Length() =>
-            ByteBuffer.Count; // Return the length of buffer
+        public int Length()
+        {
+            return buffer.Count; // Return the length of buffer
+        }
 
         /// <summary>Gets the length of the unread data contained in the packet.</summary>
-        public int UnreadLength() =>
-            Length() - CurrentReadPosition; // Return the remaining length (unread)
+        public int UnreadLength()
+        {
+            return Length() - readPos; // Return the remaining length (unread)
+        }
 
         /// <summary>Resets the packet instance to allow it to be reused.</summary>
         /// <param name="_shouldReset">Whether or not to reset the packet.</param>
@@ -156,64 +178,68 @@ namespace Shared
         {
             if (_shouldReset)
             {
-                ByteBuffer.Clear(); // Clear buffer
+                buffer.Clear(); // Clear buffer
                 readableBuffer = null;
-                CurrentReadPosition = 0; // Reset readPos
+                readPos = 0; // Reset readPos
             }
             else
-                CurrentReadPosition -= 4; // "Unread" the last read int
+            {
+                readPos -= 4; // "Unread" the last read int
+            }
         }
         #endregion
 
         #region Write Data
+        //public void Write(bit)
+
         /// <summary>Adds a byte to the packet.</summary>
         /// <param name="_value">The byte to add.</param>
         public void Write(byte _value)
         {
-            ByteBuffer.Add(_value);
+            buffer.Add(_value);
         }
         /// <summary>Adds an array of bytes to the packet.</summary>
         /// <param name="_value">The byte array to add.</param>
         public void Write(byte[] _value)
         {
-            ByteBuffer.AddRange(_value);
+            buffer.AddRange(_value);
         }
         /// <summary>Adds a short to the packet.</summary>
         /// <param name="_value">The short to add.</param>
         public void Write(short _value)
         {
-            ByteBuffer.AddRange(BitConverter.GetBytes(_value));
+            buffer.AddRange(BitConverter.GetBytes(_value));
         }
         /// <summary>Adds an int to the packet.</summary>
         /// <param name="_value">The int to add.</param>
         public void Write(int _value)
         {
-            ByteBuffer.AddRange(BitConverter.GetBytes(_value));
+            buffer.AddRange(BitConverter.GetBytes(_value));
         }
         /// <summary>Adds a long to the packet.</summary>
         /// <param name="_value">The long to add.</param>
         public void Write(long _value)
         {
-            ByteBuffer.AddRange(BitConverter.GetBytes(_value));
+            buffer.AddRange(BitConverter.GetBytes(_value));
         }
         /// <summary>Adds a float to the packet.</summary>
         /// <param name="_value">The float to add.</param>
         public void Write(float _value)
         {
-            ByteBuffer.AddRange(BitConverter.GetBytes(_value));
+            buffer.AddRange(BitConverter.GetBytes(_value));
         }
         /// <summary>Adds a bool to the packet.</summary>
         /// <param name="_value">The bool to add.</param>
         public void Write(bool _value)
         {
-            ByteBuffer.AddRange(BitConverter.GetBytes(_value));
+            buffer.AddRange(BitConverter.GetBytes(_value));
         }
         /// <summary>Adds a string to the packet.</summary>
         /// <param name="_value">The string to add.</param>
         public void Write(string _value)
         {
             Write(_value.Length); // Add the length of the string to the packet
-            ByteBuffer.AddRange(Encoding.ASCII.GetBytes(_value)); // Add the string itself
+            buffer.AddRange(Encoding.ASCII.GetBytes(_value)); // Add the string itself
         }
         /// <summary>Adds a Vector3 to the packet.</summary>
         /// <param name="_value">The Vector3 to add.</param>
@@ -230,15 +256,7 @@ namespace Shared
             Write(_value.X);
             Write(_value.Y);
         }
-        /// <summary>Adds a Quaternion to the packet.</summary>
-        /// <param name="_value">The Quaternion to add.</param>
-        //public void Write(Quaternion _value)
-        //{
-        //    Write(_value.X);
-        //    Write(_value.Y);
-        //    Write(_value.Z);
-        //    Write(_value.W);
-        //}
+
         /// <summary>Adds a Quaternion to the packet.</summary>
         /// <param name="_value">The Quaternion to add.</param>
         /// 
@@ -249,14 +267,16 @@ namespace Shared
         /// Also can use less precise floating point value, instead of 4 bytes per component, use 1 byte
         /// 
         /// This should decrease the packet size from 16 bytes = 128 bits
-        /// To 2 bit (largest component index) + 3 * 7 bits (smallest 3 components) = 23 bits - will send 3 bytes = 24 bits
+        /// To 2 bit (largest component index) + 3 * 7 bits (smallest 3 components) + 1 bit for negating all components = 24 bits - will send 3 bytes = 24 bits
         /// only 18.75% of the original packet
 
         public void Write(Quaternion value)
         {
-            float[] components = new float[] { Math.Abs(value.X), Math.Abs(value.Y), Math.Abs(value.Z), Math.Abs(value.W) };
+            float[] componentsAbs = new float[] { Math.Abs(value.X), Math.Abs(value.Y), Math.Abs(value.Z), Math.Abs(value.W) };
+            float[] components = new float[] { value.X, value.Y, value.Z, value.W };
 
-            int largestAbsIndex = GetLargestComponentIndex(components);
+            int largestAbsIndex = GetLargestComponentIndex(componentsAbs);
+            bool largestCompNegative = components[largestAbsIndex] < 0;
             bool[] largestAbsIndexBin = ConvertIntMax4ToBin2(largestAbsIndex);
 
             byte[] bytesToSend = new byte[3];
@@ -267,7 +287,7 @@ namespace Shared
                 if (count == largestAbsIndex)
                     continue;
                 // Writes the 7 bit representation of the float instead of the 32 bit
-                bytesToSend[byteCounter++] = Get7BitFractionalFrom32BitFloat(components[count]);
+                bytesToSend[byteCounter++] = Get7BitFractionalFrom32BitFloat(componentsAbs[count], components[count] < 0);
             }
 
             //Writes the bit indexes of which component not to read fragmented amongst the bits
@@ -276,18 +296,26 @@ namespace Shared
             if (largestAbsIndexBin[1])
                 bytesToSend[1] += 128;
 
+            if (largestCompNegative) //Should negate the smallest 3 (*-1) components
+                bytesToSend[2] += 128;
+
             Write(bytesToSend);
         }
 
-        private byte Get7BitFractionalFrom32BitFloat(float floating32Bit)
+        const float SmallestFloatCanRepresent = 1 / 64; //2^-6
+        private byte Get7BitFractionalFrom32BitFloat(float floating32BitAbs, bool negative)
         {
             byte BitFraction7 = 0;
-            if (floating32Bit == 0 || floating32Bit < MathF.Pow(2, -6))
+            if (floating32BitAbs == 0 || floating32BitAbs < SmallestFloatCanRepresent)
                 return BitFraction7;
 
-            for (byte bitCount = 7 - 1; bitCount >= 0; bitCount--)
+            if (negative) //Negative sign
+                BitFraction7 += 64;
+
+            for (sbyte bitCount = 5; bitCount >= 0; bitCount--)
             {
-                float newCalc = floating32Bit - MathF.Pow(2, -(bitCount - 6));
+                float takeAway = MathF.Pow(2f, bitCount - 5);
+                float newCalc = floating32BitAbs - takeAway;
 
                 if (newCalc < 0)
                     continue;
@@ -298,7 +326,7 @@ namespace Shared
                 if (newCalc == 0)
                     break;
 
-                floating32Bit = newCalc;
+                floating32BitAbs = newCalc;
             }
 
             return BitFraction7;
@@ -313,32 +341,33 @@ namespace Shared
                 bits[0] = true;
 
             // Above is a more complex version of this
-            //
-            //switch (largestIndex)
-            //{
-            //    case 0:
-            //        break;
-            //    case 1:
-            //        bits[0] = true;
-            //        break;
-            //    case 2:
-            //        bits[1] = true;
-            //        break;
-            //    case 3:
-            //        bits[0] = true;
-            //        bits[1] = true;
-            //        break;
-            //}
+            /*
+            switch (largestIndex)
+            {
+                case 0:
+                    break;
+                case 1:
+                    bits[0] = true;
+                    break;
+                case 2:
+                    bits[1] = true;
+                    break;
+                case 3:
+                    bits[0] = true;
+                    bits[1] = true;
+                    break;
+            }
+            */
 
             return bits;
         }
-        private int GetLargestComponentIndex(float[] components)
+        private int GetLargestComponentIndex(float[] componentsAbs)
         {
             float largest = -1;
             int largestIndex = 0;
-            for (int count = 0; count < components.Length; count++)
+            for (int count = 0; count < componentsAbs.Length; count++)
             {
-                float component = components[count];
+                float component = componentsAbs[count];
                 if (component > largest)
                 {
                     largest = component;
@@ -351,18 +380,26 @@ namespace Shared
         #endregion
 
         #region Read Data
+        /// <summary>
+        /// Gets the packetLen, currently set to byte, so max packet size is 255B
+        /// Can increase to ushort so max packet size is 65_535B
+        /// Or uint, max packet size 4_294_967_295B
+        /// </summary>
+        public byte ReadPacketLen() =>
+            ReadByte();
+
         /// <summary>Reads a byte from the packet.</summary>
         /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
         public byte ReadByte(bool _moveReadPos = true)
         {
-            if (ByteBuffer.Count > CurrentReadPosition)
+            if (buffer.Count > readPos)
             {
                 // If there are unread bytes
-                byte _value = readableBuffer[CurrentReadPosition]; // Get the byte at readPos' position
+                byte _value = readableBuffer[readPos]; // Get the byte at readPos' position
                 if (_moveReadPos)
                 {
                     // If _moveReadPos is true
-                    CurrentReadPosition += 1; // Increase readPos by 1
+                    readPos += 1; // Increase readPos by 1
                 }
                 return _value; // Return the byte
             }
@@ -375,16 +412,16 @@ namespace Shared
         /// <summary>Reads an array of bytes from the packet.</summary>
         /// <param name="_length">The length of the byte array.</param>
         /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
-        public byte[] ReadBytes(int _length, bool _moveReadPos = true)
+        public byte[] ReadBytes(byte _length, bool _moveReadPos = true)
         {
-            if (ByteBuffer.Count > CurrentReadPosition)
+            if (buffer.Count > readPos)
             {
                 // If there are unread bytes
-                byte[] _value = ByteBuffer.GetRange(CurrentReadPosition, _length).ToArray(); // Get the bytes at readPos' position with a range of _length
+                byte[] _value = buffer.GetRange(readPos, _length).ToArray(); // Get the bytes at readPos' position with a range of _length
                 if (_moveReadPos)
                 {
                     // If _moveReadPos is true
-                    CurrentReadPosition += _length; // Increase readPos by _length
+                    readPos += _length; // Increase readPos by _length
                 }
                 return _value; // Return the bytes
             }
@@ -398,14 +435,14 @@ namespace Shared
         /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
         public short ReadShort(bool _moveReadPos = true)
         {
-            if (ByteBuffer.Count > CurrentReadPosition)
+            if (buffer.Count > readPos)
             {
                 // If there are unread bytes
-                short _value = BitConverter.ToInt16(readableBuffer, CurrentReadPosition); // Convert the bytes to a short
+                short _value = BitConverter.ToInt16(readableBuffer, readPos); // Convert the bytes to a short
                 if (_moveReadPos)
                 {
                     // If _moveReadPos is true and there are unread bytes
-                    CurrentReadPosition += 2; // Increase readPos by 2
+                    readPos += 2; // Increase readPos by 2
                 }
                 return _value; // Return the short
             }
@@ -419,14 +456,14 @@ namespace Shared
         /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
         public int ReadInt(bool _moveReadPos = true)
         {
-            if (ByteBuffer.Count > CurrentReadPosition)
+            if (buffer.Count > readPos)
             {
                 // If there are unread bytes
-                int _value = BitConverter.ToInt32(readableBuffer, CurrentReadPosition); // Convert the bytes to an int
+                int _value = BitConverter.ToInt32(readableBuffer, readPos); // Convert the bytes to an int
                 if (_moveReadPos)
                 {
                     // If _moveReadPos is true
-                    CurrentReadPosition += 4; // Increase readPos by 4
+                    readPos += 4; // Increase readPos by 4
                 }
                 return _value; // Return the int
             }
@@ -440,14 +477,14 @@ namespace Shared
         /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
         public long ReadLong(bool _moveReadPos = true)
         {
-            if (ByteBuffer.Count > CurrentReadPosition)
+            if (buffer.Count > readPos)
             {
                 // If there are unread bytes
-                long _value = BitConverter.ToInt64(readableBuffer, CurrentReadPosition); // Convert the bytes to a long
+                long _value = BitConverter.ToInt64(readableBuffer, readPos); // Convert the bytes to a long
                 if (_moveReadPos)
                 {
                     // If _moveReadPos is true
-                    CurrentReadPosition += 8; // Increase readPos by 8
+                    readPos += 8; // Increase readPos by 8
                 }
                 return _value; // Return the long
             }
@@ -461,14 +498,14 @@ namespace Shared
         /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
         public float ReadFloat(bool _moveReadPos = true)
         {
-            if (ByteBuffer.Count > CurrentReadPosition)
+            if (buffer.Count > readPos)
             {
                 // If there are unread bytes
-                float _value = BitConverter.ToSingle(readableBuffer, CurrentReadPosition); // Convert the bytes to a float
+                float _value = BitConverter.ToSingle(readableBuffer, readPos); // Convert the bytes to a float
                 if (_moveReadPos)
                 {
                     // If _moveReadPos is true
-                    CurrentReadPosition += 4; // Increase readPos by 4
+                    readPos += 4; // Increase readPos by 4
                 }
                 return _value; // Return the float
             }
@@ -482,14 +519,14 @@ namespace Shared
         /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
         public bool ReadBool(bool _moveReadPos = true)
         {
-            if (ByteBuffer.Count > CurrentReadPosition)
+            if (buffer.Count > readPos)
             {
                 // If there are unread bytes
-                bool _value = BitConverter.ToBoolean(readableBuffer, CurrentReadPosition); // Convert the bytes to a bool
+                bool _value = BitConverter.ToBoolean(readableBuffer, readPos); // Convert the bytes to a bool
                 if (_moveReadPos)
                 {
                     // If _moveReadPos is true
-                    CurrentReadPosition += 1; // Increase readPos by 1
+                    readPos += 1; // Increase readPos by 1
                 }
                 return _value; // Return the bool
             }
@@ -506,11 +543,11 @@ namespace Shared
             try
             {
                 int _length = ReadInt(); // Get the length of the string
-                string _value = Encoding.ASCII.GetString(readableBuffer, CurrentReadPosition, _length); // Convert the bytes to a string
+                string _value = Encoding.ASCII.GetString(readableBuffer, readPos, _length); // Convert the bytes to a string
                 if (_moveReadPos && _value.Length > 0)
                 {
                     // If _moveReadPos is true string is not empty
-                    CurrentReadPosition += _length; // Increase readPos by the length of the string
+                    readPos += _length; // Increase readPos by the length of the string
                 }
                 return _value; // Return the string
             }
@@ -548,20 +585,6 @@ namespace Shared
                 throw new Exception("Could not read value of type 'Vector2'!");
             }
         }
-        /// <summary>Reads a Quaternion from the packet.</summary>
-        /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
-        //public Quaternion ReadQuaternion(bool _moveReadPos = true)
-        //{
-        //    try
-        //    {
-        //        Quaternion _value = new Quaternion(ReadFloat(_moveReadPos), ReadFloat(_moveReadPos), ReadFloat(_moveReadPos), ReadFloat(_moveReadPos));
-        //        return _value; // Return the Quaternion
-        //    }
-        //    catch
-        //    {
-        //        throw new Exception("Could not read value of type 'Quaternion'!");
-        //    }
-        //}
 
         /// <summary>Reads a Quaternion from the packet.</summary>
         /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
@@ -582,16 +605,18 @@ namespace Shared
                 //if (largestAbsIndexBin[1])
                 //    bytesToSend[1] += 128;
 
-                byte val0 = components[0];
-                bool index0 = val0 - 128 <= 0;
+                bool index0 = components[0] - 128 >= 0;
+                bool index1 = components[1] - 128 >= 0;
 
-                byte val1 = components[1];
-                bool index1 = val1 - 128 <= 0;
+                bool shouldNegateComponents = components[2] - 128 >= 0;
 
                 if (index0)
-                    val0 -= 128;
+                    components[0] -= 128;
                 if (index1)
-                    val1 -= 128;
+                    components[1] -= 128;
+
+                if (shouldNegateComponents)
+                    components[2] -= 128;
 
                 //[00, 01, 10, 11] 00 = x, 01 = y, 10 = z, 11 = w
                 //
@@ -602,13 +627,13 @@ namespace Shared
                 float x, y, z, w;
 
                 if (index1 && index0) //Reconstruct w
-                    Reconstruct(components, out x, out y, out z, out w);
+                    Reconstruct(components, out x, out y, out z, out w, shouldNegateComponents);
                 else if (index1 && !index0) //Reconstruct z
-                    Reconstruct(components, out x, out y, out w, out z);
+                    Reconstruct(components, out x, out y, out w, out z, shouldNegateComponents);
                 else if (!index1 && index0) //Reconstruct y
-                    Reconstruct(components, out x, out z, out w, out y);
+                    Reconstruct(components, out x, out z, out w, out y, shouldNegateComponents);
                 else //same as -> else if (!index1 && !index1) //Reconstruct x
-                    Reconstruct(components, out y, out z, out w, out x);
+                    Reconstruct(components, out y, out z, out w, out x, shouldNegateComponents);
 
                 Quaternion value = new Quaternion(x, y, z, w);
 
@@ -619,13 +644,20 @@ namespace Shared
                 throw new Exception("Could not read value of type 'Quaternion'!");
             }
         }
-        private static void Reconstruct(byte[] components, out float a, out float b, out float c, out float r)
+        private static void Reconstruct(byte[] components, out float a, out float b, out float c, out float r, bool shouldNegate)
         {
             a = Read7BitFloat(components[0]);
             b = Read7BitFloat(components[1]);
             c = Read7BitFloat(components[2]);
             //Reconstruct
             r = MathF.Sqrt(1 - (a * a) - (b * b) - (c * c));
+
+            if (shouldNegate)
+            {
+                a = -a;
+                b = -b;
+                c = -c;
+            }
         }
         private static float Read7BitFloat(byte bit7Float)
         {
@@ -633,41 +665,45 @@ namespace Shared
             if (bit7Float == 0)
                 return value;
 
-            for (int bitCount = 7 - 1; bitCount >= 0; bitCount--)
+            bool negative = bit7Float - 64 >= 0;
+            if (negative)
+                bit7Float -= 64;
+
+            for (sbyte bitCount = 5; bitCount >= 0; bitCount--)
             {
                 byte bitValue = (byte)MathF.Pow(2, bitCount);
-                byte newCalc = (byte)(bit7Float - bitValue);
+                short newCalc = (short)(bit7Float - bitValue);
 
                 if (newCalc < 0)
                     continue;
 
-                float addValue = MathF.Pow(2, -(bitCount - 6));
+                float addValue = MathF.Pow(2, bitCount - 5);
                 value += addValue;
 
                 if (newCalc == 0)
                     break;
 
-                bit7Float = newCalc;
+                bit7Float = (byte)newCalc;
             }
 
-            return value;
+            return negative ? -value : value;
         }
         #endregion
 
-        private bool Disposed { get; set; } = false;
+        private bool disposed = false;
 
-        protected virtual void Dispose(bool toDispose)
+        protected virtual void Dispose(bool _disposing)
         {
-            if (!Disposed)
+            if (!disposed)
             {
-                if (toDispose)
+                if (_disposing)
                 {
-                    ByteBuffer = null;
+                    buffer = null;
                     readableBuffer = null;
-                    CurrentReadPosition = 0;
+                    readPos = 0;
                 }
 
-                Disposed = true;
+                disposed = true;
             }
         }
 

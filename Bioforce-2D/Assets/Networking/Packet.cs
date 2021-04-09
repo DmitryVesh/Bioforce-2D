@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using Unity.Mathematics;
 using UnityEngine;
 
 public enum InternetDiscoveryClientPackets
@@ -125,7 +123,10 @@ public class Packet : IDisposable
     /// <summary>Inserts the length of the packet's content at the start of the buffer.</summary>
     public void WriteLength()
     {
-        buffer.InsertRange(0, BitConverter.GetBytes(buffer.Count)); // Insert the byte length of the packet at the very beginning
+        // For packetLens that are bigger than 1B , e.g. ushort = 2B, uint = 4B
+        //buffer.InsertRange(0, BitConverter.GetBytes(buffer.Count)); // Insert the byte length of the packet at the very beginning
+
+        buffer.Insert(0, (byte)buffer.Count); // Insert the byte length of the packet at the very beginning
     }
 
     /// <summary>Inserts the given int at the start of the buffer.</summary>
@@ -253,7 +254,7 @@ public class Packet : IDisposable
     /// Also can use less precise floating point value, instead of 4 bytes per component, use 1 byte
     /// 
     /// This should decrease the packet size from 16 bytes = 128 bits
-    /// To 2 bit (largest component index) + 3 * 7 bits (smallest 3 components) = 23 bits - will send 3 bytes = 24 bits
+    /// To 2 bit (largest component index) + 3 * 7 bits (smallest 3 components) + 1 bit for negating all components = 24 bits - will send 3 bytes = 24 bits
     /// only 18.75% of the original packet
 
     public void Write(Quaternion value)
@@ -366,6 +367,14 @@ public class Packet : IDisposable
     #endregion
 
     #region Read Data
+    /// <summary>
+    /// Gets the packetLen, currently set to byte, so max packet size is 255B
+    /// Can increase to ushort so max packet size is 65_535B
+    /// Or uint, max packet size 4_294_967_295B
+    /// </summary>
+    public byte ReadPacketLen() =>
+        ReadByte(); 
+
     /// <summary>Reads a byte from the packet.</summary>
     /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
     public byte ReadByte(bool _moveReadPos = true)
@@ -390,7 +399,7 @@ public class Packet : IDisposable
     /// <summary>Reads an array of bytes from the packet.</summary>
     /// <param name="_length">The length of the byte array.</param>
     /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
-    public byte[] ReadBytes(int _length, bool _moveReadPos = true)
+    public byte[] ReadBytes(byte _length, bool _moveReadPos = true)
     {
         if (buffer.Count > readPos)
         {

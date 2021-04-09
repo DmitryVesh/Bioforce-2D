@@ -44,6 +44,7 @@ public class ClientSend : MonoBehaviour
         }
     }
 
+    // 21B (int 4B packetLen + byte 1B packetID + Vector2 8B position + Vector2 8B velocity = 21B)
     public static void PlayerMovement(Vector2 position, Vector2 velocity)
     {
         using (Packet packet = new Packet((byte)ClientPackets.playerMovement))
@@ -67,7 +68,7 @@ public class ClientSend : MonoBehaviour
     }
 
     
-
+    // 16B (int 4B PacketLen + byte 1B packetID + Vector2 8B position + 3B Quaternion rotation = 16B)
     internal static void ArmPositionAndRotation(Vector2 localPosition, Quaternion localRotation)
     {
         using (Packet packet = new Packet((byte)ClientPackets.armPositionRotation))
@@ -128,6 +129,8 @@ public class ClientSend : MonoBehaviour
             SendTCPPacket(packet);
         }
     }
+    
+    // 5B (int 4B packetLen + byte 1B packetID = 4)
     internal static void PlayerConnectedPacket()
     {
         using (Packet packet = new Packet((byte)ClientPackets.stillConnected))
