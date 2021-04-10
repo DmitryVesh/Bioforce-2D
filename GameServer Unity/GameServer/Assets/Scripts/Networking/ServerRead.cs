@@ -70,9 +70,9 @@ namespace GameServer
         {
             try
             {
-                Vector2 position = packet.ReadVector2();
-                Vector2 velocity = packet.ReadVector2();
-                Server.ClientDictionary[clientID].Player.PlayerMoves(position, velocity);
+                Vector2 position = packet.ReadUVector2WorldPosition();
+                byte moveState = packet.ReadByte();
+                Server.ClientDictionary[clientID].Player.PlayerMoves(position, moveState);
             }
             catch (Exception exception)
             {
@@ -99,7 +99,7 @@ namespace GameServer
         {
             try
             {
-                Vector2 position = packet.ReadVector2();
+                Vector2 position = packet.ReadUVector2WorldPosition();
                 Quaternion rotation = packet.ReadQuaternion();
                 ServerSend.ShotBullet(clientID, position, rotation);
             }
@@ -130,7 +130,7 @@ namespace GameServer
         {
             try
             {
-                Vector2 respawnPoint = packet.ReadVector2();
+                Vector2 respawnPoint = packet.ReadUVector2WorldPosition();
                 ServerSend.PlayerRespawned(clientID, respawnPoint);
                 Server.ClientDictionary[clientID].Player.Respawned();
             }
@@ -194,7 +194,7 @@ namespace GameServer
         {
             try
             {
-                Vector2 position = packet.ReadVector2();
+                Vector2 position = packet.ReadLocalVector2();
                 Quaternion rotation = packet.ReadQuaternion();
 
                 //TODO: make so all packets from player are sent in Update

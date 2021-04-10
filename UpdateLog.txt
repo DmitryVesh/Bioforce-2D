@@ -16,7 +16,8 @@ Main goals is to;
 		1 Change packet enums to be byte instead of int
 		1 Change Quaternions to be sent as 3 bytes, instead of 16 bytes
 		1 Change the packetLen to be sent not as int, but as either byte (1 bytePacket len), or as ushort (2 bytePacketLen)
-		0 Change Vector2 to be sent as
+		1 Change so instead of sending velocity, send player state enum, e.g. idle, running or sprinting, so only use 1 byte
+		0 Change Vector2 to be sent either (2B for localPosition signed -1 < a < 1, or 4B for worldPosition unsinged 0 <= a < 511.9921875)
 
 	0 Add health pickups
 	0 Add adrenaline pickup

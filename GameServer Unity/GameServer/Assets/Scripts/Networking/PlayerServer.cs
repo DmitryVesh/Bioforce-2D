@@ -16,10 +16,10 @@ namespace GameServer
         public int MaxHealth { get; set; } = 50;
         public int CurrentHealth { get; set; }
 
-        public Vector2 Velocity { get; private set; }
+        private byte MoveState { get; set; }
         public bool IsFacingRight { get; private set; }
         private Vector2 LastPosition { get; set; }
-        private Vector2 LastVelocity { get; set; }
+        private byte LastMoveState { get; set; }
 
 
         private Vector2 ArmPosition { get; set; }
@@ -72,10 +72,10 @@ namespace GameServer
             IsDead = false;
             CurrentHealth = MaxHealth;
         }
-        public void PlayerMoves(Vector2 position, Vector2 velocity)
+        public void PlayerMoves(Vector2 position, byte moveState)
         {
             transform.position = position;
-            Velocity = velocity;
+            MoveState = moveState;
         }
         internal void PlayerArmPosition(Vector2 position, Quaternion rotation)
         {
@@ -138,11 +138,11 @@ namespace GameServer
                 LastRotationArms = ArmRotation;
             }
 
-            if (LastPosition != (Vector2)transform.position || Velocity != LastVelocity)
+            if (LastPosition != (Vector2)transform.position || MoveState != LastMoveState)
             {
-                ServerSend.PlayerPositionButLocal(ID, transform.position, Velocity);
+                ServerSend.PlayerPositionButLocal(ID, transform.position, MoveState);
                 LastPosition = transform.position;
-                LastVelocity = Velocity;
+                LastMoveState = MoveState;
             }
             //ServerSend.PlayerRotationAndVelocity(ID, Velocity);
 
@@ -168,6 +168,7 @@ namespace GameServer
             //ServerSend.PlayerAnimation(ID, )
         }
 
+        /*
         private bool ValidMove()
         {
             bool valid = true;
@@ -202,6 +203,7 @@ namespace GameServer
 
             return valid;
         }
+        */
 
     }
 }

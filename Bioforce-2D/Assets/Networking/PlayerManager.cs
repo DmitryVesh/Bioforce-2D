@@ -20,8 +20,8 @@ public class PlayerManager : MonoBehaviour
     public delegate void PlayerMovementStats(float runSpeed);
     public event PlayerMovementStats OnPlayerMovementStatsChanged;
 
-    public delegate void PlayerSpeedX(float speedX);
-    public event PlayerSpeedX OnPlayerSpeedXChanged;
+    public delegate void PlayerMovingStateChange(PlayerMovingState movingState);
+    public event PlayerMovingStateChange OnPlayerMovingStateChange;
 
     public delegate void NoParams();
     public event NoParams OnPlayerRespawn;
@@ -76,8 +76,8 @@ public class PlayerManager : MonoBehaviour
     public void SetPlayerMovementStats(float runSpeed, float sprintSpeed) =>
         OnPlayerMovementStatsChanged?.Invoke(runSpeed);
 
-    public void SetVelocity(Vector2 velocity) =>
-        OnPlayerSpeedXChanged?.Invoke(velocity.x);
+    public void SetVelocityState(PlayerMovingState movingState) =>
+        OnPlayerMovingStateChange?.Invoke(movingState);
 
     public void PlayerDied(TypeOfDeath typeOfDeath) =>
         OnPlayerDeath?.Invoke(typeOfDeath);

@@ -44,13 +44,14 @@ public class ClientSend : MonoBehaviour
         }
     }
 
-    // 21B (int 4B packetLen + byte 1B packetID + Vector2 8B position + Vector2 8B velocity = 21B)
-    public static void PlayerMovement(Vector2 position, Vector2 velocity)
+    // Constantly sent
+    // 11B (byte 1B packetLen + byte 1B packetID + Vector2 8B position + PlayerMovingState 1B movingState)
+    public static void PlayerMovement(Vector2 position, PlayerMovingState movingState)
     {
         using (Packet packet = new Packet((byte)ClientPackets.playerMovement))
         {
             packet.Write(position);
-            packet.Write(velocity);
+            packet.Write((byte)movingState);
 
             SendTCPPacket(packet);
         }        
@@ -67,19 +68,20 @@ public class ClientSend : MonoBehaviour
         }        
     }
 
-    
-    // 16B (int 4B PacketLen + byte 1B packetID + Vector2 8B position + 3B Quaternion rotation = 16B)
+    // Constantly sent
+    // 13B (byte 1B PacketLen + byte 1B packetID + Vector2 8B position + 3B Quaternion rotation)
     internal static void ArmPositionAndRotation(Vector2 localPosition, Quaternion localRotation)
     {
         using (Packet packet = new Packet((byte)ClientPackets.armPositionRotation))
         {
-            packet.Write(localPosition);
+            packet.WriteLocalPosition(localPosition);
             packet.Write(localRotation);
 
             SendTCPPacket(packet);
         }
     }
 
+    // 13B (byte 1B packetLen + byte 1B packetID + Vector2 8B position + 3B Quaternion rotation)
     public static void ShotBullet(Vector2 position, Quaternion rotation)
     {
         using (Packet packet = new Packet((byte)ClientPackets.bulletShot))
@@ -129,8 +131,9 @@ public class ClientSend : MonoBehaviour
             SendTCPPacket(packet);
         }
     }
-    
-    // 5B (int 4B packetLen + byte 1B packetID = 4)
+
+    // Constantly sent
+    // 2B (byte 1B packetLen + byte 1B packetID)
     internal static void PlayerConnectedPacket()
     {
         using (Packet packet = new Packet((byte)ClientPackets.stillConnected))
@@ -173,6 +176,4 @@ public class ClientSend : MonoBehaviour
             Debug.Log($"Error, sending UDP Packet...\n{exception}");
         }
     }
-
-    
 }

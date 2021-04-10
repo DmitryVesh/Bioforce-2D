@@ -31,13 +31,16 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
                                                             // Also allows the player to be grounded for longer 
     private float groundTimer = 0; // Holds current ground check timer time
 
-    
+    private Vector2 LastPosition { get; set; }
+    private PlayerMovingState LastMoveState { get; set; }
+    private bool LastMovingLeft { get; set; }
 
     // Variables used for PlayerAnimations
     // Grounded found in EntityWalking
     // SpeedX which is found in moving in X direction Data
     // runSpeed used to know when to switch from normal running animation to sprinting animation
     private bool Jumped { get; set; } = false; // Used to identify when player has jumped, for LocalPlayerAnimations
+    
 
     public float GetMaxStamina() =>
         MaxStamina;
@@ -86,13 +89,16 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
     private void MovementX() // Calculates SpeedX that will be applied to player, in response to x axis inputs
     {
         float moveInputX = GetMoveInputX();
+        bool moving = moveInputX != 0;
+        bool sprinting = false;
 
-        if (GetSprintInput() && moveInputX != 0) // Player is moving and trying to sprint
+        if (GetSprintInput() && moving) // Player is moving and trying to sprint
         {
             if (currentStamina > 0) // Is stamina left
             {
                 SpeedX = moveInputX * SprintSpeed; // Set moving speed to sprint speed
                 currentStamina -= RateStaminaLoss * Time.deltaTime; // Lossing stamina
+                sprinting = true;
             }
             else
             {
@@ -105,6 +111,35 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
             SpeedX = moveInputX * RunSpeed; // Set moving speed to normal running speed
             float regenStamina = ((currentStamina < MaxStamina) ? 1 : 0) * (RateStaminaRegen * Time.deltaTime); // determines a regen value either: 0 if currentStamina >= MaxStamina, else regen rate
             currentStamina += regenStamina; // Regenerating stamina
+        }
+
+        //States 
+        bool goingLeft;
+        if (!moving)
+            goingLeft = LastMovingLeft;
+        else
+            goingLeft = moveInputX < 0;
+
+        if (sprinting) 
+        {
+            if (goingLeft)
+                CurrentMovingState = PlayerMovingState.sprintingLeft;
+            else
+                CurrentMovingState = PlayerMovingState.sprintingRight;
+        }
+        else if (moving)
+        {
+            if (goingLeft)
+                CurrentMovingState = PlayerMovingState.runningLeft;
+            else
+                CurrentMovingState = PlayerMovingState.runningRight;
+        }
+        else
+        {
+            if (goingLeft)
+                CurrentMovingState = PlayerMovingState.idleLeft;
+            else
+                CurrentMovingState = PlayerMovingState.idleRight;
         }
     }
     
@@ -167,7 +202,8 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
         Vector2 velocity = new Vector2(SpeedX, RigidBody.velocity.y);
         if (CanMove)
             RigidBody.velocity = velocity; // Applying movement in x direction, SpeedX calculated in Update, calculated in Update in order to increase responsiveness, applied in FixedUpdate to keep physics interaction reliable
-        SendMovesToServer(velocity);
+
+        SendMovesToServer();
     }
 
     protected override IEnumerator UnFreezeMotionAndHitBoxAfterRespawnAnimation()
@@ -192,9 +228,15 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
         base.PlayerCanMoveAndCanBeHit();
     }
 
-    private void SendMovesToServer(Vector2 velocity)
+    private void SendMovesToServer()
     {
-        ClientSend.PlayerMovement(ModelObject.transform.position, velocity);
+        if (LastPosition == (Vector2)ModelObject.transform.position && LastMoveState == CurrentMovingState)
+            return;
+        
+        ClientSend.PlayerMovement(ModelObject.transform.position, CurrentMovingState);
+
+        LastPosition = ModelObject.transform.position;
+        LastMoveState = CurrentMovingState;
     }
 
 }

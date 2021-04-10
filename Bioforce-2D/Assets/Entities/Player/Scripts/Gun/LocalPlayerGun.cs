@@ -70,7 +70,7 @@ public class LocalPlayerGun : NonLocalPlayerGun, ILocalPlayerGun
         LastPosition = currentPosition;
         LastRotation = currentRotation;
         //TODO: 10,001 maybe send instead of Rotation, send the AimVector, is it Vector2?
-        ClientSend.ArmPositionAndRotation(ArmsTransform.localPosition, ArmsTransform.localRotation);
+        ClientSend.ArmPositionAndRotation(currentPosition, currentRotation);
     }
 
     protected virtual void AimWherePointing()

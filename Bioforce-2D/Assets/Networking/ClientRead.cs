@@ -83,7 +83,7 @@ public class ClientRead : MonoBehaviour
     {
         byte iD = packet.ReadByte();
         string username = packet.ReadString();
-        Vector2 position = packet.ReadVector2();
+        Vector2 position = packet.ReadUVector2WorldPosition();
         bool isFacingRight = packet.ReadBool();
 
         float runSpeed = packet.ReadFloat();
@@ -121,13 +121,13 @@ public class ClientRead : MonoBehaviour
     public static void PlayerPosition(Packet packet)
     {
         byte iD = packet.ReadByte();
-        Vector2 position = packet.ReadVector2();
-        Vector2 velocity = packet.ReadVector2();
+        Vector2 position = packet.ReadUVector2WorldPosition();
+        PlayerMovingState movingState = (PlayerMovingState)packet.ReadByte();
 
         // Prevents crash when a UDP packet connects before the TCP spawn player call from server
         try
         {
-            GameManager.PlayerDictionary[iD].SetVelocity(velocity);
+            GameManager.PlayerDictionary[iD].SetVelocityState(movingState);
             GameManager.PlayerDictionary[iD].SetPosition(position);
         }
         catch (KeyNotFoundException exception)
@@ -135,25 +135,11 @@ public class ClientRead : MonoBehaviour
             Debug.Log($"Player iD PlayerPosition: {iD}\n {exception}");
         }
     }
-    public static void PlayerRotationAndVelocity(Packet packet)
-    {
-        byte iD = packet.ReadByte();
-        
 
-        // Prevents crash when a UDP packet connects before the TCP spawn player call from server
-        try
-        {
-            //GameManager.PlayerDictionary[iD].SetRotation(rotation);
-        }
-        catch (KeyNotFoundException exception)
-        {
-            Debug.Log($"Player iD PlayerRotation: {iD}\n {exception}");
-        }
-    }
     public static void BulletShot(Packet packet)
     {
         byte iD = packet.ReadByte();
-        Vector2 position = packet.ReadVector2();
+        Vector2 position = packet.ReadUVector2WorldPosition();
         Quaternion rotation = packet.ReadQuaternion();
 
         try
@@ -179,7 +165,7 @@ public class ClientRead : MonoBehaviour
     public static void PlayerRespawned(Packet packet)
     {
         byte iD = packet.ReadByte();
-        Vector2 respawnPoint = packet.ReadVector2();
+        Vector2 respawnPoint = packet.ReadUVector2WorldPosition();
         GameManager.PlayerDictionary[iD].PlayerRespawned();
         GameManager.PlayerDictionary[iD].SetRespawnPosition(respawnPoint);
     }
@@ -204,11 +190,11 @@ public class ClientRead : MonoBehaviour
     internal static void ArmPositionRotation(Packet packet)
     {
         byte iD = packet.ReadByte();
-        Vector2 position = packet.ReadVector2();
-        Quaternion rotation = packet.ReadQuaternion();
+        Vector2 localPosition = packet.ReadLocalVector2();
+        Quaternion localRotation = packet.ReadQuaternion();
         try
         {
-            GameManager.PlayerDictionary[iD].SetArmPositionRotation(position, rotation);
+            GameManager.PlayerDictionary[iD].SetArmPositionRotation(localPosition, localRotation);
         }
         catch (Exception exception)
         {
@@ -241,7 +227,7 @@ public class ClientRead : MonoBehaviour
         {
             PickupType pickupType = (PickupType)packet.ReadInt();
             int pickupID = packet.ReadInt();
-            Vector2 position = packet.ReadVector2();
+            Vector2 position = packet.ReadUVector2WorldPosition();
 
             PickupItemsManager.Instance.SpawnGeneratedPickup(pickupType, pickupID, position);
         }

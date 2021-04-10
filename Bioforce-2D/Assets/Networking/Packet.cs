@@ -236,12 +236,57 @@ public class Packet : IDisposable
         Write(_value.y);
         Write(_value.z);
     }
+
     /// <summary>Adds a Vector2 to the packet.</summary>
     /// <param name="_value">The Vector2 to add.</param>
     public void Write(Vector2 _value)
     {
         Write(_value.x);
         Write(_value.y);
+    }
+
+    /// <summary> Adds a 2B Vector2 to the packet, the components are -0.9921875 <= a <= 0.9921875, precision 0.0078125 </summary>
+    internal void WriteLocalPosition(Vector2 localPosition)
+    {
+        byte[] components = new byte[2];
+        components[0] = Get1ByteSignedFloatSmallerThan1(localPosition.x);
+        components[1] = Get1ByteSignedFloatSmallerThan1(localPosition.y);
+
+        Write(components);
+    }
+
+    /// <summary> Gets 1B representation of a float value, the float must be in range: -0.9921875 <= a <= 0.9921875, precision 0.0078125 </summary>
+    private static byte Get1ByteSignedFloatSmallerThan1(float val)
+    {
+        float valAbs = Mathf.Abs(val);
+        if (valAbs > 1)
+            throw new FormatException($"Error, can only represent values in the following ranges: x < 1, value given: {valAbs}");
+
+        byte byteVal = 0;
+        if (val < 0) //Add negative sign bit
+            byteVal += 128;
+        GetByteFromAbsFloatSmallerThan1(valAbs, ref byteVal, 6);
+
+        return byteVal;
+    }
+    private static void GetByteFromAbsFloatSmallerThan1(float valAbs, ref byte byteVal, sbyte maxBitIndex)
+    {
+        for (sbyte bitCount = maxBitIndex; bitCount >= 0; bitCount--)
+        {
+            float takeAway = Mathf.Pow(2f, bitCount - (maxBitIndex + 1));
+            float newVal = valAbs - takeAway;
+
+            if (newVal < 0)
+                continue;
+
+            byte bitValue = (byte)Mathf.Pow(2, bitCount);
+            byteVal += bitValue;
+
+            //if (newCalc == 0)
+            //    break;
+
+            valAbs = newVal;
+        }
     }
 
     /// <summary>Adds a Quaternion to the packet.</summary>
@@ -290,7 +335,7 @@ public class Packet : IDisposable
     }
 
     const float SmallestFloatCanRepresent = 1/64; //2^-6
-    private byte Get7BitFractionalFrom32BitFloat(float floating32BitAbs, bool negative)
+    private static byte Get7BitFractionalFrom32BitFloat(float floating32BitAbs, bool negative)
     {
         byte BitFraction7 = 0;
         if (floating32BitAbs == 0 || floating32BitAbs < SmallestFloatCanRepresent)
@@ -299,6 +344,7 @@ public class Packet : IDisposable
         if (negative) //Negative sign
             BitFraction7 += 64;
 
+        /*
         for (sbyte bitCount = 5; bitCount >= 0; bitCount--)
         {
             float takeAway = Mathf.Pow(2f, bitCount - 5);
@@ -315,10 +361,12 @@ public class Packet : IDisposable
 
             floating32BitAbs = newCalc;
         }
+        */
+        GetByteFromAbsFloatSmallerThan1(floating32BitAbs, ref BitFraction7, 5);
 
         return BitFraction7;
     }
-    private bool[] ConvertIntMax4ToBin2(int largestIndex)
+    private static bool[] ConvertIntMax4ToBin2(int largestIndex)
     {
         bool[] bits = new bool[2];
 
@@ -348,7 +396,7 @@ public class Packet : IDisposable
 
         return bits;
     }
-    private int GetLargestComponentIndex(float[] componentsAbs)
+    private static int GetLargestComponentIndex(float[] componentsAbs)
     {
         float largest = -1;
         int largestIndex = 0;
@@ -558,9 +606,12 @@ public class Packet : IDisposable
             throw new Exception("Could not read value of type 'Vector3'!");
         }
     }
+
     /// <summary>Reads a Vector2 from the packet.</summary>
     /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
-    public Vector2 ReadVector2(bool _moveReadPos = true)
+    /// 
+    /// Limited to Range of 0.0078125 -> 511.9921875
+    public Vector2 ReadUVector2WorldPosition(bool _moveReadPos = true)
     {
         try
         {
@@ -572,7 +623,47 @@ public class Packet : IDisposable
             throw new Exception("Could not read value of type 'Vector2'!");
         }
     }
-    
+    internal Vector2 ReadLocalVector2()
+    {
+        byte[] components = ReadBytes(2);
+
+        float x = GetSignedFloatSmallerThan1FromByte(components[0]);
+        float y = GetSignedFloatSmallerThan1FromByte(components[1]);
+
+        return new Vector2(x, y);
+    }
+    private static float GetSignedFloatSmallerThan1FromByte(byte byteVal)
+    {
+        float floatVal = 0;
+
+        bool isNegative = false;
+        if (byteVal - 128 >= 0) //Is negative
+        {
+            isNegative = true;
+            byteVal -= 128;
+        }
+
+        GetAbsFloatSmallerThan1From1Byte(byteVal, ref floatVal, 6);
+
+        return isNegative ? -floatVal : floatVal;
+    }
+
+    private static void GetAbsFloatSmallerThan1From1Byte(byte byteVal, ref float floatVal, sbyte maxBitIndex)
+    {
+        for (sbyte bitCount = maxBitIndex; bitCount >= 0; bitCount--)
+        {
+            byte bitValue = (byte)Mathf.Pow(2, bitCount);
+            short newByteVal = (short)(byteVal - bitValue);
+
+            if (newByteVal < 0)
+                continue;
+
+            float addVal = Mathf.Pow(2f, bitCount - (maxBitIndex + 1));
+            floatVal += addVal;
+            byteVal = (byte)newByteVal;
+        }
+    }
+
     /// <summary>Reads a Quaternion from the packet.</summary>
     /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
     /// 
@@ -656,6 +747,7 @@ public class Packet : IDisposable
         if (negative)
             bit7Float -= 64;
 
+        /*
         for (sbyte bitCount = 5; bitCount >= 0; bitCount--)
         {
             byte bitValue = (byte)Mathf.Pow(2, bitCount);
@@ -672,6 +764,8 @@ public class Packet : IDisposable
 
             bit7Float = (byte)newCalc;
         }
+        */
+        GetAbsFloatSmallerThan1From1Byte(bit7Float, ref value, 5);
 
         return negative ? -value : value;
     }

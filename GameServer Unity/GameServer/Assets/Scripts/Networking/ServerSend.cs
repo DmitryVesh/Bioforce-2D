@@ -1,7 +1,5 @@
 ﻿using Shared;
-using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Threading;
 using UnityEngine;
 
@@ -114,28 +112,17 @@ namespace GameServer
                 SendTCPPacket(recipientClient, packet);
             }
         }
-        public static void PlayerPositionButLocal(byte playerID, Vector2 position, Vector2 velocity)
+        public static void PlayerPositionButLocal(byte playerID, Vector2 position, byte moveState)
         {
             using (Packet packet = new Packet((byte)ServerPackets.playerPosition))
             {
                 packet.Write(playerID);
                 packet.Write(position);
-                packet.Write(velocity);
+                packet.Write(moveState);
 
                 SendTCPPacketToAllButIncluded(playerID, packet);
             }
         }
-        //Dont need this packet anymore
-        //public static void PlayerRotationAndVelocity(byte playerID, Vector2 velocity)
-        //{
-        //    using (Packet packet = new Packet((byte)ServerPackets.playerRotationAndVelocity))
-        //    {
-        //        packet.Write(playerID);
-        //        packet.Write(velocity);
-
-        //        SendTCPPacketToAllButIncluded(playerID, packet);
-        //    }
-        //}
 
         public static void PlayerMovementStats(byte playerID, float runSpeed, float sprintSpeed)
         {
@@ -193,12 +180,13 @@ namespace GameServer
                 SendTCPPacketToAllButIncluded(clientID, packet);
             }
         }
+        
         internal static void ArmPositionRotation(byte playerID, Vector2 position, Quaternion rotation)
         {
             using (Packet packet = new Packet((byte)ServerPackets.armPositionRotation))
             {
                 packet.Write(playerID);
-                packet.Write(position);
+                packet.WriteLocalPosition(position);
                 packet.Write(rotation);
 
                 SendTCPPacketToAllButIncluded(playerID, packet);

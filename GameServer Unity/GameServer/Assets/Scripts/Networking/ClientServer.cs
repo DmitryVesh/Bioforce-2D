@@ -240,22 +240,30 @@ namespace GameServer
         {
             try
             {
-                if (Player is null)
+                try
                 {
-                    Output.WriteLine($"\n\tTrying to Disconnect Player: {ID}, when they are already null...");
-                    tCP.Disconnect();
-                    uDP.Disconnect();
-                    return;
+                    if (Player is null)
+                    {
+                        Output.WriteLine($"\n\tTrying to Disconnect Player: {ID}, when they are already null...");
+                        tCP.Disconnect();
+                        uDP.Disconnect();
+                        return;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Output.WriteLine($"\n\tError in GameServer Disconnecting Player when null: {ID}...\n{e}");
                 }
 
                 Output.WriteLine($"\tPlayer: {ID} has disconnected. {tCP.Socket.Client.RemoteEndPoint}");
-                
+                ServerSend.DisconnectPlayer(ID);
+
                 PlayerColor.FreeColor(Player.PlayerColor, ID);
 
                 UnityEngine.Object.Destroy(Player.gameObject);
                 Player = null;
 
-                ServerSend.DisconnectPlayer(ID);
+                
                 tCP.Disconnect();
                 uDP.Disconnect();
 

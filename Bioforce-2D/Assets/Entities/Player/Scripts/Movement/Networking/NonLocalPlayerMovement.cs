@@ -1,11 +1,24 @@
 ﻿using System.Collections;
 using UnityEngine;
 
+public enum PlayerMovingState
+{
+    idleLeft,
+    idleRight,
+
+    runningLeft,
+    runningRight,
+
+    sprintingLeft,
+    sprintingRight
+}
+
 public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
 {
     protected float SpeedX { get; set; } // Used to store the input in x direction, as well as in PlayerAnimations
     protected byte OwnerClientID { get; set; } = 255;
     protected PlayerManager PlayerManager { get; set; } = null;
+    protected PlayerMovingState CurrentMovingState { get; set; }
 
     public float GetRunSpeed()
     {
@@ -26,7 +39,7 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
         PlayerManager = GameManager.PlayerDictionary[OwnerClientID];
 
         PlayerManager.OnPlayerMovementStatsChanged += ChangedPlayerMovementStats; //Subscribe to the PlayerMovementStatsChanged event, so can change runSpeed
-        PlayerManager.OnPlayerSpeedXChanged += ChangedSpeedX;
+        PlayerManager.OnPlayerMovingStateChange += ChangedSpeedX;
         PlayerManager.OnPlayerDeath += PlayerCantMoveAndCantBeHit;
         PlayerManager.OnPlayerRespawn += PlayerCanMoveAndCanBeHit;
 
@@ -68,8 +81,30 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
     {
         RunSpeed = runSpeed;
     }
-    private void ChangedSpeedX(float speedX)
+    private void ChangedSpeedX(PlayerMovingState movingState)
     {
+        CurrentMovingState = movingState;
+
+        float speedX;
+        switch (movingState)
+        {
+            case PlayerMovingState.idleLeft:
+            case PlayerMovingState.idleRight:
+                speedX = 0;
+                break;
+            case PlayerMovingState.runningLeft:
+                speedX = -GetRunSpeed();
+                break;
+            case PlayerMovingState.runningRight:
+                speedX = GetRunSpeed();
+                break;
+            case PlayerMovingState.sprintingLeft:
+                speedX = -SprintSpeed;
+                break;
+            default: //same as -> case PlayerMovingState.sprintingRight:
+                speedX = SprintSpeed;
+                break;
+        }
         SpeedX = speedX;
     }
     private void PlayerCantMoveAndCantBeHit(TypeOfDeath typeOfDeath)
@@ -93,7 +128,7 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
     private void OnDestroy()
     {
         PlayerManager.OnPlayerMovementStatsChanged -= ChangedPlayerMovementStats;
-        PlayerManager.OnPlayerSpeedXChanged -= ChangedSpeedX;
+        PlayerManager.OnPlayerMovingStateChange -= ChangedSpeedX;
         PlayerManager.OnPlayerDeath -= PlayerCantMoveAndCantBeHit;
         PlayerManager.OnPlayerRespawn -= PlayerCanMoveAndCanBeHit;
 

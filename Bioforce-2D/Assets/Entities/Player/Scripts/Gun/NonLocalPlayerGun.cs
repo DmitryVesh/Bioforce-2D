@@ -119,5 +119,7 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
 
         PlayerManager.OnPlayerDeath -= Disable;
         PlayerManager.OnPlayerRespawn -= Enable;
+        PlayerManager.OnPlayerShot -= ShootBullet;
+        PlayerManager.OnArmPositionRotation -= SetArmPositionRotation;
     }
 }
