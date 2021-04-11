@@ -9,10 +9,6 @@ public class Crosshair : MonoBehaviour
     private Animator Animator { get; set; }
 
     
-    
-
-    public void SetActive(bool active) =>
-        gameObject.SetActive(active);
     public void ShotBullet()
     {
         Animator.SetTrigger("shot");
@@ -31,6 +27,9 @@ public class Crosshair : MonoBehaviour
 
         Animator = GetComponent<Animator>();
         GameManager.ShowMouse(false);
+
+        if (GameManager.Instance.IsMobileSupported)
+            gameObject.SetActive(false);
     }
     private void Update()
     {

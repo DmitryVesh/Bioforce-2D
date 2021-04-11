@@ -18,8 +18,6 @@ public class MobileLocalPlayerGun : LocalPlayerGun
 
         Joystick = ShootingJoystick.Instance.GetComponent<Joystick>();
         ShootingJoystick.Instance.SetActive(true);
-
-        Crosshair.Instance.SetActive(false);
     }
     protected override void Start()
     {

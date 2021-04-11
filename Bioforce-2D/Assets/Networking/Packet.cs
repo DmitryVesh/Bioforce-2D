@@ -239,10 +239,14 @@ public class Packet : IDisposable
 
     /// <summary>Adds a Vector2 to the packet.</summary>
     /// <param name="_value">The Vector2 to add.</param>
-    public void Write(Vector2 _value)
+    public void WriteWorldUVector2(Vector2 _value)
     {
-        Write(_value.x);
-        Write(_value.y);
+
+        byte[] componentsX = Get2ByteUnsignedFloatSmallerThan512(_value.x);
+        byte[] componentsY = Get2ByteUnsignedFloatSmallerThan512(_value.y);
+
+        Write(componentsX);
+        Write(componentsY);
     }
 
     /// <summary> Adds a 2B Vector2 to the packet, the components are -0.9921875 <= a <= 0.9921875, precision 0.0078125 </summary>
@@ -607,10 +611,8 @@ public class Packet : IDisposable
         }
     }
 
-    /// <summary>Reads a Vector2 from the packet.</summary>
+    /// <summary>Reads a Unsigned Vector2 from the packet, Limited to Range of 0.0078125 -> 511.9921875.</summary>
     /// <param name="_moveReadPos">Whether or not to move the buffer's read position.</param>
-    /// 
-    /// Limited to Range of 0.0078125 -> 511.9921875
     public Vector2 ReadUVector2WorldPosition(bool _moveReadPos = true)
     {
         try

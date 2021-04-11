@@ -50,7 +50,7 @@ public class ClientSend : MonoBehaviour
     {
         using (Packet packet = new Packet((byte)ClientPackets.playerMovement))
         {
-            packet.Write(position);
+            packet.WriteWorldUVector2(position);
             packet.Write((byte)movingState);
 
             SendTCPPacket(packet);
@@ -86,7 +86,7 @@ public class ClientSend : MonoBehaviour
     {
         using (Packet packet = new Packet((byte)ClientPackets.bulletShot))
         {
-            packet.Write(position);
+            packet.WriteWorldUVector2(position);
             packet.Write(rotation);
 
             SendTCPPacket(packet);
@@ -106,7 +106,7 @@ public class ClientSend : MonoBehaviour
     {
         using (Packet packet = new Packet((byte)ClientPackets.playerRespawned))
         {
-            packet.Write(respawnPosition);
+            packet.WriteWorldUVector2(respawnPosition);
 
             SendTCPPacket(packet);
         }        

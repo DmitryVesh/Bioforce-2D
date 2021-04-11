@@ -21,6 +21,8 @@ public class ClientRead : MonoBehaviour
         GameManager.Instance.SwitchScene(mapName);
 
         GameManager.Instance.InGame = true;
+
+        InternetServerScanner.Instance.Disconnect();
     }
     public static void UDPTestRead(Packet packet)
     {
