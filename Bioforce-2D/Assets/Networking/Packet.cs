@@ -241,12 +241,18 @@ public class Packet : IDisposable
     /// <param name="_value">The Vector2 to add.</param>
     public void WriteWorldUVector2(Vector2 _value)
     {
+        Write(_value.x);
+        Write(_value.y);
+        //byte[] componentsX = Get2ByteUnsignedFloatSmallerThan512(_value.x);
+        //byte[] componentsY = Get2ByteUnsignedFloatSmallerThan512(_value.y);
 
-        byte[] componentsX = Get2ByteUnsignedFloatSmallerThan512(_value.x);
-        byte[] componentsY = Get2ByteUnsignedFloatSmallerThan512(_value.y);
+        //Write(componentsX);
+        //Write(componentsY);
+    }
 
-        Write(componentsX);
-        Write(componentsY);
+    private byte[] Get2ByteUnsignedFloatSmallerThan512(float floatVal)
+    {
+        return new byte[1];
     }
 
     /// <summary> Adds a 2B Vector2 to the packet, the components are -0.9921875 <= a <= 0.9921875, precision 0.0078125 </summary>
