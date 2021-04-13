@@ -177,16 +177,28 @@ namespace GameServer
             }
         }
 
-        internal static void PlayerStillConnected(byte clientID, Packet packet)
+        internal static void PlayerStillConnectedTCP(byte clientID, Packet _)
         {
             try
             {
-                Server.ClientDictionary[clientID].Player.LastPacketReceived(DateTime.Now.TimeOfDay);
-                ServerSend.PlayerConnectedAckn(clientID);
+                Server.ClientDictionary[clientID].Player.LastPacketReceivedTCP(DateTime.Now.TimeOfDay);
+                ServerSend.PlayerConnectedAcknTCP(clientID);
             }
             catch (Exception exception)
             {
-                Output.WriteLine($"\tError, trying to read PlayerStillConnected, from player: {clientID}\n{exception}");
+                Output.WriteLine($"\tError, trying to read PlayerStillConnectedTCP, from player: {clientID}\n{exception}");
+            }
+        }
+        internal static void PlayerStillConnectedUDP(byte clientID, Packet _)
+        {
+            try
+            {
+                Server.ClientDictionary[clientID].Player.LastPacketReceivedUDP(DateTime.Now.TimeOfDay);
+                ServerSend.PlayerConnectedAcknUDP(clientID);
+            }
+            catch (Exception exception)
+            {
+                Output.WriteLine($"\tError, trying to read PlayerStillConnectedUDP, from player: {clientID}\n{exception}");
             }
         }
 

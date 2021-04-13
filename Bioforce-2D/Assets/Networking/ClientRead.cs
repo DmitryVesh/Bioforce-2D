@@ -218,9 +218,13 @@ public class ClientRead : MonoBehaviour
         }
     }
 
-    internal static void PlayerStillConnected(Packet packet)
+    internal static void PlayerStillConnectedTCP(Packet packet)
     {
-        Client.Instance.PlayerConnectedAckn(DateTime.Now.TimeOfDay);
+        Client.Instance.PlayerConnectedAcknTCP(DateTime.Now.TimeOfDay);
+    }
+    internal static void PlayerStillConnectedUDP(Packet packet)
+    {
+        Client.Instance.PlayerConnectedAcknUDP(DateTime.Now.TimeOfDay);
     }
 
     internal static void GeneratedPickupItem(Packet packet)

@@ -40,10 +40,15 @@ public class Client : MonoBehaviour
     private bool TimerRunning { get; set; } = false;
     private float Timer { get; set; }
 
-    private TimeSpan PacketTimeOut { get; set; } 
-    private TimeSpan PacketPause { get; set; }
-    private TimeSpan TimeSpanZero { get; set; } = new TimeSpan(0, 0, 0);
+    private TimeSpan PacketTimeOutTCP { get; set; } 
+    private TimeSpan PacketPauseTCP { get; set; }
+    private readonly TimeSpan TimeSpanZero = new TimeSpan(0, 0, 0);
     private bool LastLostConnection { get; set; }
+    
+    private TimeSpan PacketSendViaOnlyTCP { get; set; }
+    private TimeSpan PacketSendViaTCPAndUDP { get; set; }
+
+    private byte FixedFrameCounter { get; set; } = 0;
 
     public static bool IsIPAddressValid(string text)
     {
@@ -108,7 +113,7 @@ public class Client : MonoBehaviour
         Connected = true;
         ResetTimeOutTimer(false);
         ClientID = assignedID;
-        PlayerConnectedAckn(DateTime.Now.TimeOfDay);
+        PlayerConnectedAcknTCP(DateTime.Now.TimeOfDay);
     }
 
     public class TCP
@@ -292,7 +297,7 @@ public class Client : MonoBehaviour
                 byte[] data = Socket.EndReceive(result, ref ipEndPoint);
                 SocketBeginReceive();
 
-                if (data.Length < 4)
+                if (data.Length < sizeof(byte))
                 {
                     Instance.Disconnect();
                     return;
@@ -349,19 +354,34 @@ public class Client : MonoBehaviour
     {
         if (Connected)
         {
-            ClientSend.PlayerConnectedPacket();
+            if (FixedFrameCounter++ % 2 == 0)
+                return;
+
+            ClientSend.PlayerConnectedTCPPacket();
+            ClientSend.PlayerConnectedUDPPacket();
 
             TimeSpan now = DateTime.Now.TimeOfDay;
 
-            if (PacketTimeOut - now < TimeSpanZero)
+            SendConstantPacketsState sendConstantPacketsState;
+
+            if (PacketSendViaOnlyTCP - now < TimeSpanZero) //Flag so only send constant packets via TCP, because UDP is not responsive, so less data is sent
+                sendConstantPacketsState = SendConstantPacketsState.TCP;
+            else if (PacketSendViaTCPAndUDP - now < TimeSpanZero) //Flag so both constantly sent packets are sent via both UDP and TCP
+                sendConstantPacketsState = SendConstantPacketsState.UDPandTCP;
+            else //Flag so can send via only UDP
+                sendConstantPacketsState = SendConstantPacketsState.UDP;
+
+            ClientSend.SendConstantPacketsState = sendConstantPacketsState;
+
+            if (PacketTimeOutTCP - now < TimeSpanZero)
             {
                 //TODO: add message when disconnected because of a time out
-                Debug.LogError("Lost connection with MainServer");
+                Debug.LogError("Lost connection with GameServer");
                 Disconnect();
                 return;
             }
 
-            bool lostConnection = PacketPause - now < TimeSpanZero;
+            bool lostConnection = PacketPauseTCP - now < TimeSpanZero;
             if (LastLostConnection != lostConnection)
             {
                 LastLostConnection = lostConnection;
@@ -381,10 +401,15 @@ public class Client : MonoBehaviour
         }
     }
 
-    public void PlayerConnectedAckn(TimeSpan timeOfDay)
+    public void PlayerConnectedAcknTCP(TimeSpan timeOfDay)
     {
-        PacketTimeOut = timeOfDay + new TimeSpan(0, 0, 10);
-        PacketPause = timeOfDay + new TimeSpan(0, 0, 2);
+        PacketTimeOutTCP = timeOfDay + new TimeSpan(0, 0, 10);
+        PacketPauseTCP = timeOfDay + new TimeSpan(0, 0, 2);
+    }
+    public void PlayerConnectedAcknUDP(TimeSpan timeOfDay)
+    {
+        PacketSendViaOnlyTCP = timeOfDay + new TimeSpan(0, 0, 5);
+        PacketSendViaTCPAndUDP = timeOfDay + new TimeSpan(0, 0, 0, 0, 500);
     }
 
     private void ResetTimeOutTimer(bool runTimer = true)
@@ -429,7 +454,8 @@ public class Client : MonoBehaviour
         PacketHandlerDictionary.Add((byte)ServerPackets.serverIsFull, ClientRead.ServerIsFull);
         PacketHandlerDictionary.Add((byte)ServerPackets.armPositionRotation, ClientRead.ArmPositionRotation);
         PacketHandlerDictionary.Add((byte)ServerPackets.playerPausedGame, ClientRead.PlayerPausedGame);
-        PacketHandlerDictionary.Add((byte)ServerPackets.stillConnected, ClientRead.PlayerStillConnected);
+        PacketHandlerDictionary.Add((byte)ServerPackets.stillConnectedTCP, ClientRead.PlayerStillConnectedTCP);
+        PacketHandlerDictionary.Add((byte)ServerPackets.stillConnectedUDP, ClientRead.PlayerStillConnectedUDP);
         PacketHandlerDictionary.Add((byte)ServerPackets.askPlayerDetails, ClientRead.AskingForPlayerDetails);
         PacketHandlerDictionary.Add((byte)ServerPackets.freeColor, ClientRead.FreeColor);
         PacketHandlerDictionary.Add((byte)ServerPackets.takeColor, ClientRead.TakeColor);

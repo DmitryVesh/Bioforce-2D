@@ -38,10 +38,18 @@ namespace GameServer
 
         public bool Paused { get; private set; }
         private bool LastPaused { get; set; }
-        public TimeSpan PacketTimeOut { get; set; } = DateTime.Now.TimeOfDay + new TimeSpan(0, 1, 0);
-        public TimeSpan PacketPause { get; set; } = DateTime.Now.TimeOfDay + new TimeSpan(0, 0, 20);
+        public TimeSpan PacketTimeOutTCP { get; set; } = DateTime.Now.TimeOfDay + new TimeSpan(0, 1, 0);
+        public TimeSpan PacketPauseTCP { get; set; } = DateTime.Now.TimeOfDay + new TimeSpan(0, 0, 20);
         public bool ReadyToPlay { get; set; }
-       
+        public readonly TimeSpan TimeSpanZero = new TimeSpan(0, 0, 0);
+
+        private TimeSpan PacketSendViaOnlyTCP { get; set; }
+        private TimeSpan PacketSendViaTCPAndUDP { get; set; }
+        public SendConstantPacketsState CurrentSendConstantPacketsState { get; private set; } = SendConstantPacketsState.UDPandTCP;
+        private void OnDestroy()
+        {
+            Output.WriteLine($"\n\tPlayer:{ID} - \"{Username}\" is destroyed/removed from server");
+        }
 
         public void Init(byte iD, string username)
         {
@@ -88,24 +96,41 @@ namespace GameServer
             SprintSpeed = sprintSpeed;
         }
 
-        internal void LastPacketReceived(TimeSpan timeOfDay)
+        internal void LastPacketReceivedTCP(TimeSpan timeOfDay)
         {
-            PacketTimeOut = timeOfDay + new TimeSpan(0, 0, 10);
-            PacketPause = timeOfDay + new TimeSpan(0, 0, 2);
+            PacketTimeOutTCP = timeOfDay + new TimeSpan(0, 0, 10);
+            PacketPauseTCP = timeOfDay + new TimeSpan(0, 0, 2);
+        }
+        internal void LastPacketReceivedUDP(TimeSpan timeOfDay)
+        {
+            PacketSendViaOnlyTCP = timeOfDay + new TimeSpan(0, 0, 5);
+            PacketSendViaTCPAndUDP = timeOfDay + new TimeSpan(0, 0, 0,0, 500);
         }
 
         public void FixedUpdate()
         {
             TimeSpan now = DateTime.Now.TimeOfDay;
-            TimeSpan zero = new TimeSpan(0, 0, 0);
-            
-            if (PacketTimeOut - now < zero)
+
+            SendConstantPacketsState sendConstantPacketsState;
+
+            if (PacketSendViaOnlyTCP - now < TimeSpanZero) //Flag so only send constant packets via TCP, because UDP is not responsive, so less data is sent
+                sendConstantPacketsState = SendConstantPacketsState.TCP;
+            else if (PacketSendViaTCPAndUDP - now < TimeSpanZero) //Flag so both constantly sent packets are sent via both UDP and TCP
+                sendConstantPacketsState = SendConstantPacketsState.UDPandTCP;
+            else //Flag so can send via only UDP
+                sendConstantPacketsState = SendConstantPacketsState.UDP;
+
+            CurrentSendConstantPacketsState = sendConstantPacketsState;
+
+            if (PacketTimeOutTCP - now < TimeSpanZero)
             {
                 Server.ClientDictionary[ID].Disconnect();
+                if (gameObject != null)
+                    Destroy(gameObject);
                 Output.WriteLine($"\n\tPlayer: {ID} has been kicked, due to GameServer not having received packets in a while...");
                 return;
             }
-            else if (PacketPause - now < zero)
+            else if (PacketPauseTCP - now < TimeSpanZero)
             {
                 if (Paused) //Shouldn't send that the player is paused more than once
                     return;

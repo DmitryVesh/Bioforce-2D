@@ -1,10 +1,17 @@
 ﻿using Shared;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
 namespace GameServer
 {
+    public enum SendConstantPacketsState
+    {
+        UDP,
+        UDPandTCP,
+        TCP
+    }
     class ServerSend
     {
         public static void Welcome(byte recipientClient, string message, string mapName)
@@ -23,6 +30,7 @@ namespace GameServer
         {
             using (Packet packet = new Packet((byte)ServerPackets.udpTest))
             {
+                Output.WriteLine($"Sending UDPTest packet to client: {recipientClient}");
                 packet.Write("Testing UDP");
 
                 SendUDPPacket(recipientClient, packet);
@@ -82,14 +90,13 @@ namespace GameServer
             }
         }
 
-
         public static void SpawnPlayer(byte recipientClient, PlayerServer player, bool justJoined)
         {
             using (Packet packet = new Packet((byte)ServerPackets.spawnPlayer))
             {
                 packet.Write(player.ID);
                 packet.Write(player.Username);
-                packet.Write((Vector2)player.transform.position);
+                packet.WriteWorldUVector2((Vector2)player.transform.position);
                 packet.Write(player.IsFacingRight);
 
                 packet.Write(player.RunSpeed);
@@ -112,17 +119,91 @@ namespace GameServer
                 SendTCPPacket(recipientClient, packet);
             }
         }
+
+
+        // Constantly sent
+        // TCP 8B (byte 1B packetLen + byte 1B packetID + byte 1B playerID + Vector2 4B position + PlayerMovingState 1B movingState)
+        // UDP 8B (byte 1B packetLen + byte 1B packetID + byte 1B playerID + Vector2 4B position + PlayerMovingState 1B movingState)
         public static void PlayerPositionButLocal(byte playerID, Vector2 position, byte moveState)
         {
             using (Packet packet = new Packet((byte)ServerPackets.playerPosition))
             {
                 packet.Write(playerID);
-                packet.Write(position);
+                packet.WriteWorldUVector2(position);
                 packet.Write(moveState);
 
-                SendTCPPacketToAllButIncluded(playerID, packet);
+                //SendTCPPacketToAllButIncluded(playerID, packet);
+                SendConstantlySentPacketToAllButIncluded(playerID, packet);
             }
         }
+
+
+        // Constantly sent
+        // TCP 8B (byte 1B PacketLen + byte 1B packetID + byte 1B playerID + Vector2 2B position + 3B Quaternion rotation)
+        // UDP 8B (byte 1B PacketLen + byte 1B packetID + byte 1B playerID + Vector2 2B position + 3B Quaternion rotation)
+        internal static void ArmPositionRotation(byte playerID, Vector2 position, Quaternion rotation)
+        {
+            using (Packet packet = new Packet((byte)ServerPackets.armPositionRotation))
+            {
+                packet.Write(playerID);
+                packet.WriteLocalPosition(position);
+                packet.Write(rotation);
+
+                //SendTCPPacketToAllButIncluded(playerID, packet);
+                SendConstantlySentPacketToAllButIncluded(playerID, packet);
+            }
+        }
+
+        // Constantly sent
+        // 2B (byte 1B packetLen + byte 1B packetID)
+        internal static void PlayerConnectedAcknTCP(byte clientID)
+        {
+            using (Packet packet = new Packet((byte)ServerPackets.stillConnectedTCP))
+            {
+                SendTCPPacket(clientID, packet);
+            }
+        }
+        // Constantly sent
+        // 2B (byte 1B packetLen + byte 1B packetID)
+        internal static void PlayerConnectedAcknUDP(byte clientID)
+        {
+            using (Packet packet = new Packet((byte)ServerPackets.stillConnectedUDP))
+            {
+                SendUDPPacket(clientID, packet);
+            }
+        }
+
+
+        private static void SendConstantlySentPacketToAllButIncluded(byte NonRecipientClient, Packet packet)
+        {
+            packet.WriteLength();
+
+            for (byte count = 1; count < (byte)Server.MaxNumPlayers + 1; count++)
+            {
+                if (count == NonRecipientClient || Server.ClientDictionary[count].Player == null)
+                    continue;
+
+                SendConstantPacketsState sendVia = Server.ClientDictionary[count].Player.CurrentSendConstantPacketsState;
+                switch (sendVia)
+                {
+                    case SendConstantPacketsState.UDP:
+                        Server.ClientDictionary[count].uDP.SendPacket(packet);
+                        break;
+                    case SendConstantPacketsState.UDPandTCP:
+                        using (Packet samePacket = new Packet(packet.ToArray()))
+                        {
+                            Server.ClientDictionary[count].tCP.SendPacket(packet);
+                            Server.ClientDictionary[count].uDP.SendPacket(packet);
+                        }
+                        break;
+                    case SendConstantPacketsState.TCP:
+                        Server.ClientDictionary[count].tCP.SendPacket(packet);
+                        break;
+                }
+
+            }
+        }
+
 
         public static void PlayerMovementStats(byte playerID, float runSpeed, float sprintSpeed)
         {
@@ -141,7 +222,7 @@ namespace GameServer
             {
 
                 packet.Write(playerID);
-                packet.Write(position);
+                packet.WriteWorldUVector2(position);
                 packet.Write(rotation);
 
                 SendTCPPacketToAllButIncluded(playerID, packet);
@@ -163,7 +244,7 @@ namespace GameServer
             using (Packet packet = new Packet((byte)ServerPackets.playerRespawned))
             {
                 packet.Write(playerID);
-                packet.Write(respawnPoint);
+                packet.WriteWorldUVector2(respawnPoint);
 
                 SendTCPPacketToAllButIncluded(playerID, packet);
             }            
@@ -180,20 +261,6 @@ namespace GameServer
                 SendTCPPacketToAllButIncluded(clientID, packet);
             }
         }
-        
-        internal static void ArmPositionRotation(byte playerID, Vector2 position, Quaternion rotation)
-        {
-            using (Packet packet = new Packet((byte)ServerPackets.armPositionRotation))
-            {
-                packet.Write(playerID);
-                packet.WriteLocalPosition(position);
-                packet.Write(rotation);
-
-                SendTCPPacketToAllButIncluded(playerID, packet);
-            }
-        }
-
-        
 
         internal static void PlayerPausedGame(byte clientID, bool paused)
         {
@@ -205,13 +272,7 @@ namespace GameServer
                 SendTCPPacketToAllButIncluded(clientID, packet);
             }
         }
-        internal static void PlayerConnectedAckn(byte clientID)
-        {
-            using (Packet packet = new Packet((byte)ServerPackets.stillConnected))
-            {
-                SendTCPPacket(clientID, packet);
-            }
-        }
+
 
 
         private static void SendTCPPacket(byte recipientClient, Packet packet)

@@ -1,8 +1,15 @@
 ﻿using System;
 using UnityEngine;
 
+public enum SendConstantPacketsState
+{
+    UDP,
+    UDPandTCP,
+    TCP
+}
 public class ClientSend : MonoBehaviour
 {
+    public static SendConstantPacketsState SendConstantPacketsState { get; set; } = SendConstantPacketsState.UDPandTCP;
     public static void WelcomePacketReply()
     {
         using (Packet packet = new Packet((byte)ClientPackets.welcomeReceived))
@@ -45,7 +52,8 @@ public class ClientSend : MonoBehaviour
     }
 
     // Constantly sent
-    // 11B (byte 1B packetLen + byte 1B packetID + Vector2 8B position + PlayerMovingState 1B movingState)
+    // TCP 7B (byte 1B packetLen + byte 1B packetID + Vector2 4B position + PlayerMovingState 1B movingState)
+    // UDP 8B (byte 1B clientID + byte 1B packetLen + byte 1B packetID + Vector2 4B position + PlayerMovingState 1B movingState)
     public static void PlayerMovement(Vector2 position, PlayerMovingState movingState)
     {
         using (Packet packet = new Packet((byte)ClientPackets.playerMovement))
@@ -53,9 +61,44 @@ public class ClientSend : MonoBehaviour
             packet.WriteWorldUVector2(position);
             packet.Write((byte)movingState);
 
-            SendTCPPacket(packet);
-        }        
+            SendConstantlySentPacket(packet);
+        }
     }
+
+    // Constantly sent
+    // TCP 7B (byte 1B PacketLen + byte 1B packetID + Vector2 2B position + 3B Quaternion rotation)
+    // UDP 8B (byte 1B clientID + byte 1B PacketLen + byte 1B packetID + Vector2 2B position + 3B Quaternion rotation)
+    internal static void ArmPositionAndRotation(Vector2 localPosition, Quaternion localRotation)
+    {
+        using (Packet packet = new Packet((byte)ClientPackets.armPositionRotation))
+        {
+            packet.WriteLocalPosition(localPosition);
+            packet.Write(localRotation);
+
+            SendConstantlySentPacket(packet);
+        }
+    }
+
+
+    // Constantly sent
+    // 2B (byte 1B packetLen + byte 1B packetID)
+    internal static void PlayerConnectedTCPPacket()
+    {
+        using (Packet packet = new Packet((byte)ClientPackets.stillConnectedTCP))
+        {
+            SendTCPPacket(packet);
+        }
+    }
+    // Constantly sent
+    // 3B (byte 1B clientID + byte 1B packetLen + byte 1B packetID)
+    internal static void PlayerConnectedUDPPacket()
+    {
+        using (Packet packet = new Packet((byte)ClientPackets.stillConnectedUDP))
+        {
+            SendUDPPacket(packet);
+        }
+    }
+
 
     public static void PlayerMovementStats(float runSpeed, float sprintSpeed)
     {
@@ -65,23 +108,10 @@ public class ClientSend : MonoBehaviour
             packet.Write(sprintSpeed);
 
             SendTCPPacket(packet); // Only sending once, so want to make sure it gets there
-        }        
-    }
-
-    // Constantly sent
-    // 13B (byte 1B PacketLen + byte 1B packetID + Vector2 8B position + 3B Quaternion rotation)
-    internal static void ArmPositionAndRotation(Vector2 localPosition, Quaternion localRotation)
-    {
-        using (Packet packet = new Packet((byte)ClientPackets.armPositionRotation))
-        {
-            packet.WriteLocalPosition(localPosition);
-            packet.Write(localRotation);
-
-            SendTCPPacket(packet);
         }
     }
-
-    // 13B (byte 1B packetLen + byte 1B packetID + Vector2 8B position + 3B Quaternion rotation)
+    
+    // 9B (byte 1B packetLen + byte 1B packetID + Vector2 4B position + 3B Quaternion rotation)
     public static void ShotBullet(Vector2 position, Quaternion rotation)
     {
         using (Packet packet = new Packet((byte)ClientPackets.bulletShot))
@@ -132,16 +162,6 @@ public class ClientSend : MonoBehaviour
         }
     }
 
-    // Constantly sent
-    // 2B (byte 1B packetLen + byte 1B packetID)
-    internal static void PlayerConnectedPacket()
-    {
-        using (Packet packet = new Packet((byte)ClientPackets.stillConnected))
-        {
-            SendTCPPacket(packet);
-        }
-    }
-
     internal static void LocalPlayerPickedUpItem(int pickupID)
     {
         using (Packet packet = new Packet((byte)ClientPackets.pickedUpItem))
@@ -152,6 +172,25 @@ public class ClientSend : MonoBehaviour
         }
     }
 
+    private static void SendConstantlySentPacket(Packet packet)
+    {
+        switch (SendConstantPacketsState)
+        {
+            case SendConstantPacketsState.UDP:
+                SendUDPPacket(packet);
+                break;
+            case SendConstantPacketsState.UDPandTCP:
+                using (Packet samePacket = new Packet(packet.ToArray()))
+                {
+                    SendTCPPacket(packet);
+                    SendUDPPacket(samePacket);
+                }
+                break;
+            case SendConstantPacketsState.TCP:
+                SendTCPPacket(packet);
+                break;
+        }
+    }
     private static void SendTCPPacket(Packet packet)
     {
         try

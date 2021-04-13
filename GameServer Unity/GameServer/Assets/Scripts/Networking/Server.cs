@@ -142,7 +142,8 @@ namespace GameServer
             PacketHandlerDictionary.Add((byte)ClientPackets.tookDamage, ServerRead.TookDamageRead);
             PacketHandlerDictionary.Add((byte)ClientPackets.armPositionRotation, ServerRead.ArmPositionRotation);
             PacketHandlerDictionary.Add((byte)ClientPackets.pausedGame, ServerRead.PlayerPausedGame);
-            PacketHandlerDictionary.Add((byte)ClientPackets.stillConnected, ServerRead.PlayerStillConnected);
+            PacketHandlerDictionary.Add((byte)ClientPackets.stillConnectedTCP, ServerRead.PlayerStillConnectedTCP);
+            PacketHandlerDictionary.Add((byte)ClientPackets.stillConnectedUDP, ServerRead.PlayerStillConnectedUDP);
             PacketHandlerDictionary.Add((byte)ClientPackets.colorToFreeAndTake, ServerRead.ColorToFreeAndToTake);
             PacketHandlerDictionary.Add((byte)ClientPackets.readyToJoin, ServerRead.ReadyToJoin);
 
@@ -190,26 +191,30 @@ namespace GameServer
                 byte[] data = UDPClient.EndReceive(asyncResult, ref clientIPEndPoint);
                 UDPBeginReceive();
 
-                if (data.Length < 4)
+                if (data.Length < sizeof(byte)) //Problem occurs, due to clientID now being a byte, not an int, so length is 1
                 {
                     return;
                 }
 
-                Packet packet = new Packet(data);
-                byte clientID = packet.ReadByte();
-                if (clientID == 0)
+                using (Packet packet = new Packet(data))
                 {
-                    return;
-                }
-                if (ClientDictionary[clientID].uDP.ipEndPoint == null)
-                {
-                    ClientDictionary[clientID].uDP.Connect(clientIPEndPoint);
-                    return;
-                }
+                    byte clientID = packet.ReadByte();
 
-                if (ClientDictionary[clientID].uDP.ipEndPoint.ToString() == clientIPEndPoint.ToString())
-                {
-                    ClientDictionary[clientID].uDP.HandlePacket(packet);
+                    if (clientID == 0)
+                    {
+                        return;
+                    }
+                    if (ClientDictionary[clientID].uDP.ipEndPoint == null)
+                    {
+                        Output.WriteLine($"\n\tUser: {clientID} trying to connect via UDP from: {clientIPEndPoint}");
+                        ClientDictionary[clientID].uDP.Connect(clientIPEndPoint);
+                        return;
+                    }
+
+                    if (ClientDictionary[clientID].uDP.ipEndPoint.ToString() == clientIPEndPoint.ToString())
+                    {
+                        ClientDictionary[clientID].uDP.HandlePacket(packet);
+                    }
                 }
             }
             catch (Exception exception)
