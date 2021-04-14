@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-[System.Serializable]
+[Serializable]
 public abstract class Overlay : MonoBehaviour
 {
     [SerializeField] private Sprite[] OverlaySprites;
@@ -13,7 +13,7 @@ public abstract class Overlay : MonoBehaviour
     [SerializeField] protected PlayerManager PlayerManager; //Holds the event to subscribe to, to activate
 
     [SerializeField] protected Image Image;
-    [SerializeField] private float TimeBeforeClearing = 0.2f;
+    [SerializeField] protected float TimeBeforeClearing = 0.2f;
 
     protected Coroutine FadingCoroutine { get; set; }
 
@@ -35,10 +35,15 @@ public abstract class Overlay : MonoBehaviour
     
     protected virtual void Activate()
     {
-        if (!(FadingCoroutine is null))
-            StopCoroutine(FadingCoroutine);
+        DeactivateOverlay();
         
         EnableOverlay();
+    }
+    protected void DeactivateOverlay()
+    {
+        if (!(FadingCoroutine is null))
+            StopCoroutine(FadingCoroutine);
+        Image.enabled = false;
     }
 
     protected virtual void EnableOverlay()

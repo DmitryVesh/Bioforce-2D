@@ -22,17 +22,27 @@ Main goals is to;
 	
 	1 Make reliable sending of constantly sent packets along UDP, if there is a UDP connection, if not then must use TCP
 
-	0 Add health pickups
-	0 Add adrenaline pickup
-
-	0 Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard	
-
-	0 Integrate ads
-	0 Make dead time, so when died, wait like 10 seconds & show banner ads
-	0 Add invincibility frames, after being hit/respawning
+	1 Add health pickups
+		1 Sync spawning and collecting
+		1 Add particle effects when picked up
+		1 Add minimap Icons to the pickups
+		1 Make so pickup can't spawn in locations where this already a pick up
+		1 Make pickups server authoratative
+		1 Sync player health upon pickup
+		1 Add animation to the pickup when waiting to be picked up
+		1 Add sound effect when picking up
+		1 Change the hit screen blood overlay & heart beat when healed
+		1 Add screen green flash effect
+	1 Add adrenaline pickup
+	1 Add invincibility frames, after respawning
 
 Future tasks;					
 	version 1.0.3
+		Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard	
+
+		Integrate ads
+		Make dead time, so when died, wait like 10 seconds & show banner ads	
+
 		Add Single-player mode
 		Add tutorial level into game
 		Add new screen shots for promotional app store pages

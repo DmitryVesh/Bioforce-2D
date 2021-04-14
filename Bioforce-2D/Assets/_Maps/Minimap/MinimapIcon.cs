@@ -9,7 +9,9 @@ public class MinimapIcon : MonoBehaviour
     [SerializeField] public Sprite IconOutOfRange;
     
     [SerializeField] public bool ShouldClamp;
-    public Color Color { get; set; }
+    [SerializeField] public Color Color;
+
+    [SerializeField] public int SortOrder = 0; //Larger values get placed on top of smaller values
 
     private void Start()
     {
@@ -20,8 +22,10 @@ public class MinimapIcon : MonoBehaviour
     {
         Minimap.Unsubscribe(this);
 
-        if (!(Icon is null))
-            Destroy(Icon);
+        if (!Icon || !Icon.gameObject)
+            return;
+
+        Destroy(Icon.gameObject);
         //if (!(Icon.gameObject is null))
         //    Destroy(Icon.gameObject);
 

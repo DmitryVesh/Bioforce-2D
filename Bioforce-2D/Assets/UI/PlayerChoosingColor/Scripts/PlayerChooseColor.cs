@@ -70,10 +70,7 @@ public class PlayerChooseColor : MonoBehaviour
         {
             PlayerColor playerColor = PlayerColors[colorCount];
             if (takenColors.Contains(colorCount))
-            {
-                Debug.Log($"SetTakenColor: {colorCount}");
                 playerColor.SetIsFree(false);
-            }
             else
                 playerColor.SetIsFree(true);
         }
@@ -81,12 +78,10 @@ public class PlayerChooseColor : MonoBehaviour
 
     internal void FreeColor(int colorToFree)
     {
-        Debug.Log($"Color: {colorToFree} is freed");
         PlayerColors[colorToFree].SetIsFree(true);
     }
     internal void TakeColor(int colorToTake)
     {
-        Debug.Log($"Color: {colorToTake} is taken");
         PlayerColors[colorToTake].SetIsFree(false);
     }
     

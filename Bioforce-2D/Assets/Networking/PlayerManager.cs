@@ -10,15 +10,14 @@ public class PlayerManager : MonoBehaviour
     public int MaxHealth { get; private set; }
 
     public Color PlayerColor { get; private set; }
-
     public Vector2 RespawnPosition { get; set; }
 
     public GameObject PlayerModelObject { get; private set; }
     [SerializeField] private TextMeshProUGUI UsernameText;
 
     // Delegate and event used to notify when movement stats are read from server
-    public delegate void PlayerMovementStats(float runSpeed);
-    public event PlayerMovementStats OnPlayerMovementStatsChanged;
+    public delegate void Float(float floatVal);
+    public event Float OnPlayerMovementStatsChanged;
 
     public delegate void PlayerMovingStateChange(PlayerMovingState movingState);
     public event PlayerMovingStateChange OnPlayerMovingStateChange;
@@ -30,8 +29,9 @@ public class PlayerManager : MonoBehaviour
     public static float RespawnTime { get; private set; } = 1.5f;
     public static float DeadTime { get; private set; } = 3;
 
-    public delegate void PlayerTookDamage(int damage, int currentHealth);
-    public event PlayerTookDamage OnPlayerTookDamage;
+    public delegate void PlayerChangeHealth(int currentHealth);
+    public event PlayerChangeHealth OnPlayerTookDamage;
+    public event PlayerChangeHealth OnPlayerRestoreHealth;
 
     public delegate void PositionAndRotation(Vector2 position, Quaternion rotation);
     public event PositionAndRotation OnPlayerShot;
@@ -53,12 +53,20 @@ public class PlayerManager : MonoBehaviour
     public event Int OnPlayerPickupBandage;
     public event Int OnPlayerPickupMedkit;
 
+    public event Float OnPlayerInvincibility;
+    public event Float OnPlayerPickupAdrenaline;
+
     public event NoParams OnPlayersBulletHitCollider;
 
     public event NoParams OnLocalPlayerHitAnother;
 
     public delegate void TripleInt(int integer1, int integer2, int integer3);
     public event TripleInt OnHeartBeatShouldPlay;
+
+    [SerializeField] public float InvincibilityTimeAfterRespawning = 2f;
+
+    internal void RestoreHealthEvent(int currentHealth) =>
+        OnPlayerRestoreHealth?.Invoke(currentHealth);
 
     internal void OnHeartBeatShouldPlayEvent(int newHealth, int healthWhenHeartBeatShouldPlayMin, int healthWhenHeartBeatShouldPlayMax) =>
         OnHeartBeatShouldPlay?.Invoke(newHealth, healthWhenHeartBeatShouldPlayMin, healthWhenHeartBeatShouldPlayMax);
@@ -70,9 +78,18 @@ public class PlayerManager : MonoBehaviour
         OnPlayerPickupBandage?.Invoke(restoreHealth);
     internal void MedkitPickup(int restoreHealth) =>
         OnPlayerPickupMedkit?.Invoke(restoreHealth);
+    internal void AdrenalinePickup(float invincibilityTime) 
+    {
+        if (invincibilityTime <= 0)
+            return;
+
+        OnPlayerInvincibility?.Invoke(invincibilityTime);
+        OnPlayerPickupAdrenaline?.Invoke(invincibilityTime);
+    }
 
     public string GetUsername() =>
         Username;
+
     public void SetPlayerMovementStats(float runSpeed, float sprintSpeed) =>
         OnPlayerMovementStatsChanged?.Invoke(runSpeed);
 
@@ -137,7 +154,7 @@ public class PlayerManager : MonoBehaviour
     public void TookDamage(int damage, int currentHealth)
     {
         DamageNumManager.Instance.Create(PlayerModelObject.transform.position, damage, PhysicsHelper.RandomBool());
-        OnPlayerTookDamage?.Invoke(damage, currentHealth);
+        OnPlayerTookDamage?.Invoke(currentHealth);
     }
 
     public void CallLocalPlayerHitAnother() =>

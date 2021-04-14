@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class ClientRead : MonoBehaviour
 {
     public static void WelcomeRead(Packet packet)
     {
-        //PacketSender.Welcome(count, $"Welcome to the server client {count}");
         string message = packet.ReadString();
         byte id = packet.ReadByte();
         string mapName = packet.ReadString();
@@ -37,13 +35,12 @@ public class ClientRead : MonoBehaviour
 
         List<int> playerColors = new List<int>();
 
-        Debug.Log("Colors that have been taken, when asking for player details");
         for (byte playerCount = 0; playerCount < numPlayers; playerCount++)
-        {
-            Debug.Log($"Color - {playerCount}");
             playerColors.Add(packet.ReadInt());
-        }
-        Debug.Log("End of colors");
+
+        byte numPickups = packet.ReadByte();
+        for (byte pickupCount = 0; pickupCount < numPickups; pickupCount++)
+            GeneratedPickupItem(packet);
 
         PlayerChooseColor.Instance.SetActivate(true);
         PlayerChooseColor.Instance.SetTakenColors(playerColors);
@@ -104,6 +101,8 @@ public class ClientRead : MonoBehaviour
         int playerColor = packet.ReadInt();
         
         bool paused = packet.ReadBool();
+
+        float invincibilityTime = packet.ReadFloat();
 
         GameManager.Instance.SpawnPlayer(iD, username, position, isFacingRight, isDead, justJoined, maxHealth, currentHealth, playerColor);
         GameManager.PlayerDictionary[iD].SetPlayerMovementStats(runSpeed, sprintSpeed);
@@ -220,19 +219,35 @@ public class ClientRead : MonoBehaviour
 
     internal static void PlayerStillConnectedTCP(Packet packet)
     {
-        Client.Instance.PlayerConnectedAcknTCP(DateTime.Now.TimeOfDay);
+        try
+        {
+            byte latencyID = packet.ReadByte();
+            Client.Instance.PlayerConnectedAcknTCP(DateTime.Now.TimeOfDay, latencyID);
+        }
+        catch (Exception e)
+        {
+            Debug.Log($"PlayerStillConnectedTCP caused an error.\n{e}");
+        }
     }
     internal static void PlayerStillConnectedUDP(Packet packet)
     {
-        Client.Instance.PlayerConnectedAcknUDP(DateTime.Now.TimeOfDay);
+        try
+        {
+            byte latencyID = packet.ReadByte();
+            Client.Instance.PlayerConnectedAcknUDP(DateTime.Now.TimeOfDay, latencyID);
+        }
+        catch (Exception e)
+        {
+            Debug.Log($"PlayerStillConnectedUDP caused an error.\n{e}");
+        }
     }
 
     internal static void GeneratedPickupItem(Packet packet)
     {
         try
         {
-            PickupType pickupType = (PickupType)packet.ReadInt();
-            int pickupID = packet.ReadInt();
+            PickupType pickupType = (PickupType)packet.ReadByte();
+            ushort pickupID = packet.ReadUShort();
             Vector2 position = packet.ReadUVector2WorldPosition();
 
             PickupItemsManager.Instance.SpawnGeneratedPickup(pickupType, pickupID, position);
@@ -246,11 +261,10 @@ public class ClientRead : MonoBehaviour
     {
         try
         {
-            int pickupID = packet.ReadInt();
+            ushort pickupID = packet.ReadUShort();
             byte clientWhoPickedUp = packet.ReadByte();
 
-            //TODO: deal with another player picking up the item, effects 
-            PickupItemsManager.Instance.OtherPlayerPickedUpItem(pickupID);
+            PickupItemsManager.Instance.PlayerPickedUpItem(pickupID, clientWhoPickedUp, packet);
         }
         catch (Exception e)
         {

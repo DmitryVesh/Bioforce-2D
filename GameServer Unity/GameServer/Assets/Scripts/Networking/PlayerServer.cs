@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Timers;
 using UnityEngine;
 
 namespace GameServer
 {
-    class PlayerServer : MonoBehaviour
+    public class PlayerServer : MonoBehaviour
     {
         public byte ID { get; private set; }
         public string Username { get; private set; }
@@ -34,7 +35,7 @@ namespace GameServer
 
         public bool IsDead { get; private set; } = false;
 
-        public int PlayerColor { get; set; } = -1; //Represents the index of the color in the color palette
+        public int PlayerColorIndex { get; set; } = -1; //Represents the index of the color in the color palette
 
         public bool Paused { get; private set; }
         private bool LastPaused { get; set; }
@@ -46,6 +47,9 @@ namespace GameServer
         private TimeSpan PacketSendViaOnlyTCP { get; set; }
         private TimeSpan PacketSendViaTCPAndUDP { get; set; }
         public SendConstantPacketsState CurrentSendConstantPacketsState { get; private set; } = SendConstantPacketsState.UDPandTCP;
+        
+        public float CurrentInvincibilityTime { get; set; }
+        
         private void OnDestroy()
         {
             Output.WriteLine($"\n\tPlayer:{ID} - \"{Username}\" is destroyed/removed from server");
@@ -63,7 +67,7 @@ namespace GameServer
             transform.position = position;
             LastPositionValidation = position;
 
-            PlayerColor = playerColor;
+            PlayerColorIndex = playerColor;
         }
         public void Died()
         {
@@ -96,6 +100,31 @@ namespace GameServer
             SprintSpeed = sprintSpeed;
         }
 
+        public void RestoreHealth(int healthRestore)
+        {
+            CurrentHealth += healthRestore;
+            if (CurrentHealth > MaxHealth)
+                CurrentHealth = MaxHealth;
+        }
+
+        internal void PickedUpAdrenaline(float invincibilityTime)
+        {
+            ResetInvincibilityTime(invincibilityTime);
+        }
+        internal void ResetInvincibilityTime(float invincibilityTime)
+        {
+            CurrentInvincibilityTime = invincibilityTime;
+            StartCoroutine(DecreaseInvincibilityTime());
+        }
+        private IEnumerator DecreaseInvincibilityTime()
+        {
+            do
+            {
+                yield return new WaitForFixedUpdate();
+                CurrentInvincibilityTime -= Time.fixedDeltaTime;
+            } while (CurrentInvincibilityTime > 0);
+        }
+
         internal void LastPacketReceivedTCP(TimeSpan timeOfDay)
         {
             PacketTimeOutTCP = timeOfDay + new TimeSpan(0, 0, 10);
@@ -125,6 +154,7 @@ namespace GameServer
             if (PacketTimeOutTCP - now < TimeSpanZero)
             {
                 Server.ClientDictionary[ID].Disconnect();
+                PlayerColor.FreeColor(PlayerColorIndex, ID);
                 if (gameObject != null)
                     Destroy(gameObject);
                 Output.WriteLine($"\n\tPlayer: {ID} has been kicked, due to GameServer not having received packets in a while...");

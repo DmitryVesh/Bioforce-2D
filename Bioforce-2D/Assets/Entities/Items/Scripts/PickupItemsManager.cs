@@ -6,10 +6,11 @@ public class PickupItemsManager : MonoBehaviour
 {
     public static PickupItemsManager Instance { get; private set; }
     private Transform PickupHolder { get; set; }
-    private Dictionary<int, PickupItem> PickupDictionary { get; set; } = new Dictionary<int, PickupItem>();
+    private Dictionary<ushort, PickupItem> PickupDictionary { get; set; } = new Dictionary<ushort, PickupItem>();
 
     [SerializeField] private GameObject Bandage;
     [SerializeField] private GameObject Medkit;
+    [SerializeField] private GameObject Adrenaline;
 
     private void Awake()
     {
@@ -27,7 +28,7 @@ public class PickupItemsManager : MonoBehaviour
         PickupHolder.position = Vector3.zero;
     }
 
-    public void SpawnGeneratedPickup(PickupType pickupType, int pickupID, Vector2 position)
+    public void SpawnGeneratedPickup(PickupType pickupType, ushort pickupID, Vector2 position)
     {
         GameObject pickupObject;
         switch (pickupType)
@@ -38,28 +39,57 @@ public class PickupItemsManager : MonoBehaviour
             case PickupType.medkit:
                 pickupObject = Medkit;
                 break;
+            case PickupType.adrenaline:
+                pickupObject = Adrenaline;
+                break;
             default:
                 pickupObject = null;
                 break;
         }
 
-        PickupItem pickup = Instantiate(pickupObject, PickupHolder).GetComponent<PickupItem>();
-        pickup.transform.position = position;
+        GameObject newPickupObj = Instantiate(pickupObject, PickupHolder);
+        newPickupObj.transform.position = position;
+
+        PickupItem pickup = newPickupObj.GetComponentInChildren<PickupItem>();
+        
         pickup.PickupID = pickupID;
-        pickup.OnPickup += LocalPlayerPickedUpItem;
 
         PickupDictionary.Add(pickupID, pickup);
     }
 
-    private void LocalPlayerPickedUpItem(int pickupID, int clientID)
-    {
-        ClientSend.LocalPlayerPickedUpItem(pickupID);
-    }
-
-    internal void OtherPlayerPickedUpItem(int pickupID)
+    internal void PlayerPickedUpItem(ushort pickupID, byte clientWhoPickedUp, Packet packet)
     {
         PickupItem pickup = PickupDictionary[pickupID];
-        pickup.PlayEffectsAndHide();
         PickupDictionary.Remove(pickupID);
+
+        switch (pickup.PickupType)
+        {
+            case PickupType.bandage:
+            case PickupType.medkit:
+                int healAmount = packet.ReadInt();
+                ((HealthPickup)pickup).Restore = healAmount;
+                break;
+            case PickupType.adrenaline:
+                //TimeSpan timeOfInvincibilityStart = packet.ReadTimeSpan();
+                float oldInvincibilityTime = packet.ReadFloat();
+
+                //Turns out that the time set on the machines is different, hence why my client
+                // showed that there was negative latency... because my time of day was 0.5s slower,
+                // showing that dif was -0.5...s 
+                // Therefore would be easy to cheat, by changing the time on the device
+                //TimeSpan dif = (DateTime.UtcNow.TimeOfDay - timeOfInvincibilityStart);
+                //float newInvincibilityTime = oldInvincibilityTime - (float)dif.TotalSeconds;
+
+                //Debug.Log(DateTime.UtcNow.TimeOfDay);
+                //Debug.Log(timeOfInvincibilityStart);
+                //Debug.Log(dif);
+                //Debug.Log(newInvincibilityTime);
+
+                oldInvincibilityTime = oldInvincibilityTime - Client.Instance.LatestLatency1WaySecondsTCP;
+
+                ((AdrenalinePickup)pickup).InvincibilityTime = oldInvincibilityTime;
+                break;
+        }
+        pickup.PlayerPickedUp(GameManager.PlayerDictionary[clientWhoPickedUp]);
     }
 }

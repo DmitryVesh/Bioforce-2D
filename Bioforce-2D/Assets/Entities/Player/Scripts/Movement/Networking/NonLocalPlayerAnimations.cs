@@ -42,7 +42,8 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     private ParticleSystem.MinMaxCurve EmissionNormal;
     private ParticleSystem.MinMaxCurve EmissionSprint;
     [SerializeField] private float SprintingParticlesAdd = 15f;
-    private ParticleSystem.MinMaxCurve EmissionEmpty;
+    private ParticleSystem.MinMaxCurve EmissionEmpty;    
+
     enum MovingState
     {
         notMoving,
@@ -54,6 +55,8 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     [SerializeField] private ParticleSystem ImpactOnFlootParticles;
     private bool LastGrounded { get; set; } = true;
 
+    [SerializeField] [Range(0.1f, 1)] private float TimeBeforeStoppingFlashingCutMultiplier = 0.875f;
+    private Coroutine FlashCoroutine;
     //TODO: add Jumped sent animations so can play sound effect on non local players
 
     public void SetOwnerClientID(byte iD)
@@ -62,17 +65,21 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     }
     internal void SetColor(Color playerColor)
     {
-        PlayerBodySprite.color = playerColor;
-        PlayerArmsSprite.color = playerColor;
+        SetPlayerModelColor(playerColor);
 
         PlayerHitParticles.Initilise(playerColor, OwnerClientID);
         PlayerMuzzelFlashParticles.Initilise(playerColor, OwnerClientID);
-        
+
         SplatterSpriteRenderer.color = playerColor;
 
         MinimapPlayerIcon.Color = playerColor;
 
         GenerateSplatters();
+    }
+    private void SetPlayerModelColor(Color playerColor)
+    {
+        PlayerBodySprite.color = playerColor;
+        PlayerArmsSprite.color = playerColor;
     }
 
     private void GenerateSplatters()
@@ -126,9 +133,42 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
 
         HitMarker.SetActive(false);
         PlayerManager.OnPlayerTookDamage += ShowHitMarker;
+
+        PlayerManager.OnPlayerInvincibility += InvincibilityAnimation;
+        PlayerManager.OnPlayerRespawn += PlayRespawnInvincibilityAnimation;
+    }
+    private void OnDestroy()
+    {
+        PlayerManager.OnPlayerDeath -= DieAnimation;
+        PlayerManager.OnPlayerRespawn -= RespawnAnimation;
+        PlayerManager.OnPlayerPaused -= PlayerPaused;
+        PlayerManager.OnPlayerTookDamage -= PlayHitParticleEffect;
+        PlayerManager.OnPlayerTookDamage -= LeaveSplatter;
+        PlayerManager.OnPlayerShot -= PlayMuzzelFlashParticleEffect;
+        PlayerManager.OnPlayerTookDamage -= ShowHitMarker;
+        PlayerManager.OnPlayerInvincibility -= InvincibilityAnimation;
+        PlayerManager.OnPlayerRespawn -= PlayRespawnInvincibilityAnimation;
     }
 
-    private void ShowHitMarker(int damage, int currentHealth) =>
+    private void PlayRespawnInvincibilityAnimation()
+    {
+        InvincibilityAnimation(PlayerManager.RespawnTime + PlayerManager.InvincibilityTimeAfterRespawning);
+    }
+    private void InvincibilityAnimation(float invincibilityTime)
+    {
+        if (!(FlashCoroutine is null))
+            StopCoroutine(FlashCoroutine);
+
+        FlashCoroutine = StartCoroutine(FlashPlayer(invincibilityTime));
+    }
+    private IEnumerator FlashPlayer(float flashFor)
+    {
+        Anim.SetBool("Flash", true);
+        yield return new WaitForSeconds(flashFor * TimeBeforeStoppingFlashingCutMultiplier);
+        Anim.SetBool("Flash", false);
+    }
+
+    private void ShowHitMarker(int currentHealth) =>
         StartCoroutine(DisplayHitMarker());
     private IEnumerator DisplayHitMarker()
     {
@@ -139,13 +179,13 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
 
     private void PlayMuzzelFlashParticleEffect(Vector2 position, Quaternion rotation) =>
         PlayerMuzzelFlashParticles.PlayAffect(position, rotation);
-    private void PlayHitParticleEffect(int damage, int currentHealth) 
+    private void PlayHitParticleEffect(int currentHealth) 
     {
         Transform tf = PlayerModelObject.transform;
         PlayerHitParticles.PlayAffect(tf.position, tf.rotation);
     }
 
-    private void LeaveSplatter(int damage, int currentHealth)
+    private void LeaveSplatter(int currentHealth)
     {
         GameObject splatter = Splatters[CurrentSplatterIndex];
         splatter.SetActive(true);
@@ -254,16 +294,7 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
         PlayerModelObject.transform.Rotate(0, 180, 0);
     }
 
-    private void OnDestroy()
-    {
-        PlayerManager.OnPlayerDeath -= DieAnimation;
-        PlayerManager.OnPlayerRespawn -= RespawnAnimation;
-        PlayerManager.OnPlayerPaused -= PlayerPaused;
-        PlayerManager.OnPlayerTookDamage -= PlayHitParticleEffect;
-        PlayerManager.OnPlayerTookDamage -= LeaveSplatter;
-        PlayerManager.OnPlayerShot -= PlayMuzzelFlashParticleEffect;
-        PlayerManager.OnPlayerTookDamage -= ShowHitMarker;
-    }
+    
 
     
 }

@@ -33,9 +33,9 @@ namespace GameServer
             List<int> PlayerColors = new List<int>();
             foreach (ClientServer client in ClientDictionary.Values)
             {
-                if ((!(client.Player is null)) && client.Player.PlayerColor != -1)
+                if ((!(client.Player is null)) && client.Player.PlayerColorIndex != -1)
                 {
-                    PlayerColors.Add(client.Player.PlayerColor);
+                    PlayerColors.Add(client.Player.PlayerColorIndex);
                 }
             }
             return PlayerColors;

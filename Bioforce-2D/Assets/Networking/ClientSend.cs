@@ -10,6 +10,7 @@ public enum SendConstantPacketsState
 public class ClientSend : MonoBehaviour
 {
     public static SendConstantPacketsState SendConstantPacketsState { get; set; } = SendConstantPacketsState.UDPandTCP;
+
     public static void WelcomePacketReply()
     {
         using (Packet packet = new Packet((byte)ClientPackets.welcomeReceived))
@@ -51,6 +52,8 @@ public class ClientSend : MonoBehaviour
         }
     }
 
+
+
     // Constantly sent
     // TCP 7B (byte 1B packetLen + byte 1B packetID + Vector2 4B position + PlayerMovingState 1B movingState)
     // UDP 8B (byte 1B clientID + byte 1B packetLen + byte 1B packetID + Vector2 4B position + PlayerMovingState 1B movingState)
@@ -81,23 +84,28 @@ public class ClientSend : MonoBehaviour
 
 
     // Constantly sent
-    // 2B (byte 1B packetLen + byte 1B packetID)
-    internal static void PlayerConnectedTCPPacket()
+    // 3B (byte 1B packetLen + byte 1B packetID + byte 1B latencyID)
+    internal static void PlayerConnectedTCPPacket(byte latencyID)
     {
         using (Packet packet = new Packet((byte)ClientPackets.stillConnectedTCP))
         {
+            packet.Write(latencyID);
+
             SendTCPPacket(packet);
         }
     }
     // Constantly sent
-    // 3B (byte 1B clientID + byte 1B packetLen + byte 1B packetID)
-    internal static void PlayerConnectedUDPPacket()
+    // 4B (byte 1B clientID + byte 1B packetLen + byte 1B packetID + byte 1B latencyID)
+    internal static void PlayerConnectedUDPPacket(byte latencyID)
     {
         using (Packet packet = new Packet((byte)ClientPackets.stillConnectedUDP))
         {
+            packet.Write(latencyID);
+
             SendUDPPacket(packet);
         }
     }
+
 
 
     public static void PlayerMovementStats(float runSpeed, float sprintSpeed)
@@ -158,16 +166,6 @@ public class ClientSend : MonoBehaviour
         using (Packet packet = new Packet((byte)ClientPackets.pausedGame))
         {
             packet.Write(paused);
-            SendTCPPacket(packet);
-        }
-    }
-
-    internal static void LocalPlayerPickedUpItem(int pickupID)
-    {
-        using (Packet packet = new Packet((byte)ClientPackets.pickedUpItem))
-        {
-            packet.Write(pickupID);
-
             SendTCPPacket(packet);
         }
     }

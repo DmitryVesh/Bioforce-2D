@@ -228,6 +228,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerPrefab: {fileID: 6976175958362774432, guid: 77780f1a6e9b0684f90ce8e2c0a77451, type: 3}
+  GameTime: 240
 --- !u!4 &621652459
 Transform:
   m_ObjectHideFlags: 0

@@ -1,51 +1,43 @@
-using System;
+using System.Collections;
 using UnityEngine;
 
 public enum PickupType
 {
     bandage,
-    medkit
+    medkit,
+    adrenaline
 }
 public abstract class PickupItem : MonoBehaviour
 {
-    [SerializeField] private PickupType PickupType;
+    [SerializeField] public PickupType PickupType;
     [SerializeField] private ParticleSystem PickupEffect;
-    [SerializeField] private Collider2D ItemCollider;
     [SerializeField] private SpriteRenderer SpriteRenderer;
 
-    public Action<int, int> OnPickup { get; set; }
-    public int PickupID { get; set; }
+    [SerializeField] private MinimapIcon ItemMinimapIcon;
 
-    public void SetActive(bool active)
+    public ushort PickupID { get; set; }
+
+    private void SetActive(bool active)
     {
-        ItemCollider.enabled = active;
         SpriteRenderer.enabled = active;
     }
-    public void PlayEffectsAndHide()
+    private void PlayEffectsAndHide()
     {
         PickupEffect.Play();
         //TODO: make an animation e.g. a white circle that collapses into a smaller circle
         SetActive(false);
-        Invoke("DestroyItem", 5f);
+        StartCoroutine(DestroyItem());
     }
-    private void DestroyItem() //Called by Invoke
+    private IEnumerator DestroyItem() //Called by Invoke
     {
+        Destroy(ItemMinimapIcon);
+        yield return new WaitForSeconds(5f);
         Destroy(PickupEffect.gameObject);
         Destroy(gameObject);
     }
 
-    protected virtual void PlayerPickedUp(PlayerManager player)
+    public virtual void PlayerPickedUp(PlayerManager player)
     {
         PlayEffectsAndHide();
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        PlayerManager player = collision.GetComponentInParent<PlayerManager>();
-        if (player is null || player.ID != Client.Instance.ClientID) //Must be a local player to pickup the item
-            return;
-
-        PlayerPickedUp(player);
-        OnPickup?.Invoke(PickupID, player.ID);
     }
 }

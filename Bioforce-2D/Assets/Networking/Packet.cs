@@ -76,8 +76,7 @@ public enum ClientPackets
     stillConnectedTCP,
     stillConnectedUDP,
     colorToFreeAndTake,
-    readyToJoin,
-    pickedUpItem
+    readyToJoin
 }
 
 public class Packet : IDisposable
@@ -179,7 +178,6 @@ public class Packet : IDisposable
     #endregion
 
     #region Write Data
-    //public void Write(bit)
 
     /// <summary>Adds a byte to the packet.</summary>
     /// <param name="value">The byte to add.</param>
@@ -235,6 +233,12 @@ public class Packet : IDisposable
     {
         Write(value.Length); // Add the length of the string to the packet
         Buffer.AddRange(Encoding.ASCII.GetBytes(value)); // Add the string itself
+    }
+    /// <summary>Adds a TimeSpan 8B to the packet.</summary>
+    /// <param name="value">The float to add.</param>
+    public void Write(TimeSpan value)
+    {
+        Buffer.AddRange(BitConverter.GetBytes(value.Ticks));
     }
 
     /// <summary>Adds a Vector2 to the packet 4B - 512 >= a >= 0 Limited to Range of 0.0078125 -> 511.9921875.</summary>
@@ -525,7 +529,7 @@ public class Packet : IDisposable
                 // If moveReadPos is true and there are unread bytes
                 ReadPosition += 2; // Increase readPos by 2
             }
-            return value; // Return the short
+            return value; // Return the ushort
         }
         else
         {
@@ -637,6 +641,26 @@ public class Packet : IDisposable
         }
     }
 
+    /// <summary>Reads a TimeSpan 8B from the packet.</summary>
+    /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+    public TimeSpan ReadTimeSpan(bool moveReadPos = true)
+    {
+        if (Buffer.Count > ReadPosition)
+        {
+            // If there are unread bytes
+            TimeSpan value = new TimeSpan(BitConverter.ToInt64(ReadableBuffer, ReadPosition)); // Convert the bytes to a long
+            if (moveReadPos)
+            {
+                // If moveReadPos is true
+                ReadPosition += 8; // Increase readPos by 8
+            }
+            return value; // Return the TimeSpan
+        }
+        else
+        {
+            throw new Exception("Could not read value of type 'TimeSpan'!");
+        }
+    }
 
     /// <summary>Reads a Unsigned Vector2 from the packet, Limited to Range of 0.0078125 -> 511.9921875.</summary>
     /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>

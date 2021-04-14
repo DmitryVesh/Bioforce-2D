@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public enum CornderIndex
 {
@@ -33,10 +34,22 @@ public class Minimap : MonoBehaviour
     {
         Instance.Icons.Add(minimapIcon);
         minimapIcon.Icon = Instantiate(minimapIcon.Icon, Instance.MinimapMaskTF);
+        int numIcons = Instance.transform.childCount;
+        for (int iconCount = 2; iconCount < numIcons; iconCount++)
+        {
+            int otherIconSortOrder = Instance.transform.GetChild(iconCount).GetComponent<SortingGroup>().sortingOrder;
+            if (otherIconSortOrder <= minimapIcon.SortOrder)
+                continue;
+
+            minimapIcon.Icon.transform.SetSiblingIndex(iconCount);
+            break;
+        }
         minimapIcon.Icon.color = color;
     }
-    internal static void Unsubscribe(MinimapIcon minimapIcon) =>
+    internal static void Unsubscribe(MinimapIcon minimapIcon)
+    {
         Instance.Icons.Remove(minimapIcon);
+    }
 
     private void Awake()
     {

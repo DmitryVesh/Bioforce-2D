@@ -258,9 +258,9 @@ namespace GameServer
                 Output.WriteLine($"\tPlayer: {ID} has disconnected. {tCP.Socket.Client.RemoteEndPoint}");
                 ServerSend.DisconnectPlayer(ID);
 
-                PlayerColor.FreeColor(Player.PlayerColor, ID);
 
                 UnityEngine.Object.Destroy(Player.gameObject);
+                PlayerColor.FreeColor(Player.PlayerColorIndex, ID);
                 Player = null;
 
                 

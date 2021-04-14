@@ -55,7 +55,7 @@ public class PlayerCameraController : MonoBehaviour
     private void GenerateJumpImpulse() =>
         JumpImpulse.GenerateImpulse();
 
-    private void GenerateHitImpulse(int damage, int currentHealth) =>
+    private void GenerateHitImpulse(int currentHealth) =>
         HitImpulse.GenerateImpulse();
 
     public void GenerateLocalPlayerHitOtherPlayerImpulse() =>

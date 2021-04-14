@@ -17,21 +17,6 @@ namespace GameServer
 
         private void Start()
         {
-            float example = -10f;
-            byte[] bytes = BitConverter.GetBytes(example);
-            string output = "";
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                output += bytes[i];
-                Output.WriteLine(bytes[i].ToString());
-            }
-            string newOutput = "";
-            for (int i = output.Length - 1; i >= 0; i--)
-            {
-                newOutput += output[i];
-            }
-            Output.WriteLine($"{newOutput}");
-
             string[] args = Environment.GetCommandLineArgs().Skip(2).ToArray();
             StartServerProgram(args);
         }
@@ -58,6 +43,7 @@ namespace GameServer
 
             try
             {
+                //Output.Instance.Init(serverName);
                 SceneManager.LoadScene(mapName);
                 MainServerComms.Connect(portMainServer, serverName, timeOut);
                 Server.StartServer(serverName, maxNumPlayers, mapName, portGame);

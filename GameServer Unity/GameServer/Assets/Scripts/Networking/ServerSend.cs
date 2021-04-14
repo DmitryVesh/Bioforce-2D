@@ -30,13 +30,15 @@ namespace GameServer
         {
             using (Packet packet = new Packet((byte)ServerPackets.udpTest))
             {
-                Output.WriteLine($"Sending UDPTest packet to client: {recipientClient}");
+                Output.WriteLine($"\n\tSending UDPTest packet to client: {recipientClient}");
                 packet.Write("Testing UDP");
 
                 SendUDPPacket(recipientClient, packet);
             }
         }
 
+        // 138B (byte 1B packetLen + byte 1B packetID + byte 1B numPlayers + xint xMax=16 16*4B = 64B playerColors 
+        //          + byte 1B numPickups + ypickups yMax=10 10*7B = 70B pickups
         internal static void AskPlayerDetails(byte clientID, List<int> PlayerColors)
         {
             using (Packet packet = new Packet((byte)ServerPackets.askPlayerDetails))
@@ -45,6 +47,10 @@ namespace GameServer
                 packet.Write(numberOfPlayers);
                 for (byte playerCount = 0; playerCount < numberOfPlayers; playerCount++)
                     packet.Write(PlayerColors[playerCount]);
+
+                packet.Write((byte)PickupItemsManager.Instance.PickupsDictionary.Count);
+                foreach (PickupItem pickup in PickupItemsManager.Instance.PickupsDictionary.Values)
+                    WritePickupData(pickup, packet);
 
                 SendTCPPacket(clientID, packet);
             }
@@ -90,6 +96,10 @@ namespace GameServer
             }
         }
 
+        // 63B (byte 1B packetLen + byte 1B packetID + byte 1B playerID + string 16B-max = 4B+12B 12Chars playerName + Vector2 4B playerPosition +
+        //      bool 1B isFacingRight + float 4B runSpeed + float 4B sprintSpeed + bool 1B isDead + bool 1B justJoined + int 4B Kills +
+        //      int 4B Deaths + int 4B Score + int 4B MaxHealth + int 4B CurrentHealth + int 4B PlayerColor + bool 1B Paused +
+        //      float 4B CurrentInvincibilityTime
         public static void SpawnPlayer(byte recipientClient, PlayerServer player, bool justJoined)
         {
             using (Packet packet = new Packet((byte)ServerPackets.spawnPlayer))
@@ -112,13 +122,17 @@ namespace GameServer
                 packet.Write(player.MaxHealth);
                 packet.Write(player.CurrentHealth);
 
-                packet.Write(player.PlayerColor);
+                packet.Write(player.PlayerColorIndex);
 
                 packet.Write(player.Paused);
+
+                packet.Write(player.CurrentInvincibilityTime);
 
                 SendTCPPacket(recipientClient, packet);
             }
         }
+
+        
 
 
         // Constantly sent
@@ -155,20 +169,24 @@ namespace GameServer
         }
 
         // Constantly sent
-        // 2B (byte 1B packetLen + byte 1B packetID)
-        internal static void PlayerConnectedAcknTCP(byte clientID)
+        // 3B (byte 1B packetLen + byte 1B packetID + byte 1B latencyID)
+        internal static void PlayerConnectedAcknTCP(byte clientID, byte latencyID)
         {
             using (Packet packet = new Packet((byte)ServerPackets.stillConnectedTCP))
             {
+                packet.Write(latencyID);
+
                 SendTCPPacket(clientID, packet);
             }
         }
         // Constantly sent
-        // 2B (byte 1B packetLen + byte 1B packetID)
-        internal static void PlayerConnectedAcknUDP(byte clientID)
+        // 3B (byte 1B packetLen + byte 1B packetID + byte 1B latencyID)
+        internal static void PlayerConnectedAcknUDP(byte clientID, byte latencyID)
         {
             using (Packet packet = new Packet((byte)ServerPackets.stillConnectedUDP))
             {
+                packet.Write(latencyID);
+
                 SendUDPPacket(clientID, packet);
             }
         }
@@ -239,6 +257,8 @@ namespace GameServer
                 SendTCPPacketToAllButIncluded(playerKilledID, packet);
             }
         }
+
+
         public static void PlayerRespawned(byte playerID, Vector2 respawnPoint)
         {
             using (Packet packet = new Packet((byte)ServerPackets.playerRespawned))
@@ -273,6 +293,50 @@ namespace GameServer
             }
         }
 
+
+        internal static void GeneratedPickupItem(PickupItem pickup)
+        {
+            using (Packet packet = new Packet((byte)ServerPackets.generatedPickup))
+            {
+                WritePickupData(pickup, packet);
+
+                SendTCPPacketToAll(packet);
+            }
+        }
+
+        private static void WritePickupData(PickupItem pickup, Packet packet)
+        {
+            packet.Write((byte)pickup.PickupType);
+            packet.Write(pickup.PickupID);
+            packet.WriteWorldUVector2(pickup.transform.position);
+        }
+
+        // Bandage/Medkit 9B (byte 1B packetLen + byte 1B packetID + ushort 2B pickupID + byte 1B clientID + int 4B restoreHealth)
+        // Adrenaline 17B (byte 1B packetLen + byte 1B packetID + ushort 2B pickupID + byte 1B clientID + 
+        //                  TimeSpan 8B timeOfInvincibilityStart + float 4B invincibilityTime)
+        internal static void PlayerPickedUpItem(byte clientID, ushort pickupID, PickupItem pickup)
+        {
+            using (Packet packet = new Packet((byte)ServerPackets.playerPickedUpItem))
+            {
+                packet.Write(pickupID);
+                packet.Write(clientID);
+
+                switch (pickup.PickupType)
+                {
+                    case PickupType.bandage:
+                    case PickupType.medkit:
+                        packet.Write(((HealthPickup)pickup).Restore);
+                        break;
+                    case PickupType.adrenaline:
+                        //Output.WriteLine($"TimeNow: {DateTime.UtcNow.TimeOfDay}, TimeNowTicks: {DateTime.UtcNow.TimeOfDay.Ticks}");
+                        //packet.Write(DateTime.UtcNow.TimeOfDay); //Need so players' are synchronised with server
+                        packet.Write(((AdrenalinePickup)pickup).InvincibilityTime);
+                        break;
+                }
+
+                SendTCPPacketToAll(packet);
+            }
+        }
 
 
         private static void SendTCPPacket(byte recipientClient, Packet packet)

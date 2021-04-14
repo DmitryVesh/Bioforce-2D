@@ -50,6 +50,12 @@ public class Client : MonoBehaviour
 
     private byte FixedFrameCounter { get; set; } = 0;
 
+    public float LatestLatency1WaySecondsTCP = 0.25f;
+    public float LatestLatency1WaySecondsUDP = 0.25f;
+    private byte LatencyID { get; set; } = 0; //Loops from 0 - 255, then back to 0
+    private Dictionary<byte, TimeSpan> LatencyDictionary { get; set; } = new Dictionary<byte, TimeSpan>();
+
+
     public static bool IsIPAddressValid(string text)
     {
         string[] splitIPAddress = text.Split('.');
@@ -113,7 +119,7 @@ public class Client : MonoBehaviour
         Connected = true;
         ResetTimeOutTimer(false);
         ClientID = assignedID;
-        PlayerConnectedAcknTCP(DateTime.Now.TimeOfDay);
+        SetPacketTimeoutsTCP(DateTime.Now.TimeOfDay);
     }
 
     public class TCP
@@ -357,10 +363,15 @@ public class Client : MonoBehaviour
             if (FixedFrameCounter++ % 2 == 0)
                 return;
 
-            ClientSend.PlayerConnectedTCPPacket();
-            ClientSend.PlayerConnectedUDPPacket();
+            ClientSend.PlayerConnectedTCPPacket(++LatencyID);
+            ClientSend.PlayerConnectedUDPPacket(LatencyID);
 
             TimeSpan now = DateTime.Now.TimeOfDay;
+
+            if (!LatencyDictionary.ContainsKey(LatencyID))
+                LatencyDictionary.Add(LatencyID, now);
+            else
+                LatencyDictionary[LatencyID] = now;
 
             SendConstantPacketsState sendConstantPacketsState;
 
@@ -401,15 +412,26 @@ public class Client : MonoBehaviour
         }
     }
 
-    public void PlayerConnectedAcknTCP(TimeSpan timeOfDay)
+    public void PlayerConnectedAcknTCP(TimeSpan now, byte latencyID)
     {
-        PacketTimeOutTCP = timeOfDay + new TimeSpan(0, 0, 10);
-        PacketPauseTCP = timeOfDay + new TimeSpan(0, 0, 2);
+        SetPacketTimeoutsTCP(now);
+
+        TimeSpan latencyCheckSent = LatencyDictionary[latencyID];
+        LatestLatency1WaySecondsTCP = (float)(now - latencyCheckSent).TotalSeconds / 2;
     }
-    public void PlayerConnectedAcknUDP(TimeSpan timeOfDay)
+    private void SetPacketTimeoutsTCP(TimeSpan now)
     {
-        PacketSendViaOnlyTCP = timeOfDay + new TimeSpan(0, 0, 5);
-        PacketSendViaTCPAndUDP = timeOfDay + new TimeSpan(0, 0, 0, 0, 500);
+        PacketTimeOutTCP = now + new TimeSpan(0, 0, 10);
+        PacketPauseTCP = now + new TimeSpan(0, 0, 2);
+    }
+
+    public void PlayerConnectedAcknUDP(TimeSpan now, byte latencyID)
+    {
+        PacketSendViaOnlyTCP = now + new TimeSpan(0, 0, 5);
+        PacketSendViaTCPAndUDP = now + new TimeSpan(0, 0, 0, 0, 500);
+
+        TimeSpan latencyCheckSent = LatencyDictionary[latencyID];
+        LatestLatency1WaySecondsUDP = (float)(now - latencyCheckSent).TotalSeconds / 2;
     }
 
     private void ResetTimeOutTimer(bool runTimer = true)
@@ -444,7 +466,7 @@ public class Client : MonoBehaviour
         PacketHandlerDictionary.Add((byte)ServerPackets.udpTest, ClientRead.UDPTestRead);
         PacketHandlerDictionary.Add((byte)ServerPackets.spawnPlayer, ClientRead.SpawnPlayer);
         PacketHandlerDictionary.Add((byte)ServerPackets.playerPosition, ClientRead.PlayerPosition);
-        //PacketHandlerDictionary.Add((int)ServerPackets.playerRotationAndVelocity, ClientRead.PlayerRotationAndVelocity);
+        //PacketHandlerDictionary.Add((byte)ServerPackets.playerRotationAndVelocity, ClientRead.PlayerRotationAndVelocity);
         PacketHandlerDictionary.Add((byte)ServerPackets.playerMovementStats, ClientRead.PlayerMovementStats);
         PacketHandlerDictionary.Add((byte)ServerPackets.playerDisconnect, ClientRead.PlayerDisconnect);
         PacketHandlerDictionary.Add((byte)ServerPackets.bulleShot, ClientRead.BulletShot);

@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 9033224430572459146}
   - component: {fileID: 456874882867764053}
   - component: {fileID: 1354753864783989025}
+  - component: {fileID: -871361228989464481}
   m_Layer: 5
-  m_Name: Player Icon
+  m_Name: Bandage Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35,7 +36,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 48, y: 45}
+  m_SizeDelta: {x: 18, y: 31}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &456874882867764053
 CanvasRenderer:
@@ -65,7 +66,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 2df3d5eb933383a45920e70ca7d5d9bc, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 46b5d988d50d9c54ba51c94aaf0ef673, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -75,3 +76,14 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!210 &-871361228989464481
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4757630999094391428}
+  m_Enabled: 1
+  m_SortingLayerID: 23045771
+  m_SortingLayer: 8
+  m_SortingOrder: 0

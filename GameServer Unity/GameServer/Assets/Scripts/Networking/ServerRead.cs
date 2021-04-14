@@ -1,7 +1,5 @@
-﻿using System;
-using System.Linq;
-using Shared;
-using System.Collections.Generic;
+﻿using Shared;
+using System;
 using UnityEngine;
 
 namespace GameServer
@@ -45,7 +43,7 @@ namespace GameServer
 
                 PlayerColor.FreeColor(colorToFree, clientID);
                 PlayerColor.TakeColor(colorToTake, clientID);
-                Server.ClientDictionary[clientID].Player.PlayerColor = colorToTake;
+                Server.ClientDictionary[clientID].Player.PlayerColorIndex = colorToTake;
             }
             catch (Exception exception)
             {
@@ -58,6 +56,7 @@ namespace GameServer
             {
                 int colorIndex = packet.ReadInt();
                 Server.ClientDictionary[clientID].SendIntoGame(colorIndex);
+                NetworkManager.Instance.PlayerJoinedServer();
                 Output.WriteLine($"\tPlayer: {clientID} was sent into game.");
             }
             catch (Exception exception)
@@ -161,7 +160,6 @@ namespace GameServer
             }
         }
 
-
         internal static void PlayerPausedGame(byte clientID, Packet packet)
         {
             try
@@ -177,30 +175,35 @@ namespace GameServer
             }
         }
 
-        internal static void PlayerStillConnectedTCP(byte clientID, Packet _)
+        internal static void PlayerStillConnectedTCP(byte clientID, Packet packet)
         {
             try
             {
+                byte latencyID = packet.ReadByte();
+
                 Server.ClientDictionary[clientID].Player.LastPacketReceivedTCP(DateTime.Now.TimeOfDay);
-                ServerSend.PlayerConnectedAcknTCP(clientID);
+                ServerSend.PlayerConnectedAcknTCP(clientID, latencyID);
             }
             catch (Exception exception)
             {
                 Output.WriteLine($"\tError, trying to read PlayerStillConnectedTCP, from player: {clientID}\n{exception}");
             }
         }
-        internal static void PlayerStillConnectedUDP(byte clientID, Packet _)
+        internal static void PlayerStillConnectedUDP(byte clientID, Packet packet)
         {
             try
             {
+                byte latencyID = packet.ReadByte();
+
                 Server.ClientDictionary[clientID].Player.LastPacketReceivedUDP(DateTime.Now.TimeOfDay);
-                ServerSend.PlayerConnectedAcknUDP(clientID);
+                ServerSend.PlayerConnectedAcknUDP(clientID, latencyID);
             }
             catch (Exception exception)
             {
                 Output.WriteLine($"\tError, trying to read PlayerStillConnectedUDP, from player: {clientID}\n{exception}");
             }
         }
+
 
         internal static void ArmPositionRotation(byte clientID, Packet packet)
         {

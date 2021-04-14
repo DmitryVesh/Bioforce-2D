@@ -16,8 +16,9 @@ public class SoundPlayerManager : MonoBehaviour
     [SerializeField] private AudioClip DieBullet;
     [SerializeField] private AudioClip DieFall;
 
-    [SerializeField] private AudioClip PickupBandage;
-    [SerializeField] private AudioClip PickupMedkit;
+    [SerializeField] private AudioClip[] PickupBandage;
+    [SerializeField] private AudioClip[] PickupMedkit;
+    [SerializeField] private AudioClip[] PickupAdrenaline;
 
     [SerializeField] private AudioClip HitMarker;
 
@@ -55,10 +56,18 @@ public class SoundPlayerManager : MonoBehaviour
 
         PlayerManager.OnHeartBeatShouldPlay += PlayHeartBeat;
         PlayerManager.OnPlayerDeath += StopHeartBeat;
+
+        PlayerManager.OnPlayerPickupAdrenaline += PlayAdrenalineSound;
     }
 
     private void PlayHeartBeat(int health, int healthMinToPlayHeartBeat, int healthMaxToPlayHeartBeat)
     {
+        if (health > healthMinToPlayHeartBeat)
+        {
+            StopHeartBeat(TypeOfDeath.Bullet);
+            return;
+        }
+
         HeartBeatAudioSource.volume = LinearInterpolate(health, healthMinToPlayHeartBeat, healthMaxToPlayHeartBeat, MinHeartBeatVolume, MaxHeartBeatVolume);
 
         //TODO: Turn down the music volume as well to amplify effect
@@ -72,7 +81,7 @@ public class SoundPlayerManager : MonoBehaviour
             PlayingHeartbeat = true;
         }
     }
-    private void StopHeartBeat(TypeOfDeath typeOfDeath)
+    private void StopHeartBeat(TypeOfDeath _)
     {
         if (PlayingHeartbeat)
         {
@@ -111,6 +120,13 @@ public class SoundPlayerManager : MonoBehaviour
         PlayerManager.OnPlayersBulletHitCollider -= BulletHitCollider;
 
         PlayerManager.OnLocalPlayerHitAnother -= HitMarkerSound;
+
+        PlayerManager.OnPlayerDeath -= PlaySkullLaughing;
+
+        PlayerManager.OnHeartBeatShouldPlay -= PlayHeartBeat;
+        PlayerManager.OnPlayerDeath -= StopHeartBeat;
+
+        PlayerManager.OnPlayerPickupAdrenaline -= PlayAdrenalineSound;
     }
 
     
@@ -121,10 +137,12 @@ public class SoundPlayerManager : MonoBehaviour
 
     private void HitMarkerSound() =>
         Play(HitMarker);
-    private void PlayMedkitSound(int integer) =>
+    private void PlayMedkitSound(int _) =>
         Play(PickupMedkit);
-    private void PlayBandageSound(int integer) =>
+    private void PlayBandageSound(int _) =>
         Play(PickupBandage);
+    private void PlayAdrenalineSound(float floatVal) =>
+        Play(PickupAdrenaline);
 
     public void PlayShootSound(Vector2 position, Quaternion rotation) =>
         Play(Shoot);
@@ -132,7 +150,7 @@ public class SoundPlayerManager : MonoBehaviour
         Play(Footsteps);
     public void PlayJumpSound() =>
         Play(Jump);
-    public void PlayGotHitSound(int damage, int bulletOwnerID) =>
+    public void PlayGotHitSound(int currentHealth) =>
         Play(WasHit);
     public void PlayDied(TypeOfDeath typeOfDeath)
     {

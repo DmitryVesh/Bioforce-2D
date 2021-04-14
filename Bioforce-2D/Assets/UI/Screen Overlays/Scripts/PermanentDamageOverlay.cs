@@ -10,11 +10,14 @@ public class PermanentDamageOverlay : HitOverlay //Only need to inherit the over
     [SerializeField] private float ColorThresholdValues = 0.1f;
     private float Alpha { get; set; }
 
-    protected override void ActivateOverlay(int damage, int currentHealth)
+    protected override void ActivateOverlay(int currentHealth)
     {
         float healthFraction = currentHealth / MaxHealth;
         if (healthFraction > Threshold)
+        {
+            DeactivateOverlay();
             return;
+        }
 
         if (!CurrentlyOn())
             EnableOverlay();
@@ -67,16 +70,13 @@ public class PermanentDamageOverlay : HitOverlay //Only need to inherit the over
     {
         base.SubscribeToActivationEvent();
         PlayerManager.OnPlayerRespawn += DeactivateOverlay;
+        PlayerManager.OnPlayerRestoreHealth += ActivateOverlay;
     }
 
-
-
-    private void DeactivateOverlay() 
+    private void OnDestroy()
     {
-        Image.enabled = false;
-
-        if (!(FadingCoroutine is null))
-            StopCoroutine(FadingCoroutine);
+        PlayerManager.OnPlayerRespawn -= DeactivateOverlay;
+        PlayerManager.OnPlayerRestoreHealth -= ActivateOverlay;
     }
 
     private bool CurrentlyOn() =>

@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4467000502275282641}
+  - component: {fileID: 1542118619}
   m_Layer: 0
   m_Name: Pickups Spawn Locations
   m_TagString: Untagged
@@ -23,7 +24,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 261444950545895705}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -42,6 +43,36 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1542118619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 261444950545895705}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cf133fc731763c4f846da7d745294de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Bandage: {fileID: 2800527510055935911, guid: 4dea10f9a81ff8a429f5fc341341adec, type: 3}
+  Medkit: {fileID: 6227399678520746207, guid: c5c7f3ffa37ad704b98cd7333ab56309, type: 3}
+  Adrenaline: {fileID: 2800527510055935911, guid: 379ba507e9a7925428d2ef4ef549ed70, type: 3}
+  MaxNumPickups: 10
+  TimeInBetweenPickupSpawns: 10000
+  SpawnLocations:
+  - {fileID: 6153168871079619752}
+  - {fileID: 1023232325408625085}
+  - {fileID: 7264161124825514380}
+  - {fileID: 127592608028587143}
+  - {fileID: 6497770657195273901}
+  - {fileID: 2314145514959381666}
+  - {fileID: 3659193304717084796}
+  - {fileID: 5416158886671000481}
+  - {fileID: 1367130124130435088}
+  - {fileID: 4552896142774667905}
+  - {fileID: 7240042597315783217}
+  - {fileID: 3006401909335513312}
 --- !u!1 &649343035900952564
 GameObject:
   m_ObjectHideFlags: 0

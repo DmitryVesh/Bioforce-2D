@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MedkitPickup : HealthPickup
 {
-    protected override void PlayerPickedUp(PlayerManager player)
+    public override void PlayerPickedUp(PlayerManager player)
     {
         base.PlayerPickedUp(player);
         player.MedkitPickup(Restore);

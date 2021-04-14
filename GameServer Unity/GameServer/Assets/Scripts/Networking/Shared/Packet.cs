@@ -89,8 +89,7 @@ namespace Shared
         stillConnectedTCP,
         stillConnectedUDP,
         colorToFreeAndTake,
-        readyToJoin,
-        pickedUpItem
+        readyToJoin
     }
 
     public class Packet : IDisposable
@@ -206,49 +205,56 @@ namespace Shared
         {
             Buffer.AddRange(value);
         }
-        /// <summary>Adds a short to the packet.</summary>
+        /// <summary>Adds a short 2B to the packet.</summary>
         /// <param name="value">The short to add.</param>
         public void Write(short value)
         {
             Buffer.AddRange(BitConverter.GetBytes(value));
         }
-        /// <summary>Adds a ushort to the packet.</summary>
+        /// <summary>Adds a ushort 2B to the packet.</summary>
         /// <param name="value">The short to add.</param>
         public void Write(ushort value)
         {
             Buffer.AddRange(BitConverter.GetBytes(value));
         }
-        /// <summary>Adds an int to the packet.</summary>
+        /// <summary>Adds an int 4B to the packet.</summary>
         /// <param name="value">The int to add.</param>
         public void Write(int value)
         {
             Buffer.AddRange(BitConverter.GetBytes(value));
         }
-        /// <summary>Adds a long to the packet.</summary>
+        /// <summary>Adds a long 8B to the packet.</summary>
         /// <param name="value">The long to add.</param>
         public void Write(long value)
         {
             Buffer.AddRange(BitConverter.GetBytes(value));
         }
-        /// <summary>Adds a float to the packet.</summary>
+        /// <summary>Adds a float 4B to the packet.</summary>
         /// <param name="value">The float to add.</param>
         public void Write(float value)
         {
             Buffer.AddRange(BitConverter.GetBytes(value));
         }
-        /// <summary>Adds a bool to the packet.</summary>
+        /// <summary>Adds a bool 1B to the packet.</summary>
         /// <param name="value">The bool to add.</param>
         public void Write(bool value)
         {
             Buffer.AddRange(BitConverter.GetBytes(value));
         }
-        /// <summary>Adds a string to the packet.</summary>
+        /// <summary>Adds a string x*1B to the packet.</summary>
         /// <param name="value">The string to add.</param>
         public void Write(string value)
         {
             Write(value.Length); // Add the length of the string to the packet
             Buffer.AddRange(Encoding.ASCII.GetBytes(value)); // Add the string itself
         }
+        /// <summary>Adds a TimeSpan 8B to the packet.</summary>
+        /// <param name="value">The float to add.</param>
+        public void Write(TimeSpan value)
+        {
+            Buffer.AddRange(BitConverter.GetBytes(value.Ticks));
+        }
+
 
         /// <summary>Adds a Vector2 to the packet 4B - 512 >= a >= 0 Limited to Range of 0.0078125 -> 511.9921875.</summary>
         /// <param name="value">The Vector2 to add.</param>
@@ -538,7 +544,7 @@ namespace Shared
                     // If moveReadPos is true and there are unread bytes
                     ReadPosition += 2; // Increase readPos by 2
                 }
-                return value; // Return the short
+                return value; // Return the ushort
             }
             else
             {
@@ -647,6 +653,27 @@ namespace Shared
             catch
             {
                 throw new Exception("Could not read value of type 'string'!");
+            }
+        }
+
+        /// <summary>Reads a TimeSpan 8B from the packet.</summary>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        public TimeSpan ReadTimeSpan(bool moveReadPos = true)
+        {
+            if (Buffer.Count > ReadPosition)
+            {
+                // If there are unread bytes
+                TimeSpan value = new TimeSpan(BitConverter.ToInt64(ReadableBuffer, ReadPosition)); // Convert the bytes to a long
+                if (moveReadPos)
+                {
+                    // If moveReadPos is true
+                    ReadPosition += 8; // Increase readPos by 8
+                }
+                return value; // Return the TimeSpan
+            }
+            else
+            {
+                throw new Exception("Could not read value of type 'TimeSpan'!");
             }
         }
 

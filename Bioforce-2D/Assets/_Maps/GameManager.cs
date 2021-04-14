@@ -92,7 +92,6 @@ public class GameManager : MonoBehaviour
         GameObject prefab;
 
         bool localClient = iD == Client.Instance.ClientID;
-        Debug.Log(playerColorIndex);
         Color playerColor = PlayerChooseColor.Instance.GetColorFromIndex(playerColorIndex);
 
         if (localClient)
