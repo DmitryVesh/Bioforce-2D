@@ -8,7 +8,7 @@ public abstract class UIEntryManager : MonoBehaviour
 {
     [SerializeField] protected float EntryTimeToLive = 8;
 
-    private GameObject Panel { get; set; }
+    [SerializeField] protected GameObject EntryPanel;
     private List<GameObject> EntryPanels { get; set; }
     private List<(TextMeshProUGUI, TextMeshProUGUI)> EntryTexts { get; set; }
     private List<Image> EntryImage { get; set; }
@@ -17,21 +17,25 @@ public abstract class UIEntryManager : MonoBehaviour
 
     protected virtual void Awake()
     {
-        Panel = transform.GetChild(0).gameObject;
-        Panel.SetActive(true);
+        EntryPanel.SetActive(true);
 
         InitEntryPanels();
         InitEntryTexts();
         ActiveEntries = new Queue<(GameObject, Coroutine)>();
     }
-    protected (GameObject, int) AddEntry(string text1, string text2, Sprite image)
+    protected void AddEntry(string text, Color textColor)
+    {
+        (_, int entryIndex) = AddEntry(text, null, null);
+        EntryTexts[entryIndex].Item1.color = textColor;
+    }
+    private (GameObject, int) AddEntry(string text1, string text2, Sprite image)
     {
         int inactiveEntryIndex = FindIndexOfInactiveEntry();
         GameObject entry = GetEntry(ref inactiveEntryIndex);
 
         entry.SetActive(true);
 
-        EntryTexts[inactiveEntryIndex].Item1.text = text1;
+        EntryTexts[inactiveEntryIndex].Item1.text = text1; //Problem here as inactive index doesn't match 
         EntryTexts[inactiveEntryIndex].Item2.text = text2;
         EntryImage[inactiveEntryIndex].sprite = image;
         Coroutine removingEntryCoroutine = StartCoroutine(RemoveEntry(entry));
@@ -52,6 +56,9 @@ public abstract class UIEntryManager : MonoBehaviour
 
     private IEnumerator RemoveEntry(GameObject entry)
     {
+        if (EntryTimeToLive == -1) //Lives forever
+            yield break;
+
         yield return new WaitForSeconds(EntryTimeToLive);
         //TODO: make disappering decreasing in alpha, then deactivating
         entry.SetActive(false);
@@ -80,10 +87,19 @@ public abstract class UIEntryManager : MonoBehaviour
         if (inactiveEntryIndex == -1)
         {
             entry = GetLongestActiveEntry();
-            inactiveEntryIndex = entry.transform.GetSiblingIndex();
+            //inactiveEntryIndex = entry.transform.GetSiblingIndex(); //This is wrong
+            for (int i = 0; i < EntryPanels.Count; i++)
+            {
+                if (entry.Equals(EntryPanels[i]))
+                {
+                    inactiveEntryIndex = i;
+                    break;
+                }
+            }
         }
         else
             entry = EntryPanels[inactiveEntryIndex];
+
         SetSiblingIndexLast(entry);
         return entry;
     }
@@ -91,7 +107,8 @@ public abstract class UIEntryManager : MonoBehaviour
     private GameObject GetLongestActiveEntry()
     {
         (GameObject entry, Coroutine removeCoroutine) = ActiveEntries.Dequeue();
-        StopCoroutine(removeCoroutine);
+        if (removeCoroutine != null)
+            StopCoroutine(removeCoroutine);
         entry.SetActive(false);
         return entry;
     }
@@ -109,7 +126,7 @@ public abstract class UIEntryManager : MonoBehaviour
     }
     private void InitEntryPanels()
     {
-        Transform panelTransform = Panel.transform;
+        Transform panelTransform = EntryPanel.transform;
         int numPanels = panelTransform.childCount;
         EntryPanels = new List<GameObject>(numPanels);
         for (int count = 0; count < numPanels; count++)

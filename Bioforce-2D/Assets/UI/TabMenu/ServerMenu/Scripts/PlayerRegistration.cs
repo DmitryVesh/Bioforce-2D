@@ -43,8 +43,12 @@ public class PlayerRegistration : MonoBehaviour
         PlayerModelUsernameText.text = inputField;
         OKMenuButton.Interactable = IsUsernameValid;
     }
-    public void SavePlayerUsername() =>
+    public void SavePlayerUsername()
+    {
+        UsernameInputField.text = TextInputValidator.TrimAllSpaces(UsernameInputField.text);
+
         PlayerPrefs.SetString("Username", UsernameInputField.text);
+    }
     public void HideUserRegistration() =>
         gameObject.SetActive(false);
 

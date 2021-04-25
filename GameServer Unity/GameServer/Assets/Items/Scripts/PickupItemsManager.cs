@@ -30,8 +30,16 @@ public class PickupItemsManager : MonoBehaviour
         Transform pickupHolder = new GameObject("PickupHolder").transform;
         pickupHolder.position = Vector3.zero;
 
+        //Adding defaults
+        MakeAndAddPickupToAvailableQueue(pickupHolder, Bandage);
+        MakeAndAddPickupToAvailableQueue(pickupHolder, Medkit);
+        MakeAndAddPickupToAvailableQueue(pickupHolder, Adrenaline);
+        MakeAndAddPickupToAvailableQueue(pickupHolder, Bandage);
+        MakeAndAddPickupToAvailableQueue(pickupHolder, Medkit);
+        MakeAndAddPickupToAvailableQueue(pickupHolder, Bandage);
+
         for (byte pickupCount = 0; pickupCount < MaxNumPickups * 2; pickupCount++)
-            MakeAndAddPickupToAvailableQueue(pickupHolder);
+            MakeAndAddPickupToAvailableQueue(pickupHolder, GetRandomPickupGameObject());
     }
 
     private void Awake()
@@ -42,7 +50,7 @@ public class PickupItemsManager : MonoBehaviour
         }
         else if (Instance != this)
         {
-            Debug.Log($"PickupItemsManager instance already exists, destroying {gameObject.name}");
+            Output.WriteLine($"PickupItemsManager instance already exists, destroying {gameObject.name}");
             Destroy(gameObject);
         }
         
@@ -60,14 +68,19 @@ public class PickupItemsManager : MonoBehaviour
         Output.WriteLine("\t!Started spawning items timer!");
     }
 
-    private PickupItem MakeAndAddPickupToAvailableQueue(Transform pickupHolder)
+    private void MakeAndAddPickupToAvailableQueue(Transform pickupHolder, GameObject pickupObject)
     {
-        PickupItem pickup = Instantiate(GetRandomPickupGameObject(), pickupHolder).GetComponent<PickupItem>();
+        PickupItem pickup = Instantiate(pickupObject, pickupHolder).GetComponent<PickupItem>();
+        AddPickupToAvailableQueue(pickup);
+    }
+
+    private void AddPickupToAvailableQueue(PickupItem pickup)
+    {
         Output.WriteLine($"\tInstantiated a Pickup of type: {pickup.PickupType}");
         PickupsAvailable.Enqueue(pickup);
         pickup.SetActive(false);
-        return pickup;
     }
+
     private void AddPickupToDictionary(PickupItem pickup)
     {
         pickup.SetPosition(GetRandomPickupSpawnPoint());
@@ -113,7 +126,6 @@ public class PickupItemsManager : MonoBehaviour
     private GameObject GetRandomPickupGameObject()
     {
         float dropRarity = Random.Range(0f, 1f);
-        //TODO: Fix rarity drops, as now mostly bandage, then adrenaline, 
         if (dropRarity < 0.15f)
             return Adrenaline;
         else if (dropRarity < 0.4f)

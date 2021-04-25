@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: a14d10119e1daff41abf6d7f12941660
+guid: 3ced556b27254ec45894b7093aadff35
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - AmazDooMRight
+  - DejaVu Sans Mono
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0

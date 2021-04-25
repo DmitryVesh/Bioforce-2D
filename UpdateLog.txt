@@ -1,4 +1,46 @@
 ===============================================================================================================================
+Version 1.0.3
+---------------
+
+Summary
+-------
+Main goals is to;
+	1 Add server logging, so every WriteLine is logged into a txt file, later to be read
+	1 Make icon higher resolution
+	
+	0 Decrease the music volume / deafen the music as player's heart beat increases in bpm
+	1 Implement chat system - need to watch out for max num characters sent, as packetLen is 1B, so say only 100 Characters max
+
+	0 Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard	
+
+	0 Integrate ads
+	0 Make dead time, so when died, wait like 10 seconds & show banner ads	
+
+	0 Add Single-player mode
+
+	0 Add tutorial level into game
+	0 Add new screen shots for promotional app store pages
+	0 Add splash images to android & ios versions
+
+Future tasks;							
+	version 1.0.4
+		Add scene transitions
+
+	Add chat into game
+	Add ping field to Player Score entries in scoreboard
+	Add gamepad support for pc & mac
+	Make server sided, currently very client sided
+
+	make the ThreadManager to work on multi-threading
+	
+	imrpove killFeedUI, make entries disappear by decreasing opacity, and popping them back up smoothly instead of vertical layout group which
+		pops them and moves other entries up instantly.
+	improve UI, adding pop up animations to the UI elements instead of just appearing instantly.
+	improve UI, adding black borders to UI Panels like TimeOutPanel.
+	fix player move validation, when respawned, should ignore any changes that occured lately.
+
+
+===============================================================================================================================
 Version 1.0.2
 ---------------
 

@@ -57,7 +57,8 @@ public enum ServerPackets
     takeColor,
     triedTakingTakenColor,
     generatedPickup,
-    playerPickedUpItem
+    playerPickedUpItem,
+    chatMessage
 }
 
 /// <summary>Sent from client to server.</summary>
@@ -76,7 +77,8 @@ public enum ClientPackets
     stillConnectedTCP,
     stillConnectedUDP,
     colorToFreeAndTake,
-    readyToJoin
+    readyToJoin,
+    chatMessage
 }
 
 public class Packet : IDisposable

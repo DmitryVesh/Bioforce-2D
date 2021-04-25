@@ -121,6 +121,7 @@ public class CreateServer : MonoBehaviour
         else 
         {
             ServerMenu.Instance.HideServerMenu();
+            ServerNameSelected = TextInputValidator.TrimAllSpaces(ServerNameSelected);
             successStart = InternetServerScanner.Instance.ContactMainServerToAddOwnServer(ServerNameSelected, MaxPlayerSelected, MapSelected, Client.PortNumInternetToConnectTo);
             //Waiting for response packet from MainServer
         }

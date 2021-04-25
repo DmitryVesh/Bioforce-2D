@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6101433599479511157}
   - component: {fileID: 6101433599479511156}
   m_Layer: 5
-  m_Name: Key Tabs
+  m_Name: Tab Group - Key Server Fields
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -203,16 +203,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_text
       value: Server
-      objectReference: {fileID: 0}
-    - target: {fileID: 8166814079389225342, guid: d8d0c84db32dd1f4da4ca218168110dd,
-        type: 3}
-      propertyPath: m_fontSize
-      value: 42
-      objectReference: {fileID: 0}
-    - target: {fileID: 8166814079389225342, guid: d8d0c84db32dd1f4da4ca218168110dd,
-        type: 3}
-      propertyPath: m_fontSizeBase
-      value: 42
       objectReference: {fileID: 0}
     - target: {fileID: 8166814079389225343, guid: d8d0c84db32dd1f4da4ca218168110dd,
         type: 3}

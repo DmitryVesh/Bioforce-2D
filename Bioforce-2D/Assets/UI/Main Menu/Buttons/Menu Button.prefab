@@ -69,6 +69,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f00e10519964c494e8091599c6fb5790, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Interactable: 1
   OnClickEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -140,8 +141,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Multiplayer
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 3c29b5ed756829e44a04e3e6a1baef45, type: 2}
-  m_sharedMaterial: {fileID: 8173724976565738183, guid: 3c29b5ed756829e44a04e3e6a1baef45,
+  m_fontAsset: {fileID: 11400000, guid: a903889aeec85c04196990a65290038e, type: 2}
+  m_sharedMaterial: {fileID: 5517125784193828375, guid: a903889aeec85c04196990a65290038e,
     type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}

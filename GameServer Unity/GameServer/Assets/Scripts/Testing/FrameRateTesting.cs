@@ -9,7 +9,7 @@ public class FrameRateTesting : MonoBehaviour
     {
         CurrentFrameFixedCount = (CurrentFrameFixedCount + 1) % ApplicationSetup.UpdateFrameRate;
         if (CurrentFrameFixedCount == 0)
-            Debug.Log($"FixedUpdate all: {ApplicationSetup.UpdateFrameRate} called");
+            Output.WriteLine($"FixedUpdate all: {ApplicationSetup.UpdateFrameRate} called");
     }
 
     private int CurrentFrameUpdateCount { get; set; } = 0;
@@ -17,6 +17,6 @@ public class FrameRateTesting : MonoBehaviour
     {
         CurrentFrameUpdateCount = (CurrentFrameUpdateCount + 1) % ApplicationSetup.UpdateFrameRate;
         if (CurrentFrameUpdateCount == 0)
-            Debug.Log($"Update all: {ApplicationSetup.UpdateFrameRate} called");
+            Output.WriteLine($"Update all: {ApplicationSetup.UpdateFrameRate} called");
     }
 }

@@ -191,7 +191,6 @@ namespace GameServer
             }
         }
 
-
         private static void SendConstantlySentPacketToAllButIncluded(byte NonRecipientClient, Packet packet)
         {
             packet.WriteLength();
@@ -293,7 +292,6 @@ namespace GameServer
             }
         }
 
-
         internal static void GeneratedPickupItem(PickupItem pickup)
         {
             using (Packet packet = new Packet((byte)ServerPackets.generatedPickup))
@@ -303,14 +301,12 @@ namespace GameServer
                 SendTCPPacketToAll(packet);
             }
         }
-
         private static void WritePickupData(PickupItem pickup, Packet packet)
         {
             packet.Write((byte)pickup.PickupType);
             packet.Write(pickup.PickupID);
             packet.WriteWorldUVector2(pickup.transform.position);
         }
-
         // Bandage/Medkit 9B (byte 1B packetLen + byte 1B packetID + ushort 2B pickupID + byte 1B clientID + int 4B restoreHealth)
         // Adrenaline 17B (byte 1B packetLen + byte 1B packetID + ushort 2B pickupID + byte 1B clientID + 
         //                  TimeSpan 8B timeOfInvincibilityStart + float 4B invincibilityTime)
@@ -338,6 +334,16 @@ namespace GameServer
             }
         }
 
+        internal static void ChatMessage(string chatEntryToSend, byte clientID)
+        {
+            using (Packet packet = new Packet((byte)ServerPackets.chatMessage))
+            {
+                packet.Write(chatEntryToSend);
+                packet.Write(clientID);
+
+                SendTCPPacketToAll(packet);
+            }
+        }
 
         private static void SendTCPPacket(byte recipientClient, Packet packet)
         {

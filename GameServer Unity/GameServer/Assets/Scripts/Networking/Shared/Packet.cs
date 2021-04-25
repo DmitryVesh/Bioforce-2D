@@ -70,7 +70,8 @@ namespace Shared
         takeColor,
         triedTakingTakenColor,
         generatedPickup,
-        playerPickedUpItem
+        playerPickedUpItem,
+        chatMessage
     }
 
     /// <summary>Sent from client to server.</summary>
@@ -89,7 +90,8 @@ namespace Shared
         stillConnectedTCP,
         stillConnectedUDP,
         colorToFreeAndTake,
-        readyToJoin
+        readyToJoin,
+        chatMessage
     }
 
     public class Packet : IDisposable

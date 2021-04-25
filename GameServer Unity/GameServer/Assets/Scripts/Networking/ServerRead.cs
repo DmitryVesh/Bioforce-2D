@@ -160,6 +160,8 @@ namespace GameServer
             }
         }
 
+        
+
         internal static void PlayerPausedGame(byte clientID, Packet packet)
         {
             try
@@ -167,13 +169,27 @@ namespace GameServer
                 bool paused = packet.ReadBool();
 
                 ServerSend.PlayerPausedGame(clientID, paused);
-
             }
             catch (Exception exception)
             {
                 Output.WriteLine($"\tError, trying to read PausedGame, from player: {clientID}\n{exception}");
             }
         }
+        
+        internal static void ChatMessage(byte clientID, Packet packet)
+        {
+            try
+            {
+                string text = packet.ReadString();
+
+                Server.ClientDictionary[clientID].Player.MessageToSend(text);
+            }
+            catch (Exception e)
+            {
+                Output.WriteLine($"\tError, trying to read ChatMessage, from player: {clientID}\n{e}");
+            }
+        }
+
 
         internal static void PlayerStillConnectedTCP(byte clientID, Packet packet)
         {

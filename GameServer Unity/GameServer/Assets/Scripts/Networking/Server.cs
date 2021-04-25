@@ -146,6 +146,7 @@ namespace GameServer
             PacketHandlerDictionary.Add((byte)ClientPackets.stillConnectedUDP, ServerRead.PlayerStillConnectedUDP);
             PacketHandlerDictionary.Add((byte)ClientPackets.colorToFreeAndTake, ServerRead.ColorToFreeAndToTake);
             PacketHandlerDictionary.Add((byte)ClientPackets.readyToJoin, ServerRead.ReadyToJoin);
+            PacketHandlerDictionary.Add((byte)ClientPackets.chatMessage, ServerRead.ChatMessage);
 
             Output.WriteLine("\tInitialised server packets.");
         }

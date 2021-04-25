@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Experimental.AI;
 
 public enum SendConstantPacketsState
 {
@@ -166,6 +167,17 @@ public class ClientSend : MonoBehaviour
         using (Packet packet = new Packet((byte)ClientPackets.pausedGame))
         {
             packet.Write(paused);
+
+            SendTCPPacket(packet);
+        }
+    }
+
+    internal static void ChatMessage(string text)
+    {
+        using (Packet packet = new Packet((byte)ClientPackets.chatMessage))
+        {
+            packet.Write(text);
+
             SendTCPPacket(packet);
         }
     }

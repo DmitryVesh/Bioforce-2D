@@ -484,6 +484,7 @@ public class Client : MonoBehaviour
         PacketHandlerDictionary.Add((byte)ServerPackets.triedTakingTakenColor, ClientRead.TriedTakingTakenColor);
         PacketHandlerDictionary.Add((byte)ServerPackets.generatedPickup, ClientRead.GeneratedPickupItem);
         PacketHandlerDictionary.Add((byte)ServerPackets.playerPickedUpItem, ClientRead.PlayerPickedUpItem);
+        PacketHandlerDictionary.Add((byte)ServerPackets.chatMessage, ClientRead.ChatMessage);
     }
        
 }

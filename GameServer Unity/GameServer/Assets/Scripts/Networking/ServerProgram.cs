@@ -13,7 +13,6 @@ namespace GameServer
         public const int MillisecondsInTick = 1000 / Ticks;
 
         public static bool IsRunning { get; private set; } = true;
-        [SerializeField] public bool IsTesting = false;
 
         private void Start()
         {
@@ -43,7 +42,7 @@ namespace GameServer
 
             try
             {
-                //Output.Instance.Init(serverName);
+                Output.Instance.Init(serverName);
                 SceneManager.LoadScene(mapName);
                 MainServerComms.Connect(portMainServer, serverName, timeOut);
                 Server.StartServer(serverName, maxNumPlayers, mapName, portGame);
@@ -53,11 +52,5 @@ namespace GameServer
                 Output.WriteLine($"\tError starting server:\n{exception}");
             }
         }
-
-        //private void FixedUpdate()
-        //{
-        //    if (IsTesting && Input.GetKey(KeyCode.C))
-        //        Debug.developerConsoleVisible = !Debug.developerConsoleVisible;
-        //}
     }
 }

@@ -13,9 +13,9 @@ namespace MainServerBioforce2D
     class InternetDiscoveryTCPServer
     {
         public const string MainServerIP = "18.134.197.3";
-        //public const string MainServerIP = "127.0.0.1";
+        //public const string MainServerIP = "127.0.0.1"; // Used for testing
 
-        public const string GameVersionLatest = "1.0.2";
+        public static string GameVersionLatest { get; set; } = "1.0.2" ; //Default Val
 
         private static TcpListener TCPBroadCastTcpListener { get; set; }
 
@@ -72,14 +72,15 @@ namespace MainServerBioforce2D
         private static void MakePersistentServer() =>
             MakeGameServer(serverName: "Welcome", maxNumPlayers: 16, mapName: "Level 1", currentNumPlayers: 0, ping: 0, timeOut: -1);
 
-        public static void StartServer(int port)
+        public static void StartServer(int port, string version)
         {
+            GameVersionLatest = version;
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CloseServer);
             PortNum = port;
 
             PortQueue = new Queue<int>(PortsAvailable());
 
-            Console.WriteLine("\nTrying to start the MainServer...");
+            Output.WriteLine($"\nTrying to start the MainServer... version: {GameVersionLatest}");
             if (TCPBroadCastTcpListener == null)
             {
                 try
@@ -89,11 +90,11 @@ namespace MainServerBioforce2D
                     TCPBeginReceiveDiscoveryClients();
 
                     InitPacketHandlerDictionary();
-                    Console.WriteLine("\nSuccessfully started the MainServer.");
+                    Output.WriteLine("\nSuccessfully started the MainServer.");
                 }
                 catch (Exception exception)
                 {
-                    Console.WriteLine($"Error in StartServer of MainServer:\n{exception}");
+                    Output.WriteLine($"Error in StartServer of MainServer:\n{exception}");
                 }
             }
 
@@ -101,7 +102,7 @@ namespace MainServerBioforce2D
         }
         public static void CloseServer(object sender, EventArgs e)
         {
-            Console.WriteLine("Closing MainServer...");
+            Output.WriteLine("Closing MainServer...");
             if (TCPBroadCastTcpListener != null)
             {
                 TCPBroadCastTcpListener.Stop();
@@ -130,7 +131,7 @@ namespace MainServerBioforce2D
         private static void TCPConnectAsyncCallback(IAsyncResult asyncResult)
         {
             TcpClient client = TCPBroadCastTcpListener.EndAcceptTcpClient(asyncResult);
-            Console.WriteLine($"\nUser {client.Client.RemoteEndPoint} is trying to connect to the discovery server...");
+            Output.WriteLine($"\nUser {client.Client.RemoteEndPoint} is trying to connect to the discovery server...");
             TCPBeginReceiveDiscoveryClients();
 
             byte discoveryClientCount = SearchForDictSpace(ref ClientDictionary);
@@ -139,7 +140,7 @@ namespace MainServerBioforce2D
             string ip = client.Client.RemoteEndPoint.ToString().Split(':')[0].ToString();
 
             
-            Console.WriteLine($"Connected and sent welcome to new DiscoveryTCPClient: {client.Client.RemoteEndPoint}");
+            Output.WriteLine($"Connected and sent welcome to new DiscoveryTCPClient: {client.Client.RemoteEndPoint}");
 
             try
             {
@@ -156,7 +157,7 @@ namespace MainServerBioforce2D
             }
             catch(Exception e)
             {
-                Console.WriteLine(e);
+                Output.WriteLine(e.ToString());
             }
         }
 
@@ -199,7 +200,7 @@ namespace MainServerBioforce2D
             int port = args.ServerPort;
             PortQueue.Enqueue(port);
 
-            Console.WriteLine("" +
+            Output.WriteLine("" +
                 $"\n-------------------------------------------" +
                 $"\nGameServer: {serverName} exited..." +
                 $"\n-------------------------------------------");

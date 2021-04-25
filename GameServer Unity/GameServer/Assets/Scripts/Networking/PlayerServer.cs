@@ -49,7 +49,9 @@ namespace GameServer
         public SendConstantPacketsState CurrentSendConstantPacketsState { get; private set; } = SendConstantPacketsState.UDPandTCP;
         
         public float CurrentInvincibilityTime { get; set; }
-        
+
+        private string ChatEntryToSend { get; set; } = "";
+
         private void OnDestroy()
         {
             Output.WriteLine($"\n\tPlayer:{ID} - \"{Username}\" is destroyed/removed from server");
@@ -136,6 +138,9 @@ namespace GameServer
             PacketSendViaTCPAndUDP = timeOfDay + new TimeSpan(0, 0, 0,0, 500);
         }
 
+        internal void MessageToSend(string text) =>
+            ChatEntryToSend = $"[{Username}]: {text}";
+
         public void FixedUpdate()
         {
             TimeSpan now = DateTime.Now.TimeOfDay;
@@ -199,7 +204,12 @@ namespace GameServer
                 LastPosition = transform.position;
                 LastMoveState = MoveState;
             }
-            //ServerSend.PlayerRotationAndVelocity(ID, Velocity);
+
+            if (ChatEntryToSend != "")
+            {
+                ServerSend.ChatMessage(ChatEntryToSend, ID);
+                ChatEntryToSend = "";
+            }
 
             /*
             if (MovePlayerSent >= ServerProgram.Ticks)

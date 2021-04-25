@@ -41,7 +41,7 @@ namespace MainServerBioforce2D
             ReceiveBuffer = null;
             ReceivePacket = null;
 
-            Console.WriteLine($"MainServer client: {ID} has disconnected...");
+            Output.WriteLine($"MainServer client: {ID} has disconnected...");
         }
 
         public void SendPacket(Packet packet)
@@ -55,7 +55,7 @@ namespace MainServerBioforce2D
             catch (Exception exception)
             {
                 //Disconnect();
-                Console.WriteLine($"\nError, occured when sending TCP data from client {ID}\nError{exception}");
+                Output.WriteLine($"\nError, occured when sending TCP data from client {ID}\nError{exception}");
             }
         }
 
@@ -83,7 +83,7 @@ namespace MainServerBioforce2D
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"\nError in BeginReadReceiveCallback of client {TCPClient.Client.RemoteEndPoint}...\nError: {exception}");
+                Output.WriteLine($"\nError in BeginReadReceiveCallback of client {TCPClient.Client.RemoteEndPoint}...\nError: {exception}");
                 Disconnect();
             }
         }

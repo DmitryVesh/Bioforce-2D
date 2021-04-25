@@ -40,7 +40,7 @@ public class NetworkManager : MonoBehaviour
             Instance = this;
         else if (Instance != this)
         {
-            Debug.Log($"NetworkManager instance already exists, destroying {gameObject.name}");
+            Output.WriteLine($"NetworkManager instance already exists, destroying {gameObject.name}");
             Destroy(gameObject);
         }
     }

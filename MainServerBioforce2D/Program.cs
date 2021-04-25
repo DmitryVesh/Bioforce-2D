@@ -3,6 +3,7 @@ using System.Threading;
 using Shared;
 using System.Linq;
 using System.IO;
+using MainServer;
 
 namespace MainServerBioforce2D
 {
@@ -24,12 +25,16 @@ namespace MainServerBioforce2D
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            if (args.Length == 2)
+            if (args.Length == 3)
             {
                 GameServerFileName = args[0];
                 bool isTestBuild = bool.Parse(args[1]);
+                string version = args[2];
+
+                Output.Init(version);
+
                 PortInUse = isTestBuild ? PortTesting : PortRelease;
-                InternetDiscoveryTCPServer.StartServer(PortInUse);
+                InternetDiscoveryTCPServer.StartServer(PortInUse, version);
 
                 Thread mainThread = new Thread(new ThreadStart(MainThread));
                 mainThread.Start();
@@ -74,7 +79,7 @@ namespace MainServerBioforce2D
 
         private static void MainThread()
         {
-            Console.WriteLine($"\nStarted main thread. Tick/second {Ticks}");
+            Output.WriteLine($"\nStarted main thread. Tick/second {Ticks}");
             DateTime TickTimer = DateTime.Now;
 
             while (IsRunning)

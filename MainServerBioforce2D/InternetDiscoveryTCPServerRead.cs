@@ -14,7 +14,7 @@ namespace MainServerBioforce2D
             foreach (Server server in InternetDiscoveryTCPServer.ServersAvailable)
                 InternetDiscoveryTCPServerSend.SendServerData(client, server);
             InternetDiscoveryTCPServer.ClientDictionary[client].ServersAlreadyGiven = new List<Server>(InternetDiscoveryTCPServer.ServersAvailable);
-            Console.WriteLine($"Read FirstAskForServers from client:{client}");
+            Output.WriteLine($"Read FirstAskForServers from client:{client}");
         }
         internal static void ReadAskForServerChanges(byte client, Packet packet)
         {
@@ -64,11 +64,11 @@ namespace MainServerBioforce2D
                 }
 
                 InternetDiscoveryTCPServer.ClientDictionary[client].ServersAlreadyGiven = new List<Server>(serversAvailable);
-                Console.WriteLine($"Read AskForServerChanges from client:{client}");
+                Output.WriteLine($"Read AskForServerChanges from client:{client}");
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"Error ReadAskForServerChanges from client: {client}...\n{exception}");
+                Output.WriteLine($"Error ReadAskForServerChanges from client: {client}...\n{exception}");
             }
 
         }
@@ -87,12 +87,12 @@ namespace MainServerBioforce2D
                 return;
             }
             
-            Console.WriteLine($"Read AddServer from client:{client} at ip {InternetDiscoveryTCPServer.ClientDictionary[client].TCPClient.Client.RemoteEndPoint}");
+            Output.WriteLine($"Read AddServer from client:{client} at ip {InternetDiscoveryTCPServer.ClientDictionary[client].TCPClient.Client.RemoteEndPoint}");
 
             int gameServerPort = InternetDiscoveryTCPServer.MakeGameServer(serverName, maxNumPlayers, mapName, currentNumPlayers, ping, timeOut: 30);
             if (gameServerPort == -1)
             {
-                Console.WriteLine(
+                Output.WriteLine(
                     $"\n==========================" +
                     $"\nNo more servers available!" +
                     $"\n==========================\n");
@@ -106,7 +106,7 @@ namespace MainServerBioforce2D
             string serverName = packet.ReadString();            
 
             InternetDiscoveryTCPServer.GameServerDict[serverName].Kill();
-            Console.WriteLine($"Read DeleteServer from client:{client}");
+            Output.WriteLine($"Read DeleteServer from client:{client}");
         }
         internal static void ReadJoinServerNamed(byte client, Packet packet)
         {
@@ -141,7 +141,7 @@ namespace MainServerBioforce2D
                 servers[serverCount] = serverAvailable;
             }
             InternetDiscoveryTCPServer.ServersAvailable = new List<Server>(servers);
-            Console.WriteLine($"Read ModifyServer from client:{client}");
+            Output.WriteLine($"Read ModifyServer from client:{client}");
         }
 
         private static bool ServerMatch(Server server, string serverName) =>

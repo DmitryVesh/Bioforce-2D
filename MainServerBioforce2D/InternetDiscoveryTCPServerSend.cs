@@ -33,11 +33,11 @@ namespace MainServerBioforce2D
 
                     SendPacket(client, packet);
                 }
-                Console.WriteLine($"Sent ServerData of: {server.ServerName} to client:{client}");
+                Output.WriteLine($"Sent ServerData of: {server.ServerName} to client:{client}");
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"Error sending server data to client: {client}\n{exception}");
+                Output.WriteLine($"Error sending server data to client: {client}\n{exception}");
             }
         }
 
@@ -48,7 +48,7 @@ namespace MainServerBioforce2D
                 packet.Write(server.ServerName);
                 SendPacket(client, packet);
             }
-            Console.WriteLine($"Sent ServerDeleted of: {server.ServerName} to client:{client}");
+            Output.WriteLine($"Sent ServerDeleted of: {server.ServerName} to client:{client}");
         }
 
         public static void SendModifedServer(byte client, Server server)
@@ -63,7 +63,7 @@ namespace MainServerBioforce2D
 
                 SendPacket(client, packet);
             }
-            Console.WriteLine($"Sent ModifiedServer of: {server.ServerName} to client:{client}");
+            Output.WriteLine($"Sent ModifiedServer of: {server.ServerName} to client:{client}");
         }
 
         internal static void SendCantJoinServerDeleted(byte client, string serverName)
@@ -74,7 +74,7 @@ namespace MainServerBioforce2D
 
                 SendPacket(client, packet);
             }
-            Console.WriteLine($"Sent CantJoinServerDeleted packet server: {serverName} to: {client}");
+            Output.WriteLine($"Sent CantJoinServerDeleted packet server: {serverName} to: {client}");
         }
 
         internal static void SendNoMoreServersAvailable(byte client)
@@ -83,7 +83,7 @@ namespace MainServerBioforce2D
             {
                 SendPacket(client, packet);
             }
-            Console.WriteLine($"Sent NoMoreServersAvailable packet to: {client}");
+            Output.WriteLine($"Sent NoMoreServersAvailable packet to: {client}");
         }
 
         internal static void SendJoinServer(byte client, int serverPort)

@@ -272,4 +272,18 @@ public class ClientRead : MonoBehaviour
         }
     }
 
+    internal static void ChatMessage(Packet packet)
+    {
+        try
+        {
+            string text = packet.ReadString();
+            byte playerID = packet.ReadByte();
+
+            InGameChat.Instance.AddInGameChatEntry(text, GameManager.PlayerDictionary[playerID].PlayerColor);
+        }
+        catch (Exception e)
+        {
+            Debug.Log($"Error in reading ChatMessage...\n{e}");
+        }
+    }
 }

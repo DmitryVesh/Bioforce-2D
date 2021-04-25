@@ -26,10 +26,13 @@ public class Crosshair : MonoBehaviour
         }
 
         Animator = GetComponent<Animator>();
-        GameManager.ShowMouse(false);
-
+        
         if (GameManager.Instance.IsMobileSupported)
             gameObject.SetActive(false);
+
+        GameManager.ShowMouse(false);
+
+        
     }
     private void Update()
     {

@@ -43,7 +43,7 @@ namespace MainServer
         private void TCPConnectAsyncCallback(IAsyncResult ar)
         {
             TcpClient client = InitialSocketListener.EndAcceptTcpClient(ar);
-            Console.WriteLine($"\nGameServer: {client.Client.RemoteEndPoint} is trying to connect to GameServerComms...");
+            Output.WriteLine($"\nGameServer: {client.Client.RemoteEndPoint} is trying to connect to GameServerComms...");
             Connect(client);
             SendWelcome();
         }
@@ -52,7 +52,7 @@ namespace MainServer
 
         private void ReadWelcomeReceived(string serverName, Packet packet) 
         {
-            Console.WriteLine($"\nMainServer has Read WelcomeReceived packet from GameServer: {serverName}");
+            Output.WriteLine($"\nMainServer has Read WelcomeReceived packet from GameServer: {serverName}");
         }
         private void ReadServerData(string serverName, Packet packet)
         {
@@ -73,9 +73,9 @@ namespace MainServer
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"\nError ReadServerData of GameServer: {serverName}\n{exception}");
+                Output.WriteLine($"\nError ReadServerData of GameServer: {serverName}\n{exception}");
             }
-            //Console.WriteLine($"\nRead ServerData from GameServer: {serverName}");
+            //Output.WriteLine($"\nRead ServerData from GameServer: {serverName}");
         }
         private void ReadShuttingDown(string serverName, Packet packet)
         {
@@ -84,7 +84,7 @@ namespace MainServer
                 InternetDiscoveryTCPServer.GameServerDict[serverName].Kill();
                 InternetDiscoveryTCPServer.GameServerDict.Remove(serverName);
                 GameServerConnection.Remove(serverName);
-                Console.WriteLine($"\nMainServer Killed GameServer: {serverName}");
+                Output.WriteLine($"\nMainServer Killed GameServer: {serverName}");
             }
         }
 
@@ -99,7 +99,7 @@ namespace MainServer
             {
                 SendPacket(packet);
             }
-            Console.WriteLine($"\nMainServer sent Welcome packet to GameServer: {ServerName}");
+            Output.WriteLine($"\nMainServer sent Welcome packet to GameServer: {ServerName}");
         }
 
         #endregion
@@ -147,7 +147,7 @@ namespace MainServer
             catch (Exception exception)
             {
                 //Disconnect();
-                Console.WriteLine($"\n\t\tError, occured when sending TCP data from MainServer to GameServer: {ServerName}\n{exception}");
+                Output.WriteLine($"\n\t\tError, occured when sending TCP data from MainServer to GameServer: {ServerName}\n{exception}");
             }
         }
 
@@ -175,7 +175,7 @@ namespace MainServer
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"\n\t\tError in BeginReadReceiveCallback of GameServerComms {ServerName}...\nError: {exception}");
+                Output.WriteLine($"\n\t\tError in BeginReadReceiveCallback of GameServerComms {ServerName}...\nError: {exception}");
                 Disconnect();
             }
         }
