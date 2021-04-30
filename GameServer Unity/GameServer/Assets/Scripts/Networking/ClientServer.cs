@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Drawing;
 using System.Net;
 using System.Net.Sockets;
 using Shared;
 using UnityEngine;
+using UnityEngine.Output;
 
 namespace GameServer
 {
@@ -213,7 +213,7 @@ namespace GameServer
         public void SendIntoGame(int playerColor)
         {
             Player.ReadyToPlay = true;
-            Player.SetPlayerData(SpawningVector2, playerColor);
+            Player.SetFinalPlayerData(SpawningVector2, playerColor);
 
             //Spawning the player who just joined, for all connected users
             foreach (ClientServer client in Server.ClientDictionary.Values)

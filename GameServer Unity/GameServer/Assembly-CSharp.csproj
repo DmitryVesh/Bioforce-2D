@@ -56,33 +56,35 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio Tools for Unity\16.0\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Startup\ApplicationSetup.cs" />
-    <Compile Include="Assets\Scripts\Testing\FrameRateTesting.cs" />
-    <Compile Include="Assets\Scripts\Networking\ServerSend.cs" />
-    <Compile Include="Assets\Scripts\Networking\Server.cs" />
-    <Compile Include="Assets\Scripts\Networking\ServerRead.cs" />
-    <Compile Include="Assets\Scripts\Networking\PlayerServer.cs" />
-    <Compile Include="Assets\Scripts\Networking\DiscoveryServer.cs" />
-    <Compile Include="Assets\Scripts\Networking\DiscoveryTCPClientServer.cs" />
-    <Compile Include="Assets\Scripts\Networking\ServerProgram.cs" />
-    <Compile Include="Assets\Scripts\Networking\MainServerCommsSend.cs" />
-    <Compile Include="Assets\Scripts\Networking\ClientServer.cs" />
-    <Compile Include="Assets\Scripts\Networking\MainServerComms.cs" />
+    <Compile Include="Assets\Items\Scripts\PickUpItem.cs" />
     <Compile Include="Assets\Scripts\Networking\MainServerCommsRead.cs" />
     <Compile Include="Assets\Scripts\Networking\PlayerColor.cs" />
-    <Compile Include="Assets\Scripts\Networking\Shared\ThreadManager.cs" />
+    <Compile Include="Assets\Scripts\Networking\ServerSend.cs" />
+    <Compile Include="Assets\Scripts\Networking\Server.cs" />
     <Compile Include="Assets\Scripts\Networking\Shared\Packet.cs" />
-    <Compile Include="Assets\Scripts\Networking\Shared\Output.cs" />
     <Compile Include="Assets\Scripts\Networking\NetworkManager.cs" />
     <Compile Include="Assets\Scripts\DontDestroy.cs" />
-    <Compile Include="Assets\Items\Scripts\MedkitPickup.cs" />
-    <Compile Include="Assets\Items\Scripts\HealthPickup.cs" />
-    <Compile Include="Assets\Items\Scripts\PickUpItem.cs" />
-    <Compile Include="Assets\Items\Scripts\BandagePickup.cs" />
-    <Compile Include="Assets\Items\Scripts\PickupItemsManager.cs" />
+    <Compile Include="Assets\Scripts\Testing\FrameRateTesting.cs" />
     <Compile Include="Assets\Items\Scripts\AdrenalinePickup.cs" />
+    <Compile Include="Assets\Scripts\Networking\DiscoveryTCPClientServer.cs" />
+    <Compile Include="Assets\Scripts\Networking\ServerProgram.cs" />
+    <Compile Include="Assets\Scripts\Startup\ApplicationSetup.cs" />
+    <Compile Include="Assets\GameTime\Scripts\GameStateManager.cs" />
+    <Compile Include="Assets\Items\Scripts\BandagePickup.cs" />
+    <Compile Include="Assets\Scripts\Networking\MainServerCommsSend.cs" />
+    <Compile Include="Assets\Scripts\Networking\ClientServer.cs" />
+    <Compile Include="Assets\Items\Scripts\MedkitPickup.cs" />
+    <Compile Include="Assets\Scripts\Networking\DiscoveryServer.cs" />
+    <Compile Include="Assets\Scripts\Networking\PlayerServer.cs" />
+    <Compile Include="Assets\Scripts\Networking\ServerRead.cs" />
+    <Compile Include="Assets\Scripts\Networking\Shared\ThreadManager.cs" />
+    <Compile Include="Assets\Items\Scripts\PickupItemsManager.cs" />
+    <Compile Include="Assets\Items\Scripts\HealthPickup.cs" />
+    <Compile Include="Assets\Scripts\Networking\MainServerComms.cs" />
   </ItemGroup>
   <ItemGroup>
+     <None Include="Assets\OwnLibs\SingletonLib.dll" />
+     <None Include="Assets\OwnLibs\UnityOutputLib.dll" />
     <Reference Include="UnityEngine">
       <HintPath>C:\Unity\2020.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>
@@ -301,6 +303,12 @@
     </Reference>
     <Reference Include="UnityEditor.UnityConnectModule">
       <HintPath>C:\Unity\2020.3.0f1\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
+    </Reference>
+    <Reference Include="SingletonLib">
+      <HintPath>Assets\OwnLibs\SingletonLib.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityOutputLib">
+      <HintPath>Assets\OwnLibs\UnityOutputLib.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>C:\Unity\2020.3.0f1\Editor\Data\NetStandard\ref\2.0.0\netstandard.dll</HintPath>
@@ -671,6 +679,9 @@
     <Reference Include="Unity.VisualStudio.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VisualStudio.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Sysroot.Linux_x86_64">
+      <HintPath>Library\ScriptAssemblies\Unity.Sysroot.Linux_x86_64.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Timeline">
       <HintPath>Library\ScriptAssemblies\Unity.Timeline.dll</HintPath>
     </Reference>
@@ -716,6 +727,9 @@
     <Reference Include="Unity.2D.PixelPerfect.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.2D.PixelPerfect.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Toolchain.Win-x86_64-Linux-x86_64">
+      <HintPath>Library\ScriptAssemblies\Unity.Toolchain.Win-x86_64-Linux-x86_64.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
     </Reference>
@@ -733,12 +747,6 @@
     </Reference>
     <Reference Include="Unity.2D.SpriteShape.Runtime">
       <HintPath>Library\ScriptAssemblies\Unity.2D.SpriteShape.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Sysroot.Linux_x86_64">
-      <HintPath>Library\ScriptAssemblies\Unity.Sysroot.Linux_x86_64.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Toolchain.Win-x86_64-Linux-x86_64">
-      <HintPath>Library\ScriptAssemblies\Unity.Toolchain.Win-x86_64-Linux-x86_64.dll</HintPath>
     </Reference>
     <Reference Include="Unity.SysrootPackage.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.SysrootPackage.Editor.dll</HintPath>

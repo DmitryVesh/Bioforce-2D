@@ -1,14 +1,12 @@
 ﻿using Shared;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
+using UnityEngine.Output;
 
 namespace GameServer
 {
     class MainServerCommsRead
     {
-        public static void Welcome(Packet packet)
+        public static void Welcome(Packet _)
         {
             Output.WriteLine("\n\t\tGameServer reading welcome packet from MainServer");
             MainServerComms.EstablishedConnection = true;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
-using System.Timers;
 using UnityEngine;
+using UnityEngine.Output;
 
 namespace GameServer
 {
@@ -64,7 +64,7 @@ namespace GameServer
             IsFacingRight = true;            
             CurrentHealth = MaxHealth;            
         }
-        public void SetPlayerData(Vector2 position, int playerColor)
+        public void SetFinalPlayerData(Vector2 position, int playerColor)
         {
             transform.position = position;
             LastPositionValidation = position;

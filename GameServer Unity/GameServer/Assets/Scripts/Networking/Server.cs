@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using Shared;
 using UnityEngine;
+using UnityEngine.Output;
 
 namespace GameServer
 {
@@ -77,14 +78,14 @@ namespace GameServer
                     $"\n\t\tMap:          {MapName}" +
                     $"\n\t\tMax Players:  {MaxNumPlayers}" +
                     $"\n\t\tPort number:  {PortNum}");
-                
+
                 //PlayerColor.GetRandomColor();
             }
             catch (Exception exception)
             {
                 Output.WriteLine($"\tError in making the Server: {ServerName}...\n{exception}");
                 Application.Quit(1);
-                CloseServer();
+                //CloseServer(); TODO: May cause damage commenting it, but I think there is already an OnApplicationQuiting event that calls CloseServer
             }
         }
 

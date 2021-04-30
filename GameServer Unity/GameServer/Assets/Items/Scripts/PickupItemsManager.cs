@@ -2,10 +2,12 @@ using GameServer;
 using System.Collections.Generic;
 using System.Timers;
 using UnityEngine;
+using UnityEngine.Output;
+using UnityEngine.Singleton;
 
 public class PickupItemsManager : MonoBehaviour
 {
-    public static PickupItemsManager Instance { get; private set; }
+    public static PickupItemsManager Instance;// { get; private set; }
 
     
     [SerializeField] private GameObject Bandage;
@@ -25,7 +27,7 @@ public class PickupItemsManager : MonoBehaviour
 
     private void Start()
     {
-        NetworkManager.Instance.OnServerActivated += StartSpawningItems;
+        GameStateManager.Instance.OnServerActivated += StartSpawningItems;
 
         Transform pickupHolder = new GameObject("PickupHolder").transform;
         pickupHolder.position = Vector3.zero;
@@ -43,24 +45,16 @@ public class PickupItemsManager : MonoBehaviour
     }
 
     private void Awake()
-    {        
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Output.WriteLine($"PickupItemsManager instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+    {
+        Singleton.Init(ref Instance, this);
         
     }
     private void OnDestroy()
     {
-        NetworkManager.Instance.OnServerActivated -= StartSpawningItems;
+        GameStateManager.Instance.OnServerActivated -= StartSpawningItems;
     }
 
-    private void StartSpawningItems(float remainingGameTime)
+    private void StartSpawningItems(float _)
     {
         SpawnPickupsTimer = new Timer(TimeInBetweenPickupSpawnsMS);
         SpawnPickupsTimer.Elapsed += GeneratePickup;
@@ -107,10 +101,10 @@ public class PickupItemsManager : MonoBehaviour
         PickupItem pickup;
         if (!PickupsDictionary.TryGetValue(pickupID, out pickup))
         {
-            Output.WriteLine("" +
-                "\n\t===================================================================" +
-                "\n\tPickup that doesn't exist in dictionary on GameServer was picked up" +
-                "\n\t===================================================================");
+            //Output.WriteLine("" +
+            //    "\n\t===================================================================" +
+            //    "\n\tPickup that doesn't exist in dictionary on GameServer was picked up" +
+            //    "\n\t===================================================================");
             return null;
         }
 

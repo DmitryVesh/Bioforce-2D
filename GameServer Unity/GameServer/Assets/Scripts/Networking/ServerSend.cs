@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.Output;
 
 namespace GameServer
 {
@@ -37,9 +38,10 @@ namespace GameServer
             }
         }
 
-        // 138B (byte 1B packetLen + byte 1B packetID + byte 1B numPlayers + xint xMax=16 16*4B = 64B playerColors 
+        // max 143B (byte 1B packetLen + byte 1B packetID + byte 1B numPlayers + xint xMax=16 16*4B = 64B playerColors 
         //          + byte 1B numPickups + ypickups yMax=10 10*7B = 70B pickups
-        internal static void AskPlayerDetails(byte clientID, List<int> PlayerColors)
+        //          + byte 1B CurrentGameState + float 4B RemainingGameTIme
+        internal static void AskPlayerDetails(byte clientID, List<int> PlayerColors, GameState CurrentGameState, float RemainingGameTime)
         {
             using (Packet packet = new Packet((byte)ServerPackets.askPlayerDetails))
             {
@@ -51,6 +53,9 @@ namespace GameServer
                 packet.Write((byte)PickupItemsManager.Instance.PickupsDictionary.Count);
                 foreach (PickupItem pickup in PickupItemsManager.Instance.PickupsDictionary.Values)
                     WritePickupData(pickup, packet);
+
+                packet.Write((byte)CurrentGameState);
+                packet.Write(RemainingGameTime);
 
                 SendTCPPacket(clientID, packet);
             }

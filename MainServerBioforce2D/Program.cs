@@ -34,14 +34,14 @@ namespace MainServerBioforce2D
                 Output.Init(version);
 
                 PortInUse = isTestBuild ? PortTesting : PortRelease;
-                InternetDiscoveryTCPServer.StartServer(PortInUse, version);
+                //InternetDiscoveryTCPServer.StartServer(PortInUse, version);
 
                 Thread mainThread = new Thread(new ThreadStart(MainThread));
                 mainThread.Start();
             }
             else
             {
-                throw new Exception("Not entered the Proper args... Need to Enter GameServer file name to start in MainServer args...");
+                throw new Exception("Not entered the Proper args... Need to Enter \"GameServer file name\", isTesting either \"true\" or \"false\", \"version number\" to start in MainServer args...");
             }
         }
 
@@ -80,20 +80,26 @@ namespace MainServerBioforce2D
         private static void MainThread()
         {
             Output.WriteLine($"\nStarted main thread. Tick/second {Ticks}");
-            DateTime TickTimer = DateTime.Now;
+            //DateTime TickTimer = DateTime.Now;
 
             while (IsRunning)
             {
-                while (TickTimer < DateTime.Now)
-                {
-                    ThreadManager.UpdateMain();
-                    TickTimer = TickTimer.AddMilliseconds(MillisecondsInTick);
+                ThreadManager.UpdateMain();
+                Thread.Sleep(MillisecondsInTick);
 
-                    if (TickTimer > DateTime.Now)
-                    {
-                        Thread.Sleep(TickTimer - DateTime.Now);
-                    }
-                }
+                //while (TickTimer < DateTime.Now)
+                //{
+                //    ThreadManager.UpdateMain();
+                //    TickTimer = TickTimer.AddMilliseconds(MillisecondsInTick);
+
+                //    if (TickTimer > DateTime.Now)
+                //    {
+                //        //TimeSpan timespanToWait = TickTimer - DateTime.Now;
+                //        //int ms = (int)timespanToWait.TotalMilliseconds;
+                //        //if (ms)
+                //        Thread.Sleep(TickTimer - DateTime.Now);
+                //    }
+                //}
             }
         }
     }

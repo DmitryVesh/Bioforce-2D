@@ -1,6 +1,7 @@
 ﻿using Shared;
 using System;
 using UnityEngine;
+using UnityEngine.Output;
 
 namespace GameServer
 {
@@ -14,7 +15,8 @@ namespace GameServer
             Output.WriteLine($"\t{Server.ClientDictionary[clientID].tCP.Socket.Client.RemoteEndPoint} connected as player: \"{username}\" : {clientID}");
             if (clientID == checkClientID)
             {
-                ServerSend.AskPlayerDetails(clientID, PlayerColor.UnAvailablePlayerColors());
+                ServerSend.AskPlayerDetails(clientID, PlayerColor.UnAvailablePlayerColors(), 
+                    GameStateManager.Instance.CurrentState, GameStateManager.Instance.RemainingGameTime);
                 Server.ClientDictionary[clientID].SetPlayer(username);
                 Server.ClientDictionary[clientID].SpawnOtherPlayersToConnectedUser();
                 return;
@@ -55,8 +57,9 @@ namespace GameServer
             try
             {
                 int colorIndex = packet.ReadInt();
+                GameStateManager.Instance.PlayerJoinedServer();
                 Server.ClientDictionary[clientID].SendIntoGame(colorIndex);
-                NetworkManager.Instance.PlayerJoinedServer();
+                
                 Output.WriteLine($"\tPlayer: {clientID} was sent into game.");
             }
             catch (Exception exception)

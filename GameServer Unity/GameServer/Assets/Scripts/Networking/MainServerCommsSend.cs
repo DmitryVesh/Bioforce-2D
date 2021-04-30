@@ -1,5 +1,6 @@
 ﻿using Shared;
 using System;
+using UnityEngine.Output;
 
 namespace GameServer
 {
@@ -32,7 +33,6 @@ namespace GameServer
                 packet.Write(mapName);
                 SendTCPPacket(packet);
             }
-            //Output.WriteLine($"\n\t\tGameServer: {serverName} sent ServerData packet to MainServer.");
         }
 
         internal static void ShuttingDown(string serverName)

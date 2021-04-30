@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
-using Shared;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Output;
 
 namespace GameServer
 {
@@ -16,7 +15,9 @@ namespace GameServer
 
         private void Start()
         {
-            string[] args = Environment.GetCommandLineArgs().Skip(2).ToArray();
+            //Skip the fileName of this executable, and the "GameServer" string given to easily identify which processes in linux are MainServer/GameServer
+            string[] args = Environment.GetCommandLineArgs().Skip(2).ToArray(); 
+
             StartServerProgram(args);
         }
 
@@ -42,7 +43,7 @@ namespace GameServer
 
             try
             {
-                Output.Instance.Init(serverName);
+                Output.InitLogFile($"GameServer_{serverName}");
                 SceneManager.LoadScene(mapName);
                 MainServerComms.Connect(portMainServer, serverName, timeOut);
                 Server.StartServer(serverName, maxNumPlayers, mapName, portGame);
