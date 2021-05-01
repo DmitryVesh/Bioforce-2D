@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Output;
+using UnityEngine.Singleton;
 
 public class ServerMenu : MonoBehaviour
 {
-    public static ServerMenu Instance;
+    public static ServerMenu Instance { get => instance; }
+    private static ServerMenu instance;
+
     public ServerEntry ServerEntryConnectTo { get; private set; } = null;
     public bool AskingForServers { get; set; }
 
@@ -40,7 +42,7 @@ public class ServerMenu : MonoBehaviour
     {
         string message = packet.ReadString();
         string gameVersionLatest = packet.ReadString();
-        Debug.Log($"Connection with MainServer established.\nMessage from MainServer: {message}" +
+        Output.WriteLine($"Connection with MainServer established.\nMessage from MainServer: {message}" +
             $"\nLatest GameVersion: {gameVersionLatest}");
 
         if (!VersionCompatibility.Instance.DoGameVersionsMatch(gameVersionLatest))
@@ -103,7 +105,7 @@ public class ServerMenu : MonoBehaviour
         
         string serverIP = packet.ReadString();
         int serverPort = packet.ReadInt();
-        Debug.Log($"Read JoinServer Packet, Server: {serverIP}:{serverPort}");
+        Output.WriteLine($"Read JoinServer Packet, Server: {serverIP}:{serverPort}");
 
         Client.Instance.ConnectToServer(serverIP, serverPort);
     }
@@ -209,13 +211,8 @@ public class ServerMenu : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-            Instance = this;
-        else if (Instance != this)
-        {
-            Debug.Log($"ServerMenu instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
+
         ServerMenuPanel = transform.GetChild(0).gameObject;
         PlayerRegistrationPanel = transform.GetChild(1).gameObject;
 

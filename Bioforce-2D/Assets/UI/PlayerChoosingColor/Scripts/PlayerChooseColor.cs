@@ -1,14 +1,12 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
 using UnityEngine;
+using UnityEngine.Singleton;
 using UnityEngine.UI;
 
 public class PlayerChooseColor : MonoBehaviour
 {
-    public static PlayerChooseColor Instance { get; private set; }
+    public static PlayerChooseColor Instance { get => instance; }
+    private static PlayerChooseColor instance;
 
     [SerializeField] private GameObject Panel;
 
@@ -99,15 +97,7 @@ public class PlayerChooseColor : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Debug.Log($"PlayerChooseColor instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
     }
 
     

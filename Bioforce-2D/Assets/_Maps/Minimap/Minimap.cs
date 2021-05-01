@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Output;
 using UnityEngine.Rendering;
+using UnityEngine.Singleton;
 
 public enum CornderIndex
 {
@@ -15,7 +17,9 @@ public class Minimap : MonoBehaviour
 {
     [SerializeField] private Camera MinimapCamera;
 
-    public static Minimap Instance { get; private set; }
+    public static Minimap Instance { get => instance; }
+    private static Minimap instance;
+
     private List<MinimapIcon> Icons { get; set; } = new List<MinimapIcon>();
     [SerializeField] private RectTransform MinimapRectTF;
     private Rect MinimapRect { get; set; }
@@ -53,15 +57,7 @@ public class Minimap : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Debug.Log($"GameManager instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
 
         MinimapRect = MinimapRectTF.rect;        
 

@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.Output;
+using UnityEngine.Singleton;
 using UnityEngine.UI;
 
 public class KillFeedUI : UIEntryManager
 {
-    public static KillFeedUI Instance { get; private set; }
+    public static KillFeedUI Instance { get => instance; }
+    private static KillFeedUI instance;
 
     [SerializeField] private Color BorderColor = new Color(212, 0, 0);
     [SerializeField] private Color NormalFillColor = new Color(0, 0, 0);
@@ -58,13 +61,7 @@ public class KillFeedUI : UIEntryManager
 
     protected override void Awake()
     {
-        if (Instance == null)
-            Instance = this;
-        else if (Instance != this)
-        {
-            Debug.Log($"KillFeedUI instance already exists, destorying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
         base.Awake();
     }
 

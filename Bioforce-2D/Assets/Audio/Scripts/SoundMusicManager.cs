@@ -4,10 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.Output;
+using UnityEngine.Singleton;
 
 public class SoundMusicManager : MonoBehaviour
 {
-    public static SoundMusicManager Instance { get; set; }
+    public static SoundMusicManager Instance { get => instance; }
+    private static SoundMusicManager instance;
+
     private Transform AudioListenerTF { get; set; }
 
     private AudioSource MusicAudioSource { get; set; }
@@ -63,13 +67,7 @@ public class SoundMusicManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-            Instance = this;
-        else if (Instance != this)
-        {
-            Debug.Log($"SoundMusicManager instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
 
         MusicAudioSource = GetComponent<AudioSource>();
         AudioListenerTF = Camera.main.transform;

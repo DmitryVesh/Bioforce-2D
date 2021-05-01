@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices.ComTypes;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Output;
+using UnityEngine.Singleton;
 
 public class RespawnPoint : MonoBehaviour
 {
-    public static RespawnPoint Instance { get; set; }
+    public static RespawnPoint Instance { get => instance; }
+    private static RespawnPoint instance;
+
     public Vector3 LastRespawnPoint;
     public Vector3 LastDiePosition;
 
@@ -25,15 +29,7 @@ public class RespawnPoint : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Debug.Log($"RespawnPoint instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
 
         int numPoints = transform.childCount;
         Points = new Vector3[numPoints];

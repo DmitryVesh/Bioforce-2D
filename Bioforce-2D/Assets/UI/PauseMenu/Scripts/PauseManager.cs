@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
+using UnityEngine.Singleton;
 
 public class PauseManager : MonoBehaviour
 {
-    public static PauseManager Instance { get; set; }
+    public static PauseManager Instance { get => instance; }
+    private static PauseManager instance;
+
     public bool Paused { get; set; }
 
 
@@ -91,13 +91,7 @@ public class PauseManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-            Instance = this;
-        else if (Instance != this)
-        {
-            Debug.Log($"PauseMenu instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
 
         SetNormalPauseActive(false);
         MobileSettingsButton.SetActive(GameManager.Instance.IsMobileSupported);

@@ -4,10 +4,14 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
+using UnityEngine.Output;
+using UnityEngine.Singleton;
 
 public class Client : MonoBehaviour
 {
-    public static Client Instance;
+    public static Client Instance { get => instance; }
+    private static Client instance;
+
     public static int DataBufferSize = 4096;
 
     public const int PortNumInternetDiscover = 28020;
@@ -79,7 +83,7 @@ public class Client : MonoBehaviour
     public void ConnectToServer(string ip, int port)
     {
         PortNumGame = port;
-        Debug.Log($"Client going to try and connect to: {ip}:{port}");
+        Output.WriteLine($"Client going to try and connect to: {ip}:{port}");
         InitClientData();
 
         tCP = new TCP();
@@ -105,11 +109,11 @@ public class Client : MonoBehaviour
             }
             catch (Exception exception)
             {
-                Debug.Log($"Error, tried to close TCP and UDP sockets:\n{exception}");
+                Output.WriteLine($"Error, tried to close TCP and UDP sockets:\n{exception}");
             }
             Connected = false;
 
-            Debug.Log($"You, client: {ClientID} have been disconnected.");
+            Output.WriteLine($"You, client: {ClientID} have been disconnected.");
 
             GameManager.Instance.DisconnectLoadMainMenu();
         }
@@ -152,7 +156,7 @@ public class Client : MonoBehaviour
             }
             catch (Exception exception)
             {
-                Debug.Log($"Error, sending data to server from Client: {Instance.ClientID} via TCP.\nException {exception}");
+                Output.WriteLine($"Error, sending data to server from Client: {Instance.ClientID} via TCP.\nException {exception}");
             }
         }
 
@@ -169,7 +173,7 @@ public class Client : MonoBehaviour
             }
             catch (Exception exception)
             {
-                Debug.Log($"Error in TCP ConnectCallback\n{exception}");
+                Output.WriteLine($"Error in TCP ConnectCallback\n{exception}");
             }
         }
 
@@ -192,7 +196,7 @@ public class Client : MonoBehaviour
             }
             catch (Exception exception)
             {
-                Debug.Log($"\nError in BeginReadReceiveCallback...\nError: {exception}");
+                Output.WriteLine($"\nError in BeginReadReceiveCallback...\nError: {exception}");
                 Disconnect();
             }
         }
@@ -220,11 +224,11 @@ public class Client : MonoBehaviour
                     }
                     catch (KeyNotFoundException exception)
                     {
-                        Debug.Log($"Error in Handle data of TCP Packet {packetID} ...\n{exception}");
+                        Output.WriteLine($"Error in Handle data of TCP Packet {packetID} ...\n{exception}");
                     }
                     catch (Exception exception)
                     {
-                        Debug.LogWarning($"Error in Handle data of not know TCP Packet...\n{exception}");
+                        Output.WriteLine($"Error in Handle data of not know TCP Packet...\n{exception}");
                     }
                 });
                 packetLen = 0;
@@ -292,7 +296,7 @@ public class Client : MonoBehaviour
             }
             catch (Exception exception)
             {
-                Debug.Log($"Error, sending data to server from Client: {Instance.ClientID} via UDP.\nException {exception}");
+                Output.WriteLine($"Error, sending data to server from Client: {Instance.ClientID} via UDP.\nException {exception}");
                 Disconnect();
             }
         }
@@ -313,7 +317,7 @@ public class Client : MonoBehaviour
             }
             catch (Exception exception)
             {
-                Debug.Log($"Player {Instance.ClientID} Can't access the server via UDP.\nDisconnecting from server.\n{exception}");
+                Output.WriteLine($"Player {Instance.ClientID} Can't access the server via UDP.\nDisconnecting from server.\n{exception}");
                 Disconnect();
             }
         }
@@ -348,13 +352,7 @@ public class Client : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-            Instance = this;
-        else if (Instance != this)
-        {
-            Debug.Log($"Client instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
     }
     private void FixedUpdate()
     {
@@ -387,7 +385,7 @@ public class Client : MonoBehaviour
             if (PacketTimeOutTCP - now < TimeSpanZero)
             {
                 //TODO: add message when disconnected because of a time out
-                Debug.LogError("Lost connection with GameServer");
+                Output.WriteLine("Lost connection with GameServer");
                 Disconnect();
                 return;
             }

@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Output;
+using UnityEngine.Singleton;
 
 public enum MainMenuSFXs
 {
@@ -12,7 +14,8 @@ public enum MainMenuSFXs
 [RequireComponent(typeof(AudioSource))]
 public class MainMenu : MonoBehaviour
 {
-    public static MainMenu Instance { get; set; }
+    public static MainMenu Instance { get => instance; }
+    private static MainMenu instance;
 
     [SerializeField] private List<MenuButton> MenuButtons;
     private int CurrentSelectedButtonIndex { get; set; }
@@ -74,13 +77,7 @@ public class MainMenu : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-            Instance = this;
-        else if (Instance != this)
-        {
-            Debug.Log($"MainMenu instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
         MainMenuPanel = transform.GetChild(0).gameObject;
     }
     private void Start()

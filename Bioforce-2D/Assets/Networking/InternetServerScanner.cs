@@ -2,10 +2,14 @@
 using System.Collections;
 using System.Timers;
 using UnityEngine;
+using UnityEngine.Output;
+using UnityEngine.Singleton;
 
 public class InternetServerScanner : MonoBehaviour
 {
-    public static InternetServerScanner Instance { get; set; }
+    public static InternetServerScanner Instance { get => instance; }
+    private static InternetServerScanner instance;
+
     private InternetDiscoveryClient MainServerSocket { get; set; }
 
     private const double ReAskTimerMax = 5000d;
@@ -37,7 +41,7 @@ public class InternetServerScanner : MonoBehaviour
         }
         catch (Exception exception)
         {
-            Debug.Log($"Error contacting MainServer to add own server.\n{exception}");
+            Output.WriteLine($"Error contacting MainServer to add own server.\n{exception}");
             return false;
         }
     }
@@ -57,7 +61,7 @@ public class InternetServerScanner : MonoBehaviour
         
         catch (Exception exception)
         {
-            Debug.Log($"Error in contacting MainServer...\n{exception}");
+            Output.WriteLine($"Error in contacting MainServer...\n{exception}");
             Instance.MainServerSocket.Disconnect(false, true);
         }
     }
@@ -78,7 +82,7 @@ public class InternetServerScanner : MonoBehaviour
             packet.Write((byte)InternetDiscoveryClientPackets.firstAskForServers);
             Instance.MainServerSocket.SendPacket(packet);
         }
-        Debug.Log("Sent FirstAskForServers Packet to MainServer");
+        Output.WriteLine("Sent FirstAskForServers Packet to MainServer");
 
         //4.
         Instance.AutoReAskTimer = new Timer(ReAskTimerMax);
@@ -90,7 +94,7 @@ public class InternetServerScanner : MonoBehaviour
     internal IEnumerator SendAddServerPacket(string serverName, int maxNumPlayers, string mapName)
     {
         yield return new WaitForSeconds(0.5f);
-        Debug.Log($"Sent Add Server Packet: {serverName}");
+        Output.WriteLine($"Sent Add Server Packet: {serverName}");
         using (Packet packet = new Packet())
         {
             packet.Write((byte)InternetDiscoveryClientPackets.addServer);
@@ -144,7 +148,7 @@ public class InternetServerScanner : MonoBehaviour
         }
         catch (Exception exception)
         {
-            Debug.Log($"Error SendJoinServerPacket to server: {serverName}...\n{exception}");
+            Output.WriteLine($"Error SendJoinServerPacket to server: {serverName}...\n{exception}");
         }
     }
     private static void AutoReAskTimer_Elapsed(object sender, ElapsedEventArgs e) =>
@@ -173,13 +177,7 @@ public class InternetServerScanner : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-            Instance = this;
-        else if (Instance != this)
-        {
-            Debug.Log($"InternetSeverScanner instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
     }
 
     private void OnDestroy()

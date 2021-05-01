@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using UnityEngine.Output;
 
 public class CreateServer : MonoBehaviour
 {
@@ -129,7 +130,7 @@ public class CreateServer : MonoBehaviour
 
         if (!successStart)
         {
-            Debug.Log($"Error, {(InternetServerSelected ? "Internet" : "LAN" )} server not started...");
+            Output.WriteLine($"Error, {(InternetServerSelected ? "Internet" : "LAN" )} server not started...");
             return;
         }
     }

@@ -3,10 +3,13 @@ using TMPro;
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.Output;
+using UnityEngine.Singleton;
 
 public class InGameChat : UIEntryManager
 {
-    public static InGameChat Instance { get; private set; }
+    public static InGameChat Instance { get => instance; }
+    private static InGameChat instance;
 
     [SerializeField] private byte NumMaxCharsInLine = 32;
     private bool ClickedOdd { get; set; } = false;
@@ -123,13 +126,7 @@ public class InGameChat : UIEntryManager
     
     protected override void Awake()
     {
-        if (Instance == null)
-            Instance = this;
-        else if (Instance != this)
-        {
-            Debug.Log($"InGameChat instance already exists, destorying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
         base.Awake();
 
         //Clear the log of existing text and hide it

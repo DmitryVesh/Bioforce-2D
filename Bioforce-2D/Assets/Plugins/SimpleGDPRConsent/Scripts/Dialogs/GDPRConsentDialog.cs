@@ -1,6 +1,7 @@
 ﻿using SimpleGDPRConsent;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Output;
 
 public class GDPRConsentDialog : IGDPRDialog
 {
@@ -43,7 +44,7 @@ public class GDPRConsentDialog : IGDPRDialog
 	{
 		if( string.IsNullOrEmpty( identifier ) )
 		{
-			Debug.LogError( "Error: 'GDPR.identifier' was empty!" );
+			Output.WriteLine( "Error: 'GDPR.identifier' was empty!" );
 			return this;
 		}
 
@@ -54,7 +55,7 @@ public class GDPRConsentDialog : IGDPRDialog
 	{
 		if( onButtonClicked == null )
 		{
-			Debug.LogError( "Error: 'GDPR.onButtonClicked' was empty!" );
+			Output.WriteLine( "Error: 'GDPR.onButtonClicked' was empty!" );
 			return this;
 		}
 
@@ -65,7 +66,7 @@ public class GDPRConsentDialog : IGDPRDialog
 	{
 		if( string.IsNullOrEmpty( link ) )
 		{
-			Debug.LogError( "Error: 'GDPR.link' was empty!" );
+			Output.WriteLine( "Error: 'GDPR.link' was empty!" );
 			return this;
 		}
 
@@ -82,7 +83,7 @@ public class GDPRConsentDialog : IGDPRDialog
 	{
 		if( links == null || links.Length == 0 )
 		{
-			Debug.LogError( "Error: 'GDPR.links' was empty!" );
+			Output.WriteLine( "Error: 'GDPR.links' was empty!" );
 			return this;
 		}
 

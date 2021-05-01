@@ -1,10 +1,13 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Output;
+using UnityEngine.Singleton;
 
 public class VersionCompatibility : MonoBehaviour
 {
-    public static VersionCompatibility Instance { get; private set; }
+    public static VersionCompatibility Instance { get => instance; }
+    private static VersionCompatibility instance;
+
     [SerializeField] private GameObject Panel;
     private string GameVersionCurrent { get; set; }
     private string GameVersionLatest { get; set; }
@@ -15,7 +18,7 @@ public class VersionCompatibility : MonoBehaviour
     {
         GameVersionLatest = gameVersionLatest;
 
-        Debug.Log($"Latest Version available: {GameVersionLatest}" +
+        Output.WriteLine($"Latest Version available: {GameVersionLatest}" +
             $"\nCurrent Version Installed: {GameVersionCurrent}");
 
         return GameVersionCurrent == gameVersionLatest;
@@ -29,13 +32,7 @@ public class VersionCompatibility : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-            Instance = this;
-        else if (Instance != this)
-        {
-            Debug.Log($"VersionCompatibility instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
 
         Panel.SetActive(false);
         GameVersionCurrent = Application.version;

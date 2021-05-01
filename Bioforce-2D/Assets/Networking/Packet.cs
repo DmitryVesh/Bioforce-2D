@@ -253,7 +253,6 @@ public class Packet : IDisposable
         Write(componentsX);
         Write(componentsY);
     }
-
     private ushort GetUShortUnsignedFloatSmallerThan512(float floatVal)
     {
         if (floatVal < 0 || floatVal > 512)
@@ -286,7 +285,6 @@ public class Packet : IDisposable
 
         Write(components);
     }
-
     /// <summary> Gets 1B representation of a float value, the float must be in range: 0.9921875 >= a >= -0.9921875, precision 0.0078125 </summary>
     private static byte Get1ByteSignedFloatSmallerThan1(float val)
     {
@@ -333,7 +331,6 @@ public class Packet : IDisposable
     /// This should decrease the packet size from 16 bytes = 128 bits
     /// To 2 bit (largest component index) + 3 * 7 bits (smallest 3 components) + 1 bit for negating all components = 24 bits - will send 3 bytes = 24 bits
     /// only 18.75% of the original packet
-
     public void Write(Quaternion value)
     {
         float[] componentsAbs = new float[] { Math.Abs(value.x), Math.Abs(value.y), Math.Abs(value.z), Math.Abs(value.w) };

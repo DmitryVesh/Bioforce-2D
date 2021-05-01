@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Output;
+using UnityEngine.Singleton;
 
 public class PickupItemsManager : MonoBehaviour
 {
-    public static PickupItemsManager Instance { get; private set; }
+    public static PickupItemsManager Instance { get => instance; }
+    private static PickupItemsManager instance;
+
     private Transform PickupHolder { get; set; }
     private Dictionary<ushort, PickupItem> PickupDictionary { get; set; } = new Dictionary<ushort, PickupItem>();
 
@@ -14,15 +18,7 @@ public class PickupItemsManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Debug.Log($"PickupItemsManager instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
 
         PickupHolder = new GameObject("PickupHolder").transform;
         PickupHolder.position = Vector3.zero;
@@ -80,10 +76,10 @@ public class PickupItemsManager : MonoBehaviour
                 //TimeSpan dif = (DateTime.UtcNow.TimeOfDay - timeOfInvincibilityStart);
                 //float newInvincibilityTime = oldInvincibilityTime - (float)dif.TotalSeconds;
 
-                //Debug.Log(DateTime.UtcNow.TimeOfDay);
-                //Debug.Log(timeOfInvincibilityStart);
-                //Debug.Log(dif);
-                //Debug.Log(newInvincibilityTime);
+                //Output.WriteLine(DateTime.UtcNow.TimeOfDay);
+                //Output.WriteLine(timeOfInvincibilityStart);
+                //Output.WriteLine(dif);
+                //Output.WriteLine(newInvincibilityTime);
 
                 oldInvincibilityTime = oldInvincibilityTime - Client.Instance.LatestLatency1WaySecondsTCP;
 

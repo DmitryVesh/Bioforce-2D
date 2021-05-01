@@ -1,10 +1,14 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Output;
+using UnityEngine.Singleton;
 using UnityEngine.UI;
 
 public class ScoreboardManager : UIItemListingManager
 {
-    public static ScoreboardManager Instance { get; set; }
+    public static ScoreboardManager Instance { get => instance; }
+    private static ScoreboardManager instance;
+
     private GameObject Scoreboard { get; set; }
     private GameObject ScoreboardPanel { get; set; }
 
@@ -63,15 +67,8 @@ public class ScoreboardManager : UIItemListingManager
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Debug.Log($"ScoreboardManager instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
+
         Scoreboard = transform.GetChild(0).gameObject;
         ScoreboardPanel = Scoreboard.transform.GetChild(0).gameObject;
         ScoreboardTimer = Scoreboard.transform.GetChild(2).gameObject;

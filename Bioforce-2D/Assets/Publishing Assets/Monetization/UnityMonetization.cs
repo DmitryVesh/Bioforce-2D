@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Advertisements;
+using UnityEngine.Output;
+using UnityEngine.Singleton;
 
 enum AdsPlatform
 {
@@ -11,6 +13,9 @@ enum AdsPlatform
 }
 public class UnityMonetization : MonoBehaviour, IUnityAdsListener
 {
+    public static UnityMonetization Instance { get => instance; }
+    private static UnityMonetization instance;
+
     const string ProjectIDiOS = "4059326";
     const string ProjectIDAndroid = "4059326";
     private AdsPlatform AdsPlatform { get; set; }
@@ -29,6 +34,8 @@ public class UnityMonetization : MonoBehaviour, IUnityAdsListener
     
     private void Awake()
     {
+        Singleton.Init(ref instance, this);
+
         PrivacyPolicyTermsConditionsMenu.Accepted += OnAcceptedPolicy;
     }
 
@@ -39,8 +46,8 @@ public class UnityMonetization : MonoBehaviour, IUnityAdsListener
 
         Advertisement.AddListener(this);
 
-        AdRewardIsReadyEvent += () => Debug.Log("Reward ad is ready");
-        AdInterstitialIsReadyEvent += () => Debug.Log("Interstitial ad is ready");
+        AdRewardIsReadyEvent += () => Output.WriteLine("Reward ad is ready");
+        AdInterstitialIsReadyEvent += () => Output.WriteLine("Interstitial ad is ready");
     }
 
     private IEnumerator ShowBannerAdWhenInitialised()
@@ -67,7 +74,7 @@ public class UnityMonetization : MonoBehaviour, IUnityAdsListener
 
         if (!Advertisement.IsReady(placementID))
         {
-            Debug.Log($"Ad: {placementID} is not ready...");
+            Output.WriteLine($"Ad: {placementID} is not ready...");
             return;
         }
 
@@ -129,7 +136,7 @@ public class UnityMonetization : MonoBehaviour, IUnityAdsListener
     }
     public void OnUnityAdsDidError(string message)
     {
-        Debug.LogError($"Error in Unity Ad...\n{message}");
+        Output.WriteLine($"Error in Unity Ad...\n{message}");
     }
     public void OnUnityAdsDidStart(string placementId)
     {
@@ -140,7 +147,7 @@ public class UnityMonetization : MonoBehaviour, IUnityAdsListener
         switch (showResult)
         {
             case ShowResult.Failed:
-                Debug.LogWarning($"Error in showing ad: {placementId}");
+                Output.WriteLine($"Error in showing ad: {placementId}");
                 break;
             case ShowResult.Skipped:
                 //No reward as the ad was skipped

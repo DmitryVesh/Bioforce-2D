@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Net;
 using UnityEngine;
+using UnityEngine.Output;
 
 public interface IGDPRDialog
 {
@@ -44,7 +45,7 @@ public static class SimpleGDPR
 				}
 				catch( System.Exception e )
 				{
-					Debug.LogException( e );
+					Output.WriteLine( e.ToString() );
 					m_isGDPRApplicable = true;
 				}
 			}

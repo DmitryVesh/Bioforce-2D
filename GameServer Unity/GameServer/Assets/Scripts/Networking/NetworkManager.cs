@@ -1,19 +1,17 @@
 using GameServer;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Singleton;
 
 public class NetworkManager : MonoBehaviour
 {
-    public static NetworkManager Instance;// { get; private set; }
-    
+    public static NetworkManager Instance { get => instance; }
+    private static NetworkManager instance;
+
     [SerializeField] private GameObject PlayerPrefab;
 
     private void Awake()
     {
-        Singleton.Init(ref Instance, this);
+        Singleton.Init(ref instance, this);
     }
 
     internal PlayerServer InstantiatePlayer() =>

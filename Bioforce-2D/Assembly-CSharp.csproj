@@ -105,7 +105,6 @@
     <Compile Include="Assets\UI\KillFeed\KillFeedUI.cs" />
     <Compile Include="Assets\UI\PlayerChoosingColor\Scripts\PlayerChooseColor.cs" />
     <Compile Include="Assets\Networking\Client.cs" />
-    <Compile Include="Assets\UI\Main Menu\Buttons\Scripts\MenuButtonManager.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Movement\Networking\MobileLocalPlayerMovement.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\UI\HealthBar.cs" />
     <Compile Include="Assets\Networking\Packet.cs" />
@@ -402,6 +401,12 @@
     </Reference>
     <Reference Include="UnityEditor.UnityConnectModule">
       <HintPath>C:\Unity\2020.3.0f1\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
+    </Reference>
+    <Reference Include="SingletonLib">
+      <HintPath>Assets\Plugins\MyOwnLibs\SingletonLib.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityOutputLib">
+      <HintPath>Assets\Plugins\MyOwnLibs\UnityOutputLib.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>C:\Unity\2020.3.0f1\Editor\Data\NetStandard\ref\2.0.0\netstandard.dll</HintPath>

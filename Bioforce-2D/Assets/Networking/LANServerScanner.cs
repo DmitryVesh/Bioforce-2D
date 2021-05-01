@@ -6,6 +6,7 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Output;
 
 public  class LANServerScanner : MonoBehaviour
 {
@@ -67,13 +68,13 @@ public  class LANServerScanner : MonoBehaviour
         {
             if (ServerAddresses.Count == 0)
             {
-                Debug.Log("No addresses found....");
+                Output.WriteLine("No addresses found....");
                 return;
             }
 
-            Debug.Log("Addresses found:");
+            Output.WriteLine("Addresses found:");
             foreach (string address in ServerAddresses)
-                Debug.Log(address);
+                Output.WriteLine(address);
         }
         public float GetTotalPingTime() =>
             (NumberOfPings * BroadcastAddresses.Count * WaitBeforePings) + ExtraTimeGivenForPingsToComplete;
@@ -88,7 +89,7 @@ public  class LANServerScanner : MonoBehaviour
     
                     if (BroadcastClientSocket == null)
                     {
-                        Debug.Log("Client socket is null");
+                        Output.WriteLine("Client socket is null");
                         return null;
                     }
                     BroadcastClientSocket.Bind(new IPEndPoint(IPAddress.Any, port));
@@ -105,18 +106,18 @@ public  class LANServerScanner : MonoBehaviour
                 {
                     if (SocketException.SocketErrorCode.Equals(SocketError.AddressAlreadyInUse))
                     {
-                        Debug.Log($"Error in making and binding the client socket\nA server is already running on machine: \n{SocketException}");
+                        Output.WriteLine($"Error in making and binding the client socket\nA server is already running on machine: \n{SocketException}");
                         CloseClient();
                         string localHostIP = "127.0.0.1";
                         AddNewClient(localHostIP);
                         return localHostIP; //Return localHost due to server running on local machine
                     }
-                    Debug.Log($"Unexpected SocketException in Start Client:\n{SocketException}");
+                    Output.WriteLine($"Unexpected SocketException in Start Client:\n{SocketException}");
                     return null;
                 }
                 catch (Exception exception)
                 {
-                    Debug.Log($"Unexpected error in Starting client:\n{exception}");
+                    Output.WriteLine($"Unexpected error in Starting client:\n{exception}");
                     return null;
                 }
             }
@@ -151,7 +152,7 @@ public  class LANServerScanner : MonoBehaviour
                         }
                         catch (Exception exception)
                         {
-                            Debug.Log($"Error sending out a ping to: {ipEndPoint}\n{exception}");
+                            Output.WriteLine($"Error sending out a ping to: {ipEndPoint}\n{exception}");
                         }
                         yield return new WaitForSeconds(WaitBeforePings);
                     }
@@ -176,12 +177,12 @@ public  class LANServerScanner : MonoBehaviour
                         if (BroadcastAddresses.Contains(broadcastAddress))
                             continue;
 
-                        Debug.Log($"Local machine ip address: {unicastIPInfo.Address}, {unicastIPInfo.IPv4Mask}, broadCast address: {broadcastAddress}");
+                        Output.WriteLine($"Local machine ip address: {unicastIPInfo.Address}, {unicastIPInfo.IPv4Mask}, broadCast address: {broadcastAddress}");
                         BroadcastAddresses.Add(broadcastAddress);
                     }
                 }
             }
-            Debug.Log("Finished searching local network addresses.");
+            Output.WriteLine("Finished searching local network addresses.");
         }
 
         private void AsyncCallbackBroadcastSocket(IAsyncResult result)
@@ -195,7 +196,7 @@ public  class LANServerScanner : MonoBehaviour
                     
                     if (!ServerAddresses.Contains(address) && !LocalFullAddresses.Contains(address))
                     {
-                        Debug.Log($"Got a server address: {address}");
+                        Output.WriteLine($"Got a server address: {address}");
                         AddNewClient(address);
                     }
 
@@ -204,7 +205,7 @@ public  class LANServerScanner : MonoBehaviour
                 }
                 catch (Exception exception)
                 {
-                    Debug.Log($"Error in AsyncCallback of Broadcast socket:\n{exception}");
+                    Output.WriteLine($"Error in AsyncCallback of Broadcast socket:\n{exception}");
                 }
             }
         }

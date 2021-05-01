@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
+using UnityEngine.Output;
 
 public class ClientRead : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class ClientRead : MonoBehaviour
         string message = packet.ReadString();
         byte id = packet.ReadByte();
         string mapName = packet.ReadString();
-        Debug.Log($"Message from server:\n{message}");
+        Output.WriteLine($"Message from server:\n{message}");
         Client.Instance.SuccessfullyConnected(id);
         Client.Instance.uDP.Connect(((IPEndPoint)Client.Instance.tCP.Socket.Client.LocalEndPoint).Port);
 
@@ -24,13 +25,13 @@ public class ClientRead : MonoBehaviour
     }
     public static void UDPTestRead(Packet packet)
     {
-        Debug.Log($"Received packet via UDP: {packet.ReadString()}");
+        Output.WriteLine($"Received packet via UDP: {packet.ReadString()}");
         ClientSend.UDPTestPacketReply();
     }
 
     internal static void AskingForPlayerDetails(Packet packet)
     {
-        Debug.Log("Have Received AskingForPlayerDetails packet");
+        Output.WriteLine("Have Received AskingForPlayerDetails packet");
         byte numPlayers = packet.ReadByte();
 
         List<int> playerColors = new List<int>();
@@ -133,7 +134,7 @@ public class ClientRead : MonoBehaviour
         }
         catch (KeyNotFoundException exception)
         {
-            Debug.Log($"Player iD PlayerPosition: {iD}\n {exception}");
+            Output.WriteLine($"Player iD PlayerPosition: {iD}\n {exception}");
         }
     }
 
@@ -149,7 +150,7 @@ public class ClientRead : MonoBehaviour
         }
         catch (KeyNotFoundException exception)
         {
-            Debug.Log($"Error, in bullet shot in player iD: {iD}\n{exception}");
+            Output.WriteLine($"Error, in bullet shot in player iD: {iD}\n{exception}");
         }
     }
     public static void PlayerDied(Packet packet)
@@ -199,7 +200,7 @@ public class ClientRead : MonoBehaviour
         }
         catch (Exception exception)
         {
-            Debug.Log($"Player's: {iD} ArmPositionRotation caused an error.\n{exception}");
+            Output.WriteLine($"Player's: {iD} ArmPositionRotation caused an error.\n{exception}");
         }
     }
 
@@ -213,7 +214,7 @@ public class ClientRead : MonoBehaviour
         }
         catch (Exception exception)
         {
-            Debug.Log($"Player's: {iD} PlayerPausedGame caused an error.\n{exception}");
+            Output.WriteLine($"Player's: {iD} PlayerPausedGame caused an error.\n{exception}");
         }
     }
 
@@ -226,7 +227,7 @@ public class ClientRead : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.Log($"PlayerStillConnectedTCP caused an error.\n{e}");
+            Output.WriteLine($"PlayerStillConnectedTCP caused an error.\n{e}");
         }
     }
     internal static void PlayerStillConnectedUDP(Packet packet)
@@ -238,7 +239,7 @@ public class ClientRead : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.Log($"PlayerStillConnectedUDP caused an error.\n{e}");
+            Output.WriteLine($"PlayerStillConnectedUDP caused an error.\n{e}");
         }
     }
 
@@ -254,7 +255,7 @@ public class ClientRead : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.Log($"Error in reading GeneratedPickupItem...\n{e}");
+            Output.WriteLine($"Error in reading GeneratedPickupItem...\n{e}");
         }
     }
     internal static void PlayerPickedUpItem(Packet packet)
@@ -268,7 +269,7 @@ public class ClientRead : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.Log($"Error in reading PlayerPickedUpItem...\n{e}");
+            Output.WriteLine($"Error in reading PlayerPickedUpItem...\n{e}");
         }
     }
 
@@ -283,7 +284,7 @@ public class ClientRead : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.Log($"Error in reading ChatMessage...\n{e}");
+            Output.WriteLine($"Error in reading ChatMessage...\n{e}");
         }
     }
 }

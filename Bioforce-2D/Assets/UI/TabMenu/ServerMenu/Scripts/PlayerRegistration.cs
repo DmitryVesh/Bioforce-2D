@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Singleton;
 
 public class PlayerRegistration : MonoBehaviour
 {
-    public static PlayerRegistration Instance;
+    public static PlayerRegistration Instance { get => instance; }
+    private static PlayerRegistration instance;
 
     public bool IsUsernameValid { get; set; }
 
@@ -54,13 +53,8 @@ public class PlayerRegistration : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-            Instance = this;
-        else if (Instance != this)
-        {
-            Debug.Log($"PlayerRegistration instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
+
         UsernameInputField = transform.GetChild(0).GetComponent<TMP_InputField>();
         OKMenuButton = transform.GetChild(1).GetComponent<MenuButton>();
 

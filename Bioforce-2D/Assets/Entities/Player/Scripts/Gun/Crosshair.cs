@@ -1,10 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Output;
+using UnityEngine.Singleton;
 
 public class Crosshair : MonoBehaviour
 {
-    public static Crosshair Instance { get; set; }
+    public static Crosshair Instance { get => instance; }
+    private static Crosshair instance;
 
     private Animator Animator { get; set; }
 
@@ -15,15 +18,7 @@ public class Crosshair : MonoBehaviour
     }
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Debug.Log($"Crosshair instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
 
         Animator = GetComponent<Animator>();
         

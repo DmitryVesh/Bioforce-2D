@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.Singleton;
 using UnityEngine.UI;
 
 public class ShootingJoystick : MonoBehaviour
 {
-    public static ShootingJoystick Instance;
+    public static ShootingJoystick Instance { get => instance; }
+    private static ShootingJoystick instance;
+
     private bool Destroyed;
     [SerializeField] private Image HandleImage;
 
@@ -16,15 +19,8 @@ public class ShootingJoystick : MonoBehaviour
     }
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Debug.Log($"ShootingJoystick instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
+
         Destroyed = false;
         SetActive(false);
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.Experimental.AI;
+using UnityEngine.Output;
 
 public enum SendConstantPacketsState
 {
@@ -210,7 +211,7 @@ public class ClientSend : MonoBehaviour
         }
         catch (Exception exception)
         {
-            Debug.Log($"Error, sending TCP Packet...\n{exception}");
+            Output.WriteLine($"Error, sending TCP Packet...\n{exception}");
         }
     }
     private static void SendUDPPacket(Packet packet)
@@ -222,7 +223,7 @@ public class ClientSend : MonoBehaviour
         }
         catch (Exception exception)
         {
-            Debug.Log($"Error, sending UDP Packet...\n{exception}");
+            Output.WriteLine($"Error, sending UDP Packet...\n{exception}");
         }
     }
 }

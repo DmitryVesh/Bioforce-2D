@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using UnityEngine;
+using UnityEngine.Output;
 
 public abstract class DiscoveryTCPClient
 {
@@ -35,11 +36,11 @@ public abstract class DiscoveryTCPClient
 
             ReceiveBuffer = new byte[DataBufferSize];
             Socket.BeginConnect(ipAddressConnectTo, portNum, ConnectCallback, Socket);
-            Debug.Log($"A DiscoveryTCPClient trying to connect to: {ipAddressConnectTo}...");
+            Output.WriteLine($"A DiscoveryTCPClient trying to connect to: {ipAddressConnectTo}...");
         }
         catch (Exception exception)
         {
-            Debug.Log($"Error Connecting DiscoveryTCPClient...{exception}");
+            Output.WriteLine($"Error Connecting DiscoveryTCPClient...{exception}");
             Disconnect(false, true);
         }
     }
@@ -53,7 +54,7 @@ public abstract class DiscoveryTCPClient
         }
         catch (Exception exception)
         {
-            Debug.Log($"Error, sending data to server from Client via TCP.\nException {exception}");
+            Output.WriteLine($"Error, sending data to server from Client via TCP.\nException {exception}");
             Disconnect(false, true);
         }
     }
@@ -90,7 +91,7 @@ public abstract class DiscoveryTCPClient
         }
         catch (Exception exception)
         {
-            Debug.Log($"Error in TCP ConnectCallback\n{exception}");
+            Output.WriteLine($"Error in TCP ConnectCallback\n{exception}");
             Disconnect(true, false);            
         }
     }
@@ -114,7 +115,7 @@ public abstract class DiscoveryTCPClient
         }
         catch (Exception exception)
         {
-            Debug.Log($"Error in BeginReadReceiveCallback: {Socket.Client.RemoteEndPoint}...\nError: {exception}");
+            Output.WriteLine($"Error in BeginReadReceiveCallback: {Socket.Client.RemoteEndPoint}...\nError: {exception}");
             Disconnect(true, false);
         }
     }
@@ -140,7 +141,7 @@ public abstract class DiscoveryTCPClient
                 }
                 catch (Exception exception)
                 {
-                    Debug.Log($"\nError in HandleData of DiscoveryTCPClient...\n{exception}");
+                    Output.WriteLine($"\nError in HandleData of DiscoveryTCPClient...\n{exception}");
                 }
             });
             packetLen = 0;

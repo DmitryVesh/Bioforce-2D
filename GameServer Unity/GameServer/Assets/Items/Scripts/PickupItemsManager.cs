@@ -7,7 +7,8 @@ using UnityEngine.Singleton;
 
 public class PickupItemsManager : MonoBehaviour
 {
-    public static PickupItemsManager Instance;// { get; private set; }
+    public static PickupItemsManager Instance { get => instance; }
+    private static PickupItemsManager instance;
 
     
     [SerializeField] private GameObject Bandage;
@@ -46,7 +47,7 @@ public class PickupItemsManager : MonoBehaviour
 
     private void Awake()
     {
-        Singleton.Init(ref Instance, this);
+        Singleton.Init(ref instance, this);
         
     }
     private void OnDestroy()

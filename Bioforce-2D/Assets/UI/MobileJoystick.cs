@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
+using UnityEngine.Output;
+using UnityEngine.Singleton;
 using UnityEngine.UI;
 
 public class MobileJoystick : MonoBehaviour
 {
-    public static MobileJoystick Instance;
+    public static MobileJoystick Instance { get => instance; }
+    private static MobileJoystick instance;
+
     private bool Destroyed;
     [SerializeField] private Image HandleImage;
 
@@ -16,15 +20,8 @@ public class MobileJoystick : MonoBehaviour
     }
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Debug.Log($"MobileJoystick instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
+
         Destroyed = false;
         SetActive(false);
     }

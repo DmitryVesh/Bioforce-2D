@@ -9,7 +9,8 @@ public enum GameState
 }
 public class GameStateManager : MonoBehaviour
 {
-    public static GameStateManager Instance;// { get; private set; }
+    public static GameStateManager Instance { get => instance; }
+    private static GameStateManager instance;
 
     public GameState CurrentState { get; private set; } = GameState.waitingForAPlayerToJoin;
     public Action<float> OnServerActivated { get; set; }
@@ -42,6 +43,6 @@ public class GameStateManager : MonoBehaviour
 
     private void Awake()
     {
-        Singleton.Init(ref Instance, this);
+        Singleton.Init(ref instance, this);
     }
 }

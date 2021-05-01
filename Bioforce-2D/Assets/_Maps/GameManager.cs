@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Output;
 using UnityEngine.SceneManagement;
+using UnityEngine.Singleton;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance { get; set; }
+    public static GameManager Instance { get => instance; }
+    private static GameManager instance;
+
     public static Dictionary<byte, PlayerManager> PlayerDictionary { get; set; }
 
     [SerializeField] private bool TestingTouchInEditor = false;
@@ -57,15 +61,8 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Debug.Log($"GameManager instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
+
         PlayerDictionary = new Dictionary<byte, PlayerManager>();
         ConfyMouse();
         IsMobileSupported = CheckIfOnMobile();
@@ -102,12 +99,12 @@ public class GameManager : MonoBehaviour
                 prefab = LocalPlayerPrefab;
             MobileJoystick.Instance.SetPlayerColor(playerColor);
             ShootingJoystick.Instance.SetPlayerColor(playerColor);
-            Debug.Log($"You, player: {iD} have been spawned.");
+            Output.WriteLine($"You, player: {iD} have been spawned.");
         }
         else
         {
             prefab = PlayerPrefab;
-            Debug.Log($"Player: {iD} has been spawned.");
+            Output.WriteLine($"Player: {iD} has been spawned.");
         }
         player = Instantiate(prefab, position, Quaternion.identity);
 
@@ -149,19 +146,19 @@ public class GameManager : MonoBehaviour
 
             playerManager.Disconnect();
             PlayerDictionary.Remove(disconnectedPlayer);
-            Debug.Log($"Player: {disconnectedPlayer} has disconnected.");
+            Output.WriteLine($"Player: {disconnectedPlayer} has disconnected.");
 
         }
         catch (KeyNotFoundException exception)
         {
-            Debug.Log($"Error in Disconnecting Player: {disconnectedPlayer}...\n{exception}");
+            Output.WriteLine($"Error in Disconnecting Player: {disconnectedPlayer}...\n{exception}");
         }
     }
     public void DisconnectLoadMainMenu()
     {
         ThreadManager.ExecuteOnMainThread(() =>
         {
-            Debug.Log($"All players are being disconnected.");
+            Output.WriteLine($"All players are being disconnected.");
             foreach (PlayerManager player in PlayerDictionary.Values)
             {
                 ScoreboardManager.Instance.DeleteEntry(player.ID);

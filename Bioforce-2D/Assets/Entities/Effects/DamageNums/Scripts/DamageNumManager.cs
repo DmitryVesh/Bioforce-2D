@@ -1,9 +1,13 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Output;
+using UnityEngine.Singleton;
 
 public class DamageNumManager : MonoBehaviour
 {
-    public static DamageNumManager Instance;
+    public static DamageNumManager Instance { get => instance; }
+    private static DamageNumManager instance;
+
     [SerializeField] private GameObject DamageNumPrefab; //Set in inspector
     private List<DamageNum> DamageNumList = new List<DamageNum>();
 
@@ -21,13 +25,7 @@ public class DamageNumManager : MonoBehaviour
    
     private void Awake()
     {
-        if (Instance == null)
-            Instance = this;
-        else if (Instance != this)
-        {
-            Debug.Log($"DamageNumManager instance already exists, destroying {gameObject.name}");
-            Destroy(gameObject);
-        }
+        Singleton.Init(ref instance, this);
     }
 
     private DamageNum AddDamageNum()

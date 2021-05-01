@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Output;
 
 public class ServersPage : UIItemListingManager
 {
@@ -142,7 +143,7 @@ public class ServersPage : UIItemListingManager
         NoServersFoundEntryPrefab.SetActive(false);
 
         
-        Debug.Log($"Adding server: {serverName}, to server page");
+        Output.WriteLine($"Adding server: {serverName}, to server page");
         GameObject entryToAdd = Instantiate(ItemListingPrefab, transform);
         ServerEntry serverEntry = entryToAdd.GetComponent<ServerEntry>();
         serverEntry.Init(this, serverName, currentPlayerCount, maxPlayerCount, mapName, ping);
