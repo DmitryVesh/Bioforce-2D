@@ -39,7 +39,7 @@ public class CreateServer : MonoBehaviour
     [SerializeField] GameObject ServerGameObject;
 
     //Final Server Data
-    public string ServerNameSelected;
+    [HideInInspector] public string ServerNameSelected;
     public string MapSelected { get; private set; }
     public int MaxPlayerSelected { get; private set; }
     public bool PublicServerSelected { get; private set; } = true;
@@ -50,7 +50,7 @@ public class CreateServer : MonoBehaviour
     public void OnServerNameChanged()
     {
         ServerNameSelected = ServerNameInputField.text;
-        TextInputValidator.RemoveInvalidCharsInString(ref ServerNameSelected);
+        TextInputValidator.SanitiseText(ref ServerNameSelected, TextType.File);
         ServerNameInputField.text = ServerNameSelected;
         StartServerButton.Interactable = TextInputValidator.IsTextLengthValid(ServerNameSelected);
     }

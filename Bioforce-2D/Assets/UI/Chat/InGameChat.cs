@@ -98,7 +98,7 @@ public class InGameChat : UIEntryManager
 
     public void EnteredText(string text) //Subscribed to by input text field
     {
-        TextInputValidator.RemoveInvalidCharsInString(ref text);
+        TextInputValidator.SanitiseText(ref text);
         ChatEntryInputField.text = text;
         ShouldSendChatEntry = text.Length > 0;
     }

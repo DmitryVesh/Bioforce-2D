@@ -34,7 +34,7 @@ public class PlayerRegistration : MonoBehaviour
     public void OnUsernameInputFieldChanged() //Called by inputField on change event
     {
         string inputField = UsernameInputField.text;
-        TextInputValidator.RemoveInvalidCharsInString(ref inputField);
+        TextInputValidator.SanitiseText(ref inputField);
         UsernameInputField.text = inputField;
 
         IsUsernameValid = TextInputValidator.IsTextLengthValid(inputField);
