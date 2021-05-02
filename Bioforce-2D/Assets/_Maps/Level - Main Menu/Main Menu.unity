@@ -13038,6 +13038,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6872406852063280954, guid: 7850bf9606fcbe344b4dc29fc7e6823a,
+        type: 3}
+      propertyPath: m_KeyboardType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7241975846816560595, guid: 7850bf9606fcbe344b4dc29fc7e6823a,
         type: 3}
       propertyPath: m_Name
