@@ -1,49 +1,73 @@
 ﻿using System;
 using System.Collections.Generic;
+
+#if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE || UNITY_WEBGL
 using UnityEngine;
 using UnityEngine.Output;
+#else
+using Output = System.Console;
+#endif
 
-public class ThreadManager : MonoBehaviour
+namespace Shared
 {
-    private static readonly List<Action> executeOnMainThread = new List<Action>();
-    private static readonly List<Action> executeCopiedOnMainThread = new List<Action>();
-    private static bool actionToExecuteOnMainThread = false;
-
-    private void FixedUpdate()
+#if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE || UNITY_WEBGL
+    public class ThreadManager : MonoBehaviour
     {
-        UpdateMain();
-    }
-
-    public static void ExecuteOnMainThread(Action _action)
-    {
-        if (_action == null)
+        private void FixedUpdate()
         {
-            Output.WriteLine("No action to execute on main thread!");
-            return;
+            UpdateMain();
         }
-
-        lock (executeOnMainThread)
-        {
-            executeOnMainThread.Add(_action);
-            actionToExecuteOnMainThread = true;
-        }
-    }
-
-    public static void UpdateMain()
+#else
+    public class ThreadManager
     {
-        if (actionToExecuteOnMainThread)
+#endif
+
+        private static readonly List<Action> ActionsToExecute = new List<Action>();
+        private static readonly List<Action> CopiedActionsToExecute = new List<Action>();
+        private static bool HasActionToExecute { get; set; } = false;
+
+        /// <summary>Sets an action to be executed on the main thread.</summary>
+        /// <param name="action">The action to be executed on the main thread.</param>
+        public static void ExecuteOnMainThread(Action action)
         {
-            executeCopiedOnMainThread.Clear();
-            lock (executeOnMainThread)
+            if (action == null)
             {
-                executeCopiedOnMainThread.AddRange(executeOnMainThread);
-                executeOnMainThread.Clear();
-                actionToExecuteOnMainThread = false;
+                Output.WriteLine("No action to execute on main thread!");
+                return;
             }
 
-            for (int i = 0; i < executeCopiedOnMainThread.Count; i++)
+            lock (ActionsToExecute)
             {
-                executeCopiedOnMainThread[i]();
+                ActionsToExecute.Add(action);
+                HasActionToExecute = true;
+            }
+        }
+
+        public static void ExecuteAfterTime(Action action, int miliseconds)
+        {
+            if (action == null)
+            {
+                Output.WriteLine("Null action was given to thread...");
+                return;
+            }
+
+        }
+
+        /// <summary>Executes all code meant to run on the main thread. NOTE: Call this ONLY from the main thread.</summary>
+        public static void UpdateMain()
+        {
+            if (HasActionToExecute)
+            {
+                CopiedActionsToExecute.Clear();
+                lock (ActionsToExecute)
+                {
+                    CopiedActionsToExecute.AddRange(ActionsToExecute);
+                    ActionsToExecute.Clear();
+                    HasActionToExecute = false;
+                }
+
+                for (int i = 0; i < CopiedActionsToExecute.Count; i++)
+                    CopiedActionsToExecute[i]();
             }
         }
     }

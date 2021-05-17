@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Singleton;
@@ -19,12 +20,17 @@ public class PlayerChooseColor : MonoBehaviour
 
     internal Color GetColorFromIndex(int playerColorIndex) =>
         PlayerColors[playerColorIndex].Color;
-    public void ClickedPlay()
+    public void ClickedPlay() //Subscribed through Inspector
     {
-        SetActivate(false);
+        Deactivate();
         GameManager.Instance.PlayerChoseColor(ChosenColor, ChosenColorIndex);
     }
-    public void SetActivate(bool active)
+
+    public void Activate() =>
+        SetActive(true);
+    public void Deactivate() =>
+        SetActive(false);
+    public void SetActive(bool active)
     {
         Panel.SetActive(active);
     }
@@ -98,7 +104,14 @@ public class PlayerChooseColor : MonoBehaviour
     private void Awake()
     {
         Singleton.Init(ref instance, this);
+
+        GameStateManager.GameEnded += Deactivate;
+        GameStateManager.GameRestarting += Activate;
+    }
+    private void OnDestroy()
+    {
+        GameStateManager.GameEnded -= Deactivate;
+        GameStateManager.GameRestarting -= Activate;
     }
 
-    
 }

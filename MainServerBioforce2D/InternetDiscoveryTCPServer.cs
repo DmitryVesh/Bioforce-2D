@@ -130,35 +130,43 @@ namespace MainServerBioforce2D
             TCPBroadCastTcpListener.BeginAcceptTcpClient(new AsyncCallback(TCPConnectAsyncCallback), null);
         private static void TCPConnectAsyncCallback(IAsyncResult asyncResult)
         {
-            TcpClient client = TCPBroadCastTcpListener.EndAcceptTcpClient(asyncResult);
-            Output.WriteLine($"\nUser {client.Client.RemoteEndPoint} is trying to connect to the discovery server...");
-            TCPBeginReceiveDiscoveryClients();
-
-            byte discoveryClientCount = SearchForDictSpace(ref ClientDictionary);
-            ClientDictionary[discoveryClientCount].Connect(client);
-            InternetDiscoveryTCPServerSend.SendWelcome(discoveryClientCount);
-            string ip = client.Client.RemoteEndPoint.ToString().Split(':')[0].ToString();
-
-            
-            Output.WriteLine($"Connected and sent welcome to new DiscoveryTCPClient: {client.Client.RemoteEndPoint}");
-
             try
             {
-                if (IPsConnected.NumNodes == 0)
-                    IPsConnected.Add(ip);
+                TcpClient client = TCPBroadCastTcpListener.EndAcceptTcpClient(asyncResult);
+                Output.WriteLine($"\nUser {client.Client.RemoteEndPoint} is trying to connect to the discovery server...");
+                TCPBeginReceiveDiscoveryClients();
 
-                if (!IPsConnected.Contains(ip))
-                    IPsConnected.Add(ip);
+                byte discoveryClientCount = SearchForDictSpace(ref ClientDictionary);
+                ClientDictionary[discoveryClientCount].Connect(client);
+                InternetDiscoveryTCPServerSend.SendWelcome(discoveryClientCount);
+                string ip = client.Client.RemoteEndPoint.ToString().Split(':')[0].ToString();
 
-                using (StreamWriter sw = new StreamWriter("IPs.txt", false))
+                Output.WriteLine($"Connected and sent welcome to new DiscoveryTCPClient: {client.Client.RemoteEndPoint}");
+
+                try
                 {
-                    sw.WriteLine(IPsConnected.NumNodes);
+                    if (IPsConnected.NumNodes == 0)
+                        IPsConnected.Add(ip);
+
+                    if (!IPsConnected.Contains(ip))
+                        IPsConnected.Add(ip);
+
+                    using (StreamWriter sw = new StreamWriter("IPs.txt", false))
+                    {
+                        sw.WriteLine(IPsConnected.NumNodes);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Output.WriteLine($"Error saving num nodes...\n{e}");
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                Output.WriteLine(e.ToString());
+                Output.WriteLine($"Error in TCPConnectAsyncCallback of InternetDiscoveryTCPServer...\n{e}");
             }
+            
+            
         }
 
         private static byte SearchForDictSpace(ref Dictionary<byte, InternetDiscoveryTCPClientOnServer> dict)

@@ -38,24 +38,45 @@ namespace GameServer
             }
         }
 
-        // max 143B (byte 1B packetLen + byte 1B packetID + byte 1B numPlayers + xint xMax=16 16*4B = 64B playerColors 
+        // max 138B (byte 1B packetLen + byte 1B packetID + byte 1B numPlayers + xint xMax=16 16*4B = 64B playerColors 
         //          + byte 1B numPickups + ypickups yMax=10 10*7B = 70B pickups
-        //          + byte 1B CurrentGameState + float 4B RemainingGameTIme
-        internal static void AskPlayerDetails(byte clientID, List<int> PlayerColors, GameState CurrentGameState, float RemainingGameTime)
+        internal static void AskPlayerDetails(byte clientID, List<int> PlayerColors)
         {
             using (Packet packet = new Packet((byte)ServerPackets.askPlayerDetails))
             {
+                //Colors
                 byte numberOfPlayers = (byte)PlayerColors.Count;
                 packet.Write(numberOfPlayers);
                 for (byte playerCount = 0; playerCount < numberOfPlayers; playerCount++)
                     packet.Write(PlayerColors[playerCount]);
 
+                //Pickups
                 packet.Write((byte)PickupItemsManager.Instance.PickupsDictionary.Count);
                 foreach (PickupItem pickup in PickupItemsManager.Instance.PickupsDictionary.Values)
                     WritePickupData(pickup, packet);
 
-                packet.Write((byte)CurrentGameState);
-                packet.Write(RemainingGameTime);
+                SendTCPPacket(clientID, packet);
+            }
+        }
+
+        // 7B (byte 1B packetLen + byte 1B packetID + byte 1B currentState, float 4B remainingGameTime)
+        internal static void SendGameState(GameState currentState, float remainingGameTime)
+        {
+            using (Packet packet = new Packet((byte)ServerPackets.gameState))
+            {
+                packet.Write((byte)currentState);
+                packet.Write(remainingGameTime);
+
+                SendTCPPacketToAll(packet);
+            }
+        }
+        // 7B (byte 1B packetLen + byte 1B packetID + byte 1B currentState, float 4B remainingGameTime)
+        internal static void SendGameState(GameState currentState, float remainingGameTime, byte clientID)
+        {
+            using (Packet packet = new Packet((byte)ServerPackets.gameState))
+            {
+                packet.Write((byte)currentState);
+                packet.Write(remainingGameTime);
 
                 SendTCPPacket(clientID, packet);
             }
@@ -97,6 +118,7 @@ namespace GameServer
             using (Packet packet = new Packet((byte)ServerPackets.playerDisconnect))
             {
                 packet.Write(disconnectedPlayer);
+
                 SendTCPPacketToAllButIncluded(disconnectedPlayer, packet); // Packet has to arrive, so sending via TCP to make sure
             }
         }

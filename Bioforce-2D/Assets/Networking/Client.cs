@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shared;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
@@ -19,12 +20,12 @@ public class Client : MonoBehaviour
 
     public const int PortNumInternetDiscoverTesting = 28420;
 
-    public static int PortNumInternetToConnectTo 
-    { 
+    public static int PortNumInternetToConnectTo
+    {
         get
         {
             return Instance.IsTesting ? PortNumInternetDiscoverTesting : PortNumInternetDiscover;
-        } 
+        }
     }
     [SerializeField] private bool IsTesting = false;
 
@@ -44,18 +45,18 @@ public class Client : MonoBehaviour
     private bool TimerRunning { get; set; } = false;
     private float Timer { get; set; }
 
-    private TimeSpan PacketTimeOutTCP { get; set; } 
+    private TimeSpan PacketTimeOutTCP { get; set; }
     private TimeSpan PacketPauseTCP { get; set; }
     private readonly TimeSpan TimeSpanZero = new TimeSpan(0, 0, 0);
     private bool LastLostConnection { get; set; }
-    
+
     private TimeSpan PacketSendViaOnlyTCP { get; set; }
     private TimeSpan PacketSendViaTCPAndUDP { get; set; }
 
     private byte FixedFrameCounter { get; set; } = 0;
 
-    public float LatestLatency1WaySecondsTCP = 0.25f;
-    public float LatestLatency1WaySecondsUDP = 0.25f;
+    public float Latency1WaySecondsTCP { get; private set; } = 0.15f;
+    public float Latency1WaySecondsUDP { get; private set; } = 0.15f;
     private byte LatencyID { get; set; } = 0; //Loops from 0 - 255, then back to 0
     private Dictionary<byte, TimeSpan> LatencyDictionary { get; set; } = new Dictionary<byte, TimeSpan>();
 
@@ -354,6 +355,7 @@ public class Client : MonoBehaviour
     {
         Singleton.Init(ref instance, this);
     }
+    
     private void FixedUpdate()
     {
         if (Connected)
@@ -415,7 +417,7 @@ public class Client : MonoBehaviour
         SetPacketTimeoutsTCP(now);
 
         TimeSpan latencyCheckSent = LatencyDictionary[latencyID];
-        LatestLatency1WaySecondsTCP = (float)(now - latencyCheckSent).TotalSeconds / 2;
+        Latency1WaySecondsTCP = (float)(now - latencyCheckSent).TotalSeconds / 2;
     }
     private void SetPacketTimeoutsTCP(TimeSpan now)
     {
@@ -429,7 +431,7 @@ public class Client : MonoBehaviour
         PacketSendViaTCPAndUDP = now + new TimeSpan(0, 0, 0, 0, 500);
 
         TimeSpan latencyCheckSent = LatencyDictionary[latencyID];
-        LatestLatency1WaySecondsUDP = (float)(now - latencyCheckSent).TotalSeconds / 2;
+        Latency1WaySecondsUDP = (float)(now - latencyCheckSent).TotalSeconds / 2;
     }
 
     private void ResetTimeOutTimer(bool runTimer = true)
@@ -447,9 +449,17 @@ public class Client : MonoBehaviour
     {
         Disconnect();
     }
+    private void Start()
+    {
+        GameStateManager.ServerShuttingDown += Disconnect;
+    }
+
+    
+
     private void OnDestroy()
     {
         Disconnect();
+        GameStateManager.ServerShuttingDown -= Disconnect;
     }
     private void OnApplicationPause(bool pause)
     {
@@ -483,6 +493,7 @@ public class Client : MonoBehaviour
         PacketHandlerDictionary.Add((byte)ServerPackets.generatedPickup, ClientRead.GeneratedPickupItem);
         PacketHandlerDictionary.Add((byte)ServerPackets.playerPickedUpItem, ClientRead.PlayerPickedUpItem);
         PacketHandlerDictionary.Add((byte)ServerPackets.chatMessage, ClientRead.ChatMessage);
+        PacketHandlerDictionary.Add((byte)ServerPackets.gameState, ClientRead.ReadGameState);
     }
        
 }

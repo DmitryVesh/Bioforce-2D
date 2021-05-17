@@ -159,6 +159,8 @@
     <Compile Include="Assets\UI\Screen Overlays\Scripts\HitOverlay.cs" />
     <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\PlayerRegistration.cs" />
     <Compile Include="Assets\UI\PauseMenu\Scripts\PauseManager.cs" />
+    <Compile Include="Assets\Networking\GameState\GameStateManager.cs" />
+    <Compile Include="Assets\UI\Timer\GameTimer.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />

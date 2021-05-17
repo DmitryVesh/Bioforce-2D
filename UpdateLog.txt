@@ -12,6 +12,9 @@ Main goals is to;
 	1 Implement chat system - need to watch out for max num characters sent, as packetLen is 1B, so say only 100 Characters max
 
 	0 Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard	
+	0 Add a ping in ms to player, and to the scoreboard
+	0 Add regex into swear words like -> f(u+)ck
+	0 Implement an Exception logging in Output Lib, also integrate the output lib in MainServer
 
 	0 Integrate ads
 	0 Make dead time, so when died, wait like 10 seconds & show banner ads	

@@ -255,12 +255,11 @@ namespace GameServer
                     Output.WriteLine($"\n\tError in GameServer Disconnecting Player when null: {ID}...\n{e}");
                 }
 
-                Output.WriteLine($"\tPlayer: {ID} has disconnected. {tCP.Socket.Client.RemoteEndPoint}");
+                Output.WriteLine($"\tPlayer: {ID} has disconnected.");
                 ServerSend.DisconnectPlayer(ID);
 
-
-                UnityEngine.Object.Destroy(Player.gameObject);
                 PlayerColor.FreeColor(Player.PlayerColorIndex, ID);
+                UnityEngine.Object.Destroy(Player.gameObject);
                 Player = null;
 
                 

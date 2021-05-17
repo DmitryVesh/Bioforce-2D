@@ -1,4 +1,5 @@
-﻿
+﻿using Shared;
+
 public class InternetDiscoveryClient : DiscoveryTCPClient
 {
     protected override void InitPacketHandlerDictionary()

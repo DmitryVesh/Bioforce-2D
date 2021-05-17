@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Threading;
 using Shared;
-using System.Linq;
 using System.IO;
-using MainServer;
 
 namespace MainServerBioforce2D
 {
     class Program
     {
         public const int Ticks = 30;
-        public const int MillisecondsInTick = 1000 / Ticks;
+        public const double MillisecondsInTick = (double)1000 / Ticks;
 
         const int PortRelease = 28020;
         const int PortTesting = 28420;
@@ -34,7 +32,7 @@ namespace MainServerBioforce2D
                 Output.Init(version);
 
                 PortInUse = isTestBuild ? PortTesting : PortRelease;
-                //InternetDiscoveryTCPServer.StartServer(PortInUse, version);
+                InternetDiscoveryTCPServer.StartServer(PortInUse, version);
 
                 Thread mainThread = new Thread(new ThreadStart(MainThread));
                 mainThread.Start();
@@ -70,6 +68,9 @@ namespace MainServerBioforce2D
                 $"\nTargetSite ---" +
                 $"\n{exc.TargetSite}" +
                 $"\n--- End TargetSite" +
+                $"\nData ---" +
+                $"\n{exc.Data}" +
+                $"\n--- End Data" +
                 $"\n--- End Unhandled Exception: {now}" +
                 $"\n===========================================================";
 
@@ -82,10 +83,24 @@ namespace MainServerBioforce2D
             Output.WriteLine($"\nStarted main thread. Tick/second {Ticks}");
             //DateTime TickTimer = DateTime.Now;
 
+            TimeSpan tickTime = TimeSpan.FromMilliseconds(MillisecondsInTick);
             while (IsRunning)
             {
                 ThreadManager.UpdateMain();
-                Thread.Sleep(MillisecondsInTick);
+                //Thread.Sleep(MillisecondsInTick); // This error occurs sometimes?? Why
+                                                    // Number must be either non-negative and less than or equal to Int32.MaxValue or -1. (Parameter 'timeout')
+                                                    // Switched to timeSpan to try and solve
+                try
+                {
+                    Thread.Sleep(tickTime);
+                }
+                catch (ArgumentOutOfRangeException e)
+                {
+                    Output.WriteLine(   $"\nIt happened again!!!! The weird thread.sleep error..." +
+                                        $"\nError: {e}" +
+                                        $"\nData: {e.Data}" +
+                                        $"\nActual Value: {e.ActualValue}");
+                }
 
                 //while (TickTimer < DateTime.Now)
                 //{

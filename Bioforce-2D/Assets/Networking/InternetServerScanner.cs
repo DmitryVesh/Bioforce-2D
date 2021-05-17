@@ -4,6 +4,7 @@ using System.Timers;
 using UnityEngine;
 using UnityEngine.Output;
 using UnityEngine.Singleton;
+using Shared;
 
 public class InternetServerScanner : MonoBehaviour
 {

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Output;
 using UnityEngine.Singleton;
@@ -15,7 +17,6 @@ public class ScoreboardManager : UIItemListingManager
     private Dictionary<object, IUIItemListing> PlayersItemLists { get; set; } = new Dictionary<object, IUIItemListing>();
     private bool ScoreboardChanged { get; set; }
 
-    private GameObject ScoreboardTimer { get; set; }
     private Button MobileButton { get; set; }
     private bool ScoreboardActive { get; set; }
     private bool ClickedOdd { get; set; }
@@ -55,6 +56,12 @@ public class ScoreboardManager : UIItemListingManager
         if (ClickedOdd)
             SetActiveScoreboard(!ScoreboardActive);
     }
+    public void DeleteAllEntries()
+    {
+        object[] playerIDs = PlayersItemLists.Keys.ToArray();
+        foreach (object id in playerIDs)
+            DeleteEntry((byte)id);
+    }
 
     //Interface methods
     protected override void SortTransformsItemListingsDictionary()
@@ -71,31 +78,50 @@ public class ScoreboardManager : UIItemListingManager
 
         Scoreboard = transform.GetChild(0).gameObject;
         ScoreboardPanel = Scoreboard.transform.GetChild(0).gameObject;
-        ScoreboardTimer = Scoreboard.transform.GetChild(2).gameObject;
         SetActiveScoreboard(false);
 
         MobileButton = transform.GetChild(1).GetComponent<Button>();
         
-        if (GameManager.Instance.IsMobileSupported)
-            MobileButton.gameObject.SetActive(true);
-        else
-            MobileButton.gameObject.SetActive(false);
+        MobileButton.gameObject.SetActive(true);
 
-        SetIndexesToCompareInMergeSort(new List<(int, bool)>() { ((int)ScoreboardEntryArrayListIndexes.score, true), ((int)ScoreboardEntryArrayListIndexes.deaths, false) });
+        SetIndexesToCompareInMergeSort(new List<(int, bool)>() 
+        { 
+            ((int)ScoreboardEntryArrayListIndexes.score, true), 
+            ((int)ScoreboardEntryArrayListIndexes.deaths, false) 
+        });
+
+        GameStateManager.GameEnded += OpenGameEndingScoreboard;
+        GameStateManager.GameRestarting += CloseGameEndingScoreboard;
+        GameStateManager.GameRestarting += DeleteAllEntries;
     }
+    private void OnDestroy()
+    {
+        GameStateManager.GameEnded -= OpenGameEndingScoreboard;
+        GameStateManager.GameRestarting -= CloseGameEndingScoreboard;
+        GameStateManager.GameRestarting -= DeleteAllEntries;
+    }
+
+    private void CloseGameEndingScoreboard() =>
+        SetActiveScoreboard(false);
+    private void OpenGameEndingScoreboard() =>
+        SetActiveScoreboard(true);
+    
     private void Update()
     {
-        if (!Client.Instance.Connected)
+        if (!Client.Instance.Connected || GameStateManager.CurrentState.Equals(GameState.gameEnded))
         {
             MobileButton.interactable = false;
             return;
         }
 
         MobileButton.interactable = true;
+
+#if UNITY_STANDALONE
         if (Input.GetButtonDown("Scoreboard"))
             SetActiveScoreboard(true);
         else if (Input.GetButtonUp("Scoreboard"))
             SetActiveScoreboard(false);
+#endif
     }
     private void FixedUpdate()
     {

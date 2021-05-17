@@ -1,5 +1,7 @@
 using GameServer;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Timers;
 using UnityEngine;
 using UnityEngine.Output;
@@ -28,7 +30,9 @@ public class PickupItemsManager : MonoBehaviour
 
     private void Start()
     {
-        GameStateManager.Instance.OnServerActivated += StartSpawningItems;
+        GameStateManager.Instance.OnServerGameActivated += StartSpawningItems;
+        GameStateManager.Instance.OnServerGameEnded += StopSpawningItems;
+        GameStateManager.Instance.OnServerRestart += ResetAllItems;
 
         Transform pickupHolder = new GameObject("PickupHolder").transform;
         pickupHolder.position = Vector3.zero;
@@ -44,16 +48,20 @@ public class PickupItemsManager : MonoBehaviour
         for (byte pickupCount = 0; pickupCount < MaxNumPickups * 2; pickupCount++)
             MakeAndAddPickupToAvailableQueue(pickupHolder, GetRandomPickupGameObject());
     }
+    private void OnDestroy()
+    {
+        GameStateManager.Instance.OnServerGameActivated -= StartSpawningItems;
+        GameStateManager.Instance.OnServerGameEnded -= StopSpawningItems;
+        GameStateManager.Instance.OnServerRestart -= ResetAllItems;
+    }
+
 
     private void Awake()
     {
         Singleton.Init(ref instance, this);
         
     }
-    private void OnDestroy()
-    {
-        GameStateManager.Instance.OnServerActivated -= StartSpawningItems;
-    }
+    
 
     private void StartSpawningItems(float _)
     {
@@ -61,6 +69,17 @@ public class PickupItemsManager : MonoBehaviour
         SpawnPickupsTimer.Elapsed += GeneratePickup;
         SpawnPickupsTimer.Start();
         Output.WriteLine("\t!Started spawning items timer!");
+    }
+    private void StopSpawningItems()
+    {
+        SpawnPickupsTimer.Stop();
+        Output.WriteLine("\t!Stopped spawning items timer!");
+    }
+    private void ResetAllItems()
+    {
+        ushort[] pickupIDs = PickupsDictionary.Keys.ToArray();
+        foreach (ushort itemID in pickupIDs)
+            PickedUpItem(itemID);
     }
 
     private void MakeAndAddPickupToAvailableQueue(Transform pickupHolder, GameObject pickupObject)
@@ -89,7 +108,7 @@ public class PickupItemsManager : MonoBehaviour
         Vector2 spawnLocation;
         do
         {
-            spawnLocation = SpawnLocations[Random.Range(0, SpawnLocations.Count)].position;
+            spawnLocation = SpawnLocations[UnityEngine.Random.Range(0, SpawnLocations.Count)].position;
         } while (SpawnLocationUsing.Contains(spawnLocation));
 
         SpawnLocationUsing.Add(spawnLocation);
@@ -120,7 +139,7 @@ public class PickupItemsManager : MonoBehaviour
 
     private GameObject GetRandomPickupGameObject()
     {
-        float dropRarity = Random.Range(0f, 1f);
+        float dropRarity = UnityEngine.Random.Range(0f, 1f);
         if (dropRarity < 0.15f)
             return Adrenaline;
         else if (dropRarity < 0.4f)

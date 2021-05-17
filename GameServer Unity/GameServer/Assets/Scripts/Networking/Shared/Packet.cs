@@ -1,7 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+#if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE || UNITY_WEBGL
 using UnityEngine;
+using Mathf = UnityEngine.Mathf;
+#else
+using System.Numerics;
+using Mathf = System.MathF;
+#endif
 
 namespace Shared
 {
@@ -71,7 +77,8 @@ namespace Shared
         triedTakingTakenColor,
         generatedPickup,
         playerPickedUpItem,
-        chatMessage
+        chatMessage,
+        gameState
     }
 
     /// <summary>Sent from client to server.</summary>
@@ -127,7 +134,7 @@ namespace Shared
             SetBytes(data);
         }
 
-        #region Functions
+#region Functions
         /// <summary>Sets the packet's content and prepares it to be read.</summary>
         /// <param name="data">The bytes to add to the packet.</param>
         public void SetBytes(byte[] data)
@@ -190,9 +197,9 @@ namespace Shared
                 ReadPosition -= 4; // "Unread" the last read int
             }
         }
-        #endregion
+#endregion
 
-        #region Write Data
+#region Write Data
         //public void Write(bit)
 
         /// <summary>Adds a byte to the packet.</summary>
@@ -257,10 +264,10 @@ namespace Shared
             Buffer.AddRange(BitConverter.GetBytes(value.Ticks));
         }
 
-
+#if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE || UNITY_WEBGL
         /// <summary>Adds a Vector2 to the packet 4B - 512 >= a >= 0 Limited to Range of 0.0078125 -> 511.9921875.</summary>
         /// <param name="value">The Vector2 to add.</param>
-        public void WriteWorldUVector2(Vector2 value)
+        public void WriteWorldUVector2(UnityEngine.Vector2 value)
         {
             ushort componentsX = GetUShortUnsignedFloatSmallerThan512(value.x);
             ushort componentsY = GetUShortUnsignedFloatSmallerThan512(value.y);
@@ -268,7 +275,18 @@ namespace Shared
             Write(componentsX);
             Write(componentsY);
         }
+#else
+        /// <summary>Adds a Vector2 to the packet 4B - 512 >= a >= 0 Limited to Range of 0.0078125 -> 511.9921875.</summary>
+        /// <param name="value">The Vector2 to add.</param>
+        public void WriteWorldUVector2(System.Numerics.Vector2 value)
+        {
+            ushort componentsX = GetUShortUnsignedFloatSmallerThan512(value.X);
+            ushort componentsY = GetUShortUnsignedFloatSmallerThan512(value.Y);
 
+            Write(componentsX);
+            Write(componentsY);
+        }
+#endif
         private ushort GetUShortUnsignedFloatSmallerThan512(float floatVal)
         {
             if (floatVal < 0 || floatVal > 512)
@@ -292,8 +310,9 @@ namespace Shared
             return ushortVal;
         }
 
+#if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE || UNITY_WEBGL
         /// <summary> Adds a 2B Vector2 to the packet, the components are 0.9921875 >= a >= -0.9921875, precision 0.0078125 </summary>
-        internal void WriteLocalPosition(Vector2 localPosition)
+        internal void WriteLocalPosition(UnityEngine.Vector2 localPosition)
         {
             byte[] components = new byte[2];
             components[0] = Get1ByteSignedFloatSmallerThan1(localPosition.x);
@@ -301,6 +320,17 @@ namespace Shared
 
             Write(components);
         }
+#else
+        /// <summary> Adds a 2B Vector2 to the packet, the components are 0.9921875 >= a >= -0.9921875, precision 0.0078125 </summary>
+        internal void WriteLocalPosition(System.Numerics.Vector2 localPosition)
+        {
+            byte[] components = new byte[2];
+            components[0] = Get1ByteSignedFloatSmallerThan1(localPosition.X);
+            components[1] = Get1ByteSignedFloatSmallerThan1(localPosition.Y);
+
+            Write(components);
+        }
+#endif
 
         /// <summary> Gets 1B representation of a float value, the float must be in range: 0.9921875 >= a >= -0.9921875, precision 0.0078125 </summary>
         private static byte Get1ByteSignedFloatSmallerThan1(float val)
@@ -336,6 +366,7 @@ namespace Shared
             }
         }
 
+#if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE || UNITY_WEBGL
         /// <summary>Adds a Quaternion to the packet.</summary>
         /// <param name="value">The Quaternion to add.</param>
         /// 
@@ -348,11 +379,10 @@ namespace Shared
         /// This should decrease the packet size from 16 bytes = 128 bits
         /// To 2 bit (largest component index) + 3 * 7 bits (smallest 3 components) + 1 bit for negating all components = 24 bits - will send 3 bytes = 24 bits
         /// only 18.75% of the original packet
-
-        public void Write(Quaternion value)
+        public void Write(UnityEngine.Quaternion value)
         {
             float[] componentsAbs = new float[] { Math.Abs(value.x), Math.Abs(value.y), Math.Abs(value.z), Math.Abs(value.w) };
-            float[] components = new float[] { value.x, value.y, value.z, value.w };
+            float[] components = new float[] { value.x, value.y, value.z, value.w };            
 
             int largestAbsIndex = GetLargestComponentIndex(componentsAbs);
             bool largestCompNegative = components[largestAbsIndex] < 0;
@@ -380,7 +410,51 @@ namespace Shared
 
             Write(bytesToSend);
         }
+#else
+        /// <summary>Adds a Quaternion to the packet.</summary>
+        /// <param name="value">The Quaternion to add.</param>
+        /// 
+        /// Smallest 3, find the largest absolute of the floats, don't send it, send the smallest 3, 
+        /// and give the index for the largest using 2 bits  [00, 01, 10, 11] 00 = x, 01 = y, 10 = z, 11 = w
+        /// Use formula x^2 + y^2 + z^2 + w^2 = 1
+        /// 
+        /// Also can use less precise floating point value, instead of 4 bytes per component, use 1 byte
+        /// 
+        /// This should decrease the packet size from 16 bytes = 128 bits
+        /// To 2 bit (largest component index) + 3 * 7 bits (smallest 3 components) + 1 bit for negating all components = 24 bits - will send 3 bytes = 24 bits
+        /// only 18.75% of the original packet
+        public void Write(System.Numerics.Quaternion value)
+        {
+            float[] componentsAbs = new float[] { Math.Abs(value.X), Math.Abs(value.Y), Math.Abs(value.Z), Math.Abs(value.W) };
+            float[] components = new float[] { value.X, value.Y, value.Z, value.W };
 
+            int largestAbsIndex = GetLargestComponentIndex(componentsAbs);
+            bool largestCompNegative = components[largestAbsIndex] < 0;
+            bool[] largestAbsIndexBin = ConvertIntMax4ToBin2(largestAbsIndex);
+
+            byte[] bytesToSend = new byte[3];
+            byte byteCounter = 0;
+
+            for (int count = 0; count < 4; count++)
+            {
+                if (count == largestAbsIndex)
+                    continue;
+                // Writes the 7 bit representation of the float instead of the 32 bit
+                bytesToSend[byteCounter++] = Get7BitFractionalFrom32BitFloat(componentsAbs[count], components[count] < 0);
+            }
+
+            //Writes the bit indexes of which component not to read fragmented amongst the bits
+            if (largestAbsIndexBin[0])
+                bytesToSend[0] += 128;
+            if (largestAbsIndexBin[1])
+                bytesToSend[1] += 128;
+
+            if (largestCompNegative) //Should negate the smallest 3 (*-1) components
+                bytesToSend[2] += 128;
+
+            Write(bytesToSend);
+        }
+#endif
         const float SmallestFloatCanRepresent = 1 / 64; //2^-6
         private static byte Get7BitFractionalFrom32BitFloat(float floating32BitAbs, bool negative)
         {
@@ -459,9 +533,9 @@ namespace Shared
 
             return largestIndex;
         }
-        #endregion
+#endregion
 
-        #region Read Data
+#region Read Data
         /// <summary>
         /// Gets the packetLen, currently set to byte, so max packet size is 255B
         /// Can increase to ushort so max packet size is 65_535B
@@ -679,11 +753,11 @@ namespace Shared
             }
         }
 
-
+#if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE || UNITY_WEBGL
         /// <summary>Reads a Unsigned Vector2 from the packet, Limited to Range of 0.0078125 -> 511.9921875.</summary>
         /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
         /// 2B for each component, so 4B in total
-        public Vector2 ReadUVector2WorldPosition(bool moveReadPos = true)
+        public UnityEngine.Vector2 ReadUVector2WorldPosition(bool moveReadPos = true)
         {
             try
             {
@@ -693,7 +767,7 @@ namespace Shared
                 float componentX = GetUnsignedFloatSmallerThan512FromUShort(valX);
                 float componentY = GetUnsignedFloatSmallerThan512FromUShort(valY);
 
-                Vector2 value = new Vector2(componentX, componentY);
+                UnityEngine.Vector2 value = new UnityEngine.Vector2(componentX, componentY);
                 return value; // Return the Vector2
             }
             catch
@@ -701,6 +775,29 @@ namespace Shared
                 throw new Exception("Could not read value of type 'Vector2'!");
             }
         }
+#else
+        /// <summary>Reads a Unsigned Vector2 from the packet, Limited to Range of 0.0078125 -> 511.9921875.</summary>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        /// 2B for each component, so 4B in total
+        public System.Numerics.Vector2 ReadUVector2WorldPosition(bool moveReadPos = true)
+        {
+            try
+            {
+                ushort valX = ReadUShort(moveReadPos);
+                ushort valY = ReadUShort(moveReadPos);
+
+                float componentX = GetUnsignedFloatSmallerThan512FromUShort(valX);
+                float componentY = GetUnsignedFloatSmallerThan512FromUShort(valY);
+
+                System.Numerics.Vector2 value = new System.Numerics.Vector2(componentX, componentY);
+                return value; // Return the Vector2
+            }
+            catch
+            {
+                throw new Exception("Could not read value of type 'Vector2'!");
+            }
+        }
+#endif
         private float GetUnsignedFloatSmallerThan512FromUShort(ushort ushortVal)
         {
             float floatVal = 0;
@@ -720,15 +817,27 @@ namespace Shared
             return floatVal;
         }
 
-        internal Vector2 ReadLocalVector2()
+#if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE || UNITY_WEBGL
+        internal UnityEngine.Vector2 ReadLocalVector2()
         {
             byte[] components = ReadBytes(2);
 
             float x = GetSignedFloatSmallerThan1FromByte(components[0]);
             float y = GetSignedFloatSmallerThan1FromByte(components[1]);
 
-            return new Vector2(x, y);
+            return new UnityEngine.Vector2(x, y);
         }
+#else
+        internal System.Numerics.Vector2 ReadLocalVector2()
+        {
+            byte[] components = ReadBytes(2);
+
+            float x = GetSignedFloatSmallerThan1FromByte(components[0]);
+            float y = GetSignedFloatSmallerThan1FromByte(components[1]);
+
+            return new System.Numerics.Vector2(x, y);
+        }
+#endif
         private static float GetSignedFloatSmallerThan1FromByte(byte byteVal)
         {
             float floatVal = 0;
@@ -761,6 +870,7 @@ namespace Shared
             }
         }
 
+#if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE || UNITY_WEBGL
         /// <summary>Reads a Quaternion from the packet.</summary>
         /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
         /// 
@@ -769,7 +879,7 @@ namespace Shared
         /// Reads the 2 fragmented bits that will indicate the index of the missing component from the 0th and 1st bytes
         /// Read the 3 smallest components
         /// Reconstruct the largest component
-        public Quaternion ReadQuaternion(bool moveReadPos = true)
+        public UnityEngine.Quaternion ReadQuaternion(bool moveReadPos = true)
         {
             try
             {
@@ -810,7 +920,7 @@ namespace Shared
                 else //same as -> else if (!index1 && !index1) //Reconstruct x
                     Reconstruct(components, out y, out z, out w, out x, shouldNegateComponents);
 
-                Quaternion value = new Quaternion(x, y, z, w);
+                UnityEngine.Quaternion value = new UnityEngine.Quaternion(x, y, z, w);
 
                 return value; // Return the Quaternion
             }
@@ -819,6 +929,66 @@ namespace Shared
                 throw new Exception("Could not read value of type 'Quaternion'!");
             }
         }
+#else
+        /// <summary>Reads a Quaternion from the packet.</summary>
+        /// <param name="moveReadPos">Whether or not to move the buffer's read position.</param>
+        /// 
+        /// Reads the same as the Smallest 3 Written version
+        /// Reads 3 bytes
+        /// Reads the 2 fragmented bits that will indicate the index of the missing component from the 0th and 1st bytes
+        /// Read the 3 smallest components
+        /// Reconstruct the largest component
+        public System.Numerics.Quaternion ReadQuaternion(bool moveReadPos = true)
+        {
+            try
+            {
+                byte[] components = ReadBytes(3);
+
+                //if (largestAbsIndexBin[0])
+                //    bytesToSend[0] += 128;
+                //if (largestAbsIndexBin[1])
+                //    bytesToSend[1] += 128;
+
+                bool index0 = components[0] - 128 >= 0;
+                bool index1 = components[1] - 128 >= 0;
+
+                bool shouldNegateComponents = components[2] - 128 >= 0;
+
+                if (index0)
+                    components[0] -= 128;
+                if (index1)
+                    components[1] -= 128;
+
+                if (shouldNegateComponents)
+                    components[2] -= 128;
+
+                //[00, 01, 10, 11] 00 = x, 01 = y, 10 = z, 11 = w
+                //
+                // Use formula x^2 + y^2 + z^2 + w^2 = 1
+                // a^2 + b^2 + c^2 + r^2 = 1
+                // r = sqrt(1 - a^2 - b^2 - c^2)
+
+                float x, y, z, w;
+
+                if (index1 && index0) //Reconstruct w
+                    Reconstruct(components, out x, out y, out z, out w, shouldNegateComponents);
+                else if (index1 && !index0) //Reconstruct z
+                    Reconstruct(components, out x, out y, out w, out z, shouldNegateComponents);
+                else if (!index1 && index0) //Reconstruct y
+                    Reconstruct(components, out x, out z, out w, out y, shouldNegateComponents);
+                else //same as -> else if (!index1 && !index1) //Reconstruct x
+                    Reconstruct(components, out y, out z, out w, out x, shouldNegateComponents);
+
+                System.Numerics.Quaternion value = new System.Numerics.Quaternion(x, y, z, w);
+
+                return value; // Return the Quaternion
+            }
+            catch
+            {
+                throw new Exception("Could not read value of type 'Quaternion'!");
+            }
+        }
+#endif
         private static void Reconstruct(byte[] components, out float a, out float b, out float c, out float r, bool shouldNegate)
         {
             a = Read7BitFloat(components[0]);
@@ -866,7 +1036,7 @@ namespace Shared
 
             return negative ? -value : value;
         }
-        #endregion
+#endregion
 
         private bool Disposed = false;
 

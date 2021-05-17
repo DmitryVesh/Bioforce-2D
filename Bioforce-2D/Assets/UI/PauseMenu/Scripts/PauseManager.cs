@@ -34,8 +34,8 @@ public class PauseManager : MonoBehaviour
         NormalPausePanel.SetActive(active);
         LostConnectionPanel.SetActive(false);
 
-        if (GameManager.Instance.IsMobileSupported)
-            MobileSettingsButton.SetActive(!active);
+        //if (GameManager.Instance.IsMobileSupported)
+        //    MobileSettingsButton.SetActive(!active);
 
         if (active)
         {
@@ -49,7 +49,7 @@ public class PauseManager : MonoBehaviour
         NormalPausePanel.SetActive(Paused && !lostConnection);
         LostConnectionPanel.SetActive(lostConnection);
     }
-    public void OnMobileSettings()
+    public void OnMobileSettings() //Subscribed through Inspector
     {
         ClickedOdd = !ClickedOdd;
         if (ClickedOdd)
@@ -94,7 +94,8 @@ public class PauseManager : MonoBehaviour
         Singleton.Init(ref instance, this);
 
         SetNormalPauseActive(false);
-        MobileSettingsButton.SetActive(GameManager.Instance.IsMobileSupported);
+        //MobileSettingsButton.SetActive(GameManager.Instance.IsMobileSupported);
+        MobileSettingsButton.SetActive(true);
 
     }
     private void Start()

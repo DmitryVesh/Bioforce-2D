@@ -20,7 +20,11 @@ namespace GameServer
         public static bool EstablishedConnection { get; set; } = false;
         public static int Port { get; private set; }
         public static string ServerName { get; set; }
-        private static int TimeOut { get; set; }
+        private static int TimeOut { get; set; } 
+        public static bool ServerEndsWhenNoPlayersOn
+        {
+            get => TimeOut != -1;
+        }
 
         public static void Connect(int port, string serverName, int timeOut)
         {

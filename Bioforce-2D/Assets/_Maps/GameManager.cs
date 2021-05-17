@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Output;
 using UnityEngine.SceneManagement;
 using UnityEngine.Singleton;
+using Shared;
 
 public class GameManager : MonoBehaviour
 {
@@ -67,6 +68,22 @@ public class GameManager : MonoBehaviour
         ConfyMouse();
         IsMobileSupported = CheckIfOnMobile();
 
+        GameStateManager.GameEnded += RemoveAllPlayers;
+    }
+
+    private void RemoveAllPlayers()
+    {
+        Output.WriteLine($"All players are being removed.");
+        foreach (PlayerManager player in PlayerDictionary.Values)
+        {
+            player.Disconnect();
+        }
+        PlayerDictionary.Clear();
+    }
+
+    private void OnDestroy()
+    {
+        GameStateManager.GameEnded -= RemoveAllPlayers;
     }
     private void Update()
     {
@@ -158,14 +175,8 @@ public class GameManager : MonoBehaviour
     {
         ThreadManager.ExecuteOnMainThread(() =>
         {
-            Output.WriteLine($"All players are being disconnected.");
-            foreach (PlayerManager player in PlayerDictionary.Values)
-            {
-                ScoreboardManager.Instance.DeleteEntry(player.ID);
-                player.Disconnect();
-            }
-            PlayerDictionary.Clear();
-
+            RemoveAllPlayers();
+            ScoreboardManager.Instance.DeleteAllEntries();
             SwitchScene("Main Menu");
         });
         

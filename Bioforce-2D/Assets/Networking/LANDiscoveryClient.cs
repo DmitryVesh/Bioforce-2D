@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using Shared;
 
 public class LANDiscoveryClient : DiscoveryTCPClient
 {

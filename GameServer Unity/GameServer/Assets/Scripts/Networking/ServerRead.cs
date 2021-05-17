@@ -2,6 +2,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.Output;
+using System.Collections.Generic;
 
 namespace GameServer
 {
@@ -15,8 +16,9 @@ namespace GameServer
             Output.WriteLine($"\t{Server.ClientDictionary[clientID].tCP.Socket.Client.RemoteEndPoint} connected as player: \"{username}\" : {clientID}");
             if (clientID == checkClientID)
             {
-                ServerSend.AskPlayerDetails(clientID, PlayerColor.UnAvailablePlayerColors(), 
-                    GameStateManager.Instance.CurrentState, GameStateManager.Instance.RemainingGameTime);
+                ServerSend.AskPlayerDetails(clientID, PlayerColor.UnAvailablePlayerColors());
+                ServerSend.SendGameState(GameStateManager.Instance.CurrentState, GameStateManager.Instance.RemainingGameTime, clientID);
+                
                 Server.ClientDictionary[clientID].SetPlayer(username);
                 Server.ClientDictionary[clientID].SpawnOtherPlayersToConnectedUser();
                 return;
@@ -206,7 +208,7 @@ namespace GameServer
             catch (Exception exception)
             {
                 Output.WriteLine($"\tError, trying to read PlayerStillConnectedTCP, from player: {clientID}\n{exception}");
-            }
+            }            
         }
         internal static void PlayerStillConnectedUDP(byte clientID, Packet packet)
         {
@@ -220,7 +222,7 @@ namespace GameServer
             catch (Exception exception)
             {
                 Output.WriteLine($"\tError, trying to read PlayerStillConnectedUDP, from player: {clientID}\n{exception}");
-            }
+            }            
         }
 
 

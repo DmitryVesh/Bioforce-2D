@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using UnityEngine;
 using UnityEngine.Output;
+using Shared;
 
 public abstract class DiscoveryTCPClient
 {

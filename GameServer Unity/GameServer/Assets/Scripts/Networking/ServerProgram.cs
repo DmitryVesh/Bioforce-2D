@@ -15,8 +15,8 @@ namespace GameServer
 
         private void Start()
         {
-            //Skip the fileName of this executable, and the "GameServer" string given to easily identify which processes in linux are MainServer/GameServer
-            string[] args = Environment.GetCommandLineArgs().Skip(2).ToArray(); 
+            string[] args 
+                = Environment.GetCommandLineArgs().Skip(2).ToArray(); //Skip the fileName of this executable, and the "GameServer" string given to easily identify which processes in linux are MainServer/GameServer
 
             StartServerProgram(args);
         }

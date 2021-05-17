@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Output;
 using UnityEngine.Singleton;
+using Shared;
 
 public class ServerMenu : MonoBehaviour
 {

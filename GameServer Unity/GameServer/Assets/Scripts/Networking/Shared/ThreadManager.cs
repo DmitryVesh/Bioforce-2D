@@ -1,20 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+
+#if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE || UNITY_WEBGL
 using UnityEngine;
 using UnityEngine.Output;
+#else
+using Output = System.Console;
+#endif
 
 namespace Shared
 {
+#if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE || UNITY_WEBGL
     public class ThreadManager : MonoBehaviour
     {
-        private static readonly List<Action> ActionsToExecute = new List<Action>();
-        private static readonly List<Action> CopiedActionsToExecute = new List<Action>();
-        private static bool HasActionToExecute { get; set; } = false;
-
         private void FixedUpdate()
         {
             UpdateMain();
         }
+#else
+    public class ThreadManager
+    {
+#endif
+
+        private static readonly List<Action> ActionsToExecute = new List<Action>();
+        private static readonly List<Action> CopiedActionsToExecute = new List<Action>();
+        private static bool HasActionToExecute { get; set; } = false;
 
         /// <summary>Sets an action to be executed on the main thread.</summary>
         /// <param name="action">The action to be executed on the main thread.</param>

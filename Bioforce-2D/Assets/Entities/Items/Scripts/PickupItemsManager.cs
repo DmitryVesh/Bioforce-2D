@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Output;
 using UnityEngine.Singleton;
+using Shared;
 
 public class PickupItemsManager : MonoBehaviour
 {
@@ -81,7 +82,7 @@ public class PickupItemsManager : MonoBehaviour
                 //Output.WriteLine(dif);
                 //Output.WriteLine(newInvincibilityTime);
 
-                oldInvincibilityTime = oldInvincibilityTime - Client.Instance.LatestLatency1WaySecondsTCP;
+                oldInvincibilityTime = oldInvincibilityTime - Client.Instance.Latency1WaySecondsTCP;
 
                 ((AdrenalinePickup)pickup).InvincibilityTime = oldInvincibilityTime;
                 break;
