@@ -89,7 +89,8 @@ namespace MainServerBioforce2D
             
             Output.WriteLine($"Read AddServer from client:{client} at ip {InternetDiscoveryTCPServer.ClientDictionary[client].TCPClient.Client.RemoteEndPoint}");
 
-            int gameServerPort = InternetDiscoveryTCPServer.MakeGameServer(serverName, maxNumPlayers, mapName, currentNumPlayers, ping, timeOut: 30);
+            int gameServerPort = 
+                InternetDiscoveryTCPServer.MakeGameServer(serverName, maxNumPlayers, mapName, currentNumPlayers, ping, timeOutSeconds: 30, isServerPermanent: false);
             if (gameServerPort == -1)
             {
                 Output.WriteLine(

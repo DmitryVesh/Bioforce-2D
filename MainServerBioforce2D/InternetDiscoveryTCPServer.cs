@@ -41,13 +41,15 @@ namespace MainServerBioforce2D
             return ports;
         }
 
-        public static int MakeGameServer(string serverName, int maxNumPlayers, string mapName, int currentNumPlayers, int ping, int timeOut)
+        public static int MakeGameServer(string serverName, int maxNumPlayers, string mapName, int currentNumPlayers, int ping, int timeOutSeconds, bool isServerPermanent)
         {
             (int gameServerPort, int gameMainPort) = GetAvailablePort();
             if (gameServerPort == -1) //No more servers available
             {
                 return gameServerPort;
             }
+
+            string mainServerIPForGameServerToConnectTo = IPAddress.Loopback.ToString();
 
             Server server = new Server(serverName, maxNumPlayers, mapName, currentNumPlayers, ping);
             ServersAvailable.Add(server);
@@ -56,7 +58,17 @@ namespace MainServerBioforce2D
             gameServerProcess.StartInfo = new ProcessStartInfo
             {
                 FileName = Program.GameServerFileName,
-                ArgumentList = { "GameServer", serverName, maxNumPlayers.ToString(), mapName, gameServerPort.ToString(), gameMainPort.ToString(), timeOut.ToString() }
+                ArgumentList = { 
+                    "GameServer", 
+                    serverName, 
+                    maxNumPlayers.ToString(), 
+                    mapName, 
+                    gameServerPort.ToString(), 
+                    gameMainPort.ToString(), 
+                    timeOutSeconds.ToString(),
+                    isServerPermanent.ToString(),
+                    mainServerIPForGameServerToConnectTo,
+                }
             };
             gameServerProcess.Start();
             gameServerProcess.EnableRaisingEvents = true;
@@ -70,7 +82,7 @@ namespace MainServerBioforce2D
             return gameServerPort;
         }
         private static void MakePersistentServer() =>
-            MakeGameServer(serverName: "Welcome", maxNumPlayers: 16, mapName: "Level 1", currentNumPlayers: 0, ping: 0, timeOut: -1);
+            MakeGameServer(serverName: "Welcome", maxNumPlayers: 16, mapName: "Level 1", currentNumPlayers: 0, ping: 0, timeOutSeconds: 30, isServerPermanent: true);
 
         public static void StartServer(int port, string version)
         {

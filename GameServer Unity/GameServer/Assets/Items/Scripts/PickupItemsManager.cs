@@ -32,6 +32,7 @@ public class PickupItemsManager : MonoBehaviour
     {
         GameStateManager.Instance.OnServerGameActivated += StartSpawningItems;
         GameStateManager.Instance.OnServerGameEnded += StopSpawningItems;
+        GameStateManager.Instance.OnServerRestart += StopSpawningItems;
         GameStateManager.Instance.OnServerRestart += ResetAllItems;
 
         Transform pickupHolder = new GameObject("PickupHolder").transform;
@@ -52,6 +53,7 @@ public class PickupItemsManager : MonoBehaviour
     {
         GameStateManager.Instance.OnServerGameActivated -= StartSpawningItems;
         GameStateManager.Instance.OnServerGameEnded -= StopSpawningItems;
+        GameStateManager.Instance.OnServerRestart -= StopSpawningItems;
         GameStateManager.Instance.OnServerRestart -= ResetAllItems;
     }
 
@@ -80,6 +82,7 @@ public class PickupItemsManager : MonoBehaviour
         ushort[] pickupIDs = PickupsDictionary.Keys.ToArray();
         foreach (ushort itemID in pickupIDs)
             PickedUpItem(itemID);
+
     }
 
     private void MakeAndAddPickupToAvailableQueue(Transform pickupHolder, GameObject pickupObject)

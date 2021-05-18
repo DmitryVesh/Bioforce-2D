@@ -10,8 +10,11 @@ namespace GameServer
         {
             Output.WriteLine("\n\t\tGameServer reading welcome packet from MainServer");
             MainServerComms.EstablishedConnection = true;
-            Thread updateThread = new Thread(new ThreadStart(MainServerComms.Update));
-            updateThread.Start();
+
+            //Thread updateThread = new Thread(new ThreadStart(MainServerComms.Update));
+            //updateThread.Start();
+            MainServerComms.StartSendingServerData();
+            
             MainServerCommsSend.WelcomeReceived(MainServerComms.ServerName);
             Output.WriteLine("\n\t\tGameServer recieved welcome packet from MainServer");
         }

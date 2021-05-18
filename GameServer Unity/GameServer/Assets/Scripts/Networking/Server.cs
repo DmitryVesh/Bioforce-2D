@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Timers;
 using Shared;
 using UnityEngine;
 using UnityEngine.Output;
@@ -13,10 +14,8 @@ namespace GameServer
         public static string ServerName { get; private set; }
         public static int MaxNumPlayers { get; private set; }
         public static string MapName { get; private set; }
-
         public static int PortNum { get; private set; }
-
-        
+        public static bool IsServerPermanent { get; private set; }
 
         public static Dictionary<byte, ClientServer> ClientDictionary = new Dictionary<byte, ClientServer>();
 
@@ -28,6 +27,10 @@ namespace GameServer
         public delegate void PacketHandler(byte clientID, Packet packet);
         public static Dictionary<byte, PacketHandler> PacketHandlerDictionary;
 
+        private static int TimeOutSeconds { get; set; }
+        const double secondInMS = 1000d;
+        private static Timer TimeOutTimer { get; set; } = new Timer(secondInMS);
+        private static int NumSecondsServerEmpty { get; set; } = 0;
 
         internal static List<int> GetAllPlayerColors()
         {
@@ -46,18 +49,20 @@ namespace GameServer
             int playerCount = 0;
             foreach (ClientServer client in ClientDictionary.Values)
             {
-                if (client.Player != null)
+                if (client.Connected)
                     playerCount++;
             }
             return playerCount;
         }
 
-        public static void StartServer(string serverName, int maxNumPlayers, string mapName, int portNum)
+        public static void StartServer(string serverName, int maxNumPlayers, string mapName, int portNum, int timeOutSeconds, bool isServerPermanent)
         {
             try
             {
                 ServerName = serverName;
                 MapName = mapName;
+                TimeOutSeconds = timeOutSeconds;
+                IsServerPermanent = isServerPermanent;
 
                 Application.quitting += OnApplicationQuiting;
                 (MaxNumPlayers, PortNum) = (maxNumPlayers, portNum);
@@ -73,19 +78,45 @@ namespace GameServer
                 UDPClient = new UdpClient(PortNum);
                 UDPBeginReceive();
 
-                Output.WriteLine($"\n\tSuccess Starting Server:" +
+                Output.WriteLine(
+                    $"\n\tSuccess Starting Server:" +
                     $"\n\t\tServer: {ServerName}" +
                     $"\n\t\tMap:          {MapName}" +
                     $"\n\t\tMax Players:  {MaxNumPlayers}" +
-                    $"\n\t\tPort number:  {PortNum}");
+                    $"\n\t\tPort number:  {PortNum}"
+                );
 
-                //PlayerColor.GetRandomColor();
+                TimeOutTimer.Elapsed += TimeOutTimer_Elapsed;
+                TimeOutTimer.Start();
             }
             catch (Exception exception)
             {
                 Output.WriteLine($"\tError in making the Server: {ServerName}...\n{exception}");
                 Application.Quit(1);
                 //CloseServer(); TODO: May cause damage commenting it, but I think there is already an OnApplicationQuiting event that calls CloseServer
+            }
+        }
+
+        private static void TimeOutTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            NumSecondsServerEmpty = GetCurrentNumPlayers() == 0 ? NumSecondsServerEmpty + 1 : 0;
+
+            if (NumSecondsServerEmpty >= TimeOutSeconds)
+            {
+                if (!IsServerPermanent) //End Server
+                {
+                    Output.WriteLine(
+                        $"\n\t\t---------------------------------------------------------------------" +
+                        $"\n\t\tGameServer {ServerName} is shutting down due to no players present..." +
+                        $"\n\t\t---------------------------------------------------------------------"
+                    );
+                    Application.Quit(0);
+                    return;
+                }
+
+                //Reset back to waiting for players
+                NumSecondsServerEmpty = 0;
+                GameStateManager.Instance.TimeoutReset();
             }
         }
 

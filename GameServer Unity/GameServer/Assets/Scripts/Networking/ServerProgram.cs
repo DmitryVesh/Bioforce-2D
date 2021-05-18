@@ -38,15 +38,21 @@ namespace GameServer
             int portMainServer = int.Parse(args[4]);
             Output.WriteLine(portMainServer.ToString());
 
-            int timeOut = int.Parse(args[5]);
-            Output.WriteLine(timeOut.ToString());
+            int timeOutSeconds = int.Parse(args[5]);
+            Output.WriteLine(timeOutSeconds.ToString());
+            
+            bool isServerPermanent = bool.Parse(args[6]);
+            Output.WriteLine(isServerPermanent.ToString());
+
+            string mainServerIP = args[7];
+            Output.WriteLine(mainServerIP);
 
             try
             {
                 Output.InitLogFile($"GameServer_{serverName}");
                 SceneManager.LoadScene(mapName);
-                MainServerComms.Connect(portMainServer, serverName, timeOut);
-                Server.StartServer(serverName, maxNumPlayers, mapName, portGame);
+                MainServerComms.Connect(portMainServer, serverName, mainServerIP);
+                Server.StartServer(serverName, maxNumPlayers, mapName, portGame, timeOutSeconds, isServerPermanent);
             }
             catch (Exception exception)
             {

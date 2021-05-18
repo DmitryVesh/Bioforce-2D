@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Output;
 using UnityEngine.Singleton;
 using Shared;
+using System.Linq;
 
 public class PickupItemsManager : MonoBehaviour
 {
@@ -23,6 +24,20 @@ public class PickupItemsManager : MonoBehaviour
 
         PickupHolder = new GameObject("PickupHolder").transform;
         PickupHolder.position = Vector3.zero;
+
+        GameStateManager.GameRestarting += ResetAllSpawnedPickups;
+    }
+    private void OnDestroy()
+    {
+        GameStateManager.GameRestarting -= ResetAllSpawnedPickups;
+    }
+
+    private void ResetAllSpawnedPickups()
+    {
+        ushort[] pickupIDs = PickupDictionary.Keys.ToArray();
+        foreach (ushort itemID in pickupIDs)
+            PickupDictionary[itemID].ResetPickup();
+        PickupDictionary.Clear();
     }
 
     public void SpawnGeneratedPickup(PickupType pickupType, ushort pickupID, Vector2 position)

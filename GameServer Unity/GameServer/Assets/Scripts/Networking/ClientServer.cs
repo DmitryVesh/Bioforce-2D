@@ -15,7 +15,7 @@ namespace GameServer
         private static int DataBufferSize { get; set; } = 4096;
 
         public PlayerServer Player { get; private set; }
-        private bool Disconnected { get; set; } = false;
+        public bool Connected { get; private set; } = false;
         public readonly Vector2 SpawningVector2 = new Vector2(31.08f, 5.65f);
 
         public ClientServer(byte iD)
@@ -158,7 +158,6 @@ namespace GameServer
             
         }
 
-
         public class UDPServer
         {
             public IPEndPoint ipEndPoint;
@@ -209,6 +208,7 @@ namespace GameServer
         {
             Player = NetworkManager.Instance.InstantiatePlayer();
             Player.Init(ID, username);
+            Connected = true; 
         }
         public void SendIntoGame(int playerColor)
         {
@@ -240,6 +240,8 @@ namespace GameServer
         {
             try
             {
+                Connected = false;
+
                 try
                 {
                     if (Player is null)
@@ -254,7 +256,7 @@ namespace GameServer
                 {
                     Output.WriteLine($"\n\tError in GameServer Disconnecting Player when null: {ID}...\n{e}");
                 }
-
+                
                 Output.WriteLine($"\tPlayer: {ID} has disconnected.");
                 ServerSend.DisconnectPlayer(ID);
 
@@ -266,7 +268,7 @@ namespace GameServer
                 tCP.Disconnect();
                 uDP.Disconnect();
 
-                Disconnected = true;
+                //Disconnected = true;
             }
             catch (Exception exception)
             {

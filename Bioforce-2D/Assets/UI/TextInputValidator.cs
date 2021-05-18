@@ -13,7 +13,7 @@ public class TextInputValidator
         "tit", "fanny", "prick", "twat", "punani", "pussy", "cock", "cum",
         "knob", "dick", "bastard", "motherfuck", "wanker", "cunt", "nigg",
         "suck", "succ", "zuck", "zucc", "idiot", "imbecile", "moron",
-        "retarded", "down", "boob", "vagin", "cuck", "jizz", "dicck", "fucc", 
+        "retarded", "downy", "boob", "vagin", "cuck", "jizz", "dicck", "fucc", 
         "fuk", "fucck", 
         "\\n", "\\\\", "\\", "/" };
 

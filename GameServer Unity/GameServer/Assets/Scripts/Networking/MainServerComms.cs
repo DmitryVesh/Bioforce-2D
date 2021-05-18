@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Threading;
+using System.Timers;
 using UnityEngine;
 using UnityEngine.Output;
 
@@ -11,7 +11,6 @@ namespace GameServer
     public class MainServerComms
     {
         public const int DataBufferSize = 4096;
-        public const string LocalIP = "127.0.0.1";
 
         public static TCP tCP { get; set; }
 
@@ -20,25 +19,24 @@ namespace GameServer
         public static bool EstablishedConnection { get; set; } = false;
         public static int Port { get; private set; }
         public static string ServerName { get; set; }
-        private static int TimeOut { get; set; } 
-        public static bool ServerEndsWhenNoPlayersOn
-        {
-            get => TimeOut != -1;
-        }
 
-        public static void Connect(int port, string serverName, int timeOut)
+        const double halfSecondInMS = 500d;
+        private static Timer ServerSendDataTimer { get; set; } = new Timer(halfSecondInMS);
+
+        public static void Connect(int port, string serverName, string mainServerIP)
         {
             Port = port;
             ServerName = serverName;
-            TimeOut = timeOut;
 
             Output.WriteLine($"\n\t\tMainServerComms trying to connect:{Port}");
             InitIncomingPacketHandler();
 
             tCP = new TCP();
-            tCP.Connect(LocalIP);            
+            tCP.Connect(mainServerIP);            
 
             Application.quitting += OnApplicationQuiting;
+            
+            ServerSendDataTimer.Elapsed += SendServerDataToMainServer;
         }
 
         private static void OnApplicationQuiting()
@@ -64,48 +62,21 @@ namespace GameServer
                 MainServerCommsSend.ShuttingDown(ServerName);
 
                 Output.WriteLine($"\n\t\tMainServerComms: {Port} has disconnected.");
-            }
 
+                ServerSendDataTimer.Stop();
+            }
         }
 
-        public static void Update()
+        public static void StartSendingServerData()
         {
-            Output.WriteLine($"\n\t\tStarted MainServerComms Update thread.");
-            DateTime TickTimer = DateTime.Now;
-            double SendTime = 1000;
-            int numTimesServerIsEmpty = 0;
-
-            while (EstablishedConnection)
-            {
-                while (TickTimer < DateTime.Now)
-                {
-                    int currentNumPlayers = Server.GetCurrentNumPlayers();
-                    if (currentNumPlayers == 0)
-                        numTimesServerIsEmpty += 1;
-                    else
-                        numTimesServerIsEmpty = 0;
-
-                    if (TimeOut != -1 && numTimesServerIsEmpty >= TimeOut)
-                    {
-                        Output.WriteLine("" +
-                            "\n\t\t------------------------------------------------------------" +
-                            $"\n\t\tGameServer {ServerName} is shutting down due to no players present..." +
-                            "\n\t\t------------------------------------------------------------");
-                        Application.Quit(0);
-                        EstablishedConnection = false;
-                        break;
-                    }
-
-                    if (EstablishedConnection)
-                        MainServerCommsSend.ServerData(ServerName, currentNumPlayers, Server.MaxNumPlayers, Server.MapName);
-
-                    TickTimer = TickTimer.AddMilliseconds(SendTime);
-
-                    if (TickTimer > DateTime.Now)
-                        Thread.Sleep(TickTimer - DateTime.Now);
-                }
-            }
-            Output.WriteLine($"\t\tEnding MainServerComms server: {Port}");
+            Output.WriteLine($"\n\t\tStarted MainServerComms.");
+            
+            ServerSendDataTimer.Start();
+        }
+        private static void SendServerDataToMainServer(object sender, ElapsedEventArgs e)
+        {
+            if (EstablishedConnection)
+                MainServerCommsSend.ServerData(ServerName, Server.GetCurrentNumPlayers(), Server.MaxNumPlayers, Server.MapName);
         }
         
         public class TCP

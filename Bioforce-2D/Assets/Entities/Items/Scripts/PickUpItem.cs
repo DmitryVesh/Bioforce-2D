@@ -16,6 +16,13 @@ public abstract class PickupItem : MonoBehaviour
     [SerializeField] private MinimapIcon ItemMinimapIcon;
 
     public ushort PickupID { get; set; }
+    
+    public virtual void PlayerPickedUp(PlayerManager player)
+    {
+        PlayEffectsAndHide();
+    }
+    public void ResetPickup() =>
+        PlayEffectsAndHide();
 
     private void SetActive(bool active)
     {
@@ -36,8 +43,5 @@ public abstract class PickupItem : MonoBehaviour
         Destroy(gameObject);
     }
 
-    public virtual void PlayerPickedUp(PlayerManager player)
-    {
-        PlayEffectsAndHide();
-    }
+    
 }

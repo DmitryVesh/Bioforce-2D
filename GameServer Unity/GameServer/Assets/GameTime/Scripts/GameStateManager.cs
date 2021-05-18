@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.ComponentModel.Design;
 using UnityEngine;
+using UnityEngine.Output;
 using UnityEngine.Singleton;
 
 public enum GameState
@@ -32,6 +33,7 @@ public class GameStateManager : MonoBehaviour
     public Action OnServerRestart { get; set; } //Each ClientServer will subscribe to this so the player model is destroyed, and is taken back to AskPlayerDetails 
     public Action OnServerStop { get; set; }
     public Action OnServerShutdown { get; set; }
+    private Coroutine EndGameInCoroutine { get; set; }
     //
 
     [SerializeField] private float GameTimeSeconds = 180f; //Game should last for 3min = 60sec/min * 3min = 180s
@@ -53,10 +55,8 @@ public class GameStateManager : MonoBehaviour
 
     internal void PlayerJoinedServer()
     {
-        if (!CurrentState.Equals(GameState.waitingForAPlayerToJoin) &&
-            !CurrentState.Equals(GameState.gameRestarting)) //Prevents more than 1 call
+        if (CurrentState != GameState.waitingForAPlayerToJoin && CurrentState != GameState.gameRestarting) //Prevents more than 1 call
             return;
-
         
         StartGameTime = Time.fixedTime;
         FinGameTime = StartGameTime + GameTimeSeconds;
@@ -65,9 +65,23 @@ public class GameStateManager : MonoBehaviour
 
         UpdateCurrentGameState(GameState.activeGameInProcess);
 
-        StartCoroutine(EndGameIn(RemainingGameTime));
+        EndGameInCoroutine = StartCoroutine(EndGameIn(RemainingGameTime));
     }
+    internal void TimeoutReset()
+    {
+        if (CurrentState != GameState.activeGameInProcess)
+            return;
 
+        StopCoroutine(EndGameInCoroutine);
+        RestartServerImmediately();
+
+        Output.WriteLine(
+            $"\n\t\t--------------------------------------------------" +
+            $"\n\t\tRestarting GameServer due to no players present..." +
+            $"\n\t\t--------------------------------------------------"
+        );
+    }
+        
     private IEnumerator EndGameIn(float remainingGameTime)
     {
         yield return new WaitForSeconds(remainingGameTime);
@@ -75,7 +89,7 @@ public class GameStateManager : MonoBehaviour
 
         OnServerGameEnded?.Invoke();
 
-        if (MainServerComms.ServerEndsWhenNoPlayersOn)
+        if (!Server.IsServerPermanent)
             StartCoroutine(CloseTheServer());
         else
             StartCoroutine(RestartServer());
@@ -84,8 +98,18 @@ public class GameStateManager : MonoBehaviour
     private IEnumerator RestartServer()
     {
         yield return new WaitForSeconds(TimeForGameEndSeconds);
+        RestartServerImmediately();
+        Output.WriteLine(
+            $"\n\t\t--------------------------------------------------" +
+            $"\n\t\tRestarting GameServer because game has finished..." +
+            $"\n\t\t--------------------------------------------------"
+        );
+    }
+    private void RestartServerImmediately()
+    {
         UpdateCurrentGameState(GameState.gameRestarting);
         OnServerRestart?.Invoke();
+        UpdateCurrentGameState(GameState.waitingForAPlayerToJoin);
     }
 
     private IEnumerator CloseTheServer()
@@ -104,4 +128,6 @@ public class GameStateManager : MonoBehaviour
     {
         Singleton.Init(ref instance, this);
     }
+
+    
 }

@@ -56,6 +56,7 @@ public class Client : MonoBehaviour
     private byte FixedFrameCounter { get; set; } = 0;
 
     public float Latency1WaySecondsTCP { get; private set; } = 0.15f;
+    public float Latency2WayMSTCP { get => (Latency1WaySecondsTCP * 2 * 1000); }
     public float Latency1WaySecondsUDP { get; private set; } = 0.15f;
     private byte LatencyID { get; set; } = 0; //Loops from 0 - 255, then back to 0
     private Dictionary<byte, TimeSpan> LatencyDictionary { get; set; } = new Dictionary<byte, TimeSpan>();
