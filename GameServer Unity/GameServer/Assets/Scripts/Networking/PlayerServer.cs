@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Output;
 
@@ -37,7 +38,7 @@ namespace GameServer
 
         public int PlayerColorIndex { get; set; } = -1; //Represents the index of the color in the color palette
 
-        public bool Paused { get; private set; }
+        public bool Paused { get; set; }
         private bool LastPaused { get; set; }
         public TimeSpan PacketTimeOutTCP { get; set; } = DateTime.Now.TimeOfDay + new TimeSpan(0, 1, 0);
         public TimeSpan PacketPauseTCP { get; set; } = DateTime.Now.TimeOfDay + new TimeSpan(0, 0, 20);
@@ -86,16 +87,16 @@ namespace GameServer
             IsDead = false;
             CurrentHealth = MaxHealth;
         }
-        public void PlayerMoves(Vector2 position, byte moveState)
-        {
+
+        public void PlayerPosition(Vector2 position) =>
             transform.position = position;
+        public void PlayerMoveState(byte moveState) =>
             MoveState = moveState;
-        }
-        internal void PlayerArmPosition(Vector2 position, Quaternion rotation)
-        {
-            ArmPosition = position;
+        internal void PlayerArmRotation(Quaternion rotation) =>
             ArmRotation = rotation;
-        }
+        internal void PlayerArmPosition(Vector2 position) =>
+            ArmPosition = position;
+
         public void SetPlayerMovementStats(float runSpeed, float sprintSpeed)
         {
             RunSpeed = runSpeed;
@@ -141,10 +142,32 @@ namespace GameServer
         internal void MessageToSend(string text) =>
             ChatEntryToSend = $"[{Username}]: {text}";
 
+        private int FixedFrameCounter { get; set; } = 0;
+        public float Latency2WaySecondsTCP { get; private set; } = 0.300f; //default 0.3s = 300ms
+        public float Latency2WaySecondsUDP { get; private set; } = 0.300f; //default 0.3s = 300ms
+
+        private Dictionary<byte, TimeSpan> LatencyDictionary { get; set; } = new Dictionary<byte, TimeSpan>();
+        private byte LatencyID { get; set; } = 0;
+
         public void FixedUpdate()
         {
             TimeSpan now = DateTime.Now.TimeOfDay;
 
+            //Send PingPackets
+            if (FixedFrameCounter++ % 2 == 0)
+            {
+                ServerSend.PingTCPPacket(ID, Latency2WaySecondsTCP, ++LatencyID);
+                ServerSend.PingUDPPacket(ID, Latency2WaySecondsUDP, LatencyID);
+
+                if (!LatencyDictionary.ContainsKey(LatencyID))
+                    LatencyDictionary.Add(LatencyID, now);
+                else
+                    LatencyDictionary[LatencyID] = now;
+            }
+
+
+            //Set the state of which to sent the constantly sent packets via: TCP, UDP or by both UDPandTCP
+            //TODO: use ping instead
             SendConstantPacketsState sendConstantPacketsState;
 
             if (PacketSendViaOnlyTCP - now < TimeSpanZero) //Flag so only send constant packets via TCP, because UDP is not responsive, so less data is sent
@@ -156,6 +179,8 @@ namespace GameServer
 
             CurrentSendConstantPacketsState = sendConstantPacketsState;
 
+            //Kicking or pausing the player based on TCP timeout 
+            //TODO: use ping instead
             if (PacketTimeOutTCP - now < TimeSpanZero)
             {
                 Server.ClientDictionary[ID].Disconnect();
@@ -190,7 +215,8 @@ namespace GameServer
         {
             if (!ReadyToPlay)
                 return;
-
+            //TODO: Somehow clump each player's packet into 1 packet, so will send deatils of all 16 players 
+            // to 1 player in 1 packet,
             if (LastPositionArms != ArmPosition || LastRotationArms != ArmRotation)
             {
                 ServerSend.ArmPositionRotation(ID, ArmPosition, ArmRotation);

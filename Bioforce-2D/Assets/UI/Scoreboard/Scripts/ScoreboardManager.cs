@@ -11,21 +11,21 @@ public class ScoreboardManager : UIItemListingManager
     public static ScoreboardManager Instance { get => instance; }
     private static ScoreboardManager instance;
 
-    private GameObject Scoreboard { get; set; }
-    private GameObject ScoreboardPanel { get; set; }
+    [SerializeField] private GameObject Scoreboard;
+    [SerializeField] private GameObject ScoreboardPanel;
 
     private Dictionary<object, IUIItemListing> PlayersItemLists { get; set; } = new Dictionary<object, IUIItemListing>();
     private bool ScoreboardChanged { get; set; }
 
-    private Button MobileButton { get; set; }
+    [SerializeField] private Button MobileButton;
     private bool ScoreboardActive { get; set; }
     private bool ClickedOdd { get; set; }
 
-    public void AddEntry(byte iD, string username, int kills, int deaths, int score)
+    public void AddEntry(byte iD, string username, int kills, int deaths, int score, int pingMS)
     {
         GameObject entryToAdd = Instantiate(ItemListingPrefab, ScoreboardPanel.transform);
         ScoreboardEntry scoreboardEntry = entryToAdd.GetComponent<ScoreboardEntry>();
-        scoreboardEntry.Init(iD, score, username, kills, deaths);
+        scoreboardEntry.Init(iD, score, username, kills, deaths, pingMS);
 
         PlayersItemLists.Add(iD, scoreboardEntry);
         ScoreboardChanged = true;
@@ -76,11 +76,7 @@ public class ScoreboardManager : UIItemListingManager
     {
         Singleton.Init(ref instance, this);
 
-        Scoreboard = transform.GetChild(0).gameObject;
-        ScoreboardPanel = Scoreboard.transform.GetChild(0).gameObject;
-        SetActiveScoreboard(false);
-
-        MobileButton = transform.GetChild(1).GetComponent<Button>();
+        SetActiveScoreboard(false);        
         
         MobileButton.gameObject.SetActive(true);
 
@@ -94,6 +90,21 @@ public class ScoreboardManager : UIItemListingManager
         GameStateManager.GameRestarting += CloseGameEndingScoreboard;
         GameStateManager.GameRestarting += DeleteAllEntries;
     }
+    private void Start()
+    {
+        ClearAllScoreboardEntries();
+    }
+    private void ClearAllScoreboardEntries()
+    {
+        Transform scoreboardTF = ScoreboardPanel.transform;
+        int childCount = scoreboardTF.childCount;
+        for (int i = 0; i < childCount; i++)
+        {
+            Transform child = scoreboardTF.GetChild(i);
+            Destroy(child.gameObject);
+        }
+    }
+
     private void OnDestroy()
     {
         GameStateManager.GameEnded -= OpenGameEndingScoreboard;

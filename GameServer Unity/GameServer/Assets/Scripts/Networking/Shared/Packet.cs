@@ -98,7 +98,8 @@ namespace Shared
         stillConnectedUDP,
         colorToFreeAndTake,
         readyToJoin,
-        chatMessage
+        chatMessage,
+        constantPlayerData
     }
 
     public class Packet : IDisposable
@@ -1036,7 +1037,33 @@ namespace Shared
 
             return negative ? -value : value;
         }
-#endregion
+
+        internal bool[] Read1ByteAs8Bools()
+        {
+            bool[] bits = new bool[8];
+
+            short shortByteToRead = ReadByte(); // short So doesn't cause a wrap around/ overflow, e.g. 127 - 128 -> -1 = 255 as byte
+                                                // Can't be sbyte, because then it can't represent max val 255
+            byte bitValue = 128;
+            for (int bitCount = bits.Length - 1; bitCount >= 0; bitCount--)
+            {
+                if (shortByteToRead - bitValue >= 0)
+                {
+                    bits[bitCount] = true;
+
+                    if (shortByteToRead == 0)
+                        break;
+
+                    shortByteToRead -= bitValue;
+                }
+
+                bitValue /= 2;
+            }
+
+            return bits;
+        }
+
+        #endregion
 
         private bool Disposed = false;
 

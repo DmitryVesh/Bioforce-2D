@@ -1,9 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices.ComTypes;
-using Unity.Mathematics;
-using UnityEngine;
-using UnityEngine.Output;
+﻿using UnityEngine;
 using UnityEngine.Singleton;
 
 public class RespawnPoint : MonoBehaviour
@@ -25,6 +20,11 @@ public class RespawnPoint : MonoBehaviour
         Instance.LastDiePosition = diePosition;
 
         return Instance.LastRespawnPoint;
+    }
+    public static Vector2 GetRandomSpawnPoint()
+    {
+        int randomIndex = Instance.Random.Next(0, Instance.Points.Length);
+        return Instance.Points[randomIndex];
     }
 
     private void Awake()

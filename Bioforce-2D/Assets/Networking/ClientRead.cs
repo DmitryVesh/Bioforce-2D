@@ -174,9 +174,11 @@ public class ClientRead : MonoBehaviour
 
             float invincibilityTime = packet.ReadFloat();
 
+            ushort pingMS = packet.ReadUShort();
+
             GameManager.Instance.SpawnPlayer(iD, username, position, isFacingRight, isDead, justJoined, maxHealth, currentHealth, playerColor);
             GameManager.PlayerDictionary[iD].SetPlayerMovementStats(runSpeed, sprintSpeed);
-            ScoreboardManager.Instance.AddEntry(iD, username, kills, deaths, score);
+            ScoreboardManager.Instance.AddEntry(iD, username, kills, deaths, score, pingMS);
 
             GameManager.PlayerDictionary[iD].SetPlayerPaused(paused);
 
@@ -325,6 +327,7 @@ public class ClientRead : MonoBehaviour
     {
         try
         {
+            float latency2WaySecondsTCP = packet.ReadFloat();
             byte latencyID = packet.ReadByte();
             Client.Instance.PlayerConnectedAcknTCP(DateTime.Now.TimeOfDay, latencyID);
         }
@@ -337,6 +340,7 @@ public class ClientRead : MonoBehaviour
     {
         try
         {
+            float latency2WaySecondsTCP = packet.ReadFloat();
             byte latencyID = packet.ReadByte();
             Client.Instance.PlayerConnectedAcknUDP(DateTime.Now.TimeOfDay, latencyID);
         }

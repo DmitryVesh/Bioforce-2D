@@ -61,6 +61,7 @@ public class Client : MonoBehaviour
     private byte LatencyID { get; set; } = 0; //Loops from 0 - 255, then back to 0
     private Dictionary<byte, TimeSpan> LatencyDictionary { get; set; } = new Dictionary<byte, TimeSpan>();
 
+    public bool IsPlaying { get; set; }
 
     public static bool IsIPAddressValid(string text)
     {
@@ -113,6 +114,7 @@ public class Client : MonoBehaviour
             {
                 Output.WriteLine($"Error, tried to close TCP and UDP sockets:\n{exception}");
             }
+            IsPlaying = false;
             Connected = false;
 
             Output.WriteLine($"You, client: {ClientID} have been disconnected.");
@@ -123,6 +125,7 @@ public class Client : MonoBehaviour
     public void SuccessfullyConnected(byte assignedID)
     {
         Connected = true;
+        IsPlaying = false;
         ResetTimeOutTimer(false);
         ClientID = assignedID;
         SetPacketTimeoutsTCP(DateTime.Now.TimeOfDay);
@@ -215,7 +218,7 @@ public class Client : MonoBehaviour
                 byte[] bytes = ReceivePacket.ReadBytes(packetLen);
                 ThreadManager.ExecuteOnMainThread(() =>
                 {
-                    byte packetID = 255;
+                    byte packetID = byte.MaxValue;
                     try
                     {
                         using (Packet packet = new Packet(bytes))
@@ -352,27 +355,67 @@ public class Client : MonoBehaviour
         }
     }
 
+    
+
     private void Awake()
     {
         Singleton.Init(ref instance, this);
     }
-    
+
+    bool shouldSendMoveState = false;
+    PlayerMovingState moveState = PlayerMovingState.idleRight;
+
+    bool shouldSendWorldPosition = false;
+    Vector2 playerPosition = RespawnPoint.GetRandomSpawnPoint(); //Default TODO: Change with actual player position
+
+    bool shouldSendArmPosition = false;
+    Vector2 armPosition = Vector2.zero;
+
+    bool shouldSendArmRotation = false;
+    Quaternion armRotation = Quaternion.identity;
+
+    internal void FlagMoveStateToBeSent(PlayerMovingState currentMovingState) =>
+        (shouldSendMoveState, moveState) = (true, currentMovingState);
+    internal void FlagWorldPositionToBeSent(Vector2 playerPosition) =>
+        (shouldSendWorldPosition, this.playerPosition) = (true, playerPosition);
+    internal void FlagArmPositionToBeSent(Vector2 currentPosition) =>
+        (shouldSendArmPosition, armPosition) = (true, currentPosition);
+    internal void FlagArmRotationToBeSent(Quaternion currentRotation) =>
+        (shouldSendArmRotation, armRotation) = (true, currentRotation);
+
+    private void SendPlayerData()
+    {
+        if (shouldSendMoveState || shouldSendWorldPosition || shouldSendArmPosition || shouldSendArmRotation)
+        {
+            ClientSend.ConstantPlayerData
+                (
+                shouldSendMoveState, moveState,
+                shouldSendWorldPosition, playerPosition,
+                shouldSendArmPosition, armPosition,
+                shouldSendArmRotation, armRotation
+                );
+        }
+    }
+
     private void FixedUpdate()
     {
         if (Connected)
         {
+            if (IsPlaying)
+                SendPlayerData();
+
             if (FixedFrameCounter++ % 2 == 0)
                 return;
 
-            ClientSend.PlayerConnectedTCPPacket(++LatencyID);
-            ClientSend.PlayerConnectedUDPPacket(LatencyID);
+            //ClientSend.PlayerConnectedTCPPacket(++LatencyID);
+            //ClientSend.PlayerConnectedUDPPacket(LatencyID);
 
             TimeSpan now = DateTime.Now.TimeOfDay;
 
-            if (!LatencyDictionary.ContainsKey(LatencyID))
-                LatencyDictionary.Add(LatencyID, now);
-            else
-                LatencyDictionary[LatencyID] = now;
+            //if (!LatencyDictionary.ContainsKey(LatencyID))
+            //    LatencyDictionary.Add(LatencyID, now);
+            //else
+            //    LatencyDictionary[LatencyID] = now;
 
             SendConstantPacketsState sendConstantPacketsState;
 
@@ -413,12 +456,14 @@ public class Client : MonoBehaviour
         }
     }
 
+    
+
     public void PlayerConnectedAcknTCP(TimeSpan now, byte latencyID)
     {
         SetPacketTimeoutsTCP(now);
 
         TimeSpan latencyCheckSent = LatencyDictionary[latencyID];
-        Latency1WaySecondsTCP = (float)(now - latencyCheckSent).TotalSeconds / 2;
+        Latency1WaySecondsTCP = (float)(now - latencyCheckSent).TotalSeconds / 2f;
     }
     private void SetPacketTimeoutsTCP(TimeSpan now)
     {

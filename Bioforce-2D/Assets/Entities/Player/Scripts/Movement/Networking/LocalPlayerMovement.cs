@@ -230,13 +230,21 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
 
     private void SendMovesToServer()
     {
-        if (LastPosition == (Vector2)ModelObject.transform.position && LastMoveState == CurrentMovingState)
-            return;
         
-        ClientSend.PlayerMovement(ModelObject.transform.position, CurrentMovingState);
+        Vector2 playerPosition = (Vector2)ModelObject.transform.position;
+        if (LastPosition != playerPosition) 
+        {
+            Client.Instance.FlagWorldPositionToBeSent(playerPosition);
+            LastPosition = playerPosition;
+        }
 
-        LastPosition = ModelObject.transform.position;
-        LastMoveState = CurrentMovingState;
+        if (LastMoveState != CurrentMovingState)
+        {
+            Client.Instance.FlagMoveStateToBeSent(CurrentMovingState);
+            LastMoveState = CurrentMovingState;
+        }
+
+        //ClientSend.PlayerMovement(ModelObject.transform.position, CurrentMovingState);
     }
 
 }

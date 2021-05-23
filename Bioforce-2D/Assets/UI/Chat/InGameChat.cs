@@ -17,6 +17,8 @@ public class InGameChat : UIEntryManager
 
     [SerializeField] private GameObject ChatLogAndWrite;
     [SerializeField] private TMP_InputField ChatEntryInputField;
+    [SerializeField] private int InputFieldMaxCharacterLimit = 100;
+
     private bool ShouldSendChatEntry { get; set; }
 
     [SerializeField] private TextMeshProUGUI EntireChatLog;
@@ -137,6 +139,8 @@ public class InGameChat : UIEntryManager
     {
         GameManager.Instance.OnPlayerConnected += PlayerConnectedMessage;
         GameManager.Instance.OnPlayerDisconnected += PlayerDisconnectedMessage;
+
+        ChatEntryInputField.characterLimit = InputFieldMaxCharacterLimit;
     }
 
     private void PlayerConnectedMessage(byte iD, string username, bool justJoined)

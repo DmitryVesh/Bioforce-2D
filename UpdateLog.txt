@@ -34,6 +34,8 @@ Future tasks;
 	version 1.0.4
 		Add scene transitions
 		Add rule to timed deathmatch, if players draw, same end score, make the last players battle, whoever is the last player alive wins, or whoever gets the first kill?
+		Add player names to the player choose color menu above the player
+		Increase the quaternion to be a 4B packet instead of 3B
 	Add chat into game
 	Add ping field to Player Score entries in scoreboard
 	Add gamepad support for pc & mac

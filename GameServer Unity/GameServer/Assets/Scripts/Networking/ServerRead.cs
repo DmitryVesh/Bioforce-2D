@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Output;
 using System.Collections.Generic;
 
+
 namespace GameServer
 {
     public class ServerRead
@@ -70,17 +71,57 @@ namespace GameServer
             }
         }
 
+        internal static void ConstantPlayerData(byte clientID, Packet packet)
+        {
+            try {
+                bool[] bits = packet.Read1ByteAs8Bools();
+                PlayerServer player = Server.ClientDictionary[clientID].Player;
+                
+                if (bits[0])
+                {
+                    UnityEngine.Quaternion armRotation = packet.ReadQuaternion();
+                    player.PlayerArmRotation(armRotation);
+                }
+
+                if (bits[1])
+                {
+                    UnityEngine.Vector2 armPosition = packet.ReadLocalVector2();
+                    player.PlayerArmPosition(armPosition);
+                }
+
+                if (bits[2])
+                {
+                    UnityEngine.Vector2 playerPosition = packet.ReadUVector2WorldPosition();
+                    player.PlayerPosition(playerPosition);
+                }
+
+                if (bits[3])
+                {
+                    byte moveState = packet.ReadByte();
+                    player.PlayerMoveState(moveState);
+                }
+            }
+            catch (Exception e) {
+                OutputPacketError(clientID, e);
+            }
+        }
+
+        private static void OutputPacketError(byte clientID, Exception e) =>
+            Output.WriteLine($"\tError, reading player:{clientID} packet...\n{e}");
+
         public static void PlayerMovementRead(byte clientID, Packet packet)
         {
             try
             {
-                Vector2 position = packet.ReadUVector2WorldPosition();
+                UnityEngine.Vector2 position = packet.ReadUVector2WorldPosition();
                 byte moveState = packet.ReadByte();
-                Server.ClientDictionary[clientID].Player.PlayerMoves(position, moveState);
+                PlayerServer player = Server.ClientDictionary[clientID].Player;
+                player.PlayerPosition(position);
+                player.PlayerMoveState(moveState);
             }
             catch (Exception exception)
             {
-                Output.WriteLine($"\tError, trying to read player movement, when a player: {clientID} has disconnected...\n{exception}");
+                Output.WriteLine($"\tError, trying to read player movement, from player: {clientID}...\n{exception}");
             }
         }
         public static void PlayerMovementStatsRead(byte clientID, Packet packet)
@@ -172,7 +213,7 @@ namespace GameServer
             try
             {
                 bool paused = packet.ReadBool();
-
+                Server.ClientDictionary[clientID].Player.Paused = paused;
                 ServerSend.PlayerPausedGame(clientID, paused);
             }
             catch (Exception exception)
@@ -210,6 +251,9 @@ namespace GameServer
                 Output.WriteLine($"\tError, trying to read PlayerStillConnectedTCP, from player: {clientID}\n{exception}");
             }            
         }
+
+        
+
         internal static void PlayerStillConnectedUDP(byte clientID, Packet packet)
         {
             try
@@ -235,7 +279,9 @@ namespace GameServer
 
                 //TODO: make so all packets from player are sent in Update
                 //Server.ClientDictionary[clientID].player.SetArmPositionRotation(position, rotation);
-                Server.ClientDictionary[clientID].Player.PlayerArmPosition(position, rotation);
+                PlayerServer player = Server.ClientDictionary[clientID].Player;
+                player.PlayerArmRotation(rotation);
+                player.PlayerArmPosition(position);
             }
             catch (Exception exception)
             {

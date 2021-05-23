@@ -116,6 +116,7 @@ public class GameManager : MonoBehaviour
                 prefab = LocalPlayerPrefab;
             MobileJoystick.Instance.SetPlayerColor(playerColor);
             ShootingJoystick.Instance.SetPlayerColor(playerColor);
+            Client.Instance.IsPlaying = true;
             Output.WriteLine($"You, player: {iD} have been spawned.");
         }
         else

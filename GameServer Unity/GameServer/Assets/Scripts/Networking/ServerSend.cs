@@ -126,7 +126,7 @@ namespace GameServer
         // 63B (byte 1B packetLen + byte 1B packetID + byte 1B playerID + string 16B-max = 4B+12B 12Chars playerName + Vector2 4B playerPosition +
         //      bool 1B isFacingRight + float 4B runSpeed + float 4B sprintSpeed + bool 1B isDead + bool 1B justJoined + int 4B Kills +
         //      int 4B Deaths + int 4B Score + int 4B MaxHealth + int 4B CurrentHealth + int 4B PlayerColor + bool 1B Paused +
-        //      float 4B CurrentInvincibilityTime
+        //      float 4B CurrentInvincibilityTime + ushort PingMS
         public static void SpawnPlayer(byte recipientClient, PlayerServer player, bool justJoined)
         {
             using (Packet packet = new Packet((byte)ServerPackets.spawnPlayer))
@@ -155,12 +155,36 @@ namespace GameServer
 
                 packet.Write(player.CurrentInvincibilityTime);
 
+                packet.Write(player.Latency2WaySecondsTCP);
+
                 SendTCPPacket(recipientClient, packet);
             }
         }
 
-        
 
+        //Constantly sent
+        // 7B (byte 1B packetLen + byte 1B packetID + float 4B latency2Way(Ping) + byte 1B latencyID)
+        internal static void PingTCPPacket(byte clientID, float latency2WaySecondsTCP, byte latencyID)
+        {
+            using (Packet packet = new Packet((byte)ServerPackets.stillConnectedTCP))
+            {
+                packet.Write(latency2WaySecondsTCP);
+                packet.Write(latencyID);
+
+                SendTCPPacket(clientID, packet);
+            }
+        }
+        // 7B (byte 1B packetLen + byte 1B packetID + float 4B latency2Way(Ping) + byte 1B latencyID)
+        internal static void PingUDPPacket(byte clientID, float latency2WaySecondsUDP, byte latencyID)
+        {
+            using (Packet packet = new Packet((byte)ServerPackets.stillConnectedTCP))
+            {
+                packet.Write(latency2WaySecondsUDP);
+                packet.Write(latencyID);
+
+                SendUDPPacket(clientID, packet);
+            }
+        }
 
         // Constantly sent
         // TCP 8B (byte 1B packetLen + byte 1B packetID + byte 1B playerID + Vector2 4B position + PlayerMovingState 1B movingState)

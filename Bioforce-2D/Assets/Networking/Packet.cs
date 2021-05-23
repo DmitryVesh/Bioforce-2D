@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 #if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE || UNITY_WEBGL
@@ -98,7 +99,8 @@ namespace Shared
         stillConnectedUDP,
         colorToFreeAndTake,
         readyToJoin,
-        chatMessage
+        chatMessage,
+        constantPlayerData
     }
 
     public class Packet : IDisposable
@@ -264,6 +266,25 @@ namespace Shared
             Buffer.AddRange(BitConverter.GetBytes(value.Ticks));
         }
 
+        internal void Write8BoolsAs1Byte(bool bit8, bool bit7, bool bit6, bool bit5, bool bit4, bool bit3, bool bit2, bool bit1)
+        {
+            byte byteToAdd = 0;
+            bool[] bits = new bool[] { bit1, bit2, bit3, bit4, bit5, bit6, bit7, bit8 };
+
+            byte bitValue = 1;
+            for (int bitCount = 0; bitCount < bits.Length; bitCount++)
+            {
+                if (bits[bitCount])
+                    byteToAdd += bitValue;
+
+                bitValue *= 2;
+            }
+
+            Write(byteToAdd);
+        }
+
+        
+
 #if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE || UNITY_WEBGL
         /// <summary>Adds a Vector2 to the packet 4B - 512 >= a >= 0 Limited to Range of 0.0078125 -> 511.9921875.</summary>
         /// <param name="value">The Vector2 to add.</param>
@@ -367,7 +388,7 @@ namespace Shared
         }
 
 #if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE || UNITY_WEBGL
-        /// <summary>Adds a Quaternion to the packet.</summary>
+        /// <summary>Adds a Quaternion 3B to the packet.</summary>
         /// <param name="value">The Quaternion to add.</param>
         /// 
         /// Smallest 3, find the largest absolute of the floats, don't send it, send the smallest 3, 
@@ -377,7 +398,7 @@ namespace Shared
         /// Also can use less precise floating point value, instead of 4 bytes per component, use 1 byte
         /// 
         /// This should decrease the packet size from 16 bytes = 128 bits
-        /// To 2 bit (largest component index) + 3 * 7 bits (smallest 3 components) + 1 bit for negating all components = 24 bits - will send 3 bytes = 24 bits
+        /// To 3 Bytes = 24 bits -> 2 bit (largest component index) + 3 * 7 bits (smallest 3 components) + 1 bit for negating all components
         /// only 18.75% of the original packet
         public void Write(UnityEngine.Quaternion value)
         {
@@ -411,7 +432,7 @@ namespace Shared
             Write(bytesToSend);
         }
 #else
-        /// <summary>Adds a Quaternion to the packet.</summary>
+        /// <summary>Adds a Quaternion 3B to the packet.</summary>
         /// <param name="value">The Quaternion to add.</param>
         /// 
         /// Smallest 3, find the largest absolute of the floats, don't send it, send the smallest 3, 
@@ -1036,6 +1057,32 @@ namespace Shared
 
             return negative ? -value : value;
         }
+
+        internal bool[] Read1ByteAs8Bools(byte byteToRead)
+        {
+            bool[] bits = new bool[8];
+
+            short shortByteToRead = byteToRead; // So doesn't cause a wrap around/ overflow, e.g. 127 - 128 -> -1 = 255 as byte
+                                                // Can't be sbyte, because then it can't represent max val 255
+            byte bitValue = 128;
+            for (int bitCount = bits.Length - 1; bitCount >= 0; bitCount--)
+            {
+                if (shortByteToRead - bitValue >= 0)
+                {
+                    bits[bitCount] = true;
+
+                    if (shortByteToRead == 0)
+                        break;
+
+                    shortByteToRead -= bitValue;
+                }
+
+                bitValue /= 2;
+            }
+
+            return bits;
+        }
+
         #endregion
 
         private bool Disposed = false;

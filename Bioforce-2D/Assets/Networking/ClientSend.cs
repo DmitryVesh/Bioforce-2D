@@ -54,39 +54,46 @@ public class ClientSend : MonoBehaviour
         }
     }
 
+    // TCP extra 40B = TCP Header 20B + IPv4 Header 20B
+    // UDP extra 28B = UDP Header 8B + IPv4 Header 20B
+    //TODO: Make all the constantly sent packets to be compressed into 1
+    //      Add a byte which contains 1s for which states changed or not, e.g. 
+    //      position, movingState, localPosition, localRotation
+    //      0b_0000_xyzw       where x=1 if movingState is sent, y=1 if position is sent...
+    //TODO: perhaps set the Nagle Algorithm to false on TCP, Socket.NoDelay = true;
+    //
 
 
-    // Constantly sent
-    // TCP 7B (byte 1B packetLen + byte 1B packetID + Vector2 4B position + PlayerMovingState 1B movingState)
-    // UDP 8B (byte 1B clientID + byte 1B packetLen + byte 1B packetID + Vector2 4B position + PlayerMovingState 1B movingState)
-    public static void PlayerMovement(Vector2 position, PlayerMovingState movingState)
+    // TCP max 13B + 40B = 53B  (byte 1B packetLen + byte 1B packetID (+ UDP byte 1B clientID)
+    // UDP max 14B + 28B = 42B  + byte 1B whatShouldSend/Read
+    //                          + byte 1B MoveState + worldVector2 4B playerPosition
+    //                          + localVector2 2B armPosition + localRotation 3B armRotation
+    internal static void ConstantPlayerData(
+        bool shouldSendMoveState, PlayerMovingState moveState,
+        bool shouldSendWorldPosition, Vector2 playerPosition,
+        bool shouldSendArmPosition, Vector2 armPosition,
+        bool shouldSendArmRotation, Quaternion armRotation)
     {
-        using (Packet packet = new Packet((byte)ClientPackets.playerMovement))
+        using (Packet packet = new Packet((byte)ClientPackets.constantPlayerData))
         {
-            packet.WriteWorldUVector2(position);
-            packet.Write((byte)movingState);
+            packet.Write8BoolsAs1Byte(false, false, false, false,
+                shouldSendMoveState, shouldSendWorldPosition, shouldSendArmPosition, shouldSendArmRotation);
+
+            if (shouldSendArmRotation)
+                packet.Write(armRotation);
+            if (shouldSendArmPosition)
+                packet.WriteLocalPosition(armPosition);
+            if (shouldSendWorldPosition)
+                packet.WriteWorldUVector2(playerPosition);
+            if (shouldSendMoveState)
+                packet.Write((byte)moveState);
 
             SendConstantlySentPacket(packet);
         }
     }
 
     // Constantly sent
-    // TCP 7B (byte 1B PacketLen + byte 1B packetID + Vector2 2B position + 3B Quaternion rotation)
-    // UDP 8B (byte 1B clientID + byte 1B PacketLen + byte 1B packetID + Vector2 2B position + 3B Quaternion rotation)
-    internal static void ArmPositionAndRotation(Vector2 localPosition, Quaternion localRotation)
-    {
-        using (Packet packet = new Packet((byte)ClientPackets.armPositionRotation))
-        {
-            packet.WriteLocalPosition(localPosition);
-            packet.Write(localRotation);
-
-            SendConstantlySentPacket(packet);
-        }
-    }
-
-
-    // Constantly sent
-    // 3B (byte 1B packetLen + byte 1B packetID + byte 1B latencyID)
+    // TCP 3B + 40B = 43B (byte 1B packetLen + byte 1B packetID + byte 1B latencyID)
     internal static void PlayerConnectedTCPPacket(byte latencyID)
     {
         using (Packet packet = new Packet((byte)ClientPackets.stillConnectedTCP))
@@ -97,7 +104,7 @@ public class ClientSend : MonoBehaviour
         }
     }
     // Constantly sent
-    // 4B (byte 1B clientID + byte 1B packetLen + byte 1B packetID + byte 1B latencyID)
+    // UDP 4B + 28B = 32B (byte 1B clientID + byte 1B packetLen + byte 1B packetID + byte 1B latencyID)
     internal static void PlayerConnectedUDPPacket(byte latencyID)
     {
         using (Packet packet = new Packet((byte)ClientPackets.stillConnectedUDP))
@@ -173,6 +180,7 @@ public class ClientSend : MonoBehaviour
         }
     }
 
+    // maxB 102B = (byte 1B packetLen, byte 1B packetID, string numChars * B -> max 100B text)
     internal static void ChatMessage(string text)
     {
         using (Packet packet = new Packet((byte)ClientPackets.chatMessage))
@@ -226,4 +234,6 @@ public class ClientSend : MonoBehaviour
             Output.WriteLine($"Error, sending UDP Packet...\n{exception}");
         }
     }
+
+    
 }
