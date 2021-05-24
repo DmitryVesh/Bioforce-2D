@@ -166,13 +166,13 @@ namespace GameServer
             PacketHandlerDictionary = new Dictionary<byte, PacketHandler>();
             PacketHandlerDictionary.Add((byte)ClientPackets.welcomeReceived, ServerRead.WelcomeRead);
             PacketHandlerDictionary.Add((byte)ClientPackets.udpTestReceived, ServerRead.UDPTestRead);
-            PacketHandlerDictionary.Add((byte)ClientPackets.playerMovement, ServerRead.PlayerMovementRead);
+            //PacketHandlerDictionary.Add((byte)ClientPackets.playerMovement, ServerRead.PlayerMovementRead);
             PacketHandlerDictionary.Add((byte)ClientPackets.playerMovementStats, ServerRead.PlayerMovementStatsRead);
             PacketHandlerDictionary.Add((byte)ClientPackets.bulletShot, ServerRead.ShotBulletRead);
             PacketHandlerDictionary.Add((byte)ClientPackets.playerDied, ServerRead.PlayerDiedRead);
             PacketHandlerDictionary.Add((byte)ClientPackets.playerRespawned, ServerRead.PlayerRespawnedRead);
             PacketHandlerDictionary.Add((byte)ClientPackets.tookDamage, ServerRead.TookDamageRead);
-            PacketHandlerDictionary.Add((byte)ClientPackets.armPositionRotation, ServerRead.ArmPositionRotation);
+            //PacketHandlerDictionary.Add((byte)ClientPackets.armPositionRotation, ServerRead.ArmPositionRotation);
             PacketHandlerDictionary.Add((byte)ClientPackets.pausedGame, ServerRead.PlayerPausedGame);
             PacketHandlerDictionary.Add((byte)ClientPackets.stillConnectedTCP, ServerRead.PlayerStillConnectedTCP);
             PacketHandlerDictionary.Add((byte)ClientPackets.stillConnectedUDP, ServerRead.PlayerStillConnectedUDP);
@@ -180,6 +180,8 @@ namespace GameServer
             PacketHandlerDictionary.Add((byte)ClientPackets.readyToJoin, ServerRead.ReadyToJoin);
             PacketHandlerDictionary.Add((byte)ClientPackets.chatMessage, ServerRead.ChatMessage);
             PacketHandlerDictionary.Add((byte)ClientPackets.constantPlayerData, ServerRead.ConstantPlayerData);
+            PacketHandlerDictionary.Add((byte)ClientPackets.pingAckTCP, ServerRead.PlayerPingAckTCP);
+            PacketHandlerDictionary.Add((byte)ClientPackets.pingAckUDP, ServerRead.PlayerPingAckUDP);
 
             Output.WriteLine("\tInitialised server packets.");
         }

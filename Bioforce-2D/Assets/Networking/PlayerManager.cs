@@ -43,7 +43,9 @@ public class PlayerManager : MonoBehaviour
     public delegate void Rotation(Quaternion rotation);
     public event Rotation OnPlayerRotation;
 
-    public event PositionAndRotation OnArmPositionRotation;
+    //public event PositionAndRotation OnArmPositionRotation;
+    public event Position OnPlayerArmPosition;
+    public event Rotation OnPlayerArmRotation;
 
     public delegate void Bool(bool boolean);
 
@@ -160,8 +162,10 @@ public class PlayerManager : MonoBehaviour
     public void CallLocalPlayerHitAnother() =>
         OnLocalPlayerHitAnother?.Invoke();
 
-    internal void SetArmPositionRotation(Vector2 position, Quaternion rotation) =>
-        OnArmPositionRotation?.Invoke(position, rotation);
+    internal void SetArmRotation(Quaternion rotation) =>
+        OnPlayerArmRotation?.Invoke(rotation);
+    internal void SetArmPosition(Vector2 position) =>
+        OnPlayerArmPosition?.Invoke(position);
     internal void SetPlayerPaused(bool paused) =>
         OnPlayerPaused?.Invoke(paused);
 

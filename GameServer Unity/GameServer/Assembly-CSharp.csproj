@@ -81,6 +81,7 @@
     <Compile Include="Assets\Items\Scripts\PickupItemsManager.cs" />
     <Compile Include="Assets\Items\Scripts\HealthPickup.cs" />
     <Compile Include="Assets\Scripts\Networking\MainServerComms.cs" />
+    <Compile Include="Assets\Scripts\Networking\ConstantlySentPlayerData.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\OwnLibs\SingletonLib.dll" />

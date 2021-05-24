@@ -81,10 +81,13 @@ public class ClientSend : MonoBehaviour
 
             if (shouldSendArmRotation)
                 packet.Write(armRotation);
+
             if (shouldSendArmPosition)
                 packet.WriteLocalPosition(armPosition);
+
             if (shouldSendWorldPosition)
                 packet.WriteWorldUVector2(playerPosition);
+
             if (shouldSendMoveState)
                 packet.Write((byte)moveState);
 
@@ -93,29 +96,42 @@ public class ClientSend : MonoBehaviour
     }
 
     // Constantly sent
-    // TCP 3B + 40B = 43B (byte 1B packetLen + byte 1B packetID + byte 1B latencyID)
-    internal static void PlayerConnectedTCPPacket(byte latencyID)
+    // TCP 2B + 40B = 42B (byte 1B packetLen + byte 1B packetID + byte 1B latencyID)
+    internal static void PlayerConnectedTCPPacket()
     {
         using (Packet packet = new Packet((byte)ClientPackets.stillConnectedTCP))
         {
-            packet.Write(latencyID);
-
             SendTCPPacket(packet);
         }
     }
     // Constantly sent
-    // UDP 4B + 28B = 32B (byte 1B clientID + byte 1B packetLen + byte 1B packetID + byte 1B latencyID)
-    internal static void PlayerConnectedUDPPacket(byte latencyID)
+    // UDP 3B + 28B = 31B (byte 1B clientID + byte 1B packetLen + byte 1B packetID)
+    internal static void PlayerConnectedUDPPacket()
     {
         using (Packet packet = new Packet((byte)ClientPackets.stillConnectedUDP))
         {
-            packet.Write(latencyID);
-
             SendUDPPacket(packet);
         }
     }
 
+    internal static void PingPacketAckTCP(byte latencyIDTCP)
+    {
+        using (Packet packet = new Packet((byte)ClientPackets.pingAckTCP))
+        {
+            packet.Write(latencyIDTCP);
 
+            SendTCPPacket(packet);
+        }
+    }
+    internal static void PingPacketAckUDP(byte latencyIDUDP)
+    {
+        using (Packet packet = new Packet((byte)ClientPackets.pingAckUDP))
+        {
+            packet.Write(latencyIDUDP);
+
+            SendUDPPacket(packet);
+        }
+    }
 
     public static void PlayerMovementStats(float runSpeed, float sprintSpeed)
     {

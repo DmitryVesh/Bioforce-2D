@@ -7,6 +7,7 @@ using Shared;
 
 public class ClientRead : MonoBehaviour
 {
+    #region Important Packets That must arrive
     public static void WelcomeRead(Packet packet)
     {
         try
@@ -26,9 +27,8 @@ public class ClientRead : MonoBehaviour
 
             InternetServerScanner.Instance.Disconnect();
         }
-        catch (Exception e)
-        {
-            Output.WriteLine($"Reading WelcomeRead caused an error.\n{e}");
+        catch (Exception e) {
+            OutputPacketError(e);
         }
     }
     public static void UDPTestRead(Packet packet)
@@ -38,9 +38,8 @@ public class ClientRead : MonoBehaviour
             Output.WriteLine($"Received packet via UDP: {packet.ReadString()}");
             ClientSend.UDPTestPacketReply();
         }
-        catch (Exception e)
-        {
-            Output.WriteLine($"Reading UDPTestRead caused an error.\n{e}");
+        catch (Exception e) {
+            OutputPacketError(e);
         }
     }
 
@@ -66,9 +65,8 @@ public class ClientRead : MonoBehaviour
             PlayerChooseColor.Instance.SetTakenColors(playerColors);
             PlayerChooseColor.Instance.SetDefaultColor();
         }
-        catch (Exception e)
-        {
-            Output.WriteLine($"Reading AskingForPlayerDetails caused an error.\n{e}");
+        catch (Exception e) {
+            OutputPacketError(e);
         }
     }
     internal static void ReadGameState(Packet packet)
@@ -81,9 +79,8 @@ public class ClientRead : MonoBehaviour
 
             GameStateManager.ReadGameState(currentGameState, remainingGameTime);
         }
-        catch (Exception e)
-        {
-            Output.WriteLine($"Reading ReadGameState caused an error.\n{e}");
+        catch (Exception e) {
+            OutputPacketError(e);
         }
     }
 
@@ -95,9 +92,8 @@ public class ClientRead : MonoBehaviour
 
             PlayerChooseColor.Instance.FreeColor(colorToFree);
         }
-        catch (Exception e)
-        {
-            Output.WriteLine($"Reading FreeColor caused an error.\n{e}");
+        catch (Exception e) {
+            OutputPacketError(e);
         }
     }
     internal static void TakeColor(Packet packet)
@@ -108,9 +104,8 @@ public class ClientRead : MonoBehaviour
 
             PlayerChooseColor.Instance.TakeColor(colorToTake);
         }
-        catch (Exception e)
-        {
-            Output.WriteLine($"Reading TakeColor caused an error.\n{e}");
+        catch (Exception e) {
+            OutputPacketError(e);
         }
     }
     internal static void TriedTakingTakenColor(Packet packet)
@@ -126,9 +121,8 @@ public class ClientRead : MonoBehaviour
             PlayerChooseColor.Instance.SetTakenColors(takenColors);
             PlayerChooseColor.Instance.SetDefaultColor();
         }
-        catch (Exception e)
-        {
-            Output.WriteLine($"Reading TriedTakingTakenColor caused an error.\n{e}");
+        catch (Exception e) {
+            OutputPacketError(e);
         }
     }
 
@@ -140,9 +134,8 @@ public class ClientRead : MonoBehaviour
             GameManager.Instance.DisconnectPlayer(disconnectedPlayer);
             ScoreboardManager.Instance.DeleteEntry(disconnectedPlayer);
         }
-        catch (Exception e)
-        {
-            Output.WriteLine($"Reading PlayerDisconnect caused an error.\n{e}");
+        catch (Exception e) {
+            OutputPacketError(e);
         }
     }
 
@@ -184,9 +177,8 @@ public class ClientRead : MonoBehaviour
 
             GameManager.PlayerDictionary[iD].AdrenalinePickup(invincibilityTime);
         }
-        catch (Exception e)
-        {
-            Output.WriteLine($"Reading SpawnPlayer caused an error.\n{e}");
+        catch (Exception e) {
+            OutputPacketError(e);
         }
     }
     public static void PlayerMovementStats(Packet packet)
@@ -199,27 +191,8 @@ public class ClientRead : MonoBehaviour
 
             GameManager.PlayerDictionary[iD].SetPlayerMovementStats(runSpeed, sprintSpeed);
         }
-        catch (Exception e)
-        {
-            Output.WriteLine($"Reading PlayerMovementStats caused an error.\n{e}");
-        }
-    }
-
-    public static void PlayerPosition(Packet packet)
-    {
-        // Prevents crash when a UDP packet connects before the TCP spawn player call from server
-        try
-        {
-            byte iD = packet.ReadByte();
-            Vector2 position = packet.ReadUVector2WorldPosition();
-            PlayerMovingState movingState = (PlayerMovingState)packet.ReadByte();
-
-            GameManager.PlayerDictionary[iD].SetVelocityState(movingState);
-            GameManager.PlayerDictionary[iD].SetPosition(position);
-        }
-        catch (Exception e)
-        {
-            Output.WriteLine($"Reading PlayerPosition caused an error.\n{e}");
+        catch (Exception e) {
+            OutputPacketError(e);
         }
     }
 
@@ -232,9 +205,8 @@ public class ClientRead : MonoBehaviour
             Quaternion rotation = packet.ReadQuaternion();
             GameManager.PlayerDictionary[iD].CallOnBulletShotEvent(position, rotation);
         }
-        catch (Exception exception)
-        {
-            Output.WriteLine($"Error, in reading BulletShot...\n{exception}");
+        catch (Exception e) {
+            OutputPacketError(e);
         }
     }
     public static void PlayerDied(Packet packet)
@@ -250,9 +222,8 @@ public class ClientRead : MonoBehaviour
             ScoreboardManager.Instance.AddDeath(playerKilledID);
             GameManager.PlayerDictionary[playerKilledID].PlayerDied(typeOfDeath);
         }
-        catch (Exception e)
-        {
-            Output.WriteLine($"Player's PlayerDied caused an error.\n{e}");
+        catch (Exception e) {
+            OutputPacketError(e);
         }
     }
     public static void PlayerRespawned(Packet packet)
@@ -264,9 +235,8 @@ public class ClientRead : MonoBehaviour
             GameManager.PlayerDictionary[iD].PlayerRespawned();
             GameManager.PlayerDictionary[iD].SetRespawnPosition(respawnPoint);
         }
-        catch (Exception e)
-        {
-            Output.WriteLine($"Player's PlayerRespawned caused an error.\n{e}");
+        catch (Exception e) {
+            OutputPacketError(e);
         }
     }
 
@@ -283,30 +253,14 @@ public class ClientRead : MonoBehaviour
             if (Client.Instance.ClientID == bulletOwner)
                 GameManager.PlayerDictionary[(byte)bulletOwner].CallLocalPlayerHitAnother();
         }
-        catch (Exception e)
-        {
-            Output.WriteLine($"Player's TookDamage caused an error.\n{e}");
+        catch (Exception e) {
+            OutputPacketError(e);
         }
     }
 
     internal static void ServerIsFull(Packet _)
     {
         ServerMenu.ServerConnectionFull();
-    }
-
-    internal static void ArmPositionRotation(Packet packet)
-    {
-        try
-        {
-            byte iD = packet.ReadByte();
-            Vector2 localPosition = packet.ReadLocalVector2();
-            Quaternion localRotation = packet.ReadQuaternion();
-            GameManager.PlayerDictionary[iD].SetArmPositionRotation(localPosition, localRotation);
-        }
-        catch (Exception exception)
-        {
-            Output.WriteLine($"Player's ArmPositionRotation caused an error.\n{exception}");
-        }
     }
 
     internal static void PlayerPausedGame(Packet packet)
@@ -317,36 +271,8 @@ public class ClientRead : MonoBehaviour
             bool paused = packet.ReadBool();
             GameManager.PlayerDictionary[iD].SetPlayerPaused(paused);
         }
-        catch (Exception exception)
-        {
-            Output.WriteLine($"Player PlayerPausedGame caused an error.\n{exception}");
-        }
-    }
-
-    internal static void PlayerStillConnectedTCP(Packet packet)
-    {
-        try
-        {
-            float latency2WaySecondsTCP = packet.ReadFloat();
-            byte latencyID = packet.ReadByte();
-            Client.Instance.PlayerConnectedAcknTCP(DateTime.Now.TimeOfDay, latencyID);
-        }
-        catch (Exception e)
-        {
-            Output.WriteLine($"PlayerStillConnectedTCP caused an error.\n{e}");
-        }
-    }
-    internal static void PlayerStillConnectedUDP(Packet packet)
-    {
-        try
-        {
-            float latency2WaySecondsTCP = packet.ReadFloat();
-            byte latencyID = packet.ReadByte();
-            Client.Instance.PlayerConnectedAcknUDP(DateTime.Now.TimeOfDay, latencyID);
-        }
-        catch (Exception e)
-        {
-            Output.WriteLine($"PlayerStillConnectedUDP caused an error.\n{e}");
+        catch (Exception e) {
+            OutputPacketError(e);
         }
     }
 
@@ -360,9 +286,8 @@ public class ClientRead : MonoBehaviour
 
             PickupItemsManager.Instance.SpawnGeneratedPickup(pickupType, pickupID, position);
         }
-        catch (Exception e)
-        {
-            Output.WriteLine($"Error in reading GeneratedPickupItem...\n{e}");
+        catch (Exception e) {
+            OutputPacketError(e);
         }
     }
     internal static void PlayerPickedUpItem(Packet packet)
@@ -374,9 +299,8 @@ public class ClientRead : MonoBehaviour
 
             PickupItemsManager.Instance.PlayerPickedUpItem(pickupID, clientWhoPickedUp, packet);
         }
-        catch (Exception e)
-        {
-            Output.WriteLine($"Error in reading PlayerPickedUpItem...\n{e}");
+        catch (Exception e) {
+            OutputPacketError(e);
         }
     }
 
@@ -389,9 +313,92 @@ public class ClientRead : MonoBehaviour
 
             InGameChat.Instance.AddInGameChatEntry(text, GameManager.PlayerDictionary[playerID].PlayerColor);
         }
-        catch (Exception e)
-        {
-            Output.WriteLine($"Error in reading ChatMessage...\n{e}");
+        catch (Exception e) {
+            OutputPacketError(e);
         }
     }
+
+    #endregion
+
+    #region ConstantlySentPackets
+
+    internal static void PlayerStillConnectedTCP(Packet packet)
+    {
+        try
+        {
+            byte latencyIDTCP = packet.ReadByte();
+            float latency2WaySecondsTCP = packet.ReadFloat();
+
+            Client.Instance.PlayerConnectedAcknAndPingTCP(DateTime.Now.TimeOfDay, latency2WaySecondsTCP);
+            ClientSend.PingPacketAckTCP(latencyIDTCP);
+        }
+        catch (Exception e) {
+            OutputPacketError(e);
+        }
+    }
+    internal static void PlayerStillConnectedUDP(Packet packet)
+    {
+        try
+        {
+            byte latencyIDUDP = packet.ReadByte();
+            float latency2WaySecondsUDP = packet.ReadFloat();
+
+            Client.Instance.PlayerConnectedAcknAndPingUDP(DateTime.Now.TimeOfDay, latency2WaySecondsUDP);
+            ClientSend.PingPacketAckUDP(latencyIDUDP);
+        }
+        catch (Exception e) {
+            OutputPacketError(e);
+        }
+    }
+
+    internal static void ConstantPlayerData(Packet packet)
+    {
+        try
+        {
+            byte numPlayers = packet.ReadByte();
+
+            for (int playerCount = 0; playerCount < numPlayers; playerCount++)
+            {
+                byte playerID = packet.ReadByte();
+                if (playerID == Client.Instance.ClientID)
+                    continue; //Don't read localPlayer stuff yet //TODO: Switch/remove when server based movement is made
+
+                bool[] bits = packet.Read1ByteAs8Bools();
+
+                PlayerManager player = GameManager.PlayerDictionary[playerID];
+
+                if (bits[0])
+                {
+                    Quaternion armRotation = packet.ReadQuaternion();
+                    player.SetArmRotation(armRotation);
+                }
+
+                if (bits[1])
+                {
+                    Vector2 armPosition = packet.ReadLocalVector2();
+                    player.SetArmPosition(armPosition);
+                }
+
+                if (bits[2])
+                {
+                    Vector2 playerPosition = packet.ReadUVector2WorldPosition();
+                    player.SetPosition(playerPosition);
+                }
+
+                if (bits[3])
+                {
+                    byte moveState = packet.ReadByte();
+                    player.SetVelocityState((PlayerMovingState)moveState);
+                }
+            }
+        }
+        catch (Exception e) {
+            OutputPacketError(e);
+        }
+    }
+
+    #endregion
+
+    private static void OutputPacketError(Exception e) =>
+        Output.WriteLine($"\tError, reading packet...\n{e}");
 }

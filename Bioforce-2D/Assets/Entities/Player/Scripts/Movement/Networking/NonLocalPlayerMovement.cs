@@ -93,10 +93,10 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
                 speedX = 0;
                 break;
             case PlayerMovingState.runningLeft:
-                speedX = -GetRunSpeed();
+                speedX = -RunSpeed;
                 break;
             case PlayerMovingState.runningRight:
-                speedX = GetRunSpeed();
+                speedX = RunSpeed;
                 break;
             case PlayerMovingState.sprintingLeft:
                 speedX = -SprintSpeed;
@@ -131,6 +131,9 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
         PlayerManager.OnPlayerMovingStateChange -= ChangedSpeedX;
         PlayerManager.OnPlayerDeath -= PlayerCantMoveAndCantBeHit;
         PlayerManager.OnPlayerRespawn -= PlayerCanMoveAndCanBeHit;
+
+        PlayerManager.OnPlayerPosition -= PlayerPosition;
+        PlayerManager.OnPlayerRotation -= PlayerRotation;
 
         GameManager.Instance.OnLostConnectionEvent -= PlayerCantMoveWhenPaused;
     }

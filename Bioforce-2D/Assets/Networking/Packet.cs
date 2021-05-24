@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 #if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE || UNITY_WEBGL
 using UnityEngine;
+using UnityEngine.Output;
 using Mathf = UnityEngine.Mathf;
 #else
 using System.Numerics;
@@ -79,7 +80,8 @@ namespace Shared
         generatedPickup,
         playerPickedUpItem,
         chatMessage,
-        gameState
+        gameState,
+        constantPlayerData
     }
 
     /// <summary>Sent from client to server.</summary>
@@ -100,7 +102,9 @@ namespace Shared
         colorToFreeAndTake,
         readyToJoin,
         chatMessage,
-        constantPlayerData
+        constantPlayerData,
+        pingAckTCP,
+        pingAckUDP
     }
 
     public class Packet : IDisposable
@@ -280,6 +284,7 @@ namespace Shared
                 bitValue *= 2;
             }
 
+            //Output.WriteLine($"{bit8}{bit7}{bit6}{bit5}{bit4}{bit3}{bit2}{bit1}:{byteToAdd}");
             Write(byteToAdd);
         }
 
@@ -1058,11 +1063,11 @@ namespace Shared
             return negative ? -value : value;
         }
 
-        internal bool[] Read1ByteAs8Bools(byte byteToRead)
+        internal bool[] Read1ByteAs8Bools()
         {
             bool[] bits = new bool[8];
 
-            short shortByteToRead = byteToRead; // So doesn't cause a wrap around/ overflow, e.g. 127 - 128 -> -1 = 255 as byte
+            short shortByteToRead = ReadByte(); // So doesn't cause a wrap around/ overflow, e.g. 127 - 128 -> -1 = 255 as byte
                                                 // Can't be sbyte, because then it can't represent max val 255
             byte bitValue = 128;
             for (int bitCount = bits.Length - 1; bitCount >= 0; bitCount--)

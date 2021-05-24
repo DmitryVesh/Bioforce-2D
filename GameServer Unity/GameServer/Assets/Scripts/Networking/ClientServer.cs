@@ -16,7 +16,7 @@ namespace GameServer
 
         public PlayerServer Player { get; private set; }
         public bool Connected { get; private set; } = false;
-        public readonly Vector2 SpawningVector2 = new Vector2(31.08f, 5.65f);
+        public static readonly Vector2 SpawningVector2 = new Vector2(31.08f, 5.65f);
 
         public ClientServer(byte iD)
         {

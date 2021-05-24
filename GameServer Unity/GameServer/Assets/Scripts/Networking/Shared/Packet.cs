@@ -78,7 +78,8 @@ namespace Shared
         generatedPickup,
         playerPickedUpItem,
         chatMessage,
-        gameState
+        gameState,
+        constantPlayerData
     }
 
     /// <summary>Sent from client to server.</summary>
@@ -99,7 +100,9 @@ namespace Shared
         colorToFreeAndTake,
         readyToJoin,
         chatMessage,
-        constantPlayerData
+        constantPlayerData,
+        pingAckTCP,
+        pingAckUDP
     }
 
     public class Packet : IDisposable
@@ -263,6 +266,23 @@ namespace Shared
         public void Write(TimeSpan value)
         {
             Buffer.AddRange(BitConverter.GetBytes(value.Ticks));
+        }
+
+        internal void Write8BoolsAs1Byte(bool bit8, bool bit7, bool bit6, bool bit5, bool bit4, bool bit3, bool bit2, bool bit1)
+        {
+            byte byteToAdd = 0;
+            bool[] bits = new bool[] { bit1, bit2, bit3, bit4, bit5, bit6, bit7, bit8 };
+
+            byte bitValue = 1;
+            for (int bitCount = 0; bitCount < bits.Length; bitCount++)
+            {
+                if (bits[bitCount])
+                    byteToAdd += bitValue;
+
+                bitValue *= 2;
+            }
+
+            Write(byteToAdd);
         }
 
 #if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS || UNITY_STANDALONE || UNITY_WEBGL
@@ -1042,19 +1062,19 @@ namespace Shared
         {
             bool[] bits = new bool[8];
 
-            short shortByteToRead = ReadByte(); // short So doesn't cause a wrap around/ overflow, e.g. 127 - 128 -> -1 = 255 as byte
-                                                // Can't be sbyte, because then it can't represent max val 255
+            short shortByteToRead = (short)ReadByte();  // short So doesn't cause a wrap around/ overflow, e.g. 127 - 128 -> -1 = 255 as byte
+                                                        // Can't be sbyte, because then it can't represent max val 255
             byte bitValue = 128;
             for (int bitCount = bits.Length - 1; bitCount >= 0; bitCount--)
             {
-                if (shortByteToRead - bitValue >= 0)
+                short result = (short)(shortByteToRead - bitValue);
+                if (result >= 0)
                 {
                     bits[bitCount] = true;
+                    shortByteToRead = result;
 
                     if (shortByteToRead == 0)
-                        break;
-
-                    shortByteToRead -= bitValue;
+                        break;                                        
                 }
 
                 bitValue /= 2;

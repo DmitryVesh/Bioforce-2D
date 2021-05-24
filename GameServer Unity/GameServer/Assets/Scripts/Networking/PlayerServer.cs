@@ -18,17 +18,7 @@ namespace GameServer
         public int MaxHealth { get; set; } = 50;
         public int CurrentHealth { get; set; }
 
-        private byte MoveState { get; set; }
         public bool IsFacingRight { get; private set; }
-        private Vector2 LastPosition { get; set; }
-        private byte LastMoveState { get; set; }
-
-
-        private Vector2 ArmPosition { get; set; }
-        private Quaternion ArmRotation { get; set; }
-        private Vector2 LastPositionArms { get; set; }
-        private Quaternion LastRotationArms { get; set; }
-
 
         private Vector2 LastPositionValidation { get; set; }
         public float RunSpeed { get; set; } = 0;
@@ -88,14 +78,21 @@ namespace GameServer
             CurrentHealth = MaxHealth;
         }
 
-        public void PlayerPosition(Vector2 position) =>
-            transform.position = position;
-        public void PlayerMoveState(byte moveState) =>
-            MoveState = moveState;
+        Vector2 PlayerPosition { get => transform.position; set => transform.position = value; }// = new Vector2(9.59f, 7.77f);
+
+        private ConstantlySentPlayerData PlayerData { get; set; } = new ConstantlySentPlayerData();
+
+        internal void SetPlayerPosition(Vector2 position)
+        {
+            PlayerPosition = position;
+            PlayerData.SetPlayerPosition(position);
+        }
+        internal void PlayerMoveState(byte moveState) =>
+            PlayerData.SetMoveState(moveState);
         internal void PlayerArmRotation(Quaternion rotation) =>
-            ArmRotation = rotation;
+            PlayerData.SetArmRotation(rotation);
         internal void PlayerArmPosition(Vector2 position) =>
-            ArmPosition = position;
+            PlayerData.SetArmPosition(position);
 
         public void SetPlayerMovementStats(float runSpeed, float sprintSpeed)
         {
@@ -142,37 +139,61 @@ namespace GameServer
         internal void MessageToSend(string text) =>
             ChatEntryToSend = $"[{Username}]: {text}";
 
-        private int FixedFrameCounter { get; set; } = 0;
+
         public float Latency2WaySecondsTCP { get; private set; } = 0.300f; //default 0.3s = 300ms
         public float Latency2WaySecondsUDP { get; private set; } = 0.300f; //default 0.3s = 300ms
 
-        private Dictionary<byte, TimeSpan> LatencyDictionary { get; set; } = new Dictionary<byte, TimeSpan>();
-        private byte LatencyID { get; set; } = 0;
+        private const byte LatencyIDLimit = 40;
+        public byte LatencyIDTCP { get; set; } = 0;
+        private Dictionary<byte, TimeSpan> LatencyDictionaryTCP { get; set; } = new Dictionary<byte, TimeSpan>();
+        public byte LatencyIDUDP { get; set; } = 0;
+        private Dictionary<byte, TimeSpan> LatencyDictionaryUDP { get; set; } = new Dictionary<byte, TimeSpan>();
+
+        private static TimeSpan Now { get; set; }
+
+        internal byte GetLatencyIDTCP()
+        {
+            LatencyIDTCP = GetLatencyID(LatencyIDTCP, LatencyDictionaryTCP);
+            return LatencyIDTCP;
+        }
+        internal byte GetLatencyIDUDP()
+        {
+            LatencyIDUDP = GetLatencyID(LatencyIDUDP, LatencyDictionaryUDP);
+            return LatencyIDUDP;
+        }
+        private byte GetLatencyID(byte latencyID, Dictionary<byte, TimeSpan> latencyDictionary)
+        {
+            latencyID = (byte)((latencyID + 1) % LatencyIDLimit);
+
+            if (!latencyDictionary.ContainsKey(latencyID))
+                latencyDictionary.Add(latencyID, Now);
+            else
+                latencyDictionary[latencyID] = Now;
+
+            return latencyID;
+        }
+
+        internal void PingAckTCP(byte latencyIDTCP) =>
+            Latency2WaySecondsTCP = PingAck(latencyIDTCP, LatencyDictionaryTCP);
+        internal void PingAckUDP(byte latencyIDUDP) =>
+            Latency2WaySecondsUDP = PingAck(latencyIDUDP, LatencyDictionaryUDP);
+        private float PingAck(byte latencyID, Dictionary<byte, TimeSpan> latencyDictionary)
+        {
+            TimeSpan latencyCheckSent = latencyDictionary[latencyID];
+            return (float)(Now - latencyCheckSent).TotalSeconds;
+        }
 
         public void FixedUpdate()
         {
-            TimeSpan now = DateTime.Now.TimeOfDay;
-
-            //Send PingPackets
-            if (FixedFrameCounter++ % 2 == 0)
-            {
-                ServerSend.PingTCPPacket(ID, Latency2WaySecondsTCP, ++LatencyID);
-                ServerSend.PingUDPPacket(ID, Latency2WaySecondsUDP, LatencyID);
-
-                if (!LatencyDictionary.ContainsKey(LatencyID))
-                    LatencyDictionary.Add(LatencyID, now);
-                else
-                    LatencyDictionary[LatencyID] = now;
-            }
-
+            Now = DateTime.Now.TimeOfDay;
 
             //Set the state of which to sent the constantly sent packets via: TCP, UDP or by both UDPandTCP
             //TODO: use ping instead
             SendConstantPacketsState sendConstantPacketsState;
 
-            if (PacketSendViaOnlyTCP - now < TimeSpanZero) //Flag so only send constant packets via TCP, because UDP is not responsive, so less data is sent
+            if (PacketSendViaOnlyTCP - Now < TimeSpanZero) //Flag so only send constant packets via TCP, because UDP is not responsive, so less data is sent
                 sendConstantPacketsState = SendConstantPacketsState.TCP;
-            else if (PacketSendViaTCPAndUDP - now < TimeSpanZero) //Flag so both constantly sent packets are sent via both UDP and TCP
+            else if (PacketSendViaTCPAndUDP - Now < TimeSpanZero) //Flag so both constantly sent packets are sent via both UDP and TCP
                 sendConstantPacketsState = SendConstantPacketsState.UDPandTCP;
             else //Flag so can send via only UDP
                 sendConstantPacketsState = SendConstantPacketsState.UDP;
@@ -181,7 +202,7 @@ namespace GameServer
 
             //Kicking or pausing the player based on TCP timeout 
             //TODO: use ping instead
-            if (PacketTimeOutTCP - now < TimeSpanZero)
+            if (PacketTimeOutTCP - Now < TimeSpanZero)
             {
                 Server.ClientDictionary[ID].Disconnect();
                 PlayerColor.FreeColor(PlayerColorIndex, ID);
@@ -190,7 +211,7 @@ namespace GameServer
                 Output.WriteLine($"\n\tPlayer: {ID} has been kicked, due to GameServer not having received packets in a while...");
                 return;
             }
-            else if (PacketPauseTCP - now < TimeSpanZero)
+            else if (PacketPauseTCP - Now < TimeSpanZero)
             {
                 if (Paused) //Shouldn't send that the player is paused more than once
                     return;
@@ -215,21 +236,12 @@ namespace GameServer
         {
             if (!ReadyToPlay)
                 return;
-            //TODO: Somehow clump each player's packet into 1 packet, so will send deatils of all 16 players 
-            // to 1 player in 1 packet,
-            if (LastPositionArms != ArmPosition || LastRotationArms != ArmRotation)
-            {
-                ServerSend.ArmPositionRotation(ID, ArmPosition, ArmRotation);
-                LastPositionArms = ArmPosition;
-                LastRotationArms = ArmRotation;
-            }
 
-            if (LastPosition != (Vector2)transform.position || MoveState != LastMoveState)
-            {
-                ServerSend.PlayerPositionButLocal(ID, transform.position, MoveState);
-                LastPosition = transform.position;
-                LastMoveState = MoveState;
-            }
+
+            if (PlayerData.HasAnyData())
+                NetworkManager.Instance.AddPlayerDataToBeSynchronised(ID, PlayerData);
+            PlayerData.Reset();          
+
 
             if (ChatEntryToSend != "")
             {

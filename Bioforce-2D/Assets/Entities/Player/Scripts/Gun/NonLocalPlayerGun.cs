@@ -41,12 +41,10 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
     public void SetOwnerCollider(Collider2D ownCollider) =>
         OwnCollider = ownCollider;
 
-    private void SetArmPositionRotation(Vector2 position, Quaternion rotation)
-    {
-        //Need to call in late update so anims don't override the position x...
-        ArmPosition = position;
+    private void SetArmRotation(Quaternion rotation) => //Need to call in late update so anims don't override the position x...
         ArmRotation = rotation;
-    }
+    private void SetArmPosition(Vector2 position) => //Need to call in late update so anims don't override the position x...
+        ArmPosition = position;
 
     public void Disable(TypeOfDeath typeOfDeath) =>
         CanShootAndAim = false;
@@ -70,7 +68,8 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
         PlayerManager.OnPlayerDeath += Disable;
         PlayerManager.OnPlayerRespawn += Enable;
         PlayerManager.OnPlayerShot += ShootBullet;
-        PlayerManager.OnArmPositionRotation += SetArmPositionRotation;
+        PlayerManager.OnPlayerArmPosition += SetArmPosition;
+        PlayerManager.OnPlayerArmRotation += SetArmRotation;
         SetToPlayerColor(MuzzelFlash.gameObject);
     }
     protected virtual void LateUpdate()
@@ -120,6 +119,7 @@ public class NonLocalPlayerGun : MonoBehaviour, IGun
         PlayerManager.OnPlayerDeath -= Disable;
         PlayerManager.OnPlayerRespawn -= Enable;
         PlayerManager.OnPlayerShot -= ShootBullet;
-        PlayerManager.OnArmPositionRotation -= SetArmPositionRotation;
+        PlayerManager.OnPlayerArmPosition -= SetArmPosition;
+        PlayerManager.OnPlayerArmRotation -= SetArmRotation;
     }
 }

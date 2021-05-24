@@ -1,4 +1,6 @@
 using GameServer;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Singleton;
 
@@ -9,6 +11,9 @@ public class NetworkManager : MonoBehaviour
 
     [SerializeField] private GameObject PlayerPrefab;
 
+    private bool HasDataToSend { get; set; } = false;
+    private List<(byte, ConstantlySentPlayerData)> PlayerDatas { get; set; } = new List<(byte, ConstantlySentPlayerData)>();
+
     private void Awake()
     {
         Singleton.Init(ref instance, this);
@@ -16,4 +21,20 @@ public class NetworkManager : MonoBehaviour
 
     internal PlayerServer InstantiatePlayer() =>
         Instantiate(PlayerPrefab).GetComponent<PlayerServer>();
+
+    internal void AddPlayerDataToBeSynchronised(byte iD, ConstantlySentPlayerData playerData)
+    {
+        HasDataToSend = true;
+        PlayerDatas.Add((iD, playerData.Clone()));
+    }
+
+    private void FixedUpdate()
+    {
+        if (HasDataToSend)
+        {
+            ServerSend.ConstantPlayerData(PlayerDatas);
+            HasDataToSend = false;
+            PlayerDatas.Clear();
+        }
+    }
 }

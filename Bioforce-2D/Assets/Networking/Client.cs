@@ -56,10 +56,8 @@ public class Client : MonoBehaviour
     private byte FixedFrameCounter { get; set; } = 0;
 
     public float Latency1WaySecondsTCP { get; private set; } = 0.15f;
-    public float Latency2WayMSTCP { get => (Latency1WaySecondsTCP * 2 * 1000); }
+    public float Latency2WayMSTCP { get => (Latency1WaySecondsTCP * 2000); }
     public float Latency1WaySecondsUDP { get; private set; } = 0.15f;
-    private byte LatencyID { get; set; } = 0; //Loops from 0 - 255, then back to 0
-    private Dictionary<byte, TimeSpan> LatencyDictionary { get; set; } = new Dictionary<byte, TimeSpan>();
 
     public bool IsPlaying { get; set; }
 
@@ -366,7 +364,9 @@ public class Client : MonoBehaviour
     PlayerMovingState moveState = PlayerMovingState.idleRight;
 
     bool shouldSendWorldPosition = false;
-    Vector2 playerPosition = RespawnPoint.GetRandomSpawnPoint(); //Default TODO: Change with actual player position
+
+    public static readonly Vector2 SpawningVector2 = new Vector2(31.08f, 5.65f);
+    Vector2 playerPosition = SpawningVector2; //Default TODO: Change with actual player position
 
     bool shouldSendArmPosition = false;
     Vector2 armPosition = Vector2.zero;
@@ -394,6 +394,11 @@ public class Client : MonoBehaviour
                 shouldSendArmPosition, armPosition,
                 shouldSendArmRotation, armRotation
                 );
+
+            shouldSendMoveState = false;
+            shouldSendWorldPosition = false;
+            shouldSendArmPosition = false;
+            shouldSendArmRotation = false;
         }
     }
 
@@ -407,15 +412,10 @@ public class Client : MonoBehaviour
             if (FixedFrameCounter++ % 2 == 0)
                 return;
 
-            //ClientSend.PlayerConnectedTCPPacket(++LatencyID);
-            //ClientSend.PlayerConnectedUDPPacket(LatencyID);
+            ClientSend.PlayerConnectedTCPPacket();
+            ClientSend.PlayerConnectedUDPPacket();
 
             TimeSpan now = DateTime.Now.TimeOfDay;
-
-            //if (!LatencyDictionary.ContainsKey(LatencyID))
-            //    LatencyDictionary.Add(LatencyID, now);
-            //else
-            //    LatencyDictionary[LatencyID] = now;
 
             SendConstantPacketsState sendConstantPacketsState;
 
@@ -456,29 +456,29 @@ public class Client : MonoBehaviour
         }
     }
 
-    
 
-    public void PlayerConnectedAcknTCP(TimeSpan now, byte latencyID)
+    #region Ping Stuff
+    
+    public void PlayerConnectedAcknAndPingTCP(TimeSpan now, float latency2WaySecondsTCP)
     {
         SetPacketTimeoutsTCP(now);
 
-        TimeSpan latencyCheckSent = LatencyDictionary[latencyID];
-        Latency1WaySecondsTCP = (float)(now - latencyCheckSent).TotalSeconds / 2f;
+        Latency1WaySecondsTCP = latency2WaySecondsTCP / 2f;
     }
     private void SetPacketTimeoutsTCP(TimeSpan now)
     {
         PacketTimeOutTCP = now + new TimeSpan(0, 0, 10);
         PacketPauseTCP = now + new TimeSpan(0, 0, 2);
     }
-
-    public void PlayerConnectedAcknUDP(TimeSpan now, byte latencyID)
+    public void PlayerConnectedAcknAndPingUDP(TimeSpan now, float latency2WaySecondsUDP)
     {
         PacketSendViaOnlyTCP = now + new TimeSpan(0, 0, 5);
         PacketSendViaTCPAndUDP = now + new TimeSpan(0, 0, 0, 0, 500);
 
-        TimeSpan latencyCheckSent = LatencyDictionary[latencyID];
-        Latency1WaySecondsUDP = (float)(now - latencyCheckSent).TotalSeconds / 2;
+        Latency1WaySecondsUDP = latency2WaySecondsUDP / 2;
     }
+
+    #endregion Ping Stuff
 
     private void ResetTimeOutTimer(bool runTimer = true)
     {
@@ -519,7 +519,7 @@ public class Client : MonoBehaviour
         PacketHandlerDictionary.Add((byte)ServerPackets.welcome, ClientRead.WelcomeRead);
         PacketHandlerDictionary.Add((byte)ServerPackets.udpTest, ClientRead.UDPTestRead);
         PacketHandlerDictionary.Add((byte)ServerPackets.spawnPlayer, ClientRead.SpawnPlayer);
-        PacketHandlerDictionary.Add((byte)ServerPackets.playerPosition, ClientRead.PlayerPosition);
+        //PacketHandlerDictionary.Add((byte)ServerPackets.playerPosition, ClientRead.PlayerPosition);
         //PacketHandlerDictionary.Add((byte)ServerPackets.playerRotationAndVelocity, ClientRead.PlayerRotationAndVelocity);
         PacketHandlerDictionary.Add((byte)ServerPackets.playerMovementStats, ClientRead.PlayerMovementStats);
         PacketHandlerDictionary.Add((byte)ServerPackets.playerDisconnect, ClientRead.PlayerDisconnect);
@@ -528,7 +528,7 @@ public class Client : MonoBehaviour
         PacketHandlerDictionary.Add((byte)ServerPackets.playerRespawned, ClientRead.PlayerRespawned);
         PacketHandlerDictionary.Add((byte)ServerPackets.tookDamage, ClientRead.TookDamage);
         PacketHandlerDictionary.Add((byte)ServerPackets.serverIsFull, ClientRead.ServerIsFull);
-        PacketHandlerDictionary.Add((byte)ServerPackets.armPositionRotation, ClientRead.ArmPositionRotation);
+        //PacketHandlerDictionary.Add((byte)ServerPackets.armPositionRotation, ClientRead.ArmPositionRotation);
         PacketHandlerDictionary.Add((byte)ServerPackets.playerPausedGame, ClientRead.PlayerPausedGame);
         PacketHandlerDictionary.Add((byte)ServerPackets.stillConnectedTCP, ClientRead.PlayerStillConnectedTCP);
         PacketHandlerDictionary.Add((byte)ServerPackets.stillConnectedUDP, ClientRead.PlayerStillConnectedUDP);
@@ -540,6 +540,7 @@ public class Client : MonoBehaviour
         PacketHandlerDictionary.Add((byte)ServerPackets.playerPickedUpItem, ClientRead.PlayerPickedUpItem);
         PacketHandlerDictionary.Add((byte)ServerPackets.chatMessage, ClientRead.ChatMessage);
         PacketHandlerDictionary.Add((byte)ServerPackets.gameState, ClientRead.ReadGameState);
+        PacketHandlerDictionary.Add((byte)ServerPackets.constantPlayerData, ClientRead.ConstantPlayerData);
     }
        
 }

@@ -2,7 +2,6 @@
 using System;
 using UnityEngine;
 using UnityEngine.Output;
-using System.Collections.Generic;
 
 
 namespace GameServer
@@ -11,32 +10,44 @@ namespace GameServer
     {
         public static void WelcomeRead(byte clientID, Packet packet)
         {
-            byte checkClientID = packet.ReadByte();
-            string username = packet.ReadString();
-
-            Output.WriteLine($"\t{Server.ClientDictionary[clientID].tCP.Socket.Client.RemoteEndPoint} connected as player: \"{username}\" : {clientID}");
-            if (clientID == checkClientID)
+            try
             {
-                ServerSend.AskPlayerDetails(clientID, PlayerColor.UnAvailablePlayerColors());
-                ServerSend.SendGameState(GameStateManager.Instance.CurrentState, GameStateManager.Instance.RemainingGameTime, clientID);
-                
-                Server.ClientDictionary[clientID].SetPlayer(username);
-                Server.ClientDictionary[clientID].SpawnOtherPlayersToConnectedUser();
-                return;
+                byte checkClientID = packet.ReadByte();
+                string username = packet.ReadString();
+
+                Output.WriteLine($"\t{Server.ClientDictionary[clientID].tCP.Socket.Client.RemoteEndPoint} connected as player: \"{username}\" : {clientID}");
+                if (clientID == checkClientID)
+                {
+                    ServerSend.AskPlayerDetails(clientID, PlayerColor.UnAvailablePlayerColors());
+                    ServerSend.SendGameState(GameStateManager.Instance.CurrentState, GameStateManager.Instance.RemainingGameTime, clientID);
+
+                    Server.ClientDictionary[clientID].SetPlayer(username);
+                    Server.ClientDictionary[clientID].SpawnOtherPlayersToConnectedUser();
+                    return;
+                }
+                Output.WriteLine($"\tError, player {username} is connected as wrong player number");
             }
-            Output.WriteLine($"\tError, player {username} is connected as wrong player number");
+            catch (Exception e) { 
+                OutputPacketError(clientID, e);
+            }   
         }
         public static void UDPTestRead(byte clientID, Packet packet)
         {
-            byte checkClientID = packet.ReadByte();
-            string message = packet.ReadString();
-
-            Output.WriteLine($"\tUDP Test received from: {checkClientID}, Message: {message}\n");
-            if (clientID == checkClientID)
+            try
             {
-                return;
+                byte checkClientID = packet.ReadByte();
+                string message = packet.ReadString();
+
+                Output.WriteLine($"\tUDP Test received from: {checkClientID}, Message: {message}\n");
+                if (clientID == checkClientID)
+                {
+                    return;
+                }
+                Output.WriteLine($"\tError, player {clientID} is connected as wrong player number {checkClientID}");
             }
-            Output.WriteLine($"\tError, player {clientID} is connected as wrong player number {checkClientID}");
+            catch (Exception e) { 
+                OutputPacketError(clientID, e);
+            }   
         }
 
         internal static void ColorToFreeAndToTake(byte clientID, Packet packet)
@@ -50,10 +61,9 @@ namespace GameServer
                 PlayerColor.TakeColor(colorToTake, clientID);
                 Server.ClientDictionary[clientID].Player.PlayerColorIndex = colorToTake;
             }
-            catch (Exception exception)
-            {
-                Output.WriteLine($"\tError, trying to read ColorToFreeAndToTAke, from player: {clientID}...\n{exception}");
-            }
+            catch (Exception e) { 
+                OutputPacketError(clientID, e);
+            }   
         }
         internal static void ReadyToJoin(byte clientID, Packet packet)
         {
@@ -65,65 +75,11 @@ namespace GameServer
                 
                 Output.WriteLine($"\tPlayer: {clientID} was sent into game.");
             }
-            catch (Exception exception)
-            {
-                Output.WriteLine($"\tError, trying to read ReadyToJoin, from player: {clientID}...\n{exception}");
-            }
-        }
-
-        internal static void ConstantPlayerData(byte clientID, Packet packet)
-        {
-            try {
-                bool[] bits = packet.Read1ByteAs8Bools();
-                PlayerServer player = Server.ClientDictionary[clientID].Player;
-                
-                if (bits[0])
-                {
-                    UnityEngine.Quaternion armRotation = packet.ReadQuaternion();
-                    player.PlayerArmRotation(armRotation);
-                }
-
-                if (bits[1])
-                {
-                    UnityEngine.Vector2 armPosition = packet.ReadLocalVector2();
-                    player.PlayerArmPosition(armPosition);
-                }
-
-                if (bits[2])
-                {
-                    UnityEngine.Vector2 playerPosition = packet.ReadUVector2WorldPosition();
-                    player.PlayerPosition(playerPosition);
-                }
-
-                if (bits[3])
-                {
-                    byte moveState = packet.ReadByte();
-                    player.PlayerMoveState(moveState);
-                }
-            }
-            catch (Exception e) {
+            catch (Exception e) { 
                 OutputPacketError(clientID, e);
-            }
+            }   
         }
-
-        private static void OutputPacketError(byte clientID, Exception e) =>
-            Output.WriteLine($"\tError, reading player:{clientID} packet...\n{e}");
-
-        public static void PlayerMovementRead(byte clientID, Packet packet)
-        {
-            try
-            {
-                UnityEngine.Vector2 position = packet.ReadUVector2WorldPosition();
-                byte moveState = packet.ReadByte();
-                PlayerServer player = Server.ClientDictionary[clientID].Player;
-                player.PlayerPosition(position);
-                player.PlayerMoveState(moveState);
-            }
-            catch (Exception exception)
-            {
-                Output.WriteLine($"\tError, trying to read player movement, from player: {clientID}...\n{exception}");
-            }
-        }
+       
         public static void PlayerMovementStatsRead(byte clientID, Packet packet)
         {
             try
@@ -134,10 +90,9 @@ namespace GameServer
                 Server.ClientDictionary[clientID].Player.SetPlayerMovementStats(runSpeed, sprintSpeed);
                 ServerSend.PlayerMovementStats(clientID, runSpeed, sprintSpeed);
             }
-            catch (Exception exception)
-            {
-                Output.WriteLine($"\tError, trying to read player movement stats, from player: {clientID}\n{exception}");
-            }
+            catch (Exception e) { 
+                OutputPacketError(clientID, e);
+            }   
             
         }
         public static void ShotBulletRead(byte clientID, Packet packet)
@@ -148,10 +103,9 @@ namespace GameServer
                 Quaternion rotation = packet.ReadQuaternion();
                 ServerSend.ShotBullet(clientID, position, rotation);
             }
-            catch (Exception exception)
-            {
-                Output.WriteLine($"\tError, trying to read shot bullet, from player: {clientID}\n{exception}");
-            }
+            catch (Exception e) { 
+                OutputPacketError(clientID, e);
+            }   
         }
 
         
@@ -166,10 +120,9 @@ namespace GameServer
                     Server.ClientDictionary[bulletOwnerID].Player.AddKill();
                 Server.ClientDictionary[clientID].Player.Died();
             }
-            catch (Exception exception)
-            {
-                Output.WriteLine($"\tError, trying to read player died, from player: {clientID}\n{exception}");
-            }
+            catch (Exception e) { 
+                OutputPacketError(clientID, e);
+            }   
         }
         public static void PlayerRespawnedRead(byte clientID, Packet packet)
         {
@@ -179,10 +132,9 @@ namespace GameServer
                 ServerSend.PlayerRespawned(clientID, respawnPoint);
                 Server.ClientDictionary[clientID].Player.Respawned();
             }
-            catch (Exception exception)
-            {
-                Output.WriteLine($"\tError, trying to read player respawned, from player: {clientID}\n{exception}");
-            }
+            catch (Exception e) { 
+                OutputPacketError(clientID, e);
+            }   
         }
 
         public static void TookDamageRead(byte clientID, Packet packet)
@@ -195,10 +147,9 @@ namespace GameServer
                 currentHealth = packet.ReadInt();
                 bulletOwner = packet.ReadShort();
             }
-            catch (Exception exception)
-            {
-                Output.WriteLine($"\tError, trying to read player took damage, from player: {clientID}\n{exception}");
-            }
+            catch (Exception e) { 
+                OutputPacketError(clientID, e);
+            }   
             finally
             {
                 Server.ClientDictionary[clientID].Player.CurrentHealth = currentHealth;
@@ -216,10 +167,9 @@ namespace GameServer
                 Server.ClientDictionary[clientID].Player.Paused = paused;
                 ServerSend.PlayerPausedGame(clientID, paused);
             }
-            catch (Exception exception)
-            {
-                Output.WriteLine($"\tError, trying to read PausedGame, from player: {clientID}\n{exception}");
-            }
+            catch (Exception e) { 
+                OutputPacketError(clientID, e);
+            }   
         }
         
         internal static void ChatMessage(byte clientID, Packet packet)
@@ -230,63 +180,114 @@ namespace GameServer
 
                 Server.ClientDictionary[clientID].Player.MessageToSend(text);
             }
-            catch (Exception e)
-            {
-                Output.WriteLine($"\tError, trying to read ChatMessage, from player: {clientID}\n{e}");
-            }
+            catch (Exception e) { 
+                OutputPacketError(clientID, e);
+            }   
         }
 
 
+
+        //Stage 1 -> Get reminder from player, that they are still connected -> send a ping packet, with player's ping and latencyID
         internal static void PlayerStillConnectedTCP(byte clientID, Packet packet)
         {
             try
             {
-                byte latencyID = packet.ReadByte();
+                PlayerServer player = Server.ClientDictionary[clientID].Player;
 
-                Server.ClientDictionary[clientID].Player.LastPacketReceivedTCP(DateTime.Now.TimeOfDay);
-                ServerSend.PlayerConnectedAcknTCP(clientID, latencyID);
+                player.LastPacketReceivedTCP(DateTime.Now.TimeOfDay);
+                ServerSend.PlayerConnectedAcknAndPingTCP(clientID, player.Latency2WaySecondsTCP, player.GetLatencyIDTCP());
             }
-            catch (Exception exception)
-            {
-                Output.WriteLine($"\tError, trying to read PlayerStillConnectedTCP, from player: {clientID}\n{exception}");
-            }            
-        }
-
-        
-
+            catch (Exception e) { 
+                OutputPacketError(clientID, e);
+            }              
+        }            
         internal static void PlayerStillConnectedUDP(byte clientID, Packet packet)
         {
             try
             {
-                byte latencyID = packet.ReadByte();
+                PlayerServer player = Server.ClientDictionary[clientID].Player;
 
-                Server.ClientDictionary[clientID].Player.LastPacketReceivedUDP(DateTime.Now.TimeOfDay);
-                ServerSend.PlayerConnectedAcknUDP(clientID, latencyID);
+                player.LastPacketReceivedUDP(DateTime.Now.TimeOfDay);
+                ServerSend.PlayerConnectedAcknAndPingUDP(clientID, player.Latency2WaySecondsUDP, player.GetLatencyIDUDP());
             }
-            catch (Exception exception)
-            {
-                Output.WriteLine($"\tError, trying to read PlayerStillConnectedUDP, from player: {clientID}\n{exception}");
+            catch (Exception e) { 
+                OutputPacketError(clientID, e);
             }            
         }
 
 
-        internal static void ArmPositionRotation(byte clientID, Packet packet)
+
+        //Stage 2
+        internal static void PlayerPingAckTCP(byte clientID, Packet packet)
         {
             try
             {
-                Vector2 position = packet.ReadLocalVector2();
-                Quaternion rotation = packet.ReadQuaternion();
+                byte latencyIDTCP = packet.ReadByte();
 
-                //TODO: make so all packets from player are sent in Update
-                //Server.ClientDictionary[clientID].player.SetArmPositionRotation(position, rotation);
                 PlayerServer player = Server.ClientDictionary[clientID].Player;
-                player.PlayerArmRotation(rotation);
-                player.PlayerArmPosition(position);
+                
+                player.LastPacketReceivedTCP(DateTime.Now.TimeOfDay);
+                player.PingAckTCP(latencyIDTCP);
             }
-            catch (Exception exception)
+            catch (Exception e) { 
+                OutputPacketError(clientID, e);
+            }              
+        }            
+        internal static void PlayerPingAckUDP(byte clientID, Packet packet)
+        {
+            try
             {
-                Output.WriteLine($"\tError, trying to read player's arm position and rotation, from player: {clientID}\n{exception}");
+                byte latencyIDUDP = packet.ReadByte();
+
+                PlayerServer player = Server.ClientDictionary[clientID].Player;
+
+                player.LastPacketReceivedUDP(DateTime.Now.TimeOfDay);
+                player.PingAckUDP(latencyIDUDP);
+            }
+            catch (Exception e) { 
+                OutputPacketError(clientID, e);
+            }            
+        }
+
+        internal static void ConstantPlayerData(byte clientID, Packet packet)
+        {
+            try
+            {
+                bool[] bits = packet.Read1ByteAs8Bools();
+                PlayerServer player = Server.ClientDictionary[clientID].Player;
+
+                if (bits[0])
+                {
+                    Quaternion armRotation = packet.ReadQuaternion();
+                    player.PlayerArmRotation(armRotation);
+                }
+
+                if (bits[1])
+                {
+                    Vector2 armPosition = packet.ReadLocalVector2();
+                    player.PlayerArmPosition(armPosition);
+                }
+
+                if (bits[2])
+                {
+                    Vector2 playerPosition = packet.ReadUVector2WorldPosition();
+                    player.SetPlayerPosition(playerPosition);
+                }
+
+                if (bits[3])
+                {
+                    byte moveState = packet.ReadByte();
+                    player.PlayerMoveState(moveState);
+                }
+            }
+            catch (Exception e)
+            {
+                OutputPacketError(clientID, e);
             }
         }
+
+
+        private static void OutputPacketError(byte clientID, Exception e) =>
+            Output.WriteLine($"\tError, reading player:{clientID} packet...\n{e}");
     }
 }
