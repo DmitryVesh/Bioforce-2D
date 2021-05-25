@@ -327,9 +327,9 @@ public class ClientRead : MonoBehaviour
         try
         {
             byte latencyIDTCP = packet.ReadByte();
-            float latency2WaySecondsTCP = packet.ReadFloat();
+            ushort latency2WayMSTCP = packet.ReadUShort();
 
-            Client.Instance.PlayerConnectedAcknAndPingTCP(DateTime.Now.TimeOfDay, latency2WaySecondsTCP);
+            Client.Instance.PlayerConnectedAcknAndPingTCP(DateTime.Now.TimeOfDay, latency2WayMSTCP);
             ClientSend.PingPacketAckTCP(latencyIDTCP);
         }
         catch (Exception e) {
@@ -341,9 +341,9 @@ public class ClientRead : MonoBehaviour
         try
         {
             byte latencyIDUDP = packet.ReadByte();
-            float latency2WaySecondsUDP = packet.ReadFloat();
+            ushort latency2WayMSUDP = packet.ReadUShort();
 
-            Client.Instance.PlayerConnectedAcknAndPingUDP(DateTime.Now.TimeOfDay, latency2WaySecondsUDP);
+            Client.Instance.PlayerConnectedAcknAndPingUDP(DateTime.Now.TimeOfDay, latency2WayMSUDP);
             ClientSend.PingPacketAckUDP(latencyIDUDP);
         }
         catch (Exception e) {
@@ -360,8 +360,6 @@ public class ClientRead : MonoBehaviour
             for (int playerCount = 0; playerCount < numPlayers; playerCount++)
             {
                 byte playerID = packet.ReadByte();
-                if (playerID == Client.Instance.ClientID)
-                    continue; //Don't read localPlayer stuff yet //TODO: Switch/remove when server based movement is made
 
                 bool[] bits = packet.Read1ByteAs8Bools();
 
@@ -370,25 +368,37 @@ public class ClientRead : MonoBehaviour
                 if (bits[0])
                 {
                     Quaternion armRotation = packet.ReadQuaternion();
-                    player.SetArmRotation(armRotation);
+                    if (player.ID != Client.Instance.ClientID)
+                        player.SetArmRotation(armRotation);
                 }
 
                 if (bits[1])
                 {
                     Vector2 armPosition = packet.ReadLocalVector2();
-                    player.SetArmPosition(armPosition);
+                    if (player.ID != Client.Instance.ClientID)
+                        player.SetArmPosition(armPosition);
                 }
 
                 if (bits[2])
                 {
                     Vector2 playerPosition = packet.ReadUVector2WorldPosition();
-                    player.SetPosition(playerPosition);
+                    if (player.ID != Client.Instance.ClientID)
+                        player.SetPosition(playerPosition);
                 }
 
                 if (bits[3])
                 {
                     byte moveState = packet.ReadByte();
-                    player.SetVelocityState((PlayerMovingState)moveState);
+                    if (player.ID != Client.Instance.ClientID)
+                        player.SetVelocityState((PlayerMovingState)moveState);
+                }
+
+                if (bits[4])
+                {
+                    ushort pingMS = packet.ReadUShort();
+                    ScoreboardManager.Instance.SetPing(playerID, pingMS);
+                    //if (player.ID != Client.Instance.ClientID)
+                    //
                 }
             }
         }

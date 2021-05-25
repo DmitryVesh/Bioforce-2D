@@ -14,7 +14,7 @@ namespace GameServer
                 {
                     packet.Write(serverName);
                     SendTCPPacket(packet);
-                    Output.WriteLine($"\n\t\tGameServer: {serverName} sent Received Welcome packet to MainServer.");
+                    Output.WriteLine($"\t\tGameServer: {serverName} sent Received Welcome packet to MainServer.");
                 }
             }
             catch (Exception exception)

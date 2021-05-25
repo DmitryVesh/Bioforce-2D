@@ -13,8 +13,12 @@ Main goals is to;
 
 	1 Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard	
 	1 Add a ping in ms to local player screen
-	0 Add ping to the scoreboard, for each player
+	1 Add ping to the scoreboard, for each player
 	0 Add colors to ping values, e.g. green under 50MS, yellow equal/under 100MS, red over 100MS
+
+	0 Clean up the splatter holder, bullets and other instantiated player related objects when reset game
+	0 Change the muzzleFlash, and Hit particles to be world space, so don't have to instanitated more than instance
+
 	0 Add regex into swear words like -> f(u+)ck
 	0 Implement a white outline of player when flashing in invincibility
 	0 Add server state into server page, e.g. Waiting, In progress, Ended
@@ -36,12 +40,10 @@ Future tasks;
 		Add rule to timed deathmatch, if players draw, same end score, make the last players battle, whoever is the last player alive wins, or whoever gets the first kill?
 		Add player names to the player choose color menu above the player
 		Increase the quaternion to be a 4B packet instead of 3B
-	Add chat into game
-	Add ping field to Player Score entries in scoreboard
+		Add server play time option slider when creating server -> also display as a rule in server menu
+
 	Add gamepad support for pc & mac
 	Make server sided, currently very client sided
-
-	make the ThreadManager to work on multi-threading
 	
 	imrpove killFeedUI, make entries disappear by decreasing opacity, and popping them back up smoothly instead of vertical layout group which
 		pops them and moves other entries up instantly.

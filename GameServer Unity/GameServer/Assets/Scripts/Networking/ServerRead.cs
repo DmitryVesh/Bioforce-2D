@@ -22,8 +22,12 @@ namespace GameServer
                     ServerSend.SendGameState(GameStateManager.Instance.CurrentState, GameStateManager.Instance.RemainingGameTime, clientID);
 
                     Server.ClientDictionary[clientID].SetPlayer(username);
-                    Server.ClientDictionary[clientID].SpawnOtherPlayersToConnectedUser();
-                    return;
+                    if (GameStateManager.Instance.CurrentState == GameState.activeGameInProcess ||
+                        GameStateManager.Instance.CurrentState == GameState.waitingForAPlayerToJoin)
+                    {
+                        Server.ClientDictionary[clientID].SpawnOtherPlayersToConnectedUser();
+                        return;
+                    }
                 }
                 Output.WriteLine($"\tError, player {username} is connected as wrong player number");
             }
@@ -195,7 +199,7 @@ namespace GameServer
                 PlayerServer player = Server.ClientDictionary[clientID].Player;
 
                 player.LastPacketReceivedTCP(DateTime.Now.TimeOfDay);
-                ServerSend.PlayerConnectedAcknAndPingTCP(clientID, player.Latency2WaySecondsTCP, player.GetLatencyIDTCP());
+                ServerSend.PlayerConnectedAcknAndPingTCP(clientID, player.Latency2WayMSTCP, player.GetLatencyIDTCP());
             }
             catch (Exception e) { 
                 OutputPacketError(clientID, e);
@@ -208,7 +212,7 @@ namespace GameServer
                 PlayerServer player = Server.ClientDictionary[clientID].Player;
 
                 player.LastPacketReceivedUDP(DateTime.Now.TimeOfDay);
-                ServerSend.PlayerConnectedAcknAndPingUDP(clientID, player.Latency2WaySecondsUDP, player.GetLatencyIDUDP());
+                ServerSend.PlayerConnectedAcknAndPingUDP(clientID, player.Latency2WayMSUDP, player.GetLatencyIDUDP());
             }
             catch (Exception e) { 
                 OutputPacketError(clientID, e);

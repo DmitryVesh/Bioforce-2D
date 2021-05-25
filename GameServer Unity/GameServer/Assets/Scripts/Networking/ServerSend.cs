@@ -19,9 +19,9 @@ namespace GameServer
         #region ConstantlySentPackets
 
         //Constantly sent
-        // TCP 7B (+ 40B extra) (byte 1B packetLen + byte 1B packetID + float 4B latency2Way(Ping) + byte 1B latencyID)
-        //      = 47B
-        internal static void PlayerConnectedAcknAndPingTCP(byte clientID, float latency2WayTCP, byte latencyIDTCP)
+        // TCP 5B (+ 40B extra) (byte 1B packetLen + byte 1B packetID + ushort 2B latency2Way(Ping) + byte 1B latencyID)
+        //      = 45B
+        internal static void PlayerConnectedAcknAndPingTCP(byte clientID, ushort latency2WayTCP, byte latencyIDTCP)
         {
             using (Packet packet = new Packet((byte)ServerPackets.stillConnectedTCP))
             {
@@ -31,9 +31,9 @@ namespace GameServer
                 SendTCPPacket(clientID, packet);
             }
         }
-        // UDP 7B (+ 28B extra) (byte 1B packetLen + byte 1B packetID + float 4B latency2Way(Ping) + byte 1B latencyID)
-        //      = 35B
-        internal static void PlayerConnectedAcknAndPingUDP(byte clientID, float latency2WayUDP, byte latencyIDUDP)
+        // UDP 5B (+ 28B extra) (byte 1B packetLen + byte 1B packetID + ushort 2B latency2Way(Ping) + byte 1B latencyID)
+        //      = 33B
+        internal static void PlayerConnectedAcknAndPingUDP(byte clientID, ushort latency2WayUDP, byte latencyIDUDP)
         {
             using (Packet packet = new Packet((byte)ServerPackets.stillConnectedUDP))
             {
@@ -64,7 +64,9 @@ namespace GameServer
                     packet.Write(playerData.Item1);
                     ConstantlySentPlayerData data = playerData.Item2;
 
-                    packet.Write8BoolsAs1Byte(false, false, false, false,
+                    //Add playerPing
+                    packet.Write8BoolsAs1Byte(
+                        false, false, false, data.UsePingMS,
                         data.UseMoveState, data.UsePlayerPosition, data.UseArmPosition, data.UseArmRotation);
 
                     if (data.UseArmRotation)
@@ -78,6 +80,13 @@ namespace GameServer
 
                     if (data.UseMoveState)
                         packet.Write(data.MoveState);
+
+                    if (data.UsePingMS)
+                        packet.Write(data.PingMS);
+
+                    //TODO: add Packets that have to arrive, like respawn/die, store a sentPacketID (similar to LatencyID) to get an Ack from player
+                    //If Ack is not sent back to Server within some time (e.g. 1.5 or 2 * ping), then must send that packet again.
+                    //In addition write down the time the original packet was sent, so can work out how much time to forward the action/ decrease respawn time by,
                 }
 
                 SendConstantlySentPacketToAll(packet);
@@ -285,7 +294,7 @@ namespace GameServer
 
                 packet.Write(player.CurrentInvincibilityTime);
 
-                packet.Write(player.Latency2WaySecondsTCP);
+                packet.Write(player.Latency2WayMSTCP);
 
                 SendTCPPacket(recipientClient, packet);
             }

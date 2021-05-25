@@ -48,7 +48,30 @@ public class PickupItemsManager : MonoBehaviour
 
         for (byte pickupCount = 0; pickupCount < MaxNumPickups * 2; pickupCount++)
             MakeAndAddPickupToAvailableQueue(pickupHolder, GetRandomPickupGameObject());
+
+        OutputNumAndTypesPickups();
     }
+    private void OutputNumAndTypesPickups()
+    {
+        //Counting the number of each type of pickup
+        Dictionary<PickupType, int> NumTypesOfPickups = new Dictionary<PickupType, int>();
+        foreach (PickupItem item in PickupsAvailable)
+        {
+            PickupType type = item.PickupType;
+            if (!NumTypesOfPickups.ContainsKey(type))
+                NumTypesOfPickups.Add(type, 0);
+
+            NumTypesOfPickups[type]++;
+        }
+
+        //Outputing the pickups
+        string output = "Pickups Available -> ";
+        foreach (KeyValuePair<PickupType, int> item in NumTypesOfPickups)
+            output += $"{item.Key}:{item.Value} ";
+
+        Output.WriteLine(output);
+    }
+
     private void OnDestroy()
     {
         GameStateManager.Instance.OnServerGameActivated -= StartSpawningItems;
@@ -88,12 +111,6 @@ public class PickupItemsManager : MonoBehaviour
     private void MakeAndAddPickupToAvailableQueue(Transform pickupHolder, GameObject pickupObject)
     {
         PickupItem pickup = Instantiate(pickupObject, pickupHolder).GetComponent<PickupItem>();
-        AddPickupToAvailableQueue(pickup);
-    }
-
-    private void AddPickupToAvailableQueue(PickupItem pickup)
-    {
-        Output.WriteLine($"\tInstantiated a Pickup of type: {pickup.PickupType}");
         PickupsAvailable.Enqueue(pickup);
         pickup.SetActive(false);
     }

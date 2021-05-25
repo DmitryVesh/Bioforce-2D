@@ -459,23 +459,23 @@ public class Client : MonoBehaviour
 
     #region Ping Stuff
     
-    public void PlayerConnectedAcknAndPingTCP(TimeSpan now, float latency2WaySecondsTCP)
+    public void PlayerConnectedAcknAndPingTCP(TimeSpan now, ushort latency2WayMSTCP)
     {
         SetPacketTimeoutsTCP(now);
 
-        Latency1WaySecondsTCP = latency2WaySecondsTCP / 2f;
+        Latency1WaySecondsTCP = latency2WayMSTCP / 2000f;
     }
     private void SetPacketTimeoutsTCP(TimeSpan now)
     {
         PacketTimeOutTCP = now + new TimeSpan(0, 0, 10);
         PacketPauseTCP = now + new TimeSpan(0, 0, 2);
     }
-    public void PlayerConnectedAcknAndPingUDP(TimeSpan now, float latency2WaySecondsUDP)
+    public void PlayerConnectedAcknAndPingUDP(TimeSpan now, ushort latency2WayMSUDP)
     {
         PacketSendViaOnlyTCP = now + new TimeSpan(0, 0, 5);
         PacketSendViaTCPAndUDP = now + new TimeSpan(0, 0, 0, 0, 500);
 
-        Latency1WaySecondsUDP = latency2WaySecondsUDP / 2;
+        Latency1WaySecondsUDP = latency2WayMSUDP / 2000f;
     }
 
     #endregion Ping Stuff

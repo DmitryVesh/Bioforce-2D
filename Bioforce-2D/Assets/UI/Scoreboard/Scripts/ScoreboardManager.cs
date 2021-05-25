@@ -39,6 +39,11 @@ public class ScoreboardManager : UIItemListingManager
         }
         catch (KeyNotFoundException) {}
     }
+    public void SetPing(byte clientID, int pingMS)
+    {
+        ((ScoreboardEntry)PlayersItemLists[clientID]).SetPing((int)ScoreboardEntryArrayListIndexes.ping, pingMS);
+        //ScoreboardChanged = true; //Don't need as it doesn't change the sorting of the board
+    }
     public void AddKill(byte bulletOwnerID)
     {
         PlayersItemLists[bulletOwnerID].AddToItemIndex((int)ScoreboardEntryArrayListIndexes.kills, 1);

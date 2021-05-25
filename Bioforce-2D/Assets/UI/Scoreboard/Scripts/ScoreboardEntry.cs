@@ -62,4 +62,9 @@ public class ScoreboardEntry : MonoBehaviour, IUIItemListing
         ItemList[itemListIndex] = (int)ItemList[itemListIndex] + toAdd;
         ArrayListTexts[itemListIndex].text = ItemList[itemListIndex].ToString();
     }
+    public void SetPing(int itemListIndex, int pingMS)
+    {
+        ItemList[itemListIndex] = pingMS;
+        ArrayListTexts[itemListIndex].text = ItemList[itemListIndex].ToString();
+    }
 }

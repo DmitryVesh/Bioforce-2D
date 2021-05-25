@@ -8,7 +8,7 @@ namespace GameServer
     {
         public static void Welcome(Packet _)
         {
-            Output.WriteLine("\n\t\tGameServer reading welcome packet from MainServer");
+            Output.WriteLine("\t\tGameServer reading welcome packet from MainServer");
             MainServerComms.EstablishedConnection = true;
 
             //Thread updateThread = new Thread(new ThreadStart(MainServerComms.Update));
@@ -16,7 +16,7 @@ namespace GameServer
             MainServerComms.StartSendingServerData();
             
             MainServerCommsSend.WelcomeReceived(MainServerComms.ServerName);
-            Output.WriteLine("\n\t\tGameServer recieved welcome packet from MainServer");
+            Output.WriteLine("\t\tGameServer recieved welcome packet from MainServer");
         }
     }
 }

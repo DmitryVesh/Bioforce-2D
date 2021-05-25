@@ -43,8 +43,23 @@ namespace GameServer
 
         private string ChatEntryToSend { get; set; } = "";
 
+        private void Start()
+        {
+            GameStateManager.Instance.OnServerGameEnded += ResetPlayer;
+        }
+
+        private void ResetPlayer()
+        {
+            IsDead = false;
+            CurrentHealth = MaxHealth;
+            Kills = 0;
+            Deaths = 0;
+            Score = 0;
+        }
+
         private void OnDestroy()
         {
+            GameStateManager.Instance.OnServerGameEnded -= ResetPlayer;
             Output.WriteLine($"\n\tPlayer:{ID} - \"{Username}\" is destroyed/removed from server");
         }
 
@@ -78,8 +93,8 @@ namespace GameServer
             CurrentHealth = MaxHealth;
         }
 
-        Vector2 PlayerPosition { get => transform.position; set => transform.position = value; }// = new Vector2(9.59f, 7.77f);
 
+        Vector2 PlayerPosition { get => transform.position; set => transform.position = value; }// = new Vector2(9.59f, 7.77f);
         private ConstantlySentPlayerData PlayerData { get; set; } = new ConstantlySentPlayerData();
 
         internal void SetPlayerPosition(Vector2 position)
@@ -93,6 +108,12 @@ namespace GameServer
             PlayerData.SetArmRotation(rotation);
         internal void PlayerArmPosition(Vector2 position) =>
             PlayerData.SetArmPosition(position);
+        internal IEnumerator PlayerPingMS(ushort pingMS)
+        {
+            PlayerData.SetPing(pingMS);
+            yield return new WaitForSecondsRealtime(TimeBetweenPingUpdatesSec);
+        }
+
 
         public void SetPlayerMovementStats(float runSpeed, float sprintSpeed)
         {
@@ -140,8 +161,8 @@ namespace GameServer
             ChatEntryToSend = $"[{Username}]: {text}";
 
 
-        public float Latency2WaySecondsTCP { get; private set; } = 0.300f; //default 0.3s = 300ms
-        public float Latency2WaySecondsUDP { get; private set; } = 0.300f; //default 0.3s = 300ms
+        public ushort Latency2WayMSTCP { get; private set; } = 300;
+        public ushort Latency2WayMSUDP { get; private set; } = 300;
 
         private const byte LatencyIDLimit = 40;
         public byte LatencyIDTCP { get; set; } = 0;
@@ -173,14 +194,21 @@ namespace GameServer
             return latencyID;
         }
 
-        internal void PingAckTCP(byte latencyIDTCP) =>
-            Latency2WaySecondsTCP = PingAck(latencyIDTCP, LatencyDictionaryTCP);
+        private float TimeBetweenPingUpdatesSec = 1.5f;
+        private Coroutine SendMyPingToOtherPlayers = null;
+        internal void PingAckTCP(byte latencyIDTCP)
+        {
+            Latency2WayMSTCP = PingAck(latencyIDTCP, LatencyDictionaryTCP);
+
+            if (SendMyPingToOtherPlayers is null) //Limiting how many times to send to other players
+                SendMyPingToOtherPlayers = StartCoroutine(PlayerPingMS(Latency2WayMSTCP));
+        }
         internal void PingAckUDP(byte latencyIDUDP) =>
-            Latency2WaySecondsUDP = PingAck(latencyIDUDP, LatencyDictionaryUDP);
-        private float PingAck(byte latencyID, Dictionary<byte, TimeSpan> latencyDictionary)
+            Latency2WayMSUDP = PingAck(latencyIDUDP, LatencyDictionaryUDP);
+        private ushort PingAck(byte latencyID, Dictionary<byte, TimeSpan> latencyDictionary)
         {
             TimeSpan latencyCheckSent = latencyDictionary[latencyID];
-            return (float)(Now - latencyCheckSent).TotalSeconds;
+            return (ushort)(Now - latencyCheckSent).TotalMilliseconds;
         }
 
         public void FixedUpdate()

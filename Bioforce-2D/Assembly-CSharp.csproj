@@ -65,6 +65,7 @@
     <Compile Include="Assets\UI\PauseMenu\Scripts\Menu.cs" />
     <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\ServerEntry.cs" />
     <Compile Include="Assets\_Maps\FallBoundry\Scripts\FallBoundry.cs" />
+    <Compile Include="Assets\UI\PingIndicator\PingLatencyIndicator.cs" />
     <Compile Include="Assets\UI\UIItemListingManager.cs" />
     <Compile Include="Assets\UI\Main Menu\MainMenu.cs" />
     <Compile Include="Assets\Audio\Scripts\SoundPlayerManager.cs" />
@@ -161,7 +162,6 @@
     <Compile Include="Assets\UI\Screen Overlays\Scripts\HitOverlay.cs" />
     <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\PlayerRegistration.cs" />
     <Compile Include="Assets\UI\PauseMenu\Scripts\PauseManager.cs" />
-    <Compile Include="Assets\UI\PingIndicator\PingLatencyIndicator.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />

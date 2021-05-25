@@ -69,7 +69,7 @@ namespace GameServer
 
         public static void StartSendingServerData()
         {
-            Output.WriteLine($"\n\t\tStarted MainServerComms.");
+            Output.WriteLine($"\t\tStarted MainServerComms.");
             
             ServerSendDataTimer.Start();
         }
