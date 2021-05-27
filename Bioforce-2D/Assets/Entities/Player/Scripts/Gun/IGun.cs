@@ -8,4 +8,5 @@ public interface IGun
     void Enable();
     void SetColor(Color playerColor);
     void SetOwnerCollider(Collider2D ownCollider);
+    Transform GetTransform();
 }

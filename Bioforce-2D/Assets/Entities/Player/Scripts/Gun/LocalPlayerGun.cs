@@ -23,13 +23,10 @@ public class LocalPlayerGun : NonLocalPlayerGun, ILocalPlayerGun
         if (FacingRight)
             RotateExtra = 0;
         else
-        {
             RotateExtra = 180;
-        }
     }
-    protected override void Awake()
+    protected virtual void Awake()
     {
-        base.Awake();
         MainCamera = Camera.main;
         Physics2D.IgnoreLayerCollision(11, 16, true); //Ignore layer collision between LocalPlayer and Bullet LocalPlayer
     }
@@ -39,8 +36,9 @@ public class LocalPlayerGun : NonLocalPlayerGun, ILocalPlayerGun
         GameManager.Instance.OnPauseEvent += SetCanShootAndAim;
         GameManager.Instance.OnLostConnectionEvent += SetCanShootAndAim;
     }
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
         GameManager.Instance.OnPauseEvent -= SetCanShootAndAim;
         GameManager.Instance.OnLostConnectionEvent -= SetCanShootAndAim;
     }

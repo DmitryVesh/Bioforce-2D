@@ -21,6 +21,8 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
 
     [SerializeField] private GameObject SplatterPrefab;
     [SerializeField] private Sprite[] SplatterSprites;
+
+    private Transform SplatterHolder; //Set when initing splatters
     private SpriteRenderer SplatterSpriteRenderer { get; set; }
     private GameObject[] Splatters = new GameObject[NumMaxSplatters];
     private SpriteRenderer[] SplattersRenderers = new SpriteRenderer[NumMaxSplatters];
@@ -63,12 +65,12 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     {
         OwnerClientID = iD;
     }
-    internal void SetColor(Color playerColor)
+    internal void SetColor(Color playerColor, Transform gunTransform)
     {
         SetPlayerModelColor(playerColor);
 
-        PlayerHitParticles.Initilise(playerColor, OwnerClientID);
-        PlayerMuzzelFlashParticles.Initilise(playerColor, OwnerClientID);
+        PlayerHitParticles.Initilise(playerColor, PlayerModelObject.transform);
+        PlayerMuzzelFlashParticles.Initilise(playerColor, gunTransform);
 
         SplatterSpriteRenderer.color = playerColor;
 
@@ -86,12 +88,12 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     {
         CurrentSplatterIndex = 0;
         int maxSplatterSprites = SplatterSprites.Length;
-        Transform splatterHolder = new GameObject($"SplatterHolder: {OwnerClientID}").transform;
-        splatterHolder.position = Vector3.zero;
+        SplatterHolder = new GameObject($"SplatterHolder: {OwnerClientID}").transform;
+        SplatterHolder.position = Vector3.zero;
 
         for (int splatterCount = 0; splatterCount < NumMaxSplatters; splatterCount++)
         {
-            GameObject splatter = Instantiate(SplatterPrefab, splatterHolder);
+            GameObject splatter = Instantiate(SplatterPrefab, SplatterHolder);
             SpriteRenderer spriteRenderer = splatter.GetComponent<SpriteRenderer>();
 
             splatter.GetComponent<SpriteRenderer>().sprite = SplatterSprites[UnityEngine.Random.Range(0, maxSplatterSprites)];
@@ -139,6 +141,8 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     }
     private void OnDestroy()
     {
+        CleanUpSplatters();
+
         PlayerManager.OnPlayerDeath -= DieAnimation;
         PlayerManager.OnPlayerRespawn -= RespawnAnimation;
         PlayerManager.OnPlayerPaused -= PlayerPaused;
@@ -148,6 +152,19 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
         PlayerManager.OnPlayerTookDamage -= ShowHitMarker;
         PlayerManager.OnPlayerInvincibility -= InvincibilityAnimation;
         PlayerManager.OnPlayerRespawn -= PlayRespawnInvincibilityAnimation;
+    }
+
+    private void CleanUpSplatters()
+    {
+        if (SplatterHolder && SplatterHolder.gameObject)
+            Destroy(SplatterHolder.gameObject);
+
+        foreach (GameObject splatterObj in Splatters)
+        {
+            if (splatterObj == null)
+                continue;
+            Destroy(splatterObj.gameObject);
+        }
     }
 
     private void PlayRespawnInvincibilityAnimation()
@@ -177,13 +194,10 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
         HitMarker.SetActive(false);
     }
 
-    private void PlayMuzzelFlashParticleEffect(Vector2 position, Quaternion rotation) =>
-        PlayerMuzzelFlashParticles.PlayAffect(position, rotation);
-    private void PlayHitParticleEffect(int currentHealth) 
-    {
-        Transform tf = PlayerModelObject.transform;
-        PlayerHitParticles.PlayAffect(tf.position, tf.rotation);
-    }
+    private void PlayMuzzelFlashParticleEffect(Vector2 _, Quaternion __) =>
+        PlayerMuzzelFlashParticles.PlayAffect();
+    private void PlayHitParticleEffect(int currentHealth) =>
+        PlayerHitParticles.PlayAffect();
 
     private void LeaveSplatter(int currentHealth)
     {

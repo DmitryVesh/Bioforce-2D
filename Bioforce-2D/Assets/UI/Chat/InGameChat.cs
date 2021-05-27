@@ -97,6 +97,11 @@ public class InGameChat : UIEntryManager
             OnEndEdit(ChatEntryInputField.text);
         }
     }
+    private void CloseChatMenu()
+    {
+        ActivateChatLogMenu(false);
+        ClickedOdd = true;
+    }
 
     public void EnteredText(string text) //Subscribed to by input text field
     {
@@ -118,8 +123,7 @@ public class InGameChat : UIEntryManager
 
             //TODO: Maybe make a setting so player can either have the chat log open or closed after entering message
             //Closed
-            ActivateChatLogMenu(false); //Hides the chat log after sending message
-            ClickedOdd = true;
+            CloseChatMenu(); //Hides the chat log after sending message
 
             //Open
             //ClickedOdd = false;
@@ -140,7 +144,16 @@ public class InGameChat : UIEntryManager
         GameManager.Instance.OnPlayerConnected += PlayerConnectedMessage;
         GameManager.Instance.OnPlayerDisconnected += PlayerDisconnectedMessage;
 
+        GameStateManager.GameEnded += CloseChatMenu;
+
         ChatEntryInputField.characterLimit = InputFieldMaxCharacterLimit;
+    }
+    private void OnDestroy()
+    {
+        GameManager.Instance.OnPlayerConnected -= PlayerConnectedMessage;
+        GameManager.Instance.OnPlayerDisconnected -= PlayerDisconnectedMessage;
+
+        GameStateManager.GameEnded -= CloseChatMenu;
     }
 
     private void PlayerConnectedMessage(byte iD, string username, bool justJoined)
@@ -155,10 +168,5 @@ public class InGameChat : UIEntryManager
     private void PlayerDisconnectedMessage(byte iD, string username) =>
         AddInGameChatEntry($"Player \"{username}\" left", Color.white);
 
-    private void OnDestroy()
-    {
-        GameManager.Instance.OnPlayerConnected -= PlayerConnectedMessage;
-        GameManager.Instance.OnPlayerDisconnected -= PlayerDisconnectedMessage;
-    }
 
 }

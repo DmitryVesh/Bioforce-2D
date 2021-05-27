@@ -51,6 +51,7 @@ MonoBehaviour:
   ID: 0
   Username: 
   UsernameText: {fileID: 1943561041509813256}
+  InvincibilityTimeAfterRespawning: 2
 --- !u!114 &-8473130671724453727
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -76,17 +77,16 @@ MonoBehaviour:
   PlayerHitParticles:
     ParticleGameObject: {fileID: 6421890002363139958, guid: 8c43f0adcb74e764381f6918a3c31595,
       type: 3}
-    NumMaxParticleSystems: 5
   PlayerMuzzelFlashParticles:
     ParticleGameObject: {fileID: 6421890002363139958, guid: 568dcccd583ef864293c01f02d137a39,
       type: 3}
-    NumMaxParticleSystems: 5
   HitMarker: {fileID: 4736230074330856343}
   DisplayHitMarkerTime: 0.2
   MinimapPlayerIcon: {fileID: 5911185414982741014}
   FootstepParticles: {fileID: 4125434554662602693}
   SprintingParticlesAdd: 15
   ImpactOnFlootParticles: {fileID: 1506052052720695149}
+  TimeBeforeStoppingFlashingCutMultiplier: 0.875
 --- !u!114 &2811104684193076455
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -253,19 +253,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2190302947158787147, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
         type: 3}
-      propertyPath: m_Color.a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2190302947158787147, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
-        type: 3}
       propertyPath: m_SortingOrder
       value: -2
       objectReference: {fileID: 0}
-    - target: {fileID: 2190302947158787147, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: ea4fb03c1d7885a489373f10f0da0edf, type: 2}
     - target: {fileID: 2468677318017382592, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
         type: 3}
       propertyPath: looping

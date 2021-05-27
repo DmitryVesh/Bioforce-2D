@@ -16,11 +16,13 @@ Main goals is to;
 	1 Add ping to the scoreboard, for each player
 	0 Add colors to ping values, e.g. green under 50MS, yellow equal/under 100MS, red over 100MS
 
-	0 Clean up the splatter holder, bullets and other instantiated player related objects when reset game
-	0 Change the muzzleFlash, and Hit particles to be world space, so don't have to instanitated more than instance
+	0 Implement the App Tracking Transparency
+	1 Clean up the splatter holder, bullets and other instantiated player related objects when reset game
+	1 Change the muzzleFlash, and Hit particles to be world space, so don't have to instanitated more than instance
 
-	0 Add regex into swear words like -> f(u+)ck
-	0 Implement a white outline of player when flashing in invincibility
+	1 Add regex into swear words like -> f(u+)((c+k*)|c*k+)
+
+	1 Implement a black outline of player when flashing in invincibility
 	0 Add server state into server page, e.g. Waiting, In progress, Ended
 	0 When player has picked up adrenaline, their running speed should increase, and the minimapIcon should also flash
 	0 Implement an Exception logging in Output Lib, also integrate the output lib in MainServer

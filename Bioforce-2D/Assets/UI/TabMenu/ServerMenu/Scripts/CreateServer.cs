@@ -50,7 +50,7 @@ public class CreateServer : MonoBehaviour
     public void OnServerNameChanged()
     {
         ServerNameSelected = ServerNameInputField.text;
-        TextInputValidator.SanitiseText(ref ServerNameSelected, TextType.File);
+        TextInputValidator.SanitiseText(ref ServerNameSelected, TextType.Filename);
         ServerNameInputField.text = ServerNameSelected;
         StartServerButton.Interactable = TextInputValidator.IsTextLengthValid(ServerNameSelected);
     }

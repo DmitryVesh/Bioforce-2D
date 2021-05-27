@@ -137,14 +137,14 @@ public class GameManager : MonoBehaviour
         NonLocalPlayerMovement playerMovement = player.GetComponentInChildren<NonLocalPlayerMovement>();
         playerMovement?.SetOwnerClientID(iD);
         
-        NonLocalPlayerAnimations playerAnimations = player.GetComponentInChildren<NonLocalPlayerAnimations>();
-        playerAnimations?.SetOwnerClientID(iD);
-        playerAnimations?.SetColor(playerColor);
-
         IGun playerGun = player.GetComponentInChildren<IGun>();
         playerGun?.SetOwnerClientID(iD);
         playerGun?.SetColor(playerColor);
         playerGun?.SetOwnerCollider(player.GetComponentInChildren<CapsuleCollider2D>());
+
+        NonLocalPlayerAnimations playerAnimations = player.GetComponentInChildren<NonLocalPlayerAnimations>();
+        playerAnimations?.SetOwnerClientID(iD);
+        playerAnimations?.SetColor(playerColor, playerGun.GetTransform());
 
         if (!isFacingRight)
             playerAnimations.FlipSprite();
