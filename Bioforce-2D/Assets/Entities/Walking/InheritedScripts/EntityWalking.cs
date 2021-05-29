@@ -7,6 +7,7 @@ public abstract class EntityWalking : MonoBehaviour, IWalking
     // Moving in X direction Data
     [SerializeField] protected float RunSpeed = 5; // Used as x velocity multiplier when running
     [SerializeField] protected float SprintSpeed = 7; // Used as x velocity multiplier when sprinting
+    protected float CurrentSprintSpeed = 7;
 
     // Moving in Y direction Data
     [SerializeField] protected LayerMask WhatIsGround; // LayerMask used to determine what is considered ground for the player

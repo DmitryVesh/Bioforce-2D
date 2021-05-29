@@ -124,7 +124,7 @@ public class ScoreboardManager : UIItemListingManager
     
     private void Update()
     {
-        if (!Client.Instance.Connected || GameStateManager.CurrentState.Equals(GameState.gameEnded))
+        if (!Client.Instance.Connected || GameStateManager.CurrentState.Equals(GameState.Ended))
         {
             MobileButton.interactable = false;
             return;

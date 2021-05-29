@@ -82,7 +82,7 @@ MonoBehaviour:
       type: 3}
   HitMarker: {fileID: 4736230074330856343}
   DisplayHitMarkerTime: 0.2
-  MinimapPlayerIcon: {fileID: 5911185414982741014}
+  MinimapPlayerIcon: {fileID: 7471338630510333236}
   FootstepParticles: {fileID: 4125434554662602693}
   SprintingParticlesAdd: 15
   ImpactOnFlootParticles: {fileID: 1506052052720695149}
@@ -419,15 +419,15 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 462589195740240120}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5911185414982741014 stripped
+--- !u!114 &7471338630510333236 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6080930132917482734, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+  m_CorrespondingSourceObject: {fileID: 7045024592758248908, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
     type: 3}
   m_PrefabInstance: {fileID: 462589195740240120}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 570da206f0dbdd1489997c518f857d5c, type: 3}
+  m_Script: {fileID: 11500000, guid: eaf0b71f859469745a1113a7748237a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

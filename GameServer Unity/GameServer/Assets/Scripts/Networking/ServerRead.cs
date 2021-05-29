@@ -22,8 +22,8 @@ namespace GameServer
                     ServerSend.SendGameState(GameStateManager.Instance.CurrentState, GameStateManager.Instance.RemainingGameTime, clientID);
 
                     Server.ClientDictionary[clientID].SetPlayer(username);
-                    if (GameStateManager.Instance.CurrentState == GameState.activeGameInProcess ||
-                        GameStateManager.Instance.CurrentState == GameState.waitingForAPlayerToJoin)
+                    if (GameStateManager.Instance.CurrentState == GameState.Playing ||
+                        GameStateManager.Instance.CurrentState == GameState.Waiting)
                     {
                         Server.ClientDictionary[clientID].SpawnOtherPlayersToConnectedUser();
                         return;

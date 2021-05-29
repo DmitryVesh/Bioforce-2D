@@ -70,8 +70,9 @@ public class MobileLocalPlayerMovement : LocalPlayerMovement
     {
         return JoystickScript.Vertical;
     }
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
         MobileJoystick.Instance.SetActive(false);
     }
 }

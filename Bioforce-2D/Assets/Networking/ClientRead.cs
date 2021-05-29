@@ -165,7 +165,7 @@ public class ClientRead : MonoBehaviour
             
             bool paused = packet.ReadBool();
 
-            float invincibilityTime = packet.ReadFloat();
+            float invincibilityTimeSec = packet.ReadFloat();
 
             ushort pingMS = packet.ReadUShort();
 
@@ -175,7 +175,7 @@ public class ClientRead : MonoBehaviour
 
             GameManager.PlayerDictionary[iD].SetPlayerPaused(paused);
 
-            GameManager.PlayerDictionary[iD].AdrenalinePickup(invincibilityTime);
+            GameManager.PlayerDictionary[iD].AdrenalinePickup(invincibilityTimeSec);
         }
         catch (Exception e) {
             OutputPacketError(e);

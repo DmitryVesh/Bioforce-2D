@@ -23,14 +23,16 @@ namespace GameServer
             }
         }
 
-        internal static void ServerData(string serverName, int currentNumPlayers, int maxNumPlayers, string mapName)
+        internal static void ServerData(string serverName, GameState serverState, int currentNumPlayers, int maxNumPlayers, string mapName)
         {
             using (Packet packet = new Packet((byte)ServerToMainServer.serverData))
             {
                 packet.Write(serverName);
+                packet.Write((byte)serverState);
                 packet.Write(currentNumPlayers);
                 packet.Write(maxNumPlayers);
                 packet.Write(mapName);
+
                 SendTCPPacket(packet);
             }
         }

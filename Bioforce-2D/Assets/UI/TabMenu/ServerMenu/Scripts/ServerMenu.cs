@@ -68,15 +68,15 @@ public class ServerMenu : MonoBehaviour
     internal static void ReadServerModifiedPacket(string ip, Packet packet)
     {
         string serverName = packet.ReadString();
+        GameState gameState = (GameState)packet.ReadByte();
         int currentNumPlayers = packet.ReadInt();
         int maxNumPlayers = packet.ReadInt();
         string mapName = packet.ReadString();
         int ping = packet.ReadInt();
 
-        ThreadManager.ExecuteOnMainThread(() =>
-        {
-            Instance.InternetServersPage.ModifyServer(serverName, currentNumPlayers, maxNumPlayers, mapName, ping);
-        });
+        //ThreadManager.ExecuteOnMainThread(() => { //Already might be on MainThread...
+        Instance.InternetServersPage.ModifyServer(serverName, gameState, currentNumPlayers, maxNumPlayers, mapName, ping);
+        //});
     }
     internal static void ServerConnectionFull()
     {
@@ -89,17 +89,19 @@ public class ServerMenu : MonoBehaviour
     public static void ReadServerDataPacket(string serverIP, Packet packet)
     {
         string serverName = packet.ReadString();
+        GameState gameState = (GameState)packet.ReadByte();
         int currentPlayerCount = packet.ReadInt();
         int maxPlayerCount = packet.ReadInt();
         string mapName = packet.ReadString();
         int ping = packet.ReadInt(); //TODO: look into how to calculate ping
 
+        ServersPage serverPage;
         if (serverIP == Client.MainServerIP)
-        {
-            Instance.AddInternetServerToPage(serverName, currentPlayerCount, maxPlayerCount, mapName, ping);
-        }
+            serverPage = Instance.InternetServersPage;
         else
-            Instance.AddLANServerToPage(serverName, currentPlayerCount, maxPlayerCount, mapName, ping);
+            serverPage = Instance.LANServersPage;
+
+        Instance.AddServerToPage(serverPage, serverName, gameState, currentPlayerCount, maxPlayerCount, mapName, ping);
     }
     internal static void ReadJoinServer(string ip, Packet packet)
     {
@@ -259,9 +261,7 @@ public class ServerMenu : MonoBehaviour
             InternetServerScanner.ContactMainServerForServers(Client.PortNumInternetToConnectTo);
 
     }
-    private void AddLANServerToPage(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping) =>
-        LANServersPage.EnqueEntry(serverName, currentPlayerCount, maxPlayerCount, mapName, ping);
-    private void AddInternetServerToPage(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping) =>
-        InternetServersPage.EnqueEntry(serverName, currentPlayerCount, maxPlayerCount, mapName, ping);
 
+    private void AddServerToPage(ServersPage serverPage, string serverName, GameState gameState, int currentPlayerCount, int maxPlayerCount, string mapName, int ping) =>
+        serverPage.EnqueEntry(serverName, gameState, currentPlayerCount, maxPlayerCount, mapName, ping);
 }

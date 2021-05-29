@@ -65,7 +65,7 @@ public class PlayerManager : MonoBehaviour
     public delegate void TripleInt(int integer1, int integer2, int integer3);
     public event TripleInt OnHeartBeatShouldPlay;
 
-    [SerializeField] public float InvincibilityTimeAfterRespawning = 2f;
+    public const float InvincibilityTimeAfterRespawning = 2f;
 
     internal void RestoreHealthEvent(int currentHealth) =>
         OnPlayerRestoreHealth?.Invoke(currentHealth);
@@ -80,14 +80,21 @@ public class PlayerManager : MonoBehaviour
         OnPlayerPickupBandage?.Invoke(restoreHealth);
     internal void MedkitPickup(int restoreHealth) =>
         OnPlayerPickupMedkit?.Invoke(restoreHealth);
-    internal void AdrenalinePickup(float invincibilityTime) 
+
+    public const float TimeBeforeStoppingFlashMultiplier = 0.875f;
+    internal void AdrenalinePickup(float invincibilityTimeSec) 
     {
-        if (invincibilityTime <= 0)
+        if (invincibilityTimeSec <= 0)
             return;
 
-        OnPlayerInvincibility?.Invoke(invincibilityTime);
-        OnPlayerPickupAdrenaline?.Invoke(invincibilityTime);
+        PlayerInvincible(invincibilityTimeSec);
+        OnPlayerPickupAdrenaline?.Invoke(invincibilityTimeSec);
     }
+    private void PlayerInvincible(float invincibilityTimeSec) =>
+        OnPlayerInvincibility?.Invoke(invincibilityTimeSec);
+    
+    internal void PlayerInvincibleAfterRespawning() =>
+        PlayerInvincible(RespawnTime + InvincibilityTimeAfterRespawning);
 
     public string GetUsername() =>
         Username;
@@ -110,8 +117,10 @@ public class PlayerManager : MonoBehaviour
             OnPlayerDeath?.Invoke(TypeOfDeath.Bullet);
         }
     }
-    public void PlayerRespawned() =>
+    public void PlayerRespawned()
+    {
         OnPlayerRespawn?.Invoke();
+    }
 
     public void CallOnPlayerJumpedEvent() =>
         OnPlayerJumped?.Invoke();

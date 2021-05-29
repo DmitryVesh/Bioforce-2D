@@ -69,6 +69,7 @@ public class PickupItemsManager : MonoBehaviour
         PickupDictionary.Add(pickupID, pickup);
     }
 
+
     internal void PlayerPickedUpItem(ushort pickupID, byte clientWhoPickedUp, Packet packet)
     {
         PickupItem pickup = PickupDictionary[pickupID];
@@ -83,7 +84,7 @@ public class PickupItemsManager : MonoBehaviour
                 break;
             case PickupType.adrenaline:
                 //TimeSpan timeOfInvincibilityStart = packet.ReadTimeSpan();
-                float oldInvincibilityTime = packet.ReadFloat();
+                float sentInvincibilityTime = packet.ReadFloat();
 
                 //Turns out that the time set on the machines is different, hence why my client
                 // showed that there was negative latency... because my time of day was 0.5s slower,
@@ -97,11 +98,12 @@ public class PickupItemsManager : MonoBehaviour
                 //Output.WriteLine(dif);
                 //Output.WriteLine(newInvincibilityTime);
 
-                oldInvincibilityTime = oldInvincibilityTime - Client.Instance.Latency1WaySecondsTCP;
+                sentInvincibilityTime = sentInvincibilityTime - Client.Instance.Latency1WaySecondsTCP;
 
-                ((AdrenalinePickup)pickup).InvincibilityTime = oldInvincibilityTime;
+                ((AdrenalinePickup)pickup).SetInvincibilityTime(sentInvincibilityTime);
                 break;
         }
         pickup.PlayerPickedUp(GameManager.PlayerDictionary[clientWhoPickedUp]);
+        
     }
 }

@@ -8,7 +8,14 @@ using UnityEngine.UI;
 
 public enum ServerEntryArrayListIndexes
 {
+    //If adding new states, -> 
+        //Init(T newItem), 
+        //ArrayListTexts.Add(state), 
+        //SetText(T newItem), 
+        //SetArrayList(T newItem)
+
     serverName,
+    serverState,
     playerCount,
     mapName,
     ping
@@ -19,38 +26,43 @@ public class ServerEntry : MonoBehaviour, IUIItemListing, IPointerEnterHandler, 
     public string ServerName { get; private set; }
 
     private List<TextMeshProUGUI> ArrayListTexts { get; set; }
-    private Image TextBackground { get; set; }
+    [SerializeField] private List<Image> TextBackgrounds;
     private ArrayList ItemList { get; set; }
     private ServersPage ParentServersPage { get; set; }
 
-    public void Init(ServersPage parentPage, string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping)
+    public void Init(ServersPage parentPage, string serverName, GameState gameState, int currentPlayerCount, int maxPlayerCount, string mapName, int ping)
     {
         ParentServersPage = parentPage;
         MapName = mapName;
         ServerName = serverName;
 
         ArrayListTexts = new List<TextMeshProUGUI>();
-        ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.serverName).GetComponent<TextMeshProUGUI>());
-        ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.playerCount).GetComponent<TextMeshProUGUI>());
-        ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.mapName).GetComponent<TextMeshProUGUI>());
-        //ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.ping).GetComponent<TextMeshProUGUI>());
+        ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.serverName).GetComponentInChildren<TextMeshProUGUI>());
+        ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.serverState).GetComponentInChildren<TextMeshProUGUI>());
+        ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.playerCount).GetComponentInChildren<TextMeshProUGUI>());
+        ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.mapName).GetComponentInChildren<TextMeshProUGUI>());
+        //ArrayListTexts.Add(transform.GetChild((int)ServerEntryArrayListIndexes.ping).GetComponentInChildren<TextMeshProUGUI>());
 
-        TextBackground = GetComponent<Image>();
-
-        SetText(serverName, currentPlayerCount, maxPlayerCount, mapName, ping);
+        SetText(serverName, gameState, currentPlayerCount, maxPlayerCount, mapName, ping);
     }
-    public void SetText(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping)
+
+    public void SetText(string serverName, GameState gameState, int currentPlayerCount, int maxPlayerCount, string mapName, int ping)
     {
         ArrayListTexts[(int)ServerEntryArrayListIndexes.serverName].text = serverName;
+        ArrayListTexts[(int)ServerEntryArrayListIndexes.serverState].text = gameState.ToString(); //GameStateManager.ServerStates[gameState]; //Use enum translation
         ArrayListTexts[(int)ServerEntryArrayListIndexes.playerCount].text = $"{currentPlayerCount}/{maxPlayerCount}";
         ArrayListTexts[(int)ServerEntryArrayListIndexes.mapName].text = mapName;
         //ArrayListTexts[(int)ServerEntryArrayListIndexes.ping].text = ping.ToString();
 
-        SetArrayList(new ArrayList() { serverName, currentPlayerCount, mapName, ping });
+        SetArrayList(new ArrayList() { serverName, gameState, currentPlayerCount, mapName, ping });
     }
     public void SetBackgroundColor(Color backgroundColor)
     {
-        TextBackground.color = backgroundColor;
+        foreach (Image background in TextBackgrounds)
+        {
+            background.color = backgroundColor;
+        }
+        //TextBackground.color = backgroundColor;
     }
         
 

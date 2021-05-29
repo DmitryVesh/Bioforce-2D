@@ -12,6 +12,7 @@ namespace GameServer
     static class Server
     {
         public static string ServerName { get; private set; }
+        public static GameState ServerState { get => GameStateManager.Instance.CurrentState; }
         public static int MaxNumPlayers { get; private set; }
         public static string MapName { get; private set; }
         public static int PortNum { get; private set; }

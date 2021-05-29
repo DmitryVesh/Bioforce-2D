@@ -50,8 +50,8 @@ namespace MainServerBioforce2D
             }
 
             string mainServerIPForGameServerToConnectTo = IPAddress.Loopback.ToString();
-
-            Server server = new Server(serverName, maxNumPlayers, mapName, currentNumPlayers, ping);
+            const byte InitialServerState = 0; //Reprsents Waiting
+            Server server = new Server(serverName, InitialServerState, maxNumPlayers, mapName, currentNumPlayers, ping);
             ServersAvailable.Add(server);
 
             GameServerProcess gameServerProcess = new GameServerProcess(serverName, gameServerPort);
@@ -231,7 +231,7 @@ namespace MainServerBioforce2D
                 int serverIndexToDelete = -1;
                 for (int serverCount = 0; serverCount < ServersAvailable.Count; serverCount++)
                 {
-                    if (ServersAvailable[serverCount].ServerName == serverName)
+                    if (ServersAvailable[serverCount].MatchesName(serverName))
                         serverIndexToDelete = serverCount;
                 }
                 if (serverIndexToDelete != -1)

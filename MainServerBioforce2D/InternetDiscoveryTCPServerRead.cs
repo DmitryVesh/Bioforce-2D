@@ -8,7 +8,7 @@ namespace MainServerBioforce2D
 {
     class InternetDiscoveryTCPServerRead
     {
-        internal static void ReadFirstAskForServers(byte client, Packet packet)
+        internal static void ReadFirstAskForServers(byte client, Packet _)
         {
             //Send existing servers saved on server to client
             foreach (Server server in InternetDiscoveryTCPServer.ServersAvailable)
@@ -30,7 +30,7 @@ namespace MainServerBioforce2D
                         bool givenServerFound = false;
                         foreach (Server serverAvailable in serversAvailable)
                         {
-                            if (serverGiven.ServerName == serverAvailable.ServerName)
+                            if (serverGiven == serverAvailable)
                             {
                                 givenServerFound = true;
                                 break;
@@ -48,7 +48,7 @@ namespace MainServerBioforce2D
 
                     foreach (Server serverGiven in serversGiven)
                     {
-                        if (serverAvailable.ServerName == serverGiven.ServerName)
+                        if (serverAvailable == serverGiven)
                         {
                             foundServerMatch = true;
                             if (serverAvailable.TimeStamp == serverGiven.TimeStamp)
@@ -127,6 +127,7 @@ namespace MainServerBioforce2D
         internal static void ReadModifyServer(byte client, Packet packet)
         {
             string serverName = packet.ReadString();
+            byte serverState = packet.ReadByte();
             int maxNumPlayers = packet.ReadInt();
             string mapName = packet.ReadString();
             int currentNumPlayers = packet.ReadInt();
@@ -137,15 +138,12 @@ namespace MainServerBioforce2D
             for (int serverCount = 0; serverCount < InternetDiscoveryTCPServer.ServersAvailable.Count; serverCount++)
             {
                 Server serverAvailable = InternetDiscoveryTCPServer.ServersAvailable[serverCount];
-                if (ServerMatch(serverAvailable, serverName))
-                    serverAvailable = new Server(serverName, maxNumPlayers, mapName, currentNumPlayers, ping);
+                if (serverAvailable.MatchesName(serverName))
+                    serverAvailable = new Server(serverName, serverState, maxNumPlayers, mapName, currentNumPlayers, ping);
                 servers[serverCount] = serverAvailable;
             }
             InternetDiscoveryTCPServer.ServersAvailable = new List<Server>(servers);
             Output.WriteLine($"Read ModifyServer from client:{client}");
         }
-
-        private static bool ServerMatch(Server server, string serverName) =>
-            server.ServerName == serverName;
     }
 }

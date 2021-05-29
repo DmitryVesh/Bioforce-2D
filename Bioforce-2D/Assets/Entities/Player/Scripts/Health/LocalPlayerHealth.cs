@@ -64,4 +64,11 @@ public class LocalPlayerHealth : NonLocalPlayerHealth
         yield return base.WaitBeforeRespawning();
         PlayerIsInvincible(PlayerManager.RespawnTime + PlayerManager.InvincibilityTimeAfterRespawning);
     }
+
+    public override void Respawn()
+    {
+        base.Respawn();
+        Invoke("SetCantGetHitFalse", PlayerManager.RespawnTime);
+        GameManager.Instance.PlayerRespawned(OwnerClientID);
+    }
 }

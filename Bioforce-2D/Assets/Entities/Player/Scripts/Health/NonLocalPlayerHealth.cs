@@ -48,11 +48,9 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
         ScoreboardManager.Instance.AddDeath(OwnerClientID);
         StartCoroutine(WaitBeforeRespawning());
     }
-    public void Respawn()
+    public virtual void Respawn() //Has to be public because can't have protected/private interfaces...
     {
-        ResetHealth();
-        Invoke("SetCantGetHitFalse", PlayerManager.RespawnTime);
-        GameManager.Instance.PlayerRespawned(OwnerClientID);
+        
     }
     private void SetCantGetHitFalse() =>
         CantGetHit = false;
@@ -69,14 +67,18 @@ public class NonLocalPlayerHealth : MonoBehaviour, IHealth
         PlayerManager = GameManager.PlayerDictionary[OwnerClientID];
         PlayerManager.OnPlayerTookDamage += TookDamage;
         PlayerManager.OnPlayerRespawn += ResetHealth;
+        PlayerManager.OnPlayerRespawn += PlayerManager.PlayerInvincibleAfterRespawning;
 
         PlayerManager.OnPlayerPickupMedkit += PickupHealth;
+        PlayerManager.OnPlayerPickupBandage += PickupHealth;
+
         PlayerManager.OnPlayerPickupBandage += PickupHealth;
     }
     protected virtual void OnDestroy()
     {
         PlayerManager.OnPlayerTookDamage -= TookDamage;
-        PlayerManager.OnPlayerRespawn -= ResetHealth;
+        PlayerManager.OnPlayerRespawn += ResetHealth;
+        PlayerManager.OnPlayerRespawn += PlayerManager.PlayerInvincibleAfterRespawning;
 
         PlayerManager.OnPlayerPickupMedkit -= PickupHealth;
         PlayerManager.OnPlayerPickupBandage -= PickupHealth;

@@ -56,6 +56,7 @@ namespace MainServer
         }
         private void ReadServerData(string serverName, Packet packet)
         {
+            byte serverState = packet.ReadByte();
             int currentNumPlayers = packet.ReadInt();
             int maxNumPlayers = packet.ReadInt();
             string mapName = packet.ReadString();
@@ -66,8 +67,8 @@ namespace MainServer
                 int serversNum = servers.Count;
                 for (int serverCount = 0; serverCount < serversNum; serverCount++)
                 {
-                    if (servers[serverCount].ServerName == serverName)
-                        servers[serverCount] = new Server(serverName, maxNumPlayers, mapName, currentNumPlayers, 21);
+                    if (servers[serverCount].MatchesName(serverName))
+                        servers[serverCount] = new Server(serverName, serverState, maxNumPlayers, mapName, currentNumPlayers, 21);
                 }
                 InternetDiscoveryTCPServer.ServersAvailable = new List<Server>(servers.ToList());
             }

@@ -23,8 +23,9 @@ Main goals is to;
 	1 Add regex into swear words like -> f(u+)((c+k*)|c*k+)
 
 	1 Implement a black outline of player when flashing in invincibility
-	0 Add server state into server page, e.g. Waiting, In progress, Ended
-	0 When player has picked up adrenaline, their running speed should increase, and the minimapIcon should also flash
+	1 Add server state into server page, e.g. Waiting, Playing, Ended
+	1 When player has picked up adrenaline, their running speed should increase, 
+		1 and the minimapIcon should also flash
 	0 Implement an Exception logging in Output Lib, also integrate the output lib in MainServer
 
 	0 Integrate ads

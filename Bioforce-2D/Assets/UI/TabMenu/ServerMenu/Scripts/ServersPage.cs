@@ -21,17 +21,17 @@ public class ServersPage : UIItemListingManager
     [SerializeField] private GameObject NoServersFoundEntryPrefab;
     
 
-    private Queue<(string, int, int, string, int)> ServersToAdd = new Queue<(string, int, int, string, int)>();
+    private Queue<(string, GameState, int, int, string, int)> ServersToAdd = new Queue<(string, GameState, int, int, string, int)>();
 
-    internal void SortServerEntriesBy(ServersSortBy selectedSort, bool ascending)
+    internal void SortServerEntriesBy(ServerEntryArrayListIndexes selectedSort, bool ascending)
     {
         SortByChanged = true;
         List<(int, bool)> indexesToCompare = new List<(int, bool)>() { ((int)selectedSort, ascending) };
         SetIndexesToCompareInMergeSort(indexesToCompare);
     }
 
-    public void EnqueEntry(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping) =>
-        ServersToAdd.Enqueue((serverName, currentPlayerCount, maxPlayerCount, mapName, ping));
+    public void EnqueEntry(string serverName, GameState gameState, int currentPlayerCount, int maxPlayerCount, string mapName, int ping) =>
+        ServersToAdd.Enqueue((serverName, gameState, currentPlayerCount, maxPlayerCount, mapName, ping));
     internal void LostConnectionToMainServer()
     {
         ThreadManager.ExecuteOnMainThread(() =>
@@ -68,10 +68,10 @@ public class ServersPage : UIItemListingManager
         ServerInfoItemLists.Clear();
     }
 
-    public void ModifyServer(string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping)
+    public void ModifyServer(string serverName, GameState gameState, int currentPlayerCount, int maxPlayerCount, string mapName, int ping)
     {
         if (ServerInfoItemLists.ContainsKey(serverName))
-            ((ServerEntry)ServerInfoItemLists[serverName]).SetText(serverName, currentPlayerCount, maxPlayerCount, mapName, ping);
+            ((ServerEntry)ServerInfoItemLists[serverName]).SetText(serverName, gameState, currentPlayerCount, maxPlayerCount, mapName, ping);
     }
 
     public void OnServerEntryHover(ServerEntry serverEntry)
@@ -136,7 +136,7 @@ public class ServersPage : UIItemListingManager
 
     private void AddEntry()
     {
-        (string serverName, int currentPlayerCount, int maxPlayerCount, string mapName, int ping) = ServersToAdd.Dequeue();
+        (string serverName, GameState gameState, int currentPlayerCount, int maxPlayerCount, string mapName, int ping) = ServersToAdd.Dequeue();
         if (ServerInfoItemLists.ContainsKey(serverName))
             return;
 
@@ -147,7 +147,7 @@ public class ServersPage : UIItemListingManager
         Output.WriteLine($"Adding server: {serverName}, to server page");
         GameObject entryToAdd = Instantiate(ItemListingPrefab, transform);
         ServerEntry serverEntry = entryToAdd.GetComponent<ServerEntry>();
-        serverEntry.Init(this, serverName, currentPlayerCount, maxPlayerCount, mapName, ping);
+        serverEntry.Init(this, serverName, gameState, currentPlayerCount, maxPlayerCount, mapName, ping);
 
         ServerInfoItemLists.Add(serverName, serverEntry);
         ServerAdded = true;

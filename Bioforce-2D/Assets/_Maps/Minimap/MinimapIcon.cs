@@ -13,12 +13,12 @@ public class MinimapIcon : MonoBehaviour
 
     [SerializeField] public int SortOrder = 0; //Larger values get placed on top of smaller values
 
-    private void Start()
+    protected virtual void Start()
     {
         Minimap.SubscribeIcon(this, Color);
     }
 
-    private void OnDestroy()
+    protected virtual void OnDestroy()
     {
         Minimap.Unsubscribe(this);
 

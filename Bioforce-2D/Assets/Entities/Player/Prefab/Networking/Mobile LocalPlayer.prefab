@@ -84,7 +84,7 @@ MonoBehaviour:
       type: 3}
   HitMarker: {fileID: 3842690952241875696}
   DisplayHitMarkerTime: 0.4
-  MinimapPlayerIcon: {fileID: 2801587477364284785}
+  MinimapPlayerIcon: {fileID: 1388803862563388499}
   FootstepParticles: {fileID: 5596285460121286306}
   SprintingParticlesAdd: 15
   ImpactOnFlootParticles: {fileID: 6921770375379748362}
@@ -168,6 +168,7 @@ MonoBehaviour:
   FGroundedRememberTime: 0.2
   FCutJumpHeight: 0.45
   GroundCheckTimer: 0.15
+  SprintSpeedAdrenalineMultiplier: 1.25
   RunThreshold: 0.4
   SprintThreshold: 0.85
   JumpThreshold: 0.4
@@ -803,16 +804,16 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 8251422772928506271}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2801587477364284785 stripped
+--- !u!114 &1388803862563388499 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6080930132917482734, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
+  m_CorrespondingSourceObject: {fileID: 7045024592758248908, guid: 73ac35a2afb20154c8e39c9292eb9d5d,
     type: 3}
   m_PrefabInstance: {fileID: 8251422772928506271}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 570da206f0dbdd1489997c518f857d5c, type: 3}
+  m_Script: {fileID: 11500000, guid: eaf0b71f859469745a1113a7748237a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!212 &2298301300277298035 stripped

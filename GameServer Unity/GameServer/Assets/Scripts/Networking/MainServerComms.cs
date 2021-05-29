@@ -76,7 +76,7 @@ namespace GameServer
         private static void SendServerDataToMainServer(object sender, ElapsedEventArgs e)
         {
             if (EstablishedConnection)
-                MainServerCommsSend.ServerData(ServerName, Server.GetCurrentNumPlayers(), Server.MaxNumPlayers, Server.MapName);
+                MainServerCommsSend.ServerData(ServerName, Server.ServerState, Server.GetCurrentNumPlayers(), Server.MaxNumPlayers, Server.MapName);
         }
         
         public class TCP

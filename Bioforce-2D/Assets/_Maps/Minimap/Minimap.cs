@@ -20,6 +20,7 @@ public class Minimap : MonoBehaviour
     public static Minimap Instance { get => instance; }
     private static Minimap instance;
 
+    private Dictionary<byte, PlayerMinimapIcon> PlayerIcons { get; set; } = new Dictionary<byte, PlayerMinimapIcon>();
     private List<MinimapIcon> Icons { get; set; } = new List<MinimapIcon>();
     [SerializeField] private RectTransform MinimapRectTF;
     private Rect MinimapRect { get; set; }
@@ -69,6 +70,7 @@ public class Minimap : MonoBehaviour
 
         MakeXAndYMultipliers();
     }
+
 
     void Update()
     {

@@ -8,18 +8,18 @@ using UnityEngine.Singleton;
 
 public enum GameState
 {
-    waitingForAPlayerToJoin,
-    activeGameInProcess,
-    gameEnded,
-    gameRestarting,
-    serverShuttingDown
+    Waiting,
+    Playing,
+    Ended,
+    Restarting,
+    ShuttingDown
 }
 public class GameStateManager : MonoBehaviour
 {
     public static GameStateManager Instance { get => instance; }
     private static GameStateManager instance;
 
-    public GameState CurrentState { get; private set; } = GameState.waitingForAPlayerToJoin;
+    public GameState CurrentState { get; private set; } = GameState.Waiting;
     private void UpdateCurrentGameState(GameState state)
     {
         CurrentState = state;
@@ -29,12 +29,12 @@ public class GameStateManager : MonoBehaviour
     public Action<float> OnServerGameActivated { get; set; }
     public Action OnServerGameEnded { get; set; }
 
-    //Need to implement
+    
     public Action OnServerRestart { get; set; } //Each ClientServer will subscribe to this so the player model is destroyed, and is taken back to AskPlayerDetails 
     public Action OnServerStop { get; set; }
     public Action OnServerShutdown { get; set; }
     private Coroutine EndGameInCoroutine { get; set; }
-    //
+    
 
     [SerializeField] private float GameTimeSeconds = 180f; //Game should last for 3min = 60sec/min * 3min = 180s
     private float StartGameTime { get; set; }
@@ -43,7 +43,7 @@ public class GameStateManager : MonoBehaviour
     {
         get
         {
-            if (!CurrentState.Equals(GameState.activeGameInProcess))
+            if (!CurrentState.Equals(GameState.Playing))
                 return -1f;
 
             return FinGameTime - Time.fixedTime;
@@ -55,7 +55,7 @@ public class GameStateManager : MonoBehaviour
 
     internal void PlayerJoinedServer()
     {
-        if (CurrentState != GameState.waitingForAPlayerToJoin && CurrentState != GameState.gameRestarting) //Prevents more than 1 call
+        if (CurrentState != GameState.Waiting && CurrentState != GameState.Restarting) //Prevents more than 1 call
             return;
         
         StartGameTime = Time.fixedTime;
@@ -63,13 +63,13 @@ public class GameStateManager : MonoBehaviour
 
         OnServerGameActivated?.Invoke(RemainingGameTime);
 
-        UpdateCurrentGameState(GameState.activeGameInProcess);
+        UpdateCurrentGameState(GameState.Playing);
 
         EndGameInCoroutine = StartCoroutine(EndGameIn(RemainingGameTime));
     }
     internal void TimeoutReset()
     {
-        if (CurrentState != GameState.activeGameInProcess)
+        if (CurrentState != GameState.Playing)
             return;
 
         StopCoroutine(EndGameInCoroutine);
@@ -85,7 +85,7 @@ public class GameStateManager : MonoBehaviour
     private IEnumerator EndGameIn(float remainingGameTime)
     {
         yield return new WaitForSeconds(remainingGameTime);
-        UpdateCurrentGameState(GameState.gameEnded);
+        UpdateCurrentGameState(GameState.Ended);
 
         OnServerGameEnded?.Invoke();
 
@@ -107,9 +107,9 @@ public class GameStateManager : MonoBehaviour
     }
     private void RestartServerImmediately()
     {
-        UpdateCurrentGameState(GameState.gameRestarting);
+        UpdateCurrentGameState(GameState.Restarting);
         OnServerRestart?.Invoke();
-        UpdateCurrentGameState(GameState.waitingForAPlayerToJoin);
+        UpdateCurrentGameState(GameState.Waiting);
     }
 
     private IEnumerator CloseTheServer()
@@ -118,7 +118,7 @@ public class GameStateManager : MonoBehaviour
         //Server send to all players that the server is closing
         //Send to MainServer that the server is shutting down
         //Not accept any other connection attempts by other players
-        UpdateCurrentGameState(GameState.serverShuttingDown);
+        UpdateCurrentGameState(GameState.ShuttingDown);
         OnServerStop?.Invoke();
         yield return new WaitForSeconds(TimeForServerShutdownSeconds);
         OnServerShutdown?.Invoke();

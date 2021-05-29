@@ -18,18 +18,15 @@ namespace MainServerBioforce2D
 
         public static void SendServerData(byte client, Server server)
         {
-            if (server == null)
-                return;
+            //if (server is null) //Worked when Server was a class
+            //if (server is null) //TODO: might have to bring bacl
+            //    return;
 
             try
             {
                 using (Packet packet = new Packet((byte)InternetDiscoveryServerPackets.serverData))
                 {
-                    packet.Write(server.ServerName);
-                    packet.Write(server.CurrentNumPlayers);
-                    packet.Write(server.MaxNumPlayers);
-                    packet.Write(server.MapName);
-                    packet.Write(server.Ping); //TODO: Actually get ping value for
+                    WriteServerData(server, packet);
 
                     SendPacket(client, packet);
                 }
@@ -55,15 +52,20 @@ namespace MainServerBioforce2D
         {
             using (Packet packet = new Packet((byte)InternetDiscoveryServerPackets.serverModified))
             {
-                packet.Write(server.ServerName);
-                packet.Write(server.CurrentNumPlayers);
-                packet.Write(server.MaxNumPlayers);
-                packet.Write(server.MapName);
-                packet.Write(server.Ping); //TODO: Actually get ping value for
+                WriteServerData(server, packet);
 
                 SendPacket(client, packet);
             }
             Output.WriteLine($"Sent ModifiedServer of: {server.ServerName} to client:{client}");
+        }
+        private static void WriteServerData(Server server, Packet packet)
+        {
+            packet.Write(server.ServerName);
+            packet.Write(server.ServerState);
+            packet.Write(server.CurrentNumPlayers);
+            packet.Write(server.MaxNumPlayers);
+            packet.Write(server.MapName);
+            packet.Write(server.Ping); //TODO: Actually get ping value for
         }
 
         internal static void SendCantJoinServerDeleted(byte client, string serverName)

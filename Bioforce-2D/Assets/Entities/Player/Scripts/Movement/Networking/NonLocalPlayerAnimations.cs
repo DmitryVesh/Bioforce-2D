@@ -57,7 +57,6 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
     [SerializeField] private ParticleSystem ImpactOnFlootParticles;
     private bool LastGrounded { get; set; } = true;
 
-    [SerializeField] [Range(0.1f, 1)] private float TimeBeforeStoppingFlashingCutMultiplier = 0.875f;
     private Coroutine FlashCoroutine;
     //TODO: add Jumped sent animations so can play sound effect on non local players
 
@@ -114,6 +113,7 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
 
         SplatterSpriteRenderer = SplatterPrefab.GetComponent<SpriteRenderer>();
 
+        FootstepParticles.Play();
         FootstepEmission = FootstepParticles.emission;
         EmissionNormal = FootstepEmission.rateOverTime;
         EmissionSprint = new ParticleSystem.MinMaxCurve(EmissionNormal.constant + SprintingParticlesAdd);
@@ -137,7 +137,6 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
         PlayerManager.OnPlayerTookDamage += ShowHitMarker;
 
         PlayerManager.OnPlayerInvincibility += InvincibilityAnimation;
-        PlayerManager.OnPlayerRespawn += PlayRespawnInvincibilityAnimation;
     }
     private void OnDestroy()
     {
@@ -151,7 +150,6 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
         PlayerManager.OnPlayerShot -= PlayMuzzelFlashParticleEffect;
         PlayerManager.OnPlayerTookDamage -= ShowHitMarker;
         PlayerManager.OnPlayerInvincibility -= InvincibilityAnimation;
-        PlayerManager.OnPlayerRespawn -= PlayRespawnInvincibilityAnimation;
     }
 
     private void CleanUpSplatters()
@@ -167,21 +165,17 @@ public class NonLocalPlayerAnimations : MonoBehaviour, IAnimations
         }
     }
 
-    private void PlayRespawnInvincibilityAnimation()
-    {
-        InvincibilityAnimation(PlayerManager.RespawnTime + PlayerManager.InvincibilityTimeAfterRespawning);
-    }
     private void InvincibilityAnimation(float invincibilityTime)
     {
         if (!(FlashCoroutine is null))
             StopCoroutine(FlashCoroutine);
 
-        FlashCoroutine = StartCoroutine(FlashPlayer(invincibilityTime));
+        FlashCoroutine = StartCoroutine(FlashPlayer(invincibilityTime * PlayerManager.TimeBeforeStoppingFlashMultiplier));
     }
     private IEnumerator FlashPlayer(float flashFor)
     {
         Anim.SetBool("Flash", true);
-        yield return new WaitForSeconds(flashFor * TimeBeforeStoppingFlashingCutMultiplier);
+        yield return new WaitForSeconds(flashFor);
         Anim.SetBool("Flash", false);
     }
 

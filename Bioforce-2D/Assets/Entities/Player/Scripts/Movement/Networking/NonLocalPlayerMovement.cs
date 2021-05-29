@@ -17,7 +17,7 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
 {
     protected float SpeedX { get; set; } // Used to store the input in x direction, as well as in PlayerAnimations
     protected byte OwnerClientID { get; set; } = 255;
-    protected PlayerManager PlayerManager { get; set; } = null;
+    protected PlayerManager PlayerManager { get; private set; } = null;
     protected PlayerMovingState CurrentMovingState { get; set; }
 
     public float GetRunSpeed()
@@ -34,9 +34,11 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
         OwnerClientID = iD;
     }
 
-    protected virtual void Start()
+    protected override void Awake()
     {
-        PlayerManager = GameManager.PlayerDictionary[OwnerClientID];
+        base.Awake();
+
+        PlayerManager = GetComponent<PlayerManager>(); //Can do in awake because this component is on the same GameObject
 
         PlayerManager.OnPlayerMovementStatsChanged += ChangedPlayerMovementStats; //Subscribe to the PlayerMovementStatsChanged event, so can change runSpeed
         PlayerManager.OnPlayerMovingStateChange += ChangedSpeedX;
@@ -45,6 +47,18 @@ public class NonLocalPlayerMovement : EntityWalking, IWalkingPlayer
 
         PlayerManager.OnPlayerPosition += PlayerPosition;
         PlayerManager.OnPlayerRotation += PlayerRotation;
+    }
+    protected virtual void Start()
+    {
+        //PlayerManager = GameManager.PlayerDictionary[OwnerClientID];
+
+        //PlayerManager.OnPlayerMovementStatsChanged += ChangedPlayerMovementStats; //Subscribe to the PlayerMovementStatsChanged event, so can change runSpeed
+        //PlayerManager.OnPlayerMovingStateChange += ChangedSpeedX;
+        //PlayerManager.OnPlayerDeath += PlayerCantMoveAndCantBeHit;
+        //PlayerManager.OnPlayerRespawn += PlayerCanMoveAndCanBeHit;
+
+        //PlayerManager.OnPlayerPosition += PlayerPosition;
+        //PlayerManager.OnPlayerRotation += PlayerRotation;
 
         GameManager.Instance.OnLostConnectionEvent += PlayerCantMoveWhenPaused;
 

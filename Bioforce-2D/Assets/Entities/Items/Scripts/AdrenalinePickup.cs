@@ -1,13 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class AdrenalinePickup : PickupItem
 {
-    [HideInInspector] public float InvincibilityTime { get; set; } = 0;
+    private float InvincibilityTimeSec { get; set; } = 0;
     public override void PlayerPickedUp(PlayerManager player)
     {
         base.PlayerPickedUp(player);
-        player.AdrenalinePickup(InvincibilityTime);
+        player.AdrenalinePickup(InvincibilityTimeSec);
     }
+
+    internal void SetInvincibilityTime(float invincibilityTimeSec) =>
+        InvincibilityTimeSec = invincibilityTimeSec;
 }

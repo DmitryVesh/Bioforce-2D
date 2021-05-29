@@ -2,15 +2,18 @@ using System;
 
 public enum GameState
 {
-    waitingForAPlayerToJoin,
-    activeGameInProcess,
-    gameEnded,
-    gameRestarting,
-    serverShuttingDown
+    //If adding states, add to the GameStateManager.ServerStates the relevant string representation
+    Waiting,
+    Playing,
+    Ended,
+    Restarting,
+    ShuttingDown
 }
 public static class GameStateManager
 {
-    public static GameState CurrentState { get; private set; } = GameState.waitingForAPlayerToJoin;
+    //public static readonly string[] ServerStates = { "Waiting", "Playing", "Ended", "Restarting", "Shutting down" };
+
+    public static GameState CurrentState { get; private set; } = GameState.Waiting;
     public static float RemainingGameTime { get; private set; }
 
     public static Action<float> GameActivated { get; set; }
@@ -28,19 +31,19 @@ public static class GameStateManager
 
         switch (CurrentState)
         {
-            case GameState.waitingForAPlayerToJoin:
+            case GameState.Waiting:
                 WaitingForGame?.Invoke();
                 break;
-            case GameState.activeGameInProcess:
+            case GameState.Playing:
                 GameActivated?.Invoke(RemainingGameTime);
                 break;
-            case GameState.gameEnded:
+            case GameState.Ended:
                 GameEnded?.Invoke();
                 break;
-            case GameState.gameRestarting:
+            case GameState.Restarting:
                 GameRestarting?.Invoke();
                 break;
-            case GameState.serverShuttingDown:
+            case GameState.ShuttingDown:
                 ServerShuttingDown?.Invoke();
                 break;
         }

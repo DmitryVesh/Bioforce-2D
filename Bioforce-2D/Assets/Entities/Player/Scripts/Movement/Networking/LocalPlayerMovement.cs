@@ -40,7 +40,6 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
     // SpeedX which is found in moving in X direction Data
     // runSpeed used to know when to switch from normal running animation to sprinting animation
     private bool Jumped { get; set; } = false; // Used to identify when player has jumped, for LocalPlayerAnimations
-    
 
     public float GetMaxStamina() =>
         MaxStamina;
@@ -58,13 +57,35 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
     {
         base.Awake();
 
+        PlayerManager.OnPlayerPickupAdrenaline += IncreaseSprintSpeedTemp;
+
         CanMove = true;
         currentStamina = MaxStamina;
 
         ClientSend.PlayerMovementStats(RunSpeed, SprintSpeed);
         PlatformLayer = LayerMask.NameToLayer(PlatformLayerName);
     }
-    
+    protected virtual void OnDestroy()
+    {
+        PlayerManager.OnPlayerPickupAdrenaline -= IncreaseSprintSpeedTemp;
+    }
+
+    private Coroutine IncreaseSprintSpeedCoroutine = null;
+    [SerializeField] [Range(1f, 2f)] private float SprintSpeedAdrenalineMultiplier = 1.25f;
+    private void IncreaseSprintSpeedTemp(float timeSec)
+    {
+        if (!(IncreaseSprintSpeedCoroutine is null))
+            StopCoroutine(IncreaseSprintSpeedCoroutine);
+
+        StartCoroutine(IncreaseSprintSpeedForTime(timeSec)); 
+    }
+    private IEnumerator IncreaseSprintSpeedForTime(float timeSec)
+    {
+        CurrentSprintSpeed = SprintSpeed * SprintSpeedAdrenalineMultiplier;
+        yield return new WaitForSeconds(timeSec);
+        CurrentSprintSpeed = SprintSpeed;
+    }
+
     void Update() // Used for getting user input, and storing it later to be used in FixedUpdate
     {
         if (!CanMove) 
@@ -96,7 +117,7 @@ public class LocalPlayerMovement : NonLocalPlayerMovement, IWalkingLocalPlayer
         {
             if (currentStamina > 0) // Is stamina left
             {
-                SpeedX = moveInputX * SprintSpeed; // Set moving speed to sprint speed
+                SpeedX = moveInputX * CurrentSprintSpeed; // Set moving speed to sprint speed
                 currentStamina -= RateStaminaLoss * Time.deltaTime; // Lossing stamina
                 sprinting = true;
             }
