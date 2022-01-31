@@ -1,0 +1,122 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bf7c34a0dc4e6348bea04faa70406ee, type: 3}
+  m_Name: PlayerBlack
+  m_EditorClassIdentifier: 
+  m_Labels:
+  - m_Name: Crouch
+    m_Hash: -2015693266
+    m_CategoryList:
+    - m_Name: Crouch_1
+      m_Hash: 1929218689
+      m_Sprite: {fileID: 9044786021765537137, guid: f602cb02f8bfaa64f812636254f68aca,
+        type: 3}
+    - m_Name: Crouch_2
+      m_Hash: -336274629
+      m_Sprite: {fileID: 3647156553916755266, guid: f602cb02f8bfaa64f812636254f68aca,
+        type: 3}
+    - m_Name: Crouch_3
+      m_Hash: -1661736019
+      m_Sprite: {fileID: -7025760825990288548, guid: f602cb02f8bfaa64f812636254f68aca,
+        type: 3}
+  - m_Name: Dying
+    m_Hash: 315139327
+    m_CategoryList:
+    - m_Name: Dying_1
+      m_Hash: 1874582293
+      m_Sprite: {fileID: 9044786021765537137, guid: a47af0c69c135cc4c8047578aa44647a,
+        type: 3}
+    - m_Name: Dying_2
+      m_Hash: -156071249
+      m_Sprite: {fileID: 3647156553916755266, guid: a47af0c69c135cc4c8047578aa44647a,
+        type: 3}
+    - m_Name: Dying_3
+      m_Hash: -2118796743
+      m_Sprite: {fileID: -7025760825990288548, guid: a47af0c69c135cc4c8047578aa44647a,
+        type: 3}
+    - m_Name: Dying_4
+      m_Hash: 533802906
+      m_Sprite: {fileID: 1008453939145656331, guid: a47af0c69c135cc4c8047578aa44647a,
+        type: 3}
+    - m_Name: Dying_5
+      m_Hash: 1758863116
+      m_Sprite: {fileID: 1121910671679707029, guid: a47af0c69c135cc4c8047578aa44647a,
+        type: 3}
+    - m_Name: Dying_6
+      m_Hash: -237023562
+      m_Sprite: {fileID: -5727901431455522701, guid: a47af0c69c135cc4c8047578aa44647a,
+        type: 3}
+    - m_Name: Dying_7
+      m_Hash: -2032632288
+      m_Sprite: {fileID: -620837105957682656, guid: a47af0c69c135cc4c8047578aa44647a,
+        type: 3}
+    - m_Name: Dying_8
+      m_Hash: 375874481
+      m_Sprite: {fileID: -2743714266842379729, guid: a47af0c69c135cc4c8047578aa44647a,
+        type: 3}
+  - m_Name: Idle
+    m_Hash: 2081823275
+    m_CategoryList:
+    - m_Name: Idle_1
+      m_Hash: -1506399397
+      m_Sprite: {fileID: 9044786021765537137, guid: 755a930fb60de42459bd191bebc23339,
+        type: 3}
+    - m_Name: Idle_2
+      m_Hash: 1061124833
+      m_Sprite: {fileID: 3647156553916755266, guid: 755a930fb60de42459bd191bebc23339,
+        type: 3}
+    - m_Name: Idle_3
+      m_Hash: 1211648631
+      m_Sprite: {fileID: -7025760825990288548, guid: 755a930fb60de42459bd191bebc23339,
+        type: 3}
+    - m_Name: Idle_4
+      m_Hash: -698556460
+      m_Sprite: {fileID: 1008453939145656331, guid: 755a930fb60de42459bd191bebc23339,
+        type: 3}
+  - m_Name: Jump
+    m_Hash: 125937960
+    m_CategoryList:
+    - m_Name: Jump_1
+      m_Hash: -546053831
+      m_Sprite: {fileID: 9044786021765537137, guid: 58854f0e09bd0824b9c1235d0a911a04,
+        type: 3}
+    - m_Name: Jump_2
+      m_Hash: 1182445699
+      m_Sprite: {fileID: 3647156553916755266, guid: 58854f0e09bd0824b9c1235d0a911a04,
+        type: 3}
+  - m_Name: Run
+    m_Hash: 1748754976
+    m_CategoryList:
+    - m_Name: Run_1
+      m_Hash: -156984173
+      m_Sprite: {fileID: 9044786021765537137, guid: 510a0ee4f68001e40972ecc592369a5e,
+        type: 3}
+    - m_Name: Run_2
+      m_Hash: 1873661225
+      m_Sprite: {fileID: 3647156553916755266, guid: 510a0ee4f68001e40972ecc592369a5e,
+        type: 3}
+    - m_Name: Run_3
+      m_Hash: 413859263
+      m_Sprite: {fileID: -7025760825990288548, guid: 510a0ee4f68001e40972ecc592369a5e,
+        type: 3}
+    - m_Name: Run_4
+      m_Hash: -2033293284
+      m_Sprite: {fileID: 1008453939145656331, guid: 510a0ee4f68001e40972ecc592369a5e,
+        type: 3}
+    - m_Name: Run_5
+      m_Hash: -238462838
+      m_Sprite: {fileID: 1121910671679707029, guid: 510a0ee4f68001e40972ecc592369a5e,
+        type: 3}
+    - m_Name: Run_6
+      m_Hash: 1757415728
+      m_Sprite: {fileID: -5727901431455522701, guid: 510a0ee4f68001e40972ecc592369a5e,
+        type: 3}
