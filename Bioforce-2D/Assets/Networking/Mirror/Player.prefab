@@ -11,13 +11,15 @@ GameObject:
   - component: {fileID: 7994942022592484949}
   - component: {fileID: 2697357574703288840}
   - component: {fileID: 2820645562770559236}
+  - component: {fileID: 7701287429022573312}
   - component: {fileID: 8190440871072864150}
-  - component: {fileID: -3275440464563273699}
+  - component: {fileID: 2398881062780097706}
+  - component: {fileID: 1268964195679265623}
+  - component: {fileID: 2715307156898166924}
   - component: {fileID: 4291357153151572674}
   - component: {fileID: 909028257}
   - component: {fileID: 8566886207508388534}
-  - component: {fileID: 7701287429022573312}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111,6 +113,22 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!70 &7701287429022573312
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5813497541974545226}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: -0.08819005, y: 0.01336211}
+  m_Size: {x: 0.35464877, y: 0.9532727}
+  m_Direction: 0
 --- !u!95 &8190440871072864150
 Animator:
   serializedVersion: 3
@@ -130,7 +148,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &-3275440464563273699
+--- !u!114 &2398881062780097706
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -139,13 +157,65 @@ MonoBehaviour:
   m_GameObject: {fileID: 5813497541974545226}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ef153b669a1b614490f6bbdbe4477b8, type: 3}
+  m_Script: {fileID: 11500000, guid: dcdc8a093b3b535489e1065b8f6aa80a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  movementSpeed: 4
-  rigidbody: {fileID: 2820645562770559236}
+  MoveInputX: 0
+  Sprinting: 0
+  JumpPressed: 0
+  JumpReleased: 0
+  MoveInputY: 0
+--- !u!114 &1268964195679265623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5813497541974545226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b64779f5da4a3c241982f57840ae95c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  RunSpeed: 5
+  SprintSpeed: 7
+  WhatIsGround:
+    serializedVersion: 2
+    m_Bits: 231185
+  ModelObject: {fileID: 5813497541974545226}
+  RigidBody: {fileID: 2820645562770559236}
+  Hitbox: {fileID: 7701287429022573312}
+  PlayerInput: {fileID: 2398881062780097706}
+  PlayerAnimations: {fileID: 2715307156898166924}
+  MaxStamina: 5
+  RateStaminaLoss: 1
+  RateStaminaRegen: 0.5
+  JumpForce: 10
+  NumberOfExtraJumps: 1
+  currentNumJumps: 0
+  FJumpPressedRememberTime: 0.2
+  FGroundedRememberTime: 0.2
+  FCutJumpHeight: 0.45
+  GroundCheckTimer: 0.15
+--- !u!114 &2715307156898166924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5813497541974545226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3151fbe7a4565c14e8f8d5357225c60a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  Animator: {fileID: 8190440871072864150}
 --- !u!114 &4291357153151572674
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -177,7 +247,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  clientAuthority: 1
+  clientAuthority: 0
   sendInterval: 0.05
   syncPosition: 1
   syncRotation: 1
@@ -211,21 +281,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  clientAuthority: 1
+  clientAuthority: 0
   animator: {fileID: 8190440871072864150}
---- !u!70 &7701287429022573312
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5813497541974545226}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: -0.08819005, y: 0.01336211}
-  m_Size: {x: 0.35464877, y: 0.9532727}
-  m_Direction: 0

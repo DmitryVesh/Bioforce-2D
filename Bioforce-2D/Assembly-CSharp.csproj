@@ -161,6 +161,11 @@
     <Compile Include="Assets\UI\PauseMenu\Scripts\SpinningBallsLoading.cs" />
     <Compile Include="Assets\UI\Screen Overlays\Scripts\HitOverlay.cs" />
     <Compile Include="Assets\UI\PauseMenu\Scripts\PauseManager.cs" />
+    <Compile Include="Assets\Entities\Walking\InheritedScripts\Mirror\EntityWalkingMirror.cs" />
+    <Compile Include="Assets\Entities\Walking\InheritedScripts\Mirror\IWalkingMirror.cs" />
+    <Compile Include="Assets\Entities\Player\Scripts\Movement\Mirror\PlayerMovementMirror.cs" />
+    <Compile Include="Assets\Entities\Player\Scripts\Movement\Mirror\PlayerInputMirror.cs" />
+    <Compile Include="Assets\Entities\Player\Scripts\Movement\Mirror\PlayerAnimationsMirror.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Mirror\Plugins\Mono.Cecil\Mono.CecilX.dll" />
