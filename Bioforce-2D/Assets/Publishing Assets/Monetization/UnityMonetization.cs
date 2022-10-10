@@ -21,6 +21,7 @@ public class UnityMonetization : MonoBehaviour, IUnityAdsListener
     private AdsPlatform AdsPlatform { get; set; }
 
     [SerializeField] private bool Testing = true;
+    [SerializeField] private bool Disabled = true;
 
     //Add the platform when initialisingAdsPlatform _iOS or _Android
     string InterstitialPlacementID { get; set; } = "Interstitial";
@@ -41,6 +42,9 @@ public class UnityMonetization : MonoBehaviour, IUnityAdsListener
 
     private void OnAcceptedPolicy()
     {
+        if (Disabled)
+            return;
+
         InitiliseAdsPlatform();
         //StartCoroutine(ShowBannerAdWhenInitialised());
 

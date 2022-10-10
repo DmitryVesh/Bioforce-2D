@@ -33,6 +33,7 @@ namespace MainServerBioforce2D
                     "To start Main Server:" +
                     "\n\tGameServer filename (string), is test build (bool), version num (string), main ip (string)" +
                     "\n\te.g. \"GameServer.exe\"      , true                , \"1.0.3\"             , \"127.0.0.1\"  " +
+                    "\n\tGameServer.exe true 1.0.3 192.168.0.8" +
                     "\n\n" +
                     "Ports used:" +
                     $"\n\tRelease {PortRelease} - {InternetDiscoveryTCPServer.GetMaxPort(PortRelease)}" +

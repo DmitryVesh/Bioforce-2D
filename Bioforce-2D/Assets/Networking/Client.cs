@@ -32,8 +32,8 @@ public class Client : MonoBehaviour
     [SerializeField] private bool IsTesting = false;
 
     public static int PortNumGame { get; private set; }
-    public static string MainServerIPStatic;
-    [SerializeField] public string MainServerIP = "18.134.197.3";
+    public static string MainServerIP;
+    //[SerializeField] public string MainServerIP = "18.134.197.3";
     //public const string MainServerIP = "127.0.0.1";
 
     public byte ClientID { get; set; } = 0;
@@ -362,15 +362,13 @@ public class Client : MonoBehaviour
 
     private void Awake()
     {
-        MainServerIPStatic = MainServerIP;
-        SceneManager.sceneLoaded += OnSceneChange;          
-
         Singleton.Init(ref instance, this);
+
+        SceneManager.sceneLoaded += OnSceneChange;          
     }
     public void On_InputField_Change(string input)
     {
         MainServerIP = input;
-        MainServerIPStatic = input;
     }
     private void OnSceneChange(Scene scene, LoadSceneMode _)
     {
@@ -524,7 +522,7 @@ public class Client : MonoBehaviour
     }
     private void Start()
     {
-        InputField_TestingIP.text = MainServerIPStatic;
+        InputField_TestingIP.text = MainServerIP;
 
         GameStateManager.ServerShuttingDown += Disconnect;
     }
@@ -535,6 +533,8 @@ public class Client : MonoBehaviour
     {
         Disconnect();
         GameStateManager.ServerShuttingDown -= Disconnect;
+
+        SceneManager.sceneLoaded -= OnSceneChange;
     }
     private void OnApplicationPause(bool pause)
     {

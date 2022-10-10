@@ -96,7 +96,7 @@ public class ServerMenu : MonoBehaviour
         int ping = packet.ReadInt(); //TODO: look into how to calculate ping
 
         ServersPage serverPage;
-        if (serverIP == Client.MainServerIPStatic)
+        if (serverIP == Client.MainServerIP)
             serverPage = Instance.InternetServersPage;
         else
             serverPage = Instance.LANServersPage;

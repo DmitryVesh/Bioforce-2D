@@ -57,7 +57,7 @@ public class InternetServerScanner : MonoBehaviour
             Instance.MainServerSocket.OnDisconnectAction += Instance.OnMainServerSocketDisconnected;
             Instance.MainServerSocket.OnTimedOutAction += Instance.OnMainServerSocketTimedOut;
             //1.
-            Instance.MainServerSocket.Connect(Client.MainServerIPStatic, port);
+            Instance.MainServerSocket.Connect(Client.MainServerIP, port);
         }
         
         catch (Exception exception)
