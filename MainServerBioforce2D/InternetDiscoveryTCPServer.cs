@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using MainServer;
 using Shared;
-using DmitryNamespace;
+//using DmitryNamespace;
 using System.IO;
 using System.Diagnostics;
 
@@ -12,7 +12,7 @@ namespace MainServerBioforce2D
 {
     class InternetDiscoveryTCPServer
     {
-        public const string MainServerIP = "18.134.197.3";
+        public static string MainServerIP { get; private set; } = "18.134.197.3";
         //public const string MainServerIP = "127.0.0.1"; // Used for testing
 
         public static string GameVersionLatest { get; set; } = "1.0.2" ; //Default Val
@@ -28,15 +28,19 @@ namespace MainServerBioforce2D
         public static Dictionary<string, GameServerProcess> GameServerDict { get; set; } = new Dictionary<string, GameServerProcess>();
 
         private static Queue<int> PortQueue { get; set; }
-        private static int NumServers { get; set; } = 100;
-        
-        private static BinaryTree<string> IPsConnected = new BinaryTree<string>(true);
+        public const int NumMaxServers = 100;
+        public static int GetMinPort(int port) => 
+            port + 1;
+        public static int GetMaxPort(int port) =>
+            GetMinPort(port) + NumMaxServers - 1;
+
+        //private static BinaryTree<string> IPsConnected = new BinaryTree<string>(true);
+        private static List<string> IPsConnected = new List<string>();
 
         private static List<int> PortsAvailable()
         {
-            int minPort = PortNum + 10, maxPort = minPort + NumServers - 1;
             List<int> ports = new List<int>();
-            for (int port = minPort; port < maxPort; port++)
+            for (int port = GetMinPort(PortNum); port < GetMaxPort(PortNum); port++)
                 ports.Add(port);
             return ports;
         }
@@ -84,8 +88,13 @@ namespace MainServerBioforce2D
         private static void MakePersistentServer() =>
             MakeGameServer(serverName: "Welcome", maxNumPlayers: 16, mapName: "Level 1", currentNumPlayers: 0, ping: 0, timeOutSeconds: 30, isServerPermanent: true);
 
-        public static void StartServer(int port, string version)
+        public static void StartServer(int port, string version, string ip)
         {
+            if (!IPAddress.TryParse(ip, out _))
+                throw new FormatException("Invalid Main IP address given");
+
+            MainServerIP = ip;
+
             GameVersionLatest = version;
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CloseServer);
             PortNum = port;
@@ -132,7 +141,7 @@ namespace MainServerBioforce2D
             if (PortQueue.Count != 0)
             {
                 int gamePort = PortQueue.Dequeue();
-                return (gamePort, gamePort + NumServers);
+                return (gamePort, gamePort + NumMaxServers);
             }
             else
                 return (-1, -1);
@@ -157,7 +166,8 @@ namespace MainServerBioforce2D
 
                 try
                 {
-                    if (IPsConnected.NumNodes == 0)
+                    int ipCount = IPsConnected.Count;
+                    if (ipCount == 0)
                         IPsConnected.Add(ip);
 
                     if (!IPsConnected.Contains(ip))
@@ -165,7 +175,7 @@ namespace MainServerBioforce2D
 
                     using (StreamWriter sw = new StreamWriter("IPs.txt", false))
                     {
-                        sw.WriteLine(IPsConnected.NumNodes);
+                        sw.WriteLine(ipCount);
                     }
                 }
                 catch (Exception e)

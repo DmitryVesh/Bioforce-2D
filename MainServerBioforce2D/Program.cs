@@ -19,28 +19,46 @@ namespace MainServerBioforce2D
 
         public static string GameServerFileName { get; private set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="args">GameServer filename (string), is test build (bool), version num (string), main ip (string)</param>
+        /// <exception cref="Exception"></exception>
         static void Main(string[] args)
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-
-            if (args.Length == 3)
+            if (args.Length == 1 && args[0].ToLower() == "help")
             {
-                GameServerFileName = args[0];
-                bool isTestBuild = bool.Parse(args[1]);
-                string version = args[2];
-
-                Output.Init(version);
-
-                PortInUse = isTestBuild ? PortTesting : PortRelease;
-                InternetDiscoveryTCPServer.StartServer(PortInUse, version);
-
-                Thread mainThread = new Thread(new ThreadStart(MainThread));
-                mainThread.Start();
+                string message =
+                    "To start Main Server:" +
+                    "\n\tGameServer filename (string), is test build (bool), version num (string), main ip (string)" +
+                    "\n\te.g. \"GameServer.exe\"      , true                , \"1.0.3\"             , \"127.0.0.1\"  " +
+                    "\n\n" +
+                    "Ports used:" +
+                    $"\n\tRelease {PortRelease} - {InternetDiscoveryTCPServer.GetMaxPort(PortRelease)}" +
+                    $"\n\tTesting {PortTesting} - {InternetDiscoveryTCPServer.GetMaxPort(PortTesting)}";
+                Console.WriteLine(message);
+                return;
             }
-            else
+            else if (args.Length != 4)
             {
-                throw new Exception("Not entered the Proper args... Need to Enter \"GameServer file name\", isTesting either \"true\" or \"false\", \"version number\" to start in MainServer args...");
+                throw new Exception(
+                    "Not entered the Proper args..." +
+                    "\nRun program with \"help\" as argument");               
             }
+
+            GameServerFileName = args[0];
+            bool isTestBuild = bool.Parse(args[1]);
+            string version = args[2];
+            string mainIP = args[3];
+
+            Output.Init(version);
+
+            PortInUse = isTestBuild ? PortTesting : PortRelease;
+            InternetDiscoveryTCPServer.StartServer(PortInUse, version, mainIP);
+
+            Thread mainThread = new Thread(new ThreadStart(MainThread));
+            mainThread.Start();
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs args)

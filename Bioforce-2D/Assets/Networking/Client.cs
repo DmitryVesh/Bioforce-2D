@@ -7,6 +7,8 @@ using System.Net.Sockets;
 using UnityEngine;
 using UnityEngine.Output;
 using UnityEngine.Singleton;
+using UnityEngine.SceneManagement;
+using TMPro;
 
 public class Client : MonoBehaviour
 {
@@ -30,7 +32,8 @@ public class Client : MonoBehaviour
     [SerializeField] private bool IsTesting = false;
 
     public static int PortNumGame { get; private set; }
-    public const string MainServerIP = "18.134.197.3";
+    public static string MainServerIPStatic;
+    [SerializeField] public string MainServerIP = "18.134.197.3";
     //public const string MainServerIP = "127.0.0.1";
 
     public byte ClientID { get; set; } = 0;
@@ -353,11 +356,35 @@ public class Client : MonoBehaviour
         }
     }
 
-    
+
+    [SerializeField] private GameObject Canvas_TestingIP;
+    [SerializeField] private TMP_InputField InputField_TestingIP;
 
     private void Awake()
     {
+        MainServerIPStatic = MainServerIP;
+        SceneManager.sceneLoaded += OnSceneChange;          
+
         Singleton.Init(ref instance, this);
+    }
+    public void On_InputField_Change(string input)
+    {
+        MainServerIP = input;
+        MainServerIPStatic = input;
+    }
+    private void OnSceneChange(Scene scene, LoadSceneMode _)
+    {
+        if (scene != SceneManager.GetSceneByName(GameManager.SceneMainMenuName)) //IP field should be hidden if not Main Menu scene
+        {
+            Canvas_TestingIP.SetActive(false);
+            return;
+        }
+
+        if (!IsTesting) //IP field should't be visible if not testing/in release mode
+            return;
+
+        //Scene is Main Menu, and IsTesting
+        Canvas_TestingIP.SetActive(true);
     }
 
     bool shouldSendMoveState = false;
@@ -497,6 +524,8 @@ public class Client : MonoBehaviour
     }
     private void Start()
     {
+        InputField_TestingIP.text = MainServerIPStatic;
+
         GameStateManager.ServerShuttingDown += Disconnect;
     }
 

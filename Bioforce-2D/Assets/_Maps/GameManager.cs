@@ -9,6 +9,8 @@ using Shared;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get => instance; }
+
+    public const string SceneMainMenuName = "Main Menu";
     private static GameManager instance;
 
     public static Dictionary<byte, PlayerManager> PlayerDictionary { get; set; }
@@ -178,7 +180,7 @@ public class GameManager : MonoBehaviour
         {
             RemoveAllPlayers();
             ScoreboardManager.Instance.DeleteAllEntries();
-            SwitchScene("Main Menu");
+            SwitchScene(SceneMainMenuName);
         });
         
     }
