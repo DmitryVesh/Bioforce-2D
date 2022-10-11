@@ -20,13 +20,14 @@ public class Crosshair : MonoBehaviour
     {
         Singleton.Init(ref instance, this);
 
-        Animator = GetComponent<Animator>();
-        
-        if (GameManager.Instance.IsMobileSupported)
+        Animator = GetComponent<Animator>();           
+    }
+    private void Start()
+    {
+        if (GameManager.IsMobileSupported)
             gameObject.SetActive(false);
 
         GameManager.ShowMouse(false);
-
         
     }
     private void Update()

@@ -13388,11 +13388,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mobile Safe Canvas Overlay
       objectReference: {fileID: 0}
-    - target: {fileID: 5158323510185364214, guid: d7cd1c90e8a1c994d8971f46862daf52,
-        type: 3}
-      propertyPath: m_SortingOrder
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6149660221655032575, guid: d7cd1c90e8a1c994d8971f46862daf52,
         type: 3}
       propertyPath: m_Pivot.x
@@ -13496,11 +13491,6 @@ PrefabInstance:
     - target: {fileID: 6149660221655032575, guid: d7cd1c90e8a1c994d8971f46862daf52,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7476930659599891471, guid: d7cd1c90e8a1c994d8971f46862daf52,
-        type: 3}
-      propertyPath: m_UiScaleMode
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
