@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class LocalPlayerGun : NonLocalPlayerGun, ILocalPlayerGun
 {
@@ -80,14 +81,26 @@ public class LocalPlayerGun : NonLocalPlayerGun, ILocalPlayerGun
         //ClientSend.ArmPositionAndRotation(currentPosition, currentRotation);
     }
 
+    
     protected virtual void AimWherePointing()
     {
-        Vector2 difference = MainCamera.ScreenToWorldPoint(Input.mousePosition) - ArmsTransform.position;
-
+        Vector3 difference = GetDifference(Input.mousePosition, ArmsTransform.position.z, MainCamera); 
+        difference -= ArmsTransform.position;                
         difference.Normalize();        
 
         Aim(difference.x, difference.y);
         LastAimVector = difference;
+    }
+    private Vector3 GetDifference(Vector3 mousePosition, float gameZ, Camera gameCam)
+    {
+        if (gameCam.orthographic)
+            return gameCam.ScreenToWorldPoint(mousePosition);
+
+        Ray ray = gameCam.ScreenPointToRay(mousePosition);
+        Plane xy = new Plane(Vector3.forward, new Vector3(0, 0, gameZ));
+        //float distance;
+        xy.Raycast(ray, out float distance);
+        return ray.GetPoint(distance);
     }
 
     protected void Aim(float x, float y)

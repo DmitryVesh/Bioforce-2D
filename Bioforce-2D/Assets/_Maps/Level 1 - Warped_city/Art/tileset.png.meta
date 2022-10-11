@@ -102,7 +102,7 @@ TextureImporter:
       213: 1254416349265289137
     second: ladder_top
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -123,6 +123,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -132,8 +133,8 @@ TextureImporter:
   textureSettings:
     serializedVersion: 2
     filterMode: 0
-    aniso: -1
-    mipBias: -100
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -154,11 +155,14 @@ TextureImporter:
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -210,6 +214,18 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -926,6 +942,40 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      ladder_top: 1254416349265289137
+      apartment_middle_1: 3833438497634056087
+      house_right_piece: 5201218927278278882
+      guard_small: 2202414065474253827
+      air_conditioning: -7696484177309088452
+      platform: 4919976617650649624
+      electrical_box: 7984269553401300165
+      electrical_wire_short: -4408082426781722240
+      ground_complete: -5637989647043893016
+      ground_long: -1596923510250898573
+      guard_long: 678903956739284679
+      ground_short: -4930389786618171306
+      ladder_bottom: 842120776065023159
+      electrical_wire_long: -252677984351060937
+      apartment_middle_0: -2852099825201978738
+      house_left_piece: -8098121715625606529
+      apartment_right_piece: -2337002675871526453
+      apartment_window_1: -815689794397191194
+      racks: 5354088283866942749
+      ground_left: 7830253056425364858
+      ground_right: -6805661040853493950
+      pipe_straight: 4629844260555783389
+      antena: -2702119876451896551
+      electrical_panel: 4094421522030285838
+      pipe_curved: 3144231337061263981
+      house_window: 838330171609262272
+      apartment_left_piece_2: -1822467073976326668
+      pipe_short: -8302228234173314100
+      apartment_left_piece_0: 6792381415555325339
+      apartment_middle_2: -2214406016787688364
+      apartment_window_0: 30557399910530418
+      apartment_window_2: 2324806067284048125
+      apartment_left_piece_1: -8393531267872382789
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

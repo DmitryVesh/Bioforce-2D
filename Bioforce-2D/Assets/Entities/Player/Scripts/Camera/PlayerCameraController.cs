@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerCameraController : MonoBehaviour
 {
     [SerializeField] private GameObject CinemachineCamera;
-    private CinemachineConfiner CameraConfiner { get; set; }
+    private CinemachineConfiner2D CameraConfiner { get; set; }
     private CinemachineFramingTransposer CameraTransposer { get; set; }
     private CinemachineVirtualCamera CameraVirtual { get; set; }
 
@@ -24,7 +24,7 @@ public class PlayerCameraController : MonoBehaviour
 
     private void Awake()
     {
-        CameraConfiner = CinemachineCamera.GetComponent<CinemachineConfiner>();
+        CameraConfiner = CinemachineCamera.GetComponent<CinemachineConfiner2D>();
         CameraConfiner.m_BoundingShape2D = CameraBoundries.Instance.CameraCollider;
                         
         CameraVirtual = CinemachineCamera.GetComponent<CinemachineVirtualCamera>();

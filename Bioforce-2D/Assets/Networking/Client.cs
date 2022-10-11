@@ -32,7 +32,7 @@ public class Client : MonoBehaviour
     [SerializeField] private bool IsTesting = false;
 
     public static int PortNumGame { get; private set; }
-    public static string MainServerIP;
+    public static string MainServerIP = "192.168.0.42";
     //[SerializeField] public string MainServerIP = "18.134.197.3";
     //public const string MainServerIP = "127.0.0.1";
 
