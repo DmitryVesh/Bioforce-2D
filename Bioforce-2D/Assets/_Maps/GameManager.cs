@@ -15,7 +15,8 @@ public class GameManager : MonoBehaviour
 
     public static Dictionary<byte, PlayerManager> PlayerDictionary { get; set; }
 
-    [SerializeField] private bool TestingTouchInEditor = false;
+    [SerializeField] private bool testingTouchInEditor = false;
+    public static bool TestingTouchInEditor { get; private set; } = false;
     [SerializeField] private GameObject LocalPlayerPrefab;
     [SerializeField] private GameObject PlayerPrefab;
     [SerializeField] private GameObject MobileLocalPlayerPrefab;
@@ -28,7 +29,7 @@ public class GameManager : MonoBehaviour
     
     public event PlayerDisconnected OnPlayerDisconnected;
 
-    public bool IsMobileSupported { get; private set; }
+    public static bool IsMobileSupported { get; private set; } = false;
     public bool InGame { get; set; }
 
     public delegate void OnPause(bool pause);
@@ -69,6 +70,8 @@ public class GameManager : MonoBehaviour
         PlayerDictionary = new Dictionary<byte, PlayerManager>();
         ConfyMouse();
         IsMobileSupported = CheckIfOnMobile();
+
+        TestingTouchInEditor = testingTouchInEditor;
 
         GameStateManager.GameEnded += RemoveAllPlayers;
     }
@@ -206,15 +209,58 @@ public class GameManager : MonoBehaviour
     
     private bool CheckIfOnMobile()
     {
-        bool result;
         RuntimePlatform platform = Application.platform;
 
-        if (TestingTouchInEditor && (platform.Equals(RuntimePlatform.WindowsEditor) || platform.Equals(RuntimePlatform.OSXEditor)))
-            result = true;
-        else if (platform.Equals(RuntimePlatform.IPhonePlayer) || platform.Equals(RuntimePlatform.Android) || platform.Equals(RuntimePlatform.Lumin))
-            result = true;
-        else
-            result = false;
-        return result;
+        switch (platform)
+        {
+            //Touch Platforms
+            case RuntimePlatform.IPhonePlayer:
+            case RuntimePlatform.Android:
+            case RuntimePlatform.Lumin:
+                return true;
+
+                
+            //Editor Platforms, that should be able to test touch controls
+            case RuntimePlatform.WindowsEditor:
+            case RuntimePlatform.OSXEditor:
+            case RuntimePlatform.LinuxEditor:
+                return testingTouchInEditor;
+                //return Instance is not null ? Instance.TestingTouchInEditor : false;
+
+
+            //All other platforms that shouldn't have touch controls
+            case RuntimePlatform.WindowsPlayer:                           
+            case RuntimePlatform.OSXPlayer:            
+            case RuntimePlatform.LinuxPlayer:
+            case RuntimePlatform.WebGLPlayer:
+
+            case RuntimePlatform.WSAPlayerX86:
+            case RuntimePlatform.WSAPlayerX64:
+            case RuntimePlatform.WSAPlayerARM:
+
+            case RuntimePlatform.PS4:
+            case RuntimePlatform.PS5:
+            case RuntimePlatform.XboxOne:
+            case RuntimePlatform.GameCoreXboxSeries:
+            case RuntimePlatform.GameCoreXboxOne:
+
+            case RuntimePlatform.tvOS:
+            case RuntimePlatform.Switch:
+            case RuntimePlatform.Stadia:
+            case RuntimePlatform.CloudRendering:
+
+            case RuntimePlatform.EmbeddedLinuxArm64:
+            case RuntimePlatform.EmbeddedLinuxArm32:
+            case RuntimePlatform.EmbeddedLinuxX64:                  
+            case RuntimePlatform.EmbeddedLinuxX86:
+
+            case RuntimePlatform.WindowsServer:                  
+            case RuntimePlatform.LinuxServer:                  
+            case RuntimePlatform.OSXServer:
+                return false;                                                 
+                  
+            default:
+                return false;
+        }               
     }
 }

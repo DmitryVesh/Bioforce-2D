@@ -163,6 +163,7 @@
     <Compile Include="Assets\UI\PauseMenu\Scripts\SpinningBallsLoading.cs" />
     <Compile Include="Assets\UI\Screen Overlays\Scripts\HitOverlay.cs" />
     <Compile Include="Assets\UI\PauseMenu\Scripts\PauseManager.cs" />
+    <Compile Include="Assets\Publishing Assets\MobileSafeCanvasOverlay.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />
