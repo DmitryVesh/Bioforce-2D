@@ -50,7 +50,7 @@ public class MenuButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHand
     }
     private void Start()
     {
-        if (!AppearInMobile && GameManager.Instance.IsMobileSupported)
+        if (!AppearInMobile && GameManager.IsMobileSupported)
             gameObject.SetActive(false);
     }
     private void Update()
