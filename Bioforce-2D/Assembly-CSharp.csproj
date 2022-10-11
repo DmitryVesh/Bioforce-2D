@@ -130,6 +130,7 @@
     <Compile Include="Assets\UI\TabMenu\ServerMenu\Scripts\TabGroupServerSort.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Movement\Networking\IWalkingPlayer.cs" />
     <Compile Include="Assets\Publishing Assets\Monetization\UnityMonetization.cs" />
+    <Compile Include="Assets\Publishing Assets\MobileSafeCanvasOverlay.cs" />
     <Compile Include="Assets\UI\Chat\InGameChat.cs" />
     <Compile Include="Assets\UI\IgnoreParentRotation.cs" />
     <Compile Include="Assets\Entities\Player\Scripts\Camera\DetachFromParent.cs" />
@@ -163,7 +164,6 @@
     <Compile Include="Assets\UI\PauseMenu\Scripts\SpinningBallsLoading.cs" />
     <Compile Include="Assets\UI\Screen Overlays\Scripts\HitOverlay.cs" />
     <Compile Include="Assets\UI\PauseMenu\Scripts\PauseManager.cs" />
-    <Compile Include="Assets\Publishing Assets\MobileSafeCanvasOverlay.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />
