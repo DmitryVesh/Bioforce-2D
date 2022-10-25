@@ -256,7 +256,8 @@ public class ServerMenu : MonoBehaviour
 
         KeyServerFields.SetActive(true);
         if (SelectedServersPage == LANServersPage)
-            StartCoroutine(LANServerScanner.GetLANServerAddressUDPBroadcast(Client.PortNumLANDiscover));
+            return;
+            //StartCoroutine(LANServerScanner.GetLANServerAddressUDPBroadcast(Client.PortNumLANDiscover));
         else
             InternetServerScanner.ContactMainServerForServers(Client.PortNumInternetToConnectTo);
 

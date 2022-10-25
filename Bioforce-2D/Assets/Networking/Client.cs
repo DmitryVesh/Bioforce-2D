@@ -18,9 +18,9 @@ public class Client : MonoBehaviour
     public static int DataBufferSize = 4096;
 
     public const int PortNumInternetDiscover = 28020;
-    public const int PortNumLANDiscover = 28021;
+    //public const int PortNumLANDiscover = 28021;
 
-    public const int PortNumInternetDiscoverTesting = 28420;
+    public const int PortNumInternetDiscoverTesting = 28030;
 
     public static int PortNumInternetToConnectTo
     {
@@ -32,7 +32,9 @@ public class Client : MonoBehaviour
     [SerializeField] private bool IsTesting = false;
 
     public static int PortNumGame { get; private set; }
-    public static string MainServerIP = "192.168.0.42";
+    private const string DefaultServerIP = "139.162.246.132";
+    public static string MainServerIP = DefaultServerIP;
+    private const string MainServerPlayerPrefKey = "MainServerIP";
     //[SerializeField] public string MainServerIP = "18.134.197.3";
     //public const string MainServerIP = "127.0.0.1";
 
@@ -365,10 +367,11 @@ public class Client : MonoBehaviour
         Singleton.Init(ref instance, this);
 
         SceneManager.sceneLoaded += OnSceneChange;          
-    }
+    }    
     public void On_InputField_Change(string input)
     {
         MainServerIP = input;
+        PlayerPrefs.SetString(MainServerPlayerPrefKey, MainServerIP);
     }
     private void OnSceneChange(Scene scene, LoadSceneMode _)
     {
@@ -522,9 +525,15 @@ public class Client : MonoBehaviour
     }
     private void Start()
     {
+        MainServerIP = PlayerPrefs.GetString(MainServerPlayerPrefKey, DefaultServerIP);
         InputField_TestingIP.text = MainServerIP;
 
         GameStateManager.ServerShuttingDown += Disconnect;
+
+        if (!IsTesting)
+            Canvas_TestingIP.SetActive(false);
+        else
+            Canvas_TestingIP.SetActive(true);
     }
 
     

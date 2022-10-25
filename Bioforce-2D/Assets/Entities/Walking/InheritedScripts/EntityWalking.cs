@@ -40,7 +40,7 @@ public abstract class EntityWalking : MonoBehaviour, IWalking
         Hitbox = ModelObject.GetComponent<CapsuleCollider2D>();
     }
     private void Start()
-    {
+    {      
         RealPosition = ModelObject.transform.position;
         RealRotation = ModelObject.transform.rotation;
         ShouldLerpPosition = false;

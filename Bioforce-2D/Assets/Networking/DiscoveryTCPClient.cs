@@ -37,7 +37,7 @@ public abstract class DiscoveryTCPClient
 
             ReceiveBuffer = new byte[DataBufferSize];
             Socket.BeginConnect(ipAddressConnectTo, portNum, ConnectCallback, Socket);
-            Output.WriteLine($"A DiscoveryTCPClient trying to connect to: {ipAddressConnectTo}...");
+            Output.WriteLine($"A DiscoveryTCPClient trying to connect to: {ipAddressConnectTo}:{portNum}...");
         }
         catch (Exception exception)
         {

@@ -10,8 +10,8 @@ namespace MainServerBioforce2D
         public const int Ticks = 30;
         public const double MillisecondsInTick = (double)1000 / Ticks;
 
-        const int PortRelease = 28020;
-        const int PortTesting = 28420;
+        static int PortRelease = 28020;
+        static int PortTesting = PortRelease + InternetDiscoveryTCPServer.NumMaxServers + 1;
 
         static int PortInUse;
 
@@ -27,39 +27,79 @@ namespace MainServerBioforce2D
         static void Main(string[] args)
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-            if (args.Length == 1 && args[0].ToLower() == "help")
+
+
+            string arg0;
+            string arg1;
+            //string arg2;
+            string message;
+            switch (args.Length)
             {
-                string message =
-                    "To start Main Server:" +
-                    "\n\tGameServer filename (string), is test build (bool), version num (string), main ip (string)" +
-                    "\n\te.g. \"GameServer.exe\"      , true                , \"1.0.3\"             , \"127.0.0.1\"  " +
-                    "\n\tGameServer.exe true 1.0.3 192.168.0.8" +
-                    "\n\n" +
-                    "Ports used:" +
-                    $"\n\tRelease {PortRelease} - {InternetDiscoveryTCPServer.GetMaxPort(PortRelease)}" +
-                    $"\n\tTesting {PortTesting} - {InternetDiscoveryTCPServer.GetMaxPort(PortTesting)}";
-                Console.WriteLine(message);
-                return;
+                case 1:
+                    arg0 = args[0].ToLower();
+                    if (arg0 == "help")
+                    {
+                        message = "" +
+                            "List of available commands:" +
+                            "\n" +
+                            "\nhelp         - gets all commands available" +
+                            "\nhelp start   - gives example args to start MainServer" +
+                            "\nip           - gets server's Public IP address";
+                        Console.WriteLine(message);
+                        return;
+                    }
+                    else if (arg0 == "ip")
+                    {
+                        message = "" +
+                            $"{InternetDiscoveryTCPServer.GetServerIP()}";
+                        Console.WriteLine(message);
+                        return;
+                    }
+
+                    break;
+
+
+                case 2:
+                    arg0 = args[0].ToLower();
+                    arg1 = args[1].ToLower();
+                    if (args[0] != "help" || args[1] != "start")
+                        break;
+
+                    // help start
+                    message = "" +
+                        $"To start Main Server:" +
+                        $"\n\tGameServer filename (string), is test build (bool), version num (string)" +//, main ip (string)" +                        
+                        $"\n\tGameServer.{OS.GetAppExtension()} true 1.0.2" +// {InternetDiscoveryTCPServer.GetServerIP()}" +
+                        $"\n" +
+                        $"\nPorts used:" +
+                        $"\n\tRelease {PortRelease} - {InternetDiscoveryTCPServer.GetMaxPortInclusive(PortRelease)}" +
+                        $"\n\tTesting {PortTesting} - {InternetDiscoveryTCPServer.GetMaxPortInclusive(PortTesting)}";
+                    Console.WriteLine(message);
+                    return;
+
+
+                case 3:
+                    GameServerFileName = args[0];
+                    bool isTestBuild = bool.Parse(args[1]);
+                    string version = args[2];
+                    //string mainIP = args[3];
+
+                    Output.Init(version);
+
+                    PortInUse = isTestBuild ? PortTesting : PortRelease;
+                    InternetDiscoveryTCPServer.StartServer(PortInUse, version);
+
+                    Thread mainThread = new Thread(new ThreadStart(MainThread));
+                    mainThread.Start();
+                    return;
+
+                default:
+                    break;
             }
-            else if (args.Length != 4)
-            {
-                throw new Exception(
-                    "Not entered the Proper args..." +
-                    "\nRun program with \"help\" as argument");               
-            }
 
-            GameServerFileName = args[0];
-            bool isTestBuild = bool.Parse(args[1]);
-            string version = args[2];
-            string mainIP = args[3];
-
-            Output.Init(version);
-
-            PortInUse = isTestBuild ? PortTesting : PortRelease;
-            InternetDiscoveryTCPServer.StartServer(PortInUse, version, mainIP);
-
-            Thread mainThread = new Thread(new ThreadStart(MainThread));
-            mainThread.Start();
+            throw new Exception("" +
+              "Not entered the Proper args..." +
+              "\nRun program with \"help\" as argument to find list of commands");
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs args)

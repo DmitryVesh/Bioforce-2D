@@ -28,11 +28,13 @@ namespace MainServerBioforce2D
         public static Dictionary<string, GameServerProcess> GameServerDict { get; set; } = new Dictionary<string, GameServerProcess>();
 
         private static Queue<int> PortQueue { get; set; }
-        public const int NumMaxServers = 100;
-        public static int GetMinPort(int port) => 
+        public const int NumMaxServers = 9;
+        public static int GetMinPortInclusive(int port) => 
             port + 1;
-        public static int GetMaxPort(int port) =>
-            GetMinPort(port) + NumMaxServers - 1;
+        public static int GetMaxPortInclusive(int port) =>
+            GetMinPortInclusive(port) + NumMaxServers - 1;
+
+        
 
         //private static BinaryTree<string> IPsConnected = new BinaryTree<string>(true);
         private static List<string> IPsConnected = new List<string>();
@@ -40,7 +42,7 @@ namespace MainServerBioforce2D
         private static List<int> PortsAvailable()
         {
             List<int> ports = new List<int>();
-            for (int port = GetMinPort(PortNum); port < GetMaxPort(PortNum); port++)
+            for (int port = GetMinPortInclusive(PortNum); port <= GetMaxPortInclusive(PortNum); port++)
                 ports.Add(port);
             return ports;
         }
@@ -88,8 +90,49 @@ namespace MainServerBioforce2D
         private static void MakePersistentServer() =>
             MakeGameServer(serverName: "Welcome", maxNumPlayers: 16, mapName: "Level 1", currentNumPlayers: 0, ping: 0, timeOutSeconds: 30, isServerPermanent: true);
 
-        public static void StartServer(int port, string version, string ip)
+        internal static string GetServerIP()
         {
+            try
+            {   
+                return GetPublicIP();                
+            }
+            catch (Exception e)
+            {
+                Output.WriteLine(
+                    $"Error getting Public IP: " +
+                    $"\n{e}");
+
+                return IPAddress.Loopback.ToString();
+            }
+        }
+
+        private static string GetPublicIP()
+        {
+            var address = "";
+            var request = WebRequest.Create("http://checkip.dyndns.org/");
+            using (WebResponse response = request.GetResponse())
+            using (StreamReader stream = new StreamReader(response.GetResponseStream()))
+            {
+                address = stream.ReadToEnd();
+            }
+
+            var first = address.IndexOf("Address: ") + 9;
+            var last = address.LastIndexOf("</body>");
+            address = address.Substring(first, last - first);
+            return address;
+        }
+
+        //internal static string GetServerIPLocal()
+        //{
+        //    string hostName = Dns.GetHostName();
+        //    Dns.GetHostEntry
+        //    string IP = Dns.GetHostByName(hostName).AddressList[0].ToString();
+        //    Console.WriteLine("IP Address is : " + IP);
+
+        //}
+        public static void StartServer(int port, string version)
+        {
+            var ip = GetServerIP();
             if (!IPAddress.TryParse(ip, out _))
                 throw new FormatException("Invalid Main IP address given");
 
