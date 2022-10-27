@@ -1,6 +1,12 @@
 ===============================================================================================================================
 Version 1.0.3
 ---------------
+Main 
+
+
+===============================================================================================================================
+continued Version 1.0.2
+---------------
 
 Summary
 -------
@@ -8,15 +14,13 @@ Main goals is to;
 	1 Add server logging, so every WriteLine is logged into a txt file, later to be read
 	1 Make icon higher resolution
 	
-	0 Decrease the music volume / deafen the music as player's heart beat increases in bpm
 	1 Implement chat system - need to watch out for max num characters sent, as packetLen is 1B, so say only 100 Characters max
 
 	1 Implement actual deathmatch server like rules, timer for each round, after timer ends, the round ends showing scoreboard	
 	1 Add a ping in ms to local player screen
 	1 Add ping to the scoreboard, for each player
-	0 Add colors to ping values, e.g. green under 50MS, yellow equal/under 100MS, red over 100MS
 
-	0 Implement the App Tracking Transparency
+	0 
 	1 Clean up the splatter holder, bullets and other instantiated player related objects when reset game
 	1 Change the muzzleFlash, and Hit particles to be world space, so don't have to instanitated more than instance
 
@@ -38,7 +42,15 @@ Main goals is to;
 	0 Add splash images to android & ios versions
 
 Future tasks;							
+	version 1.0.3
+		Add bots
 	version 1.0.4
+		Add colors to ping values, e.g. green under 50MS, yellow equal/under 100MS, red over 100MS
+		Decrease the music volume / deafen the music as player's heart beat increases in bpm
+		Implement the App Tracking Transparency
+		
+		
+		Fix Player choosing color already taken, and becoming that color. Fix by asking server first for confirmation if player color can be used.
 		Add scene transitions
 		Add rule to timed deathmatch, if players draw, same end score, make the last players battle, whoever is the last player alive wins, or whoever gets the first kill?
 		Add player names to the player choose color menu above the player

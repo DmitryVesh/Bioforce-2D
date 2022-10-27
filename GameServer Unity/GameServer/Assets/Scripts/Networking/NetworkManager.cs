@@ -21,6 +21,15 @@ public class NetworkManager : MonoBehaviour
 
     internal PlayerServer InstantiatePlayer() =>
         Instantiate(PlayerPrefab).GetComponent<PlayerServer>();
+    internal void InstantiateBots(int maxNumPlayers)
+    {
+        for (int i = 0; i < maxNumPlayers; i++)
+            InstatiateBot();
+    }
+    internal void InstatiateBot()
+    {
+
+    }
 
     internal void AddPlayerDataToBeSynchronised(byte iD, ConstantlySentPlayerData playerData)
     {
@@ -37,4 +46,6 @@ public class NetworkManager : MonoBehaviour
             PlayerDatas.Clear();
         }
     }
+
+    
 }

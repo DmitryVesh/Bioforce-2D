@@ -65,7 +65,7 @@ public class GameStateManager : MonoBehaviour
 
         UpdateCurrentGameState(GameState.Playing);
 
-        EndGameInCoroutine = StartCoroutine(EndGameIn(RemainingGameTime));
+        EndGameInCoroutine = StartCoroutine(EndGameIn(RemainingGameTime));        
     }
     internal void TimeoutReset()
     {

@@ -234,6 +234,8 @@ namespace GameServer
                     ServerSend.SpawnPlayer(ID, player, false);
                 }
             }
+
+            //TOODO: spawning rest of bots for the player
         }
 
         public void Disconnect()

@@ -19,7 +19,6 @@ namespace GameServer
         public static bool IsServerPermanent { get; private set; }
 
         public static Dictionary<byte, ClientServer> ClientDictionary = new Dictionary<byte, ClientServer>();
-
         public static Dictionary<byte, ClientServer> NotConnectedClients = new Dictionary<byte, ClientServer>();
 
         private static TcpListener TCPListener { get; set; }
@@ -89,6 +88,9 @@ namespace GameServer
 
                 TimeOutTimer.Elapsed += TimeOutTimer_Elapsed;
                 TimeOutTimer.Start();
+
+                //TODO: Spawn in example bots, not actually starting game's scoreboard or timer
+                //Similar to Red Alert Main Menu screen fights
             }
             catch (Exception exception)
             {

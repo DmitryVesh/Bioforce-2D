@@ -26,6 +26,7 @@ namespace GameServer
                         GameStateManager.Instance.CurrentState == GameState.Waiting)
                     {
                         Server.ClientDictionary[clientID].SpawnOtherPlayersToConnectedUser();
+                        //TODO: Send existing bots
                         return;
                     }
                 }
@@ -75,9 +76,14 @@ namespace GameServer
             {
                 int colorIndex = packet.ReadInt();
                 GameStateManager.Instance.PlayerJoinedServer();
+                
                 Server.ClientDictionary[clientID].SendIntoGame(colorIndex);
                 
                 Output.WriteLine($"\tPlayer: {clientID} was sent into game.");
+
+                //Spawn in bots
+                //var botNames =                
+                Output.WriteLine($"\tBots were sent into game.");
             }
             catch (Exception e) { 
                 OutputPacketError(clientID, e);
