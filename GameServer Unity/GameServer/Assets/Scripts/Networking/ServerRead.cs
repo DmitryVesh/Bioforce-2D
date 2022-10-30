@@ -79,11 +79,7 @@ namespace GameServer
                 
                 Server.ClientDictionary[clientID].SendIntoGame(colorIndex);
                 
-                Output.WriteLine($"\tPlayer: {clientID} was sent into game.");
-
-                //Spawn in bots
-                //var botNames =                
-                Output.WriteLine($"\tBots were sent into game.");
+                Output.WriteLine($"\tPlayer: {clientID} was sent into game.");            
             }
             catch (Exception e) { 
                 OutputPacketError(clientID, e);

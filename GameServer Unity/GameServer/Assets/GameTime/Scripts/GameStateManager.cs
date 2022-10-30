@@ -33,6 +33,10 @@ public class GameStateManager : MonoBehaviour
     public Action OnServerRestart { get; set; } //Each ClientServer will subscribe to this so the player model is destroyed, and is taken back to AskPlayerDetails 
     public Action OnServerStop { get; set; }
     public Action OnServerShutdown { get; set; }
+
+    public Action OnPlayerJoinedGame { get; set; }
+    public Action OnPlayerLeftGame { get; set; }
+
     private Coroutine EndGameInCoroutine { get; set; }
     
 
@@ -55,6 +59,8 @@ public class GameStateManager : MonoBehaviour
 
     internal void PlayerJoinedServer()
     {
+        OnPlayerJoinedGame?.Invoke();
+
         if (CurrentState != GameState.Waiting && CurrentState != GameState.Restarting) //Prevents more than 1 call
             return;
         

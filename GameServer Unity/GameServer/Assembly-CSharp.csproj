@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -53,6 +53,9 @@
     <UnityVersion>2020.3.26f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="Assets\Items\Scripts\PickUpItem.cs" />
     <Compile Include="Assets\Scripts\Networking\MainServerCommsRead.cs" />
     <Compile Include="Assets\Scripts\Networking\PlayerColor.cs" />
@@ -64,6 +67,7 @@
     <Compile Include="Assets\Scripts\Testing\FrameRateTesting.cs" />
     <Compile Include="Assets\Items\Scripts\AdrenalinePickup.cs" />
     <Compile Include="Assets\Scripts\Networking\DiscoveryTCPClientServer.cs" />
+    <Compile Include="Assets\Bots\Scripts\BotManager.cs" />
     <Compile Include="Assets\Scripts\Networking\ServerProgram.cs" />
     <Compile Include="Assets\Scripts\Startup\ApplicationSetup.cs" />
     <Compile Include="Assets\GameTime\Scripts\GameStateManager.cs" />
@@ -75,12 +79,12 @@
     <Compile Include="Assets\Scripts\Networking\PlayerServer.cs" />
     <Compile Include="Assets\Scripts\Networking\ServerRead.cs" />
     <Compile Include="Assets\Scripts\Networking\Shared\ThreadManager.cs" />
+    <Compile Include="Assets\Bots\Scripts\Bot.cs" />
     <Compile Include="Assets\Items\Scripts\PickupItemsManager.cs" />
     <Compile Include="Assets\Items\Scripts\HealthPickup.cs" />
     <Compile Include="Assets\Scripts\Networking\ConstantlySentPlayerData.cs" />
     <Compile Include="Assets\Scripts\Networking\MainServerComms.cs" />
-    <Compile Include="Assets\Bots\Scripts\BotManager.cs" />
-    <Compile Include="Assets\Bots\Scripts\Bot.cs" />
+    <Compile Include="Assets\RespawnPoint\RespawnPoint.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\OwnLibs\SingletonLib.dll" />

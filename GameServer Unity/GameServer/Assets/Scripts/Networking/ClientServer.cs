@@ -260,6 +260,7 @@ namespace GameServer
                 }
                 
                 Output.WriteLine($"\tPlayer: {ID} has disconnected.");
+                GameStateManager.Instance.OnPlayerLeftGame?.Invoke();
                 ServerSend.DisconnectPlayer(ID);
 
                 PlayerColor.FreeColor(Player.PlayerColorIndex, ID);

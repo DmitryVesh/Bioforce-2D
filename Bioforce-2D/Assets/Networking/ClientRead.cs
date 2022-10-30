@@ -232,8 +232,8 @@ public class ClientRead : MonoBehaviour
         { 
             byte iD = packet.ReadByte();
             Vector2 respawnPoint = packet.ReadUVector2WorldPosition();
-            GameManager.PlayerDictionary[iD].PlayerRespawned();
-            GameManager.PlayerDictionary[iD].SetRespawnPosition(respawnPoint);
+            GameManager.PlayerDictionary[iD]?.PlayerRespawned();
+            GameManager.PlayerDictionary[iD]?.SetRespawnPosition(respawnPoint);
         }
         catch (Exception e) {
             OutputPacketError(e);

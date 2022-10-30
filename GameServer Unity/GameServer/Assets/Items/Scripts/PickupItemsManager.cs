@@ -83,8 +83,7 @@ public class PickupItemsManager : MonoBehaviour
 
     private void Awake()
     {
-        Singleton.Init(ref instance, this);
-        
+        Singleton.Init(ref instance, this);        
     }
     
 
@@ -113,14 +112,6 @@ public class PickupItemsManager : MonoBehaviour
         PickupItem pickup = Instantiate(pickupObject, pickupHolder).GetComponent<PickupItem>();
         PickupsAvailable.Enqueue(pickup);
         pickup.SetActive(false);
-    }
-
-    private void AddPickupToDictionary(PickupItem pickup)
-    {
-        pickup.SetPosition(GetRandomPickupSpawnPoint());
-        pickup.PickupID = NumPickupsExistedCount;
-
-        PickupsDictionary.Add(NumPickupsExistedCount++, pickup);
     }
 
     private Vector2 GetRandomPickupSpawnPoint()
@@ -173,8 +164,13 @@ public class PickupItemsManager : MonoBehaviour
             return;
 
         PickupItem pickup = PickupsAvailable.Dequeue();
+
         pickup.SetActive(true);
-        AddPickupToDictionary(pickup);
+        pickup.SetPosition(GetRandomPickupSpawnPoint());
+
+        pickup.PickupID = NumPickupsExistedCount;
+        PickupsDictionary.Add(NumPickupsExistedCount++, pickup);
+        
         ServerSend.GeneratedPickupItem(pickup);
     }
 }
